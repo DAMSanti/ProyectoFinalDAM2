@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 // Define tus colores globales
-const Color colorMenuLight = Color.fromARGB(255, 103, 178, 228);
+const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
+const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);
+//0xFF6C7C88
+//0xFFACC2D5
+//0xFF96B2C8
+const Color colorTextoLight = Color.fromARGB(255, 108, 124, 136);
+const Color colorTextoDark = Color.fromARGB(255, 169, 231, 255);
+
+const Color colorMenuLight = Color.fromARGB(255, 150, 178, 200);
 const Color colorMenuDark = Color.fromARGB(255, 32, 56, 71);
-const Color colorFondoLight = Color.fromARGB(255, 220, 226, 230);
-const Color colorFondoDark = Color.fromARGB(255, 36, 37, 37);
-const Color colorTextoLight = Colors.black;
-const Color colorTextoDark = Color.fromARGB(255, 255, 255, 255);
 
 // Tema claro
 final ThemeData lightTheme = ThemeData(
@@ -19,7 +23,7 @@ final ThemeData lightTheme = ThemeData(
   ),
   appBarTheme: AppBarTheme(
     color: colorMenuLight,
-    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20),
   ),
 );
 
@@ -34,6 +38,6 @@ final ThemeData darkTheme = ThemeData(
   ),
   appBarTheme: AppBarTheme(
     color: colorMenuDark,
-    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20),
   ),
 );

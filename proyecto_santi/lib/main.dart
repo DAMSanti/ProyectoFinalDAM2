@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/utils/theme.dart';
-import 'package:proyecto_santi/views/login_view.dart';
+import 'package:proyecto_santi/views/login/login_view.dart';
 
 void main() {
   runApp(const MyApp());
