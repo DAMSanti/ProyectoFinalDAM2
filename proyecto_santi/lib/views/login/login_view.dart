@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'login_form.dart';
 import 'login_buttons.dart';
+import 'package:proyecto_santi/components/AppBar.dart';
 
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -31,7 +32,7 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancelar'),
+              child: Text('Aceptar'),
             ),
           ],
         );
@@ -54,44 +55,19 @@ class _LoginViewState extends State<LoginView> {
     });
 
     if (profesor != null) {
-      // Autenticación exitosa
-      print('Autenticación exitosa');
-      // Navegar a la siguiente pantalla o realizar alguna acción
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
-      setState(() {
-        showLoginDialog();
-      });
+      showLoginDialog();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(56.0),
-        child: Stack(
-          children: [
-            AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.brightness_6),
-                onPressed: widget.onToggleTheme,
-              ),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 32.0),
-              child: Center(
-                child: Text('Login',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                    )),
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: CustomAppBar(
+          onToggleTheme: widget.onToggleTheme,
+          title: 'Login',
+          showLogoutButton: false),
       body: OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {

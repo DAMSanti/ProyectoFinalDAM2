@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/utils/theme.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
+import 'package:proyecto_santi/views/home/home_view.dart';
+import 'package:proyecto_santi/utils/theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -26,12 +27,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ACEX App',
+      title: 'Flutter Demo',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: _themeMode,
-      home: LoginView(
-          onToggleTheme: _toggleTheme), // Pasa la función de cambio de tema
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginView(onToggleTheme: _toggleTheme),
+        '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
+      },
     );
   }
 }

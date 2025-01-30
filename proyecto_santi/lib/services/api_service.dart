@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:proyecto_santi/models/actividad.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'http://4.233.223.75:8080/api/'));
@@ -42,6 +43,26 @@ class ApiService {
     } catch (e) {
       print('Error: $e');
       return null;
+    }
+  }
+
+  Future<List<Actividad>> fetchActivities() async {
+    try {
+      final response = await _dio.get('/actividad');
+      if (response.statusCode == 500) {
+        throw Exception("Internal Server Error. Please try again later.");
+      } else if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        final currentDate = DateTime.now();
+        return data.map((json) => Actividad.fromJson(json)).where((actividad) {
+          final activityDate = DateTime.parse(actividad.fini);
+          return activityDate.isAfter(currentDate);
+        }).toList();
+      } else {
+        throw Exception("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Exception: ${e.toString()}");
     }
   }
   // Puedes agregar más métodos para PUT, DELETE, etc.
