@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/services/api_service.dart';
 
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -12,6 +13,9 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   bool isLoading = false;
   bool showDialog = false;
+  final ApiService _apiService = ApiService();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   void showLoginDialog() {
     // Implementa la lógica de autenticación aquí
@@ -28,6 +32,33 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
+  void _login() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    // Implementa la lógica de autenticación aquí
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    final profesor = await _apiService.authenticate(username, password);
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (profesor != null) {
+      // Autenticación exitosa
+      print('Autenticación exitosa');
+      // Navegar a la siguiente pantalla o realizar alguna acción
+    } else {
+      // Autenticación fallida
+      setState(() {
+        showDialog = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,12 +71,14 @@ class _LoginViewState extends State<LoginView> {
       ),
       body: Stack(
         children: [
-          Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: Center(
+          SingleChildScrollView(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 32),
                   Image.asset(
                     'assets/logorecortado.png',
                     width: 300,
@@ -58,6 +91,34 @@ class _LoginViewState extends State<LoginView> {
                       fontSize: 30,
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
+                  ),
+                  SizedBox(height: 32),
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                    ),
+                    obscureText: true,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      textStyle: TextStyle(fontSize: 16),
+                    ),
+                    child: Text('Login'),
                   ),
                   SizedBox(height: 32),
                   ElevatedButton(
@@ -81,6 +142,7 @@ class _LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
+                  SizedBox(height: 32),
                 ],
               ),
             ),
