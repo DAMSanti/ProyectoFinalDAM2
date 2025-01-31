@@ -7,13 +7,13 @@ import 'package:proyecto_santi/components/AppBar.dart';
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
 
-  const LoginView({Key? key, required this.onToggleTheme}) : super(key: key);
+  const LoginView({super.key, required this.onToggleTheme});
 
   @override
-  _LoginViewState createState() => _LoginViewState();
+  LoginViewState createState() => LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class LoginViewState extends State<LoginView> {
   bool isLoading = false;
   final ApiService _apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
@@ -50,6 +50,8 @@ class _LoginViewState extends State<LoginView> {
 
     final profesor = await _apiService.authenticate(username, password);
 
+    if (!mounted) return;
+
     setState(() {
       isLoading = false;
     });
@@ -85,16 +87,13 @@ class _LoginViewState extends State<LoginView> {
       builder: (context, constraints) {
         double imageSize = constraints.maxWidth * 0.5;
         double padding = 16.0;
-        double fontSize = 30.0;
 
         if (constraints.maxWidth < 600) {
           imageSize = constraints.maxWidth * 0.6;
           padding = 12.0;
-          fontSize = 24.0;
         } else if (constraints.maxWidth < 400) {
           imageSize = constraints.maxWidth * 0.7;
           padding = 8.0;
-          fontSize = 20.0;
         }
 
         return Stack(
@@ -141,16 +140,13 @@ class _LoginViewState extends State<LoginView> {
       builder: (context, constraints) {
         double imageSize = constraints.maxHeight * 0.5;
         double padding = 16.0;
-        double fontSize = 30.0;
 
         if (constraints.maxHeight < 600) {
           imageSize = constraints.maxHeight;
           padding = 12.0;
-          fontSize = 24.0;
         } else if (constraints.maxHeight < 400) {
           imageSize = constraints.maxHeight * 0.7;
           padding = 8.0;
-          fontSize = 20.0;
         }
 
         return Row(
