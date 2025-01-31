@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
+import 'package:proyecto_santi/views/activity_detail_view.dart';
 import 'package:proyecto_santi/utils/theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
@@ -48,6 +49,20 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => LoginView(onToggleTheme: _toggleTheme),
         '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/activityDetail') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) {
+              return ActivityDetailView(
+                activityId: args['activityId'],
+                isDarkTheme: args['isDarkTheme'],
+              );
+            },
+          );
+        }
+        return null;
       },
     );
   }

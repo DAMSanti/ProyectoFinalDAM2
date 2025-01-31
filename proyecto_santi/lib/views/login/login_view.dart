@@ -56,11 +56,11 @@ class LoginViewState extends State<LoginView> {
       isLoading = false;
     });
 
-    if (profesor != null) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      showLoginDialog();
-    }
+    //if (profesor != null) {
+    Navigator.pushReplacementNamed(context, '/home');
+    //} else {
+    //showLoginDialog();
+    //}
   }
 
   @override
