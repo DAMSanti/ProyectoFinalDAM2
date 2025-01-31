@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
 import 'package:proyecto_santi/utils/theme.dart';
+import 'package:window_manager/window_manager.dart';
+import 'dart:io' show Platform;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions =
+        WindowOptions(minimumSize: Size(400, 750), title: 'ACEX');
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
   runApp(MyApp());
 }
 
@@ -27,7 +40,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ACEX',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: _themeMode,

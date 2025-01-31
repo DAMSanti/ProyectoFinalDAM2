@@ -20,11 +20,7 @@ class LoginButtons extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onLoginPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  textStyle: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium?.color),
                 ),
                 child: Text('Login'),
               ),
@@ -38,11 +34,7 @@ class LoginButtons extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onMicrosoftLoginPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  textStyle: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium?.color),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
