@@ -23,7 +23,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               icon: Icon(Icons.brightness_6),
               onPressed: onToggleTheme,
             ),
-            backgroundColor: Colors.transparent,
+            backgroundColor: !showLogoutButton
+                ? Colors.transparent
+                : Theme.of(context).primaryColor,
             elevation: 0,
             actions: showLogoutButton
                 ? [
