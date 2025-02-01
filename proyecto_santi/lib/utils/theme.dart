@@ -78,6 +78,14 @@ final ThemeData lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(8),
     ),
   ),
+  // DRAWER
+  drawerTheme: DrawerThemeData(
+    backgroundColor: colorFondoLight,
+  ),
+  colorScheme: ColorScheme.light(
+      primary: colorAccentLight,
+      secondary: colorFondoLight // Color específico para el DrawerHeader
+      ),
 );
 
 const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);

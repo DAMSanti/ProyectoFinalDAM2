@@ -5,10 +5,10 @@ class LoginButtons extends StatelessWidget {
   final VoidCallback onMicrosoftLoginPressed;
 
   const LoginButtons({
-    Key? key,
+    super.key,
     required this.onLoginPressed,
     required this.onMicrosoftLoginPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

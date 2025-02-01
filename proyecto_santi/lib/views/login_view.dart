@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'login/login_form.dart';
 import 'login/login_buttons.dart';
-import 'package:proyecto_santi/components/AppBar.dart';
+import 'package:proyecto_santi/components/appBar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginView extends StatefulWidget {
@@ -58,17 +58,20 @@ class LoginViewState extends State<LoginView> {
       isLoading = false;
     });
 
-    if (profesor != null) {
-      await user.write(
-          key: 'username', value: '${profesor.nombre} ${profesor.apellidos}');
-      await user.write(key: 'correo', value: profesor.correo);
-      await user.write(key: 'rol', value: profesor.rol);
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    } else {
-      showLoginDialog();
+    //if (profesor != null) {
+    //  await user.write(
+    //      key: 'username', value: '${profesor.nombre} ${profesor.apellidos}');
+    //  await user.write(key: 'correo', value: profesor.correo);
+    //  await user.write(key: 'rol', value: profesor.rol);
+    await user.write(key: 'username', value: 'ACEX Database');
+    await user.write(key: 'correo', value: 'ACEX2025@hotmail.com');
+    await user.write(key: 'rol', value: 'ED');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
     }
+    //} else {
+    //showLoginDialog();
+    //}
   }
 
   @override

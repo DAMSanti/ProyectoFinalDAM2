@@ -6,11 +6,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showMenuButton;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.onToggleTheme,
     required this.title,
     this.showMenuButton = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserInformation extends StatefulWidget {
-  const UserInformation({Key? key}) : super(key: key);
+  const UserInformation({super.key});
 
   @override
   _UserInformationState createState() => _UserInformationState();

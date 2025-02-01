@@ -41,3 +41,4 @@
 # Suppress warnings for missing classes
 -dontwarn com.google.errorprone.annotations.Immutable
 -dontwarn javax.annotation.concurrent.GuardedBy
+-dontwarn java.lang.reflect.AnnotatedType

@@ -5,7 +5,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 class CalendarView extends StatefulWidget {
   final List<Actividad> activities;
 
-  const CalendarView({Key? key, required this.activities}) : super(key: key);
+  const CalendarView({super.key, required this.activities});
 
   @override
   _CalendarViewState createState() => _CalendarViewState();

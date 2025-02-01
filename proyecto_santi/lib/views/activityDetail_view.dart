@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/photo.dart';
-import 'package:proyecto_santi/services/api_service.dart';
 
 class ActivityDetailView extends StatefulWidget {
   final int activityId;
   final bool isDarkTheme;
 
   const ActivityDetailView(
-      {Key? key, required this.activityId, required this.isDarkTheme})
-      : super(key: key);
+      {super.key, required this.activityId, required this.isDarkTheme});
 
   @override
   _ActivityDetailViewState createState() => _ActivityDetailViewState();
@@ -98,13 +96,13 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
                       margin: EdgeInsets.symmetric(horizontal: 8.0),
                       //child: Image.network(photo.urlFoto),
                     );
-                  }).toList(),
+                  }),
                   ...selectedImages.map((image) {
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 8.0),
                       //child: Image.file(File(image.path)),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

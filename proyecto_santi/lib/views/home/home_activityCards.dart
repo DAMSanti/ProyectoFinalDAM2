@@ -4,7 +4,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 class ActivityList extends StatelessWidget {
   final List<Actividad> activities;
 
-  const ActivityList({Key? key, required this.activities}) : super(key: key);
+  const ActivityList({super.key, required this.activities});
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +36,13 @@ class ActivityCardItem extends StatelessWidget {
   final NavigatorState navController;
 
   const ActivityCardItem({
-    Key? key,
+    super.key,
     required this.activityName,
     required this.activityDate,
     required this.activityStatus,
     required this.index,
     required this.navController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

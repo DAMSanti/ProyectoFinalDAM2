@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/AppBar.dart';
+import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
@@ -10,7 +10,7 @@ import 'package:proyecto_santi/views/home/home_user.dart';
 class HomeView extends StatefulWidget {
   final VoidCallback onToggleTheme;
 
-  const HomeView({Key? key, required this.onToggleTheme}) : super(key: key);
+  const HomeView({super.key, required this.onToggleTheme});
 
   @override
   _HomeViewState createState() => _HomeViewState();
@@ -54,7 +54,7 @@ class _HomeViewState extends State<HomeView> {
       child: Scaffold(
         appBar: CustomAppBar(
           onToggleTheme: widget.onToggleTheme,
-          title: 'Home',
+          title: 'Inicio',
         ),
         drawer: CustomDrawer(),
         body: FutureBuilder<List<Actividad>>(
