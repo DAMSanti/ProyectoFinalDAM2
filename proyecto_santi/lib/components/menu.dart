@@ -30,15 +30,24 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.home),
               title: Text('Inicio'),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/home');
+                if (ModalRoute.of(context)?.settings.name != '/home') {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/home');
+                } else {
+                  Navigator.pop(context);
+                }
               },
             ),
             ListTile(
               leading: Icon(Icons.event),
               title: Text('Actividades'),
               onTap: () {
-                Navigator.pop(context);
+                if (ModalRoute.of(context)?.settings.name != '/actividades') {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/actividades');
+                } else {
+                  Navigator.pop(context);
+                }
               },
             ),
             ListTile(
@@ -46,14 +55,18 @@ class CustomDrawer extends StatelessWidget {
               title: Text('Chat'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(context, '/chat');
               },
             ),
             ListTile(
               leading: Icon(Icons.map),
               title: Text('Mapa'),
               onTap: () {
-                Navigator.pop(context);
+                if (ModalRoute.of(context)?.settings.name != '/mapa') {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/mapa');
+                } else {
+                  Navigator.pop(context);
+                }
               },
             ),
             Spacer(),

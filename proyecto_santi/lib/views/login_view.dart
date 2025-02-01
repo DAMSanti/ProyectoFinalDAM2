@@ -161,37 +161,41 @@ class LoginViewState extends State<LoginView> {
           padding = 8.0;
         }
 
-        return Row(
+        return Stack(
           children: [
-            Container(
-              width: constraints.maxWidth * 0.5,
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Center(
-                child: Image.asset(
-                  'assets/logorecortado.png',
-                  width: imageSize,
-                  height: imageSize,
+            Row(
+              children: [
+                Container(
+                  width: constraints.maxWidth * 0.5,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/logorecortado.png',
+                      width: imageSize,
+                      height: imageSize,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Container(
-              width: constraints.maxWidth * 0.5,
-              color: Theme.of(context).scaffoldBackgroundColor,
-              padding: EdgeInsets.symmetric(horizontal: padding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  LoginForm(
-                    usernameController: _usernameController,
-                    passwordController: _passwordController,
+                Container(
+                  width: constraints.maxWidth * 0.5,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  padding: EdgeInsets.symmetric(horizontal: padding),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LoginForm(
+                        usernameController: _usernameController,
+                        passwordController: _passwordController,
+                      ),
+                      SizedBox(height: 12),
+                      LoginButtons(
+                        onLoginPressed: _login,
+                        onMicrosoftLoginPressed: showLoginDialog,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 12),
-                  LoginButtons(
-                    onLoginPressed: _login,
-                    onMicrosoftLoginPressed: showLoginDialog,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             if (isLoading)
               Center(

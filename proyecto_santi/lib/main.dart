@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/login_view.dart';
 import 'package:proyecto_santi/views/home_view.dart';
 import 'package:proyecto_santi/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activityList_view.dart';
 import 'package:proyecto_santi/utils/theme.dart';
+import 'package:proyecto_santi/views/map_view.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions =
@@ -18,6 +24,11 @@ void main() async {
       await windowManager.focus();
     });
   }
+/*
+  if (Platform.isWindows) {
+    GoogleMapsFlutterPlatform.instance.init('AIzaSyB7qlgt4eNBQ8_XoV4di1IJISwVe-OiD5Q');
+  }
+*/
   runApp(MyApp());
 }
 
@@ -49,6 +60,12 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => LoginView(onToggleTheme: _toggleTheme),
         '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
+        '/actividades': (context) => ActividadesListView(
+            onToggleTheme: _toggleTheme,
+            isDarkTheme: _themeMode == ThemeMode.dark),
+        '/mapa': (context) => MapView(
+            onToggleTheme: _toggleTheme,
+            isDarkTheme: _themeMode == ThemeMode.dark),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/activityDetail') {
@@ -57,7 +74,8 @@ class _MyAppState extends State<MyApp> {
             builder: (context) {
               return ActivityDetailView(
                 activityId: args['activityId'],
-                isDarkTheme: args['isDarkTheme'],
+                onToggleTheme: _toggleTheme,
+                isDarkTheme: _themeMode == ThemeMode.dark,
               );
             },
           );

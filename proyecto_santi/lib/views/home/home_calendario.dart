@@ -38,11 +38,56 @@ class _CalendarViewState extends State<CalendarView> {
     super.dispose();
   }
 
+  void _showActivityDetails(List<Actividad> actividades) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Actividades'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: actividades.map((actividad) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Título: ${actividad.titulo}'),
+                  Text('Fecha de inicio: ${actividad.fini}'),
+                  Text('Descripción: ${actividad.descripcion}'),
+                  SizedBox(height: 8),
+                ],
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TableCalendar<Actividad>(
+    return Center(
+      child: Container(
+        height: 375.0,
+        margin: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10.0,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: TableCalendar<Actividad>(
           firstDay: DateTime.utc(2020, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
           focusedDay: _focusedDay,
@@ -53,6 +98,7 @@ class _CalendarViewState extends State<CalendarView> {
               _focusedDay = focusedDay;
               _selectedEvents.value = _getEventsForDay(selectedDay);
             });
+            _showActivityDetails(_selectedEvents.value);
           },
           startingDayOfWeek: StartingDayOfWeek.monday,
           calendarFormat: _calendarFormat,
@@ -69,25 +115,7 @@ class _CalendarViewState extends State<CalendarView> {
             weekendStyle: TextStyle(fontSize: 12),
           ),
         ),
-        const SizedBox(height: 8.0),
-        Expanded(
-          child: ValueListenableBuilder<List<Actividad>>(
-            valueListenable: _selectedEvents,
-            builder: (context, value, _) {
-              return ListView.builder(
-                itemCount: value.length,
-                itemBuilder: (context, index) {
-                  final actividad = value[index];
-                  return ListTile(
-                    title: Text(actividad.titulo),
-                    subtitle: Text(actividad.fini),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

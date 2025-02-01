@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/photo.dart';
+import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/menu.dart';
 
 class ActivityDetailView extends StatefulWidget {
   final int activityId;
   final bool isDarkTheme;
+  final VoidCallback onToggleTheme;
 
   const ActivityDetailView(
-      {super.key, required this.activityId, required this.isDarkTheme});
+      {Key? key,
+      required this.activityId,
+      required this.isDarkTheme,
+      required this.onToggleTheme})
+      : super(key: key);
 
   @override
   _ActivityDetailViewState createState() => _ActivityDetailViewState();
@@ -53,9 +60,11 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Detalles de Actividad'),
+      appBar: CustomAppBar(
+        onToggleTheme: widget.onToggleTheme,
+        title: 'Detalles de Actividad',
       ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
