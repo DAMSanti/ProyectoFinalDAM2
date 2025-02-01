@@ -3,58 +3,44 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
   final String title;
-  final bool showLogoutButton;
+  final bool showMenuButton;
 
   const CustomAppBar({
     Key? key,
     required this.onToggleTheme,
     required this.title,
-    this.showLogoutButton = true,
+    this.showMenuButton = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(56.0),
-      child: Stack(
-        children: [
-          AppBar(
-            leading: IconButton(
-              icon: Icon(Icons.brightness_6),
-              onPressed: onToggleTheme,
+    return AppBar(
+      centerTitle: true,
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
-            backgroundColor: !showLogoutButton
-                ? Colors.transparent
-                : Theme.of(context).primaryColor,
-            elevation: 0,
-            actions: showLogoutButton
-                ? [
-                    IconButton(
-                      icon: Icon(Icons.logout),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/');
-                      },
-                    ),
-                  ]
-                : null,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 32.0),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
+      leading: showMenuButton
+          ? Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+            )
+          : null,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.brightness_6),
+          onPressed: onToggleTheme,
+        ),
+      ],
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(56.0);
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }

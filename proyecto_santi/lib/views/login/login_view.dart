@@ -3,6 +3,7 @@ import 'package:proyecto_santi/services/api_service.dart';
 import 'login_form.dart';
 import 'login_buttons.dart';
 import 'package:proyecto_santi/components/AppBar.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -18,6 +19,7 @@ class LoginViewState extends State<LoginView> {
   final ApiService _apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final user = FlutterSecureStorage();
 
   void showLoginDialog() {
     showDialog(
@@ -56,20 +58,27 @@ class LoginViewState extends State<LoginView> {
       isLoading = false;
     });
 
-    //if (profesor != null) {
-    Navigator.pushReplacementNamed(context, '/home');
-    //} else {
-    //showLoginDialog();
-    //}
+    if (profesor != null) {
+      await user.write(
+          key: 'username', value: '${profesor.nombre} ${profesor.apellidos}');
+      await user.write(key: 'correo', value: profesor.correo);
+      await user.write(key: 'rol', value: profesor.rol);
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      showLoginDialog();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-          onToggleTheme: widget.onToggleTheme,
-          title: 'Login',
-          showLogoutButton: false),
+        onToggleTheme: widget.onToggleTheme,
+        title: 'Login',
+        showMenuButton: false,
+      ),
       body: OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {

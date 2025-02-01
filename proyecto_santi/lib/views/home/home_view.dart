@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/AppBar.dart';
+import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/components/calendario.dart';
-import 'package:proyecto_santi/components/activityCards.dart';
+import 'package:proyecto_santi/views/home/home_calendario.dart';
+import 'package:proyecto_santi/views/home/home_activityCards.dart';
+import 'package:proyecto_santi/views/home/home_user.dart';
 
 class HomeView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -54,6 +56,7 @@ class _HomeViewState extends State<HomeView> {
           onToggleTheme: widget.onToggleTheme,
           title: 'Home',
         ),
+        drawer: CustomDrawer(),
         body: FutureBuilder<List<Actividad>>(
           future: _futureActivities,
           builder: (context, snapshot) {
@@ -83,16 +86,6 @@ class _HomeViewState extends State<HomeView> {
           },
         ),
       ),
-    );
-  }
-}
-
-class UserInformation extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      child: Text("User Information"),
     );
   }
 }

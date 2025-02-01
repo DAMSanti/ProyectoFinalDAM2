@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "G:/Proyecto/proyecto_santi/linux"
+    "cmake.sourceDirectory": "G:/Proyecto/proyecto_santi/linux",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
