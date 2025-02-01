@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/views/login/login_view.dart';
-import 'package:proyecto_santi/views/home/home_view.dart';
-import 'package:proyecto_santi/views/activity_detail_view.dart';
+import 'package:proyecto_santi/views/login_view.dart';
+import 'package:proyecto_santi/views/home_view.dart';
+import 'package:proyecto_santi/views/activityDetail_view.dart';
 import 'package:proyecto_santi/utils/theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;

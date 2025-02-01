@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'login_form.dart';
-import 'login_buttons.dart';
+import 'login/login_form.dart';
+import 'login/login_buttons.dart';
 import 'package:proyecto_santi/components/AppBar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
