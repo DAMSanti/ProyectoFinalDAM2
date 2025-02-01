@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/models/photo.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(baseUrl: 'http://4.233.223.75:8080/api/'));
@@ -66,6 +67,40 @@ class ApiService {
     } catch (e) {
       throw Exception("Exception: ${e.toString()}");
     }
+  }
+
+  Future<Actividad?> fetchActivityById(int id) async {
+    try {
+      final response = await _dio.get('/actividad/$id');
+      if (response.statusCode == 200) {
+        return Actividad.fromJson(response.data);
+      } else {
+        throw Exception("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<List<Photo>> fetchPhotos() async {
+    try {
+      final response = await _dio.get('/foto');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => Photo.fromJson(json)).toList();
+      } else {
+        throw Exception("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception("Exception: ${e.toString()}");
+    }
+  }
+
+  Future<List<Photo>> fetchPhotosByActivityId(int activityId) async {
+    final allPhotos = await fetchPhotos();
+    return allPhotos.where((photo) => photo.actividad.id == activityId).toList();
   }
   // Puedes agregar más métodos para PUT, DELETE, etc.
 }

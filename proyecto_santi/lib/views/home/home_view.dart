@@ -3,9 +3,9 @@ import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/views/home/home_calendario.dart';
-import 'package:proyecto_santi/views/home/home_activityCards.dart';
-import 'package:proyecto_santi/views/home/home_user.dart';
+import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/home_activityCards.dart';
+import 'package:proyecto_santi/views/home/components/home_user.dart';
 
 class HomeView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -56,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
           onToggleTheme: widget.onToggleTheme,
           title: 'Inicio',
         ),
-        drawer: CustomDrawer(),
+        drawer: Menu(),
         body: FutureBuilder<List<Actividad>>(
           future: _futureActivities,
           builder: (context, snapshot) {

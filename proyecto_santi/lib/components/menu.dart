@@ -1,92 +1,103 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class CustomDrawer extends StatelessWidget {
+class Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width *
-          0.65, // Ajusta el ancho del Drawer
-      child: Drawer(
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 150.0, // Establece la altura deseada para el DrawerHeader
-              child: DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary, // Color específico para el DrawerHeader
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Menú',
-                    style: Theme.of(context).textTheme.headlineMedium,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double drawerWidth = constraints.maxWidth * 0.35;
+        if (constraints.maxWidth > 1200) {
+          drawerWidth = constraints.maxWidth * 0.20;
+        } else if (constraints.maxWidth < 600) {
+          drawerWidth = constraints.maxWidth * 0.65;
+        }
+
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          width: drawerWidth, // Ajusta el ancho del Drawer
+          child: Drawer(
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 150.0,
+                  // Establece la altura deseada para el DrawerHeader
+                  child: DrawerHeader(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Theme.of(context).primaryColor, Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Menú',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.home,
+                  text: 'Inicio',
+                  routeName: '/home',
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.event,
+                  text: 'Actividades',
+                  routeName: '/actividades',
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.chat,
+                  text: 'Chat',
+                  routeName: '/chat',
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.map,
+                  text: 'Mapa',
+                  routeName: '/mapa',
+                ),
+                Spacer(),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.settings,
+                  text: 'Configuración',
+                  routeName: '/configuracion',
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.exit_to_app,
+                  text: 'Salir',
+                  routeName: '/',
+                ),
+              ],
             ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Inicio'),
-              onTap: () {
-                if (ModalRoute.of(context)?.settings.name != '/home') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/home');
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.event),
-              title: Text('Actividades'),
-              onTap: () {
-                if (ModalRoute.of(context)?.settings.name != '/actividades') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/actividades');
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.chat),
-              title: Text('Chat'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.map),
-              title: Text('Mapa'),
-              onTap: () {
-                if (ModalRoute.of(context)?.settings.name != '/mapa') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/mapa');
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            Spacer(),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Configuración'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Salir'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
+    return ListTile(
+      leading: FaIcon(icon, color: Theme.of(context).primaryColor),
+      title: Text(text),
+      onTap: () {
+        if (ModalRoute.of(context)?.settings.name != routeName) {
+          Navigator.pop(context);
+          Navigator.pushNamed(context, routeName);
+        } else {
+          Navigator.pop(context);
+        }
+      },
     );
   }
 }

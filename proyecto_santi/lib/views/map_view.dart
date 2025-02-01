@@ -59,7 +59,7 @@ class _MapViewState extends State<MapView> {
         onToggleTheme: widget.onToggleTheme,
         title: 'Mapa',
       ),
-      drawer: CustomDrawer(),
+      drawer: Menu(),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : GoogleMap(

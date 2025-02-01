@@ -14,14 +14,18 @@ class Photo {
   });
 
   factory Photo.fromJson(Map<String, dynamic> json) {
+    final baseUrl = 'http://4.233.223.75:8080/imagenes/actividad/';
+    final imageName = json['urlFoto'].substring(json['urlFoto'].lastIndexOf("\\") + 1).replaceAll(" ", "_");
+    final activityId = json['actividad']['id'];
+
     return Photo(
       id: json['id'],
-      urlFoto: json['urlFoto'],
+      urlFoto: '$baseUrl$activityId/$imageName',
       descripcion: json['descripcion'],
       actividad: Actividad.fromJson(json['actividad']),
     );
   }
-
+// $baseUrl${json['activityId']}/$imageNameAfterLastSlash
   Map<String, dynamic> toJson() {
     return {
       'id': id,

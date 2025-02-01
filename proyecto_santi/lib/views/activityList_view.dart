@@ -34,7 +34,7 @@ class _ActividadesListViewState extends State<ActividadesListView> {
         onToggleTheme: widget.onToggleTheme,
         title: 'Actividades',
       ),
-      drawer: CustomDrawer(),
+      drawer: Menu(),
       body: FutureBuilder<List<Actividad>>(
         future: _futureActivities,
         builder: (context, snapshot) {

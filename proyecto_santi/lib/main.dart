@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/views/login_view.dart';
-import 'package:proyecto_santi/views/home_view.dart';
+import 'package:proyecto_santi/views/login/login_view.dart';
+import 'package:proyecto_santi/views/home/home_view.dart';
 import 'package:proyecto_santi/views/activityDetail_view.dart';
 import 'package:proyecto_santi/views/activityList_view.dart';
-import 'package:proyecto_santi/utils/theme.dart';
+import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
