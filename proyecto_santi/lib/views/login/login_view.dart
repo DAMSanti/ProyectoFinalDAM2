@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/components/appBar.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'vistas/portrait_layout.dart';
 import 'vistas/small_landscape_layout.dart';
 import 'vistas/large_landscape_layout.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
+import 'package:proyecto_santi/models/auth.dart';
 
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -21,7 +22,6 @@ class LoginViewState extends State<LoginView> {
   final ApiService _apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final user = FlutterSecureStorage();
 
   Future<bool> _onWillPop() async {
     return (await showDialog(
@@ -86,9 +86,8 @@ class LoginViewState extends State<LoginView> {
     //      key: 'username', value: '${profesor.nombre} ${profesor.apellidos}');
     //  await user.write(key: 'correo', value: profesor.correo);
     //  await user.write(key: 'rol', value: profesor.rol);
-    await user.write(key: 'username', value: 'ACEX Database');
-    await user.write(key: 'correo', value: 'ACEX2025@hotmail.com');
-    await user.write(key: 'rol', value: 'ED');
+    await Provider.of<Auth>(context, listen: false).login(username, password);
+
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/home');
     }

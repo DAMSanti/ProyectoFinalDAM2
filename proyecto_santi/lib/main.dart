@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
 import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
@@ -8,38 +9,60 @@ import 'package:proyecto_santi/views/activities/Activities_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/config.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
 void main() async {
+  // Esta es la base de flutter, vamos a repetirlo en consultas asincronas
   WidgetsFlutterBinding.ensureInitialized();
 
-  const firebaseConfig = FirebaseOptions(
-      apiKey: "AIzaSyDif9U1CH2ssVLTK0yDeh2-_C8SOlhTr7E",
-      authDomain: "acexchat.firebaseapp.com",
-      projectId: "acexchat",
-      storageBucket: "acexchat.firebasestorage.app",
-      messagingSenderId: "312191800375",
-      appId: "1:312191800375:web:763bafc4184da334099bb2",
-      measurementId: "G-B2VED5543T"
-  );
 
-  await Firebase.initializeApp(options: firebaseConfig);
+  try {
+    // Inicializamos Firebase con la info de la APi en secure storage. TODO: variables de entorno.
+    await SecureStorageConfig.storeFirebaseConfig();
 
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    await windowManager.ensureInitialized();
+    final config = await SecureStorageConfig.retrieveFirebaseConfig(); // Retrieve the config
 
-    WindowOptions windowOptions =
-        WindowOptions(minimumSize: Size(400, 750), title: 'ACEX');
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
+    final firebaseConfig = FirebaseOptions(
+      apiKey: config['apiKey']!,
+      authDomain: config['authDomain']!,
+      projectId: config['projectId']!,
+      storageBucket: config['storageBucket']!,
+      messagingSenderId: config['messagingSenderId']!,
+      appId: config['appId']!,
+      measurementId: config['measurementId']!,
+    );
+
+    await Firebase.initializeApp(options: firebaseConfig);
+
+    // Limitamos el tamaño minimo de la ventana en windows, linux y mac
+    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+      await windowManager.ensureInitialized();
+
+      WindowOptions windowOptions =
+          WindowOptions(minimumSize: Size(400, 750), title: 'ACEX');
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
+
+    // Lanzamos la App con ChangeNotifierProvier para tener acceso a Auth
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => Auth()..checkAuthStatus(),
+        child: MyApp(),
+      ),
+    );
+  } catch (e) {
+    // Handle initialization errors
+    print('Error initializing app: $e');
   }
-
-  runApp(MyApp());
 }
 
+// Clase principal de la App
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -57,6 +80,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  // Construimos la App con las rutas y el tema
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
