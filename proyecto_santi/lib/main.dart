@@ -23,7 +23,7 @@ void main() async {
       appId: "1:312191800375:web:763bafc4184da334099bb2",
       measurementId: "G-B2VED5543T"
   );
-  
+
   await Firebase.initializeApp(options: firebaseConfig);
 
 
