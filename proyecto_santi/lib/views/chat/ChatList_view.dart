@@ -3,7 +3,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
-import 'package:proyecto_santi/views/chat_view.dart';
+import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
 
 class ChatListView extends StatefulWidget {
   final VoidCallback onToggleTheme;
