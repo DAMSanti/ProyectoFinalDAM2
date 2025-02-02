@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/components/appBar.dart';
 import 'vistas/portrait_layout.dart';
 import 'vistas/small_landscape_layout.dart';
 import 'vistas/large_landscape_layout.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
 import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/components/appBar.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -73,73 +75,97 @@ class LoginViewState extends State<LoginView> {
     final username = _usernameController.text;
     final password = _passwordController.text;
 
-    final profesor = await _apiService.authenticate(username, password);
+    try {
+      final profesor = await _apiService.authenticate(username, password);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      isLoading = false;
-    });
+      setState(() {
+        isLoading = false;
+      });
 
-    //if (profesor != null) {
-    //  await user.write(
-    //      key: 'username', value: '${profesor.nombre} ${profesor.apellidos}');
-    //  await user.write(key: 'correo', value: profesor.correo);
-    //  await user.write(key: 'rol', value: profesor.rol);
-    await Provider.of<Auth>(context, listen: false).login(username, password);
-
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      await Provider.of<Auth>(context, listen: false).login(username, password);
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showLoginDialog();
     }
-    //} else {
-    //showLoginDialog();
-    //}
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-        child: Scaffold(
-        appBar: CustomAppBar(
-          onToggleTheme: widget.onToggleTheme,
-          title: 'Login',
-          showMenuButton: false,
-        ),
-        body: GradientBackground(
-          child: OrientationBuilder(
-            builder: (context, orientation) {
-              if (orientation == Orientation.portrait) {
-                return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-              } else {
-                return _buildLandscapeLayout(context);
-              }
-            },
-          ),
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Theme.of(context).brightness == Brightness.dark
+                ? GradientBackgroundDark(
+              child: Container(),
+            )
+                : GradientBackgroundLight(
+              child: Container(),
+            ),
+            Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: CustomAppBar(
+                onToggleTheme: widget.onToggleTheme,
+                title: 'Login',
+                showMenuButton: false,
+              ),
+              body: _buildLayout(context),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildLandscapeLayout(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double imageSize = constraints.maxHeight * 0.5;
-        double padding = 16.0;
-
-        if (constraints.maxHeight < 600) {
-          imageSize = constraints.maxHeight;
-          padding = 12.0;
-        } else if (constraints.maxHeight < 400) {
-          imageSize = constraints.maxHeight * 0.7;
-          padding = 8.0;
-        }
-        if (constraints.maxWidth > 1300) {
+  Widget _buildLayout(BuildContext context) {
+    if (kIsWeb) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          double imageSize = constraints.maxHeight;
+          double padding = 16.0;
           return buildLargeLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-        } else {
-          return buildSmallLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-        }
-      },
-    );
+        },
+      );
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      return OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          } else {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                double imageSize = constraints.maxHeight;
+                double padding = 16.0;
+                return buildLargeLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+              },
+            );
+          }
+        },
+      );
+    } else {
+      return OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          } else {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                double imageSize = constraints.maxHeight;
+                double padding = 16.0;
+                return buildSmallLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+              },
+            );
+          }
+        },
+      );
+    }
   }
 }

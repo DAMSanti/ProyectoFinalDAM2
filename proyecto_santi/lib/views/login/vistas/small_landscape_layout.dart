@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
+import 'package:proyecto_santi/tema/GradientBackground.dart';
 
 Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, double padding, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
+      Theme.of(context).brightness == Brightness.dark
+          ? GradientBackgroundDark(
+        child: Container(),
+      )
+          : GradientBackgroundLight(
+        child: Container(),
+      ),
       Row(
         children: [
           Container(
@@ -19,21 +28,9 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
           ),
           Container(
             width: constraints.maxWidth * 0.5,
-            color: Theme.of(context).scaffoldBackgroundColor,
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LoginForm(
-                  usernameController: usernameController,
-                  passwordController: passwordController,
-                ),
-                SizedBox(height: 12),
-                LoginButtons(
-                  onLoginPressed: _login,
-                  onMicrosoftLoginPressed: showLoginDialog,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(16.0), // Adjust margin here
+              child: _buildRightSide(context, padding, usernameController, passwordController, _login, showLoginDialog),
             ),
           ),
         ],
@@ -57,5 +54,32 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
         ),
       ),
     ],
+  );
+}
+
+Widget _buildRightSide(BuildContext context, double padding, TextEditingController usernameController, TextEditingController passwordController, VoidCallback _login, VoidCallback showLoginDialog) {
+  return Center(
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: padding, vertical: 32),
+      decoration: BoxDecoration(
+        color:  Theme.of(context).brightness == Brightness.dark
+            ? lightTheme.primaryColor.withOpacity(0.1)
+            : darkTheme.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          LoginForm(
+            usernameController: usernameController,
+            passwordController: passwordController,
+          ),
+          LoginButtonsRow(
+            onLoginPressed: _login,
+            onMicrosoftLoginPressed: showLoginDialog,
+          ),
+        ],
+      ),
+    ),
   );
 }

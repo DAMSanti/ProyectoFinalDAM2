@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
@@ -11,15 +12,10 @@ Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
           height: 600, // Fixed size
           padding: EdgeInsets.symmetric(horizontal: padding, vertical: 32),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(255, 255, 255, 0.5),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? lightTheme.primaryColor.withOpacity(0.1)
+                : darkTheme.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

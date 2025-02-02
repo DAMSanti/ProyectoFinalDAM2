@@ -5,6 +5,7 @@ const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
 const Color colorTextoLight = Color.fromARGB(255, 108, 124, 136);
 const Color colorAccentLight = Color.fromARGB(255, 150, 178, 200);
 const Color colorSoftLight = Color.fromARGB(255, 176, 196, 222);
+const Color colorAccentDLight = Color.fromARGB(255, 126, 136, 180);
 //0xFF6C7C88
 //0xFFACC2D5
 //0xFF96B2C8
@@ -16,13 +17,8 @@ final ThemeData lightTheme = ThemeData(
   primaryColor: colorAccentLight,
   // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: TextStyle(color: colorTextoLight),
-    focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorAccentLight),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorTextoLight),
-    ),
+    labelStyle: TextStyle(color: colorTextoLight), focusedBorder: OutlineInputBorder( borderSide: BorderSide(color: colorAccentDLight)),
+    enabledBorder: OutlineInputBorder( borderSide: BorderSide(color: colorTextoLight)),
   ),
   // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -30,7 +26,7 @@ final ThemeData lightTheme = ThemeData(
       backgroundColor: colorAccentLight, // Color de fondo del botón
       foregroundColor: colorTextoLight, // Color del texto del botón
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      textStyle: TextStyle(fontSize: 16),
+      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     ),
   ),
   // TEXTOS
@@ -45,8 +41,7 @@ final ThemeData lightTheme = ThemeData(
     bodyMedium: TextStyle(color: colorTextoLight),
     bodySmall: TextStyle(color: colorTextoLight),
     titleLarge: TextStyle(color: colorTextoLight),
-    titleMedium: TextStyle(
-        color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold),
+    titleMedium: TextStyle(color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold),
     titleSmall: TextStyle(color: colorTextoLight),
     labelLarge: TextStyle(color: colorTextoLight),
     labelMedium: TextStyle(color: colorTextoLight),
@@ -85,8 +80,11 @@ final ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.light(
       primary: colorAccentLight,
       secondary: colorFondoLight // Color específico para el DrawerHeader
-      ),
+  ),
 );
+
+
+
 
 const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);
 const Color colorTextoDark = Color.fromARGB(255, 169, 231, 255);
@@ -99,13 +97,8 @@ final ThemeData darkTheme = ThemeData(
   primaryColor: colorAccentDark,
   // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: TextStyle(color: colorTextoDark),
-    focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorAccentDark),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: colorTextoDark),
-    ),
+    labelStyle: TextStyle(color: colorTextoDark), focusedBorder: OutlineInputBorder( borderSide: BorderSide(color: colorAccentDark)),
+    enabledBorder: OutlineInputBorder( borderSide: BorderSide(color: colorTextoDark)),
   ),
   // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,13 +106,26 @@ final ThemeData darkTheme = ThemeData(
       backgroundColor: colorAccentDark, // Color de fondo del botón
       foregroundColor: colorTextoDark, // Color del texto del botón
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      textStyle: TextStyle(fontSize: 16),
+      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     ),
   ),
   // TEXTOS
   textTheme: TextTheme(
-    bodyMedium: TextStyle(color: colorTextoDark, fontSize: 18),
-    bodyLarge: TextStyle(color: colorTextoDark, fontSize: 16),
+    displayLarge: TextStyle(color: colorTextoDark),
+    displayMedium: TextStyle(color: colorTextoDark),
+    displaySmall: TextStyle(color: colorTextoDark),
+    headlineLarge: TextStyle(color: colorTextoDark),
+    headlineMedium: TextStyle(color: colorTextoDark),
+    headlineSmall: TextStyle(color: colorTextoDark),
+    bodyLarge: TextStyle(color: colorTextoDark),
+    bodyMedium: TextStyle(color: colorTextoDark),
+    bodySmall: TextStyle(color: colorTextoDark),
+    titleLarge: TextStyle(color: colorTextoDark),
+    titleMedium: TextStyle(color: colorTextoDark, fontSize: 20, fontWeight: FontWeight.bold),
+    titleSmall: TextStyle(color: colorTextoDark),
+    labelLarge: TextStyle(color: colorTextoDark),
+    labelMedium: TextStyle(color: colorTextoDark),
+    labelSmall: TextStyle(color: colorTextoDark),
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
