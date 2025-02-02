@@ -3,21 +3,21 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
-import 'package:proyecto_santi/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/chat_view.dart';
 
-class ActividadesListView extends StatefulWidget {
+class ChatListView extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
 
-  const ActividadesListView(
+  const ChatListView(
       {Key? key, required this.onToggleTheme, required this.isDarkTheme})
       : super(key: key);
 
   @override
-  _ActividadesListViewState createState() => _ActividadesListViewState();
+  _ChatListViewState createState() => _ChatListViewState();
 }
 
-class _ActividadesListViewState extends State<ActividadesListView> {
+class _ChatListViewState extends State<ChatListView> {
   late Future<List<Actividad>> _futureActivities;
   final ApiService _apiService = ApiService();
 
@@ -77,14 +77,14 @@ class ActividadCard extends StatelessWidget {
       margin: EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          // Navegar a la vista de detalles de la actividad
+          // Navigate to the ChatView of the activity
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ActivityDetailView(
-                  activityId: actividad.id,
-                  isDarkTheme: isDarkTheme,
-                  onToggleTheme: () {}),
+              builder: (context) => ChatView(
+                activityId: actividad.id.toString(),
+                displayName: actividad.titulo ?? 'Chat',
+              ),
             ),
           );
         },

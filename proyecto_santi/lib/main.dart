@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
 import 'package:proyecto_santi/views/activityDetail_view.dart';
-import 'package:proyecto_santi/views/activityList_view.dart';
+import 'package:proyecto_santi/views/ChatList_view.dart';
+import 'package:proyecto_santi/views/ActivityList_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  const firebaseConfig = FirebaseOptions(
+      apiKey: "AIzaSyDif9U1CH2ssVLTK0yDeh2-_C8SOlhTr7E",
+      authDomain: "acexchat.firebaseapp.com",
+      projectId: "acexchat",
+      storageBucket: "acexchat.firebasestorage.app",
+      messagingSenderId: "312191800375",
+      appId: "1:312191800375:web:763bafc4184da334099bb2",
+      measurementId: "G-B2VED5543T"
+  );
+  
+  await Firebase.initializeApp(options: firebaseConfig);
+
+
+  await Firebase.initializeApp();
 
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await windowManager.ensureInitialized();
@@ -60,12 +75,13 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => LoginView(onToggleTheme: _toggleTheme),
         '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
-        '/actividades': (context) => ActividadesListView(
-            onToggleTheme: _toggleTheme,
-            isDarkTheme: _themeMode == ThemeMode.dark),
+        '/actividades': (context) => ActivitiesView(), // Cambia a ActivitiesView
         '/mapa': (context) => MapView(
             onToggleTheme: _toggleTheme,
             isDarkTheme: _themeMode == ThemeMode.dark),
+        '/chat': (context) => ChatListView(
+            onToggleTheme: _toggleTheme,
+            isDarkTheme: _themeMode == ThemeMode.dark), // Cambia a ChatListView
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/activityDetail') {
