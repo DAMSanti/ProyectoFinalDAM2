@@ -69,7 +69,15 @@ class _HomeViewState extends State<HomeView> {
               onToggleTheme: widget.onToggleTheme,
               title: 'Inicio',
             ),
-            drawer: Menu(),
+            drawer: MediaQuery.of(context).size.shortestSide < 600
+                ? OrientationBuilder(
+              builder: (context, orientation) {
+                return orientation == Orientation.portrait
+                    ? Menu()
+                    : MenuLandscape();
+              },
+            )
+                : Menu(),
             body: FutureBuilder<List<Actividad>>(
               future: _futureActivities,
               builder: (context, snapshot) {
