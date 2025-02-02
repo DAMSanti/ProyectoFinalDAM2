@@ -26,9 +26,6 @@ void main() async {
 
   await Firebase.initializeApp(options: firebaseConfig);
 
-
-  await Firebase.initializeApp();
-
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await windowManager.ensureInitialized();
 
@@ -39,11 +36,7 @@ void main() async {
       await windowManager.focus();
     });
   }
-/*
-  if (Platform.isWindows) {
-    GoogleMapsFlutterPlatform.instance.init('AIzaSyB7qlgt4eNBQ8_XoV4di1IJISwVe-OiD5Q');
-  }
-*/
+
   runApp(MyApp());
 }
 

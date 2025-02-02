@@ -16,35 +16,41 @@ class ActivitiesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        onToggleTheme: onToggleTheme,
-        title: 'Actividades',
-      ),
-      drawer: Menu(),
-      body: Column(
-        children: [
-          SearchBar(
-            onSearchQueryChanged: (query) {
-              // Handle search query change
-            },
-            onFilterSelected: (filter, date, course, state) {
-              // Handle filter selection
-            },
-          ),
-          Expanded(
-            child: AllActividades(
-              selectedFilter: null,
-              searchQuery: '',
-              selectedDate: null,
-              selectedCourse: null,
-              selectedState: null,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/home');
+        return false; // Prevent the default back button behavior
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          onToggleTheme: onToggleTheme,
+          title: 'Actividades',
+        ),
+        drawer: Menu(),
+        body: Column(
+          children: [
+            SearchBar(
+              onSearchQueryChanged: (query) {
+                // Handle search query change
+              },
+              onFilterSelected: (filter, date, course, state) {
+                // Handle filter selection
+              },
             ),
-          ),
-          Expanded(
-            child: OtrasActividades(),
-          ),
-        ],
+            Expanded(
+              child: AllActividades(
+                selectedFilter: null,
+                searchQuery: '',
+                selectedDate: null,
+                selectedCourse: null,
+                selectedState: null,
+              ),
+            ),
+            Expanded(
+              child: OtrasActividades(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -125,8 +131,8 @@ class AllActividades extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    '/chat',
-                    arguments: actividad['id']?.toString() ?? '',
+                    '/activityDetail',
+                    arguments: {'activityId': actividad['id']},
                   );
                 },
               );
@@ -162,8 +168,8 @@ class OtrasActividades extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    '/chat',
-                    arguments: actividad['id']?.toString() ?? '',
+                    '/activityDetail',
+                    arguments: {'activityId': actividad['id']},
                   );
                 },
               );

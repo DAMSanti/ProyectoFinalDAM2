@@ -47,52 +47,58 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        onToggleTheme: widget.onToggleTheme,
-        title: 'Mapa',
-      ),
-      drawer: Menu(),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Platform.isWindows
-          ? FlutterMap(
-        options: MapOptions(
-          center: _center,
-          zoom: 10.0,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/home');
+        return false; // Prevent the default back button behavior
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          onToggleTheme: widget.onToggleTheme,
+          title: 'Mapa',
         ),
-        children: [
-          TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
+        drawer: Menu(),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Platform.isWindows
+            ? FlutterMap(
+          options: MapOptions(
+            center: _center,
+            zoom: 10.0,
           ),
-          MarkerLayer(
-            markers: activities.map((actividad) {
-              return Marker(
-                point: latlong.LatLng(actividad.latitud!, actividad.longitud!),
-                builder: (ctx) => Container(
-                  child: Icon(Icons.location_on, color: Colors.red),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      )
-          : google_maps.GoogleMap(
-        initialCameraPosition: google_maps.CameraPosition(
-          target: google_maps.LatLng(43.353, -4.064),
-          zoom: 10,
-        ),
-        markers: activities.map((actividad) {
-          return google_maps.Marker(
-            markerId: google_maps.MarkerId(actividad.id.toString()),
-            position: google_maps.LatLng(actividad.latitud!, actividad.longitud!),
-            infoWindow: google_maps.InfoWindow(
-              title: actividad.titulo,
-              snippet: actividad.descripcion,
+          children: [
+            TileLayer(
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c'],
             ),
-          );
-        }).toSet(),
+            MarkerLayer(
+              markers: activities.map((actividad) {
+                return Marker(
+                  point: latlong.LatLng(actividad.latitud!, actividad.longitud!),
+                  builder: (ctx) => Container(
+                    child: Icon(Icons.location_on, color: Colors.red),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        )
+            : google_maps.GoogleMap(
+          initialCameraPosition: google_maps.CameraPosition(
+            target: google_maps.LatLng(43.353, -4.064),
+            zoom: 10,
+          ),
+          markers: activities.map((actividad) {
+            return google_maps.Marker(
+              markerId: google_maps.MarkerId(actividad.id.toString()),
+              position: google_maps.LatLng(actividad.latitud!, actividad.longitud!),
+              infoWindow: google_maps.InfoWindow(
+                title: actividad.titulo,
+                snippet: actividad.descripcion,
+              ),
+            );
+          }).toSet(),
+        ),
       ),
     );
   }

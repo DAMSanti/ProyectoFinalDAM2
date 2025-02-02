@@ -18,7 +18,12 @@ class ChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+      Navigator.pushReplacementNamed(context, '/chat');
+      return false; // Prevent the default back button behavior
+    },
+    child: Scaffold(
       appBar: CustomAppBar(
         onToggleTheme: onToggleTheme,
         title: 'Chat',
@@ -80,15 +85,18 @@ class ChatView extends StatelessWidget {
           Positioned(
             top: kToolbarHeight,
             left: 0,
-            child: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+            child: ModalRoute.of(context)?.settings.name != '/'
+              ? IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+             )
+            : Container(),
           ),
         ],
       ),
+    ),
     );
   }
 

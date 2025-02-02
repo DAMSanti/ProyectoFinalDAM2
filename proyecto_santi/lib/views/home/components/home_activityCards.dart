@@ -56,7 +56,8 @@ class ActivityCardItem extends StatelessWidget {
           trailing: Text(activityStatus),
           onTap: () {
             // Navegar a la vista de detalles de la actividad
-            navController.pushNamed(
+            Navigator.pushNamed(
+              context,
               '/activityDetail',
               arguments: {
                 'activityId': index,

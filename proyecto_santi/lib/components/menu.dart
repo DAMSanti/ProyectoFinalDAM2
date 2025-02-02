@@ -25,7 +25,15 @@ class Menu extends StatelessWidget {
                   child: DrawerHeader(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Theme.of(context).primaryColor, Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor],
+                        colors: [Theme
+                            .of(context)
+                            .primaryColor, Theme
+                            .of(context)
+                            .appBarTheme
+                            .backgroundColor ?? Theme
+                            .of(context)
+                            .primaryColor
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -34,7 +42,11 @@ class Menu extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Menú',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
                           color: Colors.white,
                         ),
                       ),
@@ -86,14 +98,26 @@ class Menu extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
+  void _logout(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
+  }
+
+  Widget _buildDrawerItem(BuildContext context,
+      {required IconData icon, required String text, required String routeName}) {
     return ListTile(
-      leading: FaIcon(icon, color: Theme.of(context).primaryColor),
+      leading: FaIcon(icon, color: Theme
+          .of(context)
+          .primaryColor),
       title: Text(text),
       onTap: () {
-        if (ModalRoute.of(context)?.settings.name != routeName) {
+        if (routeName == '/') {
+          _logout(context);
+        } else if (ModalRoute
+            .of(context)
+            ?.settings
+            .name != routeName) {
           Navigator.pop(context);
-          Navigator.pushNamed(context, routeName);
+          Navigator.pushReplacementNamed(context, routeName);
         } else {
           Navigator.pop(context);
         }

@@ -29,38 +29,44 @@ class _ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        onToggleTheme: widget.onToggleTheme,
-        title: 'Chats',
-      ),
-      drawer: Menu(),
-      body: FutureBuilder<List<Actividad>>(
-        future: _futureActivities,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-                child: Text('Error: ${snapshot.error}',
-                    style: TextStyle(color: Colors.red)));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No activities available"));
-          } else {
-            final actividades = snapshot.data!;
-            return ListView.builder(
-              itemCount: actividades.length,
-              itemBuilder: (context, index) {
-                final actividad = actividades[index];
-                return ActividadCard(
-                  actividad: actividad,
-                  isDarkTheme: widget.isDarkTheme,
-                  onToggleTheme: widget.onToggleTheme,
-                );
-              },
-            );
-          }
-        },
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/home');
+        return false; // Prevent the default back button behavior
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(
+          onToggleTheme: widget.onToggleTheme,
+          title: 'Chats',
+        ),
+        drawer: Menu(),
+        body: FutureBuilder<List<Actividad>>(
+          future: _futureActivities,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                  child: Text('Error: ${snapshot.error}',
+                      style: TextStyle(color: Colors.red)));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text("No activities available"));
+            } else {
+              final actividades = snapshot.data!;
+              return ListView.builder(
+                itemCount: actividades.length,
+                itemBuilder: (context, index) {
+                  final actividad = actividades[index];
+                  return ActividadCard(
+                    actividad: actividad,
+                    isDarkTheme: widget.isDarkTheme,
+                    onToggleTheme: widget.onToggleTheme,
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }

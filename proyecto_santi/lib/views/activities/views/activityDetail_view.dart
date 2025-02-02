@@ -87,12 +87,13 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
+                if (ModalRoute.of(context)?.settings.name != '/')
+                  IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ElevatedButton(
                   onPressed: isDataChanged ? _saveChanges : null,
                   style: ElevatedButton.styleFrom(

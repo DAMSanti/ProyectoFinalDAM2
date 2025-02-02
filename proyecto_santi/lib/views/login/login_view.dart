@@ -23,6 +23,27 @@ class LoginViewState extends State<LoginView> {
   final TextEditingController _passwordController = TextEditingController();
   final user = FlutterSecureStorage();
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Estás seguro?'),
+        content: Text('¿Quieres salir de la aplicación?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Sí'),
+          ),
+        ],
+      ),
+    )) ??
+        false;
+  }
+
   void showLoginDialog() {
     showDialog(
       context: context,
@@ -78,21 +99,24 @@ class LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        onToggleTheme: widget.onToggleTheme,
-        title: 'Login',
-        showMenuButton: false,
-      ),
-      body: GradientBackground(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            if (orientation == Orientation.portrait) {
-              return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-            } else {
-              return _buildLandscapeLayout(context);
-            }
-          },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+        child: Scaffold(
+        appBar: CustomAppBar(
+          onToggleTheme: widget.onToggleTheme,
+          title: 'Login',
+          showMenuButton: false,
+        ),
+        body: GradientBackground(
+          child: OrientationBuilder(
+            builder: (context, orientation) {
+              if (orientation == Orientation.portrait) {
+                return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+              } else {
+                return _buildLandscapeLayout(context);
+              }
+            },
+          ),
         ),
       ),
     );
