@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/menu.dart';
 
 class ActivitiesView extends StatelessWidget {
+  final VoidCallback onToggleTheme;
+  final bool isDarkTheme;
+
+  const ActivitiesView({
+    Key? key,
+    required this.onToggleTheme,
+    required this.isDarkTheme,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Actividades'),
+      appBar: CustomAppBar(
+        onToggleTheme: onToggleTheme,
+        title: 'Actividades',
       ),
+      drawer: Menu(),
       body: Column(
         children: [
           SearchBar(

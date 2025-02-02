@@ -32,7 +32,7 @@ class _ChatListViewState extends State<ChatListView> {
     return Scaffold(
       appBar: CustomAppBar(
         onToggleTheme: widget.onToggleTheme,
-        title: 'Actividades',
+        title: 'Chats',
       ),
       drawer: Menu(),
       body: FutureBuilder<List<Actividad>>(
@@ -53,7 +53,10 @@ class _ChatListViewState extends State<ChatListView> {
               itemBuilder: (context, index) {
                 final actividad = actividades[index];
                 return ActividadCard(
-                    actividad: actividad, isDarkTheme: widget.isDarkTheme);
+                  actividad: actividad,
+                  isDarkTheme: widget.isDarkTheme,
+                  onToggleTheme: widget.onToggleTheme,
+                );
               },
             );
           }
@@ -66,9 +69,10 @@ class _ChatListViewState extends State<ChatListView> {
 class ActividadCard extends StatelessWidget {
   final Actividad actividad;
   final bool isDarkTheme;
+  final VoidCallback onToggleTheme;
 
   const ActividadCard(
-      {Key? key, required this.actividad, required this.isDarkTheme})
+      {Key? key, required this.actividad, required this.isDarkTheme, required this.onToggleTheme,})
       : super(key: key);
 
   @override
@@ -84,6 +88,8 @@ class ActividadCard extends StatelessWidget {
               builder: (context) => ChatView(
                 activityId: actividad.id.toString(),
                 displayName: actividad.titulo ?? 'Chat',
+                onToggleTheme: onToggleTheme,
+                isDarkTheme: isDarkTheme,
               ),
             ),
           );

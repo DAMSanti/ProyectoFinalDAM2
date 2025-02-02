@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
-import 'package:proyecto_santi/views/activityList/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
 import 'package:proyecto_santi/views/chat/ChatList_view.dart';
-import 'package:proyecto_santi/views/activityList/ActivityList_view.dart';
+import 'package:proyecto_santi/views/activities/Activities_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
@@ -75,7 +75,9 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => LoginView(onToggleTheme: _toggleTheme),
         '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
-        '/actividades': (context) => ActivitiesView(), // Cambia a ActivitiesView
+        '/actividades': (context) => ActivitiesView(
+            onToggleTheme: _toggleTheme,
+            isDarkTheme: _themeMode == ThemeMode.dark),
         '/mapa': (context) => MapView(
             onToggleTheme: _toggleTheme,
             isDarkTheme: _themeMode == ThemeMode.dark),
