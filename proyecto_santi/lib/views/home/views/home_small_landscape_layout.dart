@@ -1,0 +1,50 @@
+// home_small_landscape_layout.dart
+import 'package:flutter/material.dart';
+import 'package:proyecto_santi/views/home/components/home_user.dart';
+import 'package:proyecto_santi/views/home/components/home_activityCards.dart';
+import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/models/actividad.dart';
+
+class HomeSmallLandscapeLayout extends StatelessWidget {
+  final List<Actividad> activities;
+
+  const HomeSmallLandscapeLayout({super.key, required this.activities});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              UserInformation(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: activities.length,
+                  itemBuilder: (context, index) {
+                    final actividad = activities[index];
+                    return ActivityCardItem(
+                      activityName: actividad.titulo,
+                      activityDate: actividad.fini,
+                      activityStatus: actividad.estado,
+                      index: actividad.id,
+                      navController: Navigator.of(context),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            height: 285, // Adjust the height of the calendar
+            child: CalendarView(activities: activities),
+          ),
+        ),
+      ],
+    );
+  }
+}

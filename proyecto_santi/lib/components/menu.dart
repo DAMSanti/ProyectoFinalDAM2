@@ -17,86 +17,93 @@ class Menu extends StatelessWidget {
 
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
-          width: drawerWidth, // Ajusta el ancho del Drawer
+          width: drawerWidth, // Adjust the width of the Drawer
           child: Drawer(
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 150.0,
-                  // Establece la altura deseada para el DrawerHeader
-                  child: DrawerHeader(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Theme
-                            .of(context)
-                            .primaryColor, Theme
-                            .of(context)
-                            .appBarTheme
-                            .backgroundColor ?? Theme
-                            .of(context)
-                            .primaryColor
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Menú',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.home,
-                  text: 'Inicio',
-                  routeName: '/home',
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.event,
-                  text: 'Actividades',
-                  routeName: '/actividades',
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.chat,
-                  text: 'Chat',
-                  routeName: '/chat',
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.map,
-                  text: 'Mapa',
-                  routeName: '/mapa',
-                ),
-                Spacer(),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.settings,
-                  text: 'Configuración',
-                  routeName: '/configuracion',
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.exit_to_app,
-                  text: 'Salir',
-                  routeName: '/',
-                ),
-              ],
+            child: OrientationBuilder(
+              builder: (context, orientation) {
+                return orientation == Orientation.portrait
+                    ? SingleChildScrollView(
+                  child: _buildMenuContent(context),
+                )
+                    : _buildMenuContent(context);
+              },
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildMenuContent(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min, // Set mainAxisSize to min
+      children: <Widget>[
+        SizedBox(
+          height: 150.0,
+          // Set the desired height for the DrawerHeader
+          child: DrawerHeader(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Menú',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.home,
+          text: 'Inicio',
+          routeName: '/home',
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.event,
+          text: 'Actividades',
+          routeName: '/actividades',
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.chat,
+          text: 'Chat',
+          routeName: '/chat',
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.map,
+          text: 'Mapa',
+          routeName: '/mapa',
+        ),
+        Flexible(
+          fit: FlexFit.loose, // Use Flexible with FlexFit.loose
+          child: Container(),
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.settings,
+          text: 'Configuración',
+          routeName: '/configuracion',
+        ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.exit_to_app,
+          text: 'Salir',
+          routeName: '/',
+        ),
+      ],
     );
   }
 
@@ -105,20 +112,14 @@ class Menu extends StatelessWidget {
     Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
   }
 
-  Widget _buildDrawerItem(BuildContext context,
-      {required IconData icon, required String text, required String routeName}) {
+  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
-      leading: FaIcon(icon, color: Theme
-          .of(context)
-          .primaryColor),
+      leading: FaIcon(icon, color: Theme.of(context).primaryColor),
       title: Text(text),
       onTap: () {
         if (routeName == '/') {
           _logout(context);
-        } else if (ModalRoute
-            .of(context)
-            ?.settings
-            .name != routeName) {
+        } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pop(context);
           Navigator.pushReplacementNamed(context, routeName);
         } else {
