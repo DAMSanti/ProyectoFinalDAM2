@@ -53,70 +53,92 @@ class ActivityCardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Card(
-        color: Theme.of(context).brightness == Brightness.light
-            ? lightTheme.primaryColor.withOpacity(1)
-            : darkTheme.primaryColor.withOpacity(1),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ActivityDetailView(
-                  actividad: actividad,
-                  isDarkTheme: isDarkTheme,
-                  onToggleTheme: () {},
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          width: constraints.maxWidth * 0.3,
+          // Adjust width based on available space
+          margin: EdgeInsets.symmetric(horizontal: 8.0),
+          child: Card(
+            color: Theme
+                .of(context)
+                .brightness == Brightness.light
+                ? lightTheme.primaryColor.withOpacity(1)
+                : darkTheme.primaryColor.withOpacity(1),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ActivityDetailView(
+                          actividad: actividad,
+                          isDarkTheme: isDarkTheme,
+                          onToggleTheme: () {},
+                        ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      actividad.titulo ?? 'Sin título',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      actividad.descripcion ?? 'Sin descripción',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      actividad.fini ?? 'Sin fecha',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          actividad.titulo ?? 'Sin título',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .headlineSmall,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        SizedBox(height: 8.0),
+                        Text(
+                          actividad.descripcion ?? 'Sin descripción',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .bodyMedium,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          textScaler: TextScaler.linear(constraints.maxWidth * 0.003),
+                        ),
+                      ],
                     ),
-                    Text(
-                      actividad.estado ?? 'Sin estado',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          actividad.fini ?? 'Sin fecha',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .bodyMedium,
+                        ),
+                        Text(
+                          actividad.estado ?? 'Sin estado',
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
