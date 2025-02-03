@@ -3,16 +3,19 @@ import 'package:flutter/material.dart';
 class LoginButtons extends StatelessWidget {
   final VoidCallback onLoginPressed;
   final VoidCallback onMicrosoftLoginPressed;
+  final bool isColumn;
 
   const LoginButtons({
     super.key,
     required this.onLoginPressed,
     required this.onMicrosoftLoginPressed,
+    this.isColumn = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return isColumn
+        ? Column(
       children: [
         Row(
           children: [
@@ -53,23 +56,8 @@ class LoginButtons extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class LoginButtonsRow extends StatelessWidget {
-  final VoidCallback onLoginPressed;
-  final VoidCallback onMicrosoftLoginPressed;
-
-  const LoginButtonsRow({
-    super.key,
-    required this.onLoginPressed,
-    required this.onMicrosoftLoginPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
+    )
+        : Row(
       children: [
         Expanded(
           child: ElevatedButton(

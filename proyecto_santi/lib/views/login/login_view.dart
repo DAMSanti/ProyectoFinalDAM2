@@ -19,53 +19,12 @@ class LoginView extends StatefulWidget {
   LoginViewState createState() => LoginViewState();
 }
 
+// Comprueba conexión y almacena datos de forma segura
 class LoginViewState extends State<LoginView> {
   bool isLoading = false;
   final ApiService _apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿Estás seguro?'),
-        content: Text('¿Quieres salir de la aplicación?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Sí'),
-          ),
-        ],
-      ),
-    )) ??
-        false;
-  }
-
-  void showLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Permiso denegado'),
-          content: Text(
-              'Lo sentimos, no tienes permisos para entrar a esta aplicación.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Aceptar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _login() async {
     setState(() {
@@ -125,19 +84,18 @@ class LoginViewState extends State<LoginView> {
     );
   }
 
+  // Diferentes vistas para dispositivos y orientaciones
   Widget _buildLayout(BuildContext context) {
     if (kIsWeb) {
       return LayoutBuilder(
         builder: (context, constraints) {
-          double imageSize = constraints.maxHeight;
-          return buildLargeLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          return buildLargeLandscapeLayout(context, constraints, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
         },
       );
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return LayoutBuilder(
         builder: (context, constraints) {
-          double imageSize = constraints.maxHeight;
-          return buildLargeLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          return buildLargeLandscapeLayout(context, constraints, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
           },
       );
     } else {
@@ -148,13 +106,57 @@ class LoginViewState extends State<LoginView> {
           } else {
             return LayoutBuilder(
               builder: (context, constraints) {
-                double imageSize = constraints.maxHeight;
-                return buildSmallLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+                return buildSmallLandscapeLayout(context, constraints, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
               },
             );
           }
         },
       );
     }
+  }
+
+
+  // Mensaje para salir de la aplicacion
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Estás seguro?'),
+        content: Text('¿Quieres salir de la aplicación?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Sí'),
+          ),
+        ],
+      ),
+    )) ??
+        false;
+  }
+
+  // Mensaje de error en el login
+  void showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Permiso denegado'),
+          content: Text(
+              'Lo sentimos, no tienes permisos para entrar a esta aplicación.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

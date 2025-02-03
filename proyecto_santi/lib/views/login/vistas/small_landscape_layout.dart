@@ -3,7 +3,7 @@ import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
-Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
       Row(
@@ -13,8 +13,6 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
             child: Center(
               child: Image.asset(
                 'assets/logorecortado.png',
-                width: imageSize,
-                height: imageSize,
               ),
             ),
           ),
@@ -67,9 +65,10 @@ Widget _buildRightSide(BuildContext context, TextEditingController usernameContr
             passwordController: passwordController,
           ),
           SizedBox(height: 7),
-          LoginButtonsRow(
+          LoginButtons(
             onLoginPressed: login,
             onMicrosoftLoginPressed: showLoginDialog,
+            isColumn: false,
           ),
         ],
       ),
