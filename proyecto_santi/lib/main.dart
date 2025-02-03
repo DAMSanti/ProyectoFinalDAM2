@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
           return MaterialPageRoute(
             builder: (context) {
               return ActivityDetailView(
-                activityId: args['activityId'],
+                actividad: args['activity'],
                 onToggleTheme: _toggleTheme,
                 isDarkTheme: _themeMode == ThemeMode.dark,
               );

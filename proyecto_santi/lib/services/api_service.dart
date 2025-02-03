@@ -57,9 +57,11 @@ class ApiService {
       } else if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         final currentDate = DateTime.now();
+        final today = DateTime(currentDate.year, currentDate.month, currentDate.day);
         return data.map((json) => Actividad.fromJson(json)).where((actividad) {
           final activityDate = DateTime.parse(actividad.fini);
-          return activityDate.isAfter(currentDate);
+          final activityDay = DateTime(activityDate.year, activityDate.month, activityDate.day);
+          return activityDay.isAtSameMomentAs(today) || activityDay.isAfter(today);
         }).toList();
       } else {
         throw Exception("Error: ${response.statusCode}");

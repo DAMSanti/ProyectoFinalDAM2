@@ -25,11 +25,8 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final actividad = activities[index];
                     return ActivityCardItem(
-                      activityName: actividad.titulo,
-                      activityDate: actividad.fini,
-                      activityStatus: actividad.estado,
-                      index: actividad.id,
-                      navController: Navigator.of(context),
+                      actividad: actividad,
+                      isDarkTheme: Theme.of(context).brightness == Brightness.dark,
                     );
                   },
                 ),

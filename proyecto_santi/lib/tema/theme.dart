@@ -36,7 +36,7 @@ final ThemeData lightTheme = ThemeData(
     displaySmall: TextStyle(color: colorTextoLight),
     headlineLarge: TextStyle(color: colorTextoLight),
     headlineMedium: TextStyle(color: colorTextoLight),
-    headlineSmall: TextStyle(color: colorTextoLight),
+    headlineSmall: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold),
     bodyLarge: TextStyle(color: colorTextoLight),
     bodyMedium: TextStyle(color: colorTextoLight),
     bodySmall: TextStyle(color: colorTextoLight),
@@ -61,6 +61,7 @@ final ThemeData lightTheme = ThemeData(
   ),
   // LISTTILE
   listTileTheme: ListTileThemeData(
+    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold),
     textColor: colorTextoLight,
     iconColor: colorTextoLight,
   ),

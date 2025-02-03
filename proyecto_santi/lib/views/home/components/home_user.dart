@@ -34,15 +34,17 @@ class _UserInformationState extends State<UserInformation> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_username != null) Text('Username: $_username'),
-          if (_correo != null) Text('Correo: $_correo'),
-          if (_rol != null) Text('Rol: $_rol'),
-        ],
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (_username != null) Text('$_username'),
+            if (_correo != null) Text('$_correo'),
+            if (_rol != null) Text('$_rol'),
+          ],
+        ),
       ),
     );
   }

@@ -16,7 +16,7 @@ class HomePortraitLayout extends StatelessWidget {
       children: [
         UserInformation(),
         SizedBox(
-          height: 100,
+          height: 180,
           child: ActivityList(activities: activities),
         ),
         Expanded(
