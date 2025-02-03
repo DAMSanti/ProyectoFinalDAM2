@@ -130,25 +130,15 @@ class LoginViewState extends State<LoginView> {
       return LayoutBuilder(
         builder: (context, constraints) {
           double imageSize = constraints.maxHeight;
-          double padding = constraints.maxHeight * 0.5;
-          return buildLargeLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          return buildLargeLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
         },
       );
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      return OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.portrait) {
-            return buildPortraitLayout(context, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-          } else {
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                double imageSize = constraints.maxHeight;
-                double padding = 16.0;
-                return buildLargeLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
-              },
-            );
-          }
-        },
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          double imageSize = constraints.maxHeight;
+          return buildLargeLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+          },
       );
     } else {
       return OrientationBuilder(
@@ -159,8 +149,7 @@ class LoginViewState extends State<LoginView> {
             return LayoutBuilder(
               builder: (context, constraints) {
                 double imageSize = constraints.maxHeight;
-                double padding = 16.0;
-                return buildSmallLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
+                return buildSmallLandscapeLayout(context, constraints, imageSize, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
               },
             );
           }

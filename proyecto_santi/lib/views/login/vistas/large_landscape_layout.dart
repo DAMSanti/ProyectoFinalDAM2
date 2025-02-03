@@ -3,7 +3,7 @@ import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
-Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, double padding, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
       Center(
@@ -12,8 +12,8 @@ Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
           height: constraints.maxHeight * 0.6, // Fixed size
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? lightTheme.primaryColor.withOpacity(0.1)
-                : darkTheme.primaryColor.withOpacity(0.1),
+                ? lightTheme.primaryColor.withValues(alpha: 0.1)
+                : darkTheme.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -63,7 +63,7 @@ Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
           style: TextStyle(
             color: Colors.black,
             fontSize: 16,
-            backgroundColor: Colors.white.withOpacity(0.7),
+            backgroundColor: Colors.white.withValues(alpha: 0.7),
           ),
         ),
       ),

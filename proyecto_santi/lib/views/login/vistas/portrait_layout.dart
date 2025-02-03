@@ -56,7 +56,7 @@ Widget buildPortraitLayout(BuildContext context, TextEditingController usernameC
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
-                backgroundColor: Colors.white.withOpacity(0.7),
+                backgroundColor: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ),

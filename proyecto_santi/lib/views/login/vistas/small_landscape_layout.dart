@@ -2,21 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
-import 'package:proyecto_santi/tema/GradientBackground.dart';
 
-Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, double padding, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, double imageSize, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
-      Theme.of(context).brightness == Brightness.dark
-          ? GradientBackgroundDark(
-        child: Container(),
-      )
-          : GradientBackgroundLight(
-        child: Container(),
-      ),
       Row(
         children: [
-          Container(
+          SizedBox(
             width: constraints.maxWidth * 0.5,
             child: Center(
               child: Image.asset(
@@ -26,11 +18,11 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
               ),
             ),
           ),
-          Container(
+          SizedBox(
             width: constraints.maxWidth * 0.5,
             child: Padding(
               padding: const EdgeInsets.all(16.0), // Adjust margin here
-              child: _buildRightSide(context, padding, usernameController, passwordController, _login, showLoginDialog),
+              child: _buildRightSide(context, usernameController, passwordController, _login, showLoginDialog),
             ),
           ),
         ],
@@ -49,7 +41,7 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
           style: TextStyle(
             color: Colors.black,
             fontSize: 16,
-            backgroundColor: Colors.white.withOpacity(0.7),
+            backgroundColor: Colors.white.withValues(alpha: 0.7),
           ),
         ),
       ),
@@ -57,14 +49,14 @@ Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
   );
 }
 
-Widget _buildRightSide(BuildContext context, double padding, TextEditingController usernameController, TextEditingController passwordController, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget _buildRightSide(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, VoidCallback login, VoidCallback showLoginDialog) {
   return Center(
     child: Container(
-      padding: EdgeInsets.symmetric(horizontal: padding, vertical: 32),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 32),
       decoration: BoxDecoration(
         color:  Theme.of(context).brightness == Brightness.dark
-            ? lightTheme.primaryColor.withOpacity(0.1)
-            : darkTheme.primaryColor.withOpacity(0.1),
+            ? lightTheme.primaryColor.withValues(alpha: 0.1)
+            : darkTheme.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -74,8 +66,9 @@ Widget _buildRightSide(BuildContext context, double padding, TextEditingControll
             usernameController: usernameController,
             passwordController: passwordController,
           ),
+          SizedBox(height: 7),
           LoginButtonsRow(
-            onLoginPressed: _login,
+            onLoginPressed: login,
             onMicrosoftLoginPressed: showLoginDialog,
           ),
         ],
