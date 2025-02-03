@@ -130,7 +130,7 @@ class LoginViewState extends State<LoginView> {
       return LayoutBuilder(
         builder: (context, constraints) {
           double imageSize = constraints.maxHeight;
-          double padding = 16.0;
+          double padding = constraints.maxHeight * 0.5;
           return buildLargeLandscapeLayout(context, constraints, imageSize, padding, _usernameController, _passwordController, isLoading, _login, showLoginDialog);
         },
       );

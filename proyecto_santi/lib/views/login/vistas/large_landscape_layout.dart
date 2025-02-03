@@ -8,9 +8,8 @@ Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
     children: [
       Center(
         child: Container(
-          width: 800, // Fixed size
-          height: 600, // Fixed size
-          padding: EdgeInsets.symmetric(horizontal: padding, vertical: 32),
+          width: constraints.maxWidth * 0.35, // Fixed size
+          height: constraints.maxHeight * 0.6, // Fixed size
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
                 ? lightTheme.primaryColor.withOpacity(0.1)
@@ -21,31 +20,31 @@ Widget buildLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: 200, // Fixed width
-                height: 200, // Fixed height
+                width: constraints.maxHeight * 0.20, // Fixed width
+                height: constraints.maxHeight * 0.20, // Fixed height
                 child: Image.asset(
                   'assets/logorecortado.png',
                   width: imageSize,
                   height: imageSize,
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: constraints.maxHeight * 0.02),
               SizedBox(
-                width: 400, // Fixed width
+                width: constraints.maxWidth * 0.25, // Fixed width
                 child: LoginForm(
                   usernameController: usernameController,
                   passwordController: passwordController,
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: constraints.maxHeight * 0.02),
               SizedBox(
-                width: 400, // Fixed width
+                width: constraints.maxWidth * 0.25, // Fixed width
                 child: LoginButtons(
                   onLoginPressed: _login,
                   onMicrosoftLoginPressed: showLoginDialog,
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: constraints.maxHeight * 0.05),
             ],
           ),
         ),
