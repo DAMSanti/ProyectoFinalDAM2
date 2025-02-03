@@ -107,7 +107,7 @@ class _CalendarViewState extends State<CalendarView> {
                 ),
               ),
               Container(
-                height: isWeb ? 455 : 252,
+                height: isWeb ? 395 : 252,
                 margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 220.0) : EdgeInsets.all(16.0),
                 padding: EdgeInsets.symmetric(vertical: 0, horizontal: 8.0),
                 decoration: BoxDecoration(
@@ -129,7 +129,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   Widget _buildWebCalendar() {
     return TableCalendar<Actividad>(
-      rowHeight: 60,
+      rowHeight: 50,
       daysOfWeekHeight: 40,
       firstDay: DateTime.utc(2020, 1, 1),
       lastDay: DateTime.utc(2030, 12, 31),

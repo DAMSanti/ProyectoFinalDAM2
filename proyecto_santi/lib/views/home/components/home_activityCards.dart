@@ -23,7 +23,7 @@ class ActivityList extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 120, // Adjust the height as needed
+          height: 130, // Adjust the height as needed
           child: ListView.builder(
             scrollDirection: Axis.horizontal, // Horizontal scrolling
             itemCount: activities.length,

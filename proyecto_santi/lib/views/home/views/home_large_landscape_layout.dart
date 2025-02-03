@@ -37,8 +37,15 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
           child: Column(
             children: [
               UserInformation(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Próximas Actividades',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
               Container(
-                height: 160,
+                height: 130,
                 child: Listener(
                   onPointerSignal: (pointerSignal) {
                     if (pointerSignal is PointerScrollEvent) {
@@ -76,8 +83,17 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                child: Text(
+                  'Calendario de Actividades',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
               Expanded(
-                child: CalendarView(activities: widget.activities),
+                child: Center(
+                  child: CalendarView(activities: widget.activities),
+                ),
               ),
             ],
           ),

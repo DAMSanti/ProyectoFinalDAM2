@@ -121,7 +121,7 @@ class Menu extends StatelessWidget {
           _logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pop(context);
-          Navigator.pushReplacementNamed(context, routeName);
+          Navigator.pushNamed(context, routeName);
         } else {
           Navigator.pop(context);
         }
