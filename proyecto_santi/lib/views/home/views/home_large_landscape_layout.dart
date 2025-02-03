@@ -1,32 +1,86 @@
-// home_large_landscape_layout.dart
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/views/home/components/home_activityCards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/components/menu.dart';
+import 'package:flutter/gestures.dart';
 
-class HomeLargeLandscapeLayout extends StatelessWidget {
+class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
 
   const HomeLargeLandscapeLayout({super.key, required this.activities});
 
   @override
+  State<HomeLargeLandscapeLayout> createState() =>
+      _HomeLargeLandscapeLayoutState();
+}
+
+class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Container(
+          width: 250,
+          child: Menu(),
+        ),
         Expanded(
           child: Column(
             children: [
               UserInformation(),
-              SizedBox(
-                height: 100,
-                child: ActivityList(activities: activities),
+              Container(
+                height: 160,
+                child: Listener(
+                  onPointerSignal: (pointerSignal) {
+                    if (pointerSignal is PointerScrollEvent) {
+                      final offset = _scrollController.offset +
+                          (pointerSignal.scrollDelta.dy * -2.5);
+                      _scrollController.animateTo(
+                        offset.clamp(
+                          0.0,
+                          _scrollController.position.maxScrollExtent,
+                        ),
+                        duration: Duration(milliseconds: 100),
+                        curve: Curves.ease,
+                      );
+                    }
+                  },
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    physics: BouncingScrollPhysics(),
+                    child: Row(
+                      children: widget.activities.map((actividad) {
+                        return Padding(
+                          padding: EdgeInsets.only(right: 16.0),
+                          child: SizedBox(
+                            width: 300,
+                            child: ActivityCardItem(
+                              actividad: actividad,
+                              isDarkTheme: Theme.of(context).brightness ==
+                                  Brightness.dark,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: CalendarView(activities: widget.activities),
               ),
             ],
           ),
-        ),
-        Expanded(
-          child: CalendarView(activities: activities),
         ),
       ],
     );

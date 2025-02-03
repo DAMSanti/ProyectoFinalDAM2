@@ -65,10 +65,12 @@ class _HomeViewState extends State<HomeView> {
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: CustomAppBar(
+            appBar: _shouldShowAppBar()
+                ? CustomAppBar(
               onToggleTheme: widget.onToggleTheme,
               title: 'Inicio',
-            ),
+            )
+                : null,
             drawer: MediaQuery.of(context).size.shortestSide < 600
                 ? OrientationBuilder(
               builder: (context, orientation) {
@@ -96,6 +98,10 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
+  }
+
+  bool _shouldShowAppBar() {
+    return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
   }
 
   Widget _buildLayout(BuildContext context, List<Actividad> activities) {

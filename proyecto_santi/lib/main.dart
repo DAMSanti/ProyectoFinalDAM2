@@ -18,12 +18,12 @@ void main() async {
   // Esta es la base de flutter, vamos a repetirlo en consultas asincronas
   WidgetsFlutterBinding.ensureInitialized();
 
-
   try {
     // Inicializamos Firebase con la info de la APi en secure storage. TODO: variables de entorno.
     await SecureStorageConfig.storeFirebaseConfig();
 
-    final config = await SecureStorageConfig.retrieveFirebaseConfig(); // Retrieve the config
+    final config = await SecureStorageConfig
+        .retrieveFirebaseConfig(); // Retrieve the config
 
     final firebaseConfig = FirebaseOptions(
       apiKey: config['apiKey']!,
@@ -38,11 +38,12 @@ void main() async {
     await Firebase.initializeApp(options: firebaseConfig);
 
     // Limitamos el tamaño minimo de la ventana en windows, linux y mac
-    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       await windowManager.ensureInitialized();
 
       WindowOptions windowOptions =
-          WindowOptions(minimumSize: Size(400, 750), title: 'ACEX');
+          WindowOptions(minimumSize: Size(1208, 720), title: 'ACEX');
       windowManager.waitUntilReadyToShow(windowOptions, () async {
         await windowManager.show();
         await windowManager.focus();

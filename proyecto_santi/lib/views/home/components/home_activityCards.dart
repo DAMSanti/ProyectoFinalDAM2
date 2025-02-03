@@ -54,15 +54,14 @@ class ActivityCardItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300, // Adjust the width as needed
-      margin: EdgeInsets.symmetric(horizontal: 8.0), // Space between cards
+      width: 300,
+      margin: EdgeInsets.symmetric(horizontal: 8.0),
       child: Card(
         color: Theme.of(context).brightness == Brightness.light
             ? lightTheme.primaryColor.withOpacity(1)
             : darkTheme.primaryColor.withOpacity(1),
         child: InkWell(
           onTap: () {
-            // Navigate to the activity detail view
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -76,31 +75,42 @@ class ActivityCardItem extends StatelessWidget {
           },
           child: Padding(
             padding: EdgeInsets.all(16.0),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        actividad.titulo ?? 'Sin título',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 8.0),
-                      Text(
-                        actividad.fini ?? 'Sin fecha de inicio',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      actividad.titulo ?? 'Sin título',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    SizedBox(height: 8.0),
+                    Text(
+                      actividad.descripcion ?? 'Sin descripción',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ],
                 ),
-                Center(
-                  child: Text(
-                    actividad.estado ?? 'Sin estado',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      actividad.fini ?? 'Sin fecha',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    Text(
+                      actividad.estado ?? 'Sin estado',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
                 ),
               ],
             ),
