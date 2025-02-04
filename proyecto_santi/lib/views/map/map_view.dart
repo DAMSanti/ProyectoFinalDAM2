@@ -32,7 +32,7 @@ class _MapViewState extends State<MapView> {
 
   Future<void> _fetchActivities() async {
     try {
-      final fetchedActivities = await _apiService.fetchActivities();
+      final fetchedActivities = await _apiService.fetchFutureActivities();
       setState(() {
         activities = fetchedActivities.where((actividad) => actividad.latitud != null && actividad.longitud != null).toList();
         isLoading = false;

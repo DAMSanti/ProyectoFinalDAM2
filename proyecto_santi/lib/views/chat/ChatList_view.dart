@@ -24,7 +24,7 @@ class _ChatListViewState extends State<ChatListView> {
   @override
   void initState() {
     super.initState();
-    _futureActivities = _apiService.fetchActivities();
+    _futureActivities = _apiService.fetchFutureActivities();
   }
 
   @override

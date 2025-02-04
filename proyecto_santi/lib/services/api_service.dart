@@ -49,7 +49,7 @@ class ApiService {
     }
   }
 
-  Future<List<Actividad>> fetchActivities() async {
+  Future<List<Actividad>> fetchFutureActivities() async {
     try {
       final response = await _dio.get('/actividad');
       if (response.statusCode == 500) {
@@ -63,6 +63,22 @@ class ApiService {
           final activityDay = DateTime(activityDate.year, activityDate.month, activityDate.day);
           return activityDay.isAtSameMomentAs(today) || activityDay.isAfter(today);
         }).toList();
+      } else {
+        throw Exception("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Exception: ${e.toString()}");
+    }
+  }
+
+  Future<List<Actividad>> fetchActivities() async {
+    try {
+      final response = await _dio.get('/actividad');
+      if (response.statusCode == 500) {
+        throw Exception("Internal Server Error. Please try again later.");
+      } else if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => Actividad.fromJson(json)).toList();
       } else {
         throw Exception("Error: ${response.statusCode}");
       }

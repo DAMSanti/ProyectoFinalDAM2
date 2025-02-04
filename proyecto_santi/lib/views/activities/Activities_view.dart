@@ -1,32 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
+import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/tema/GradientBackground.dart';
+import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/config.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
-class ActivitiesView extends StatelessWidget {
+class ActivitiesView extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
 
   const ActivitiesView({
-    Key? key,
+    super.key,
     required this.onToggleTheme,
     required this.isDarkTheme,
-  }) : super(key: key);
+  });
+
+  @override
+  _ActivitiesViewState createState() => _ActivitiesViewState();
+}
+
+class _ActivitiesViewState extends State<ActivitiesView> {
+  late Future<List<Actividad>> _futureActivities;
+  final ApiService _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _futureActivities = _apiService.fetchFutureActivities();
+  }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushReplacementNamed(context, '/home');
-        return false; // Prevent the default back button behavior
-      },
-      child: Scaffold(
-        appBar: CustomAppBar(
-          onToggleTheme: onToggleTheme,
+      onWillPop:() async {
+    Navigator.pushReplacementNamed(context, '/home');
+    return false;
+    },
+      child: Stack(
+          children: [
+          Theme.of(context).brightness == Brightness.dark
+          ? GradientBackgroundDark(
+        child: Container(),
+      )
+          : GradientBackgroundLight(
+        child: Container(),
+      ),
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: shouldShowAppBar()
+            ? CustomAppBar(
+          onToggleTheme: widget.onToggleTheme,
           title: 'Actividades',
-        ),
-        drawer: Menu(),
+        )
+            : null,
+        drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+            ? OrientationBuilder(
+          builder: (context, orientation) {
+            return orientation == Orientation.portrait
+                ? Menu()
+                : MenuLandscape();
+          },
+        )
+            : MenuDesktop(),
         body: Column(
           children: [
             SearchBar(
@@ -52,6 +91,7 @@ class ActivitiesView extends StatelessWidget {
           ],
         ),
       ),
+    ],),
     );
   }
 }
@@ -110,29 +150,31 @@ class AllActividades extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance.collection('actividades').get(),
+    final ApiService _apiService = ApiService();
+
+    return FutureBuilder<List<Actividad>>(
+      future: _apiService.fetchActivities(), // Use your API service here
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text('No hay actividades disponibles'));
         } else {
-          var actividades = snapshot.data!.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          var actividades = snapshot.data!;
           return ListView.builder(
             itemCount: actividades.length,
             itemBuilder: (context, index) {
               var actividad = actividades[index];
               return ListTile(
-                title: Text(actividad['titulo'] ?? 'Sin título'),
-                subtitle: Text(actividad['descripcion'] ?? 'Sin descripción'),
+                title: Text(actividad.titulo ?? 'Sin título'),
+                subtitle: Text(actividad.descripcion ?? 'Sin descripción'),
                 onTap: () {
                   Navigator.pushNamed(
                     context,
                     '/activityDetail',
-                    arguments: {'activityId': actividad['id']},
+                    arguments: {'activityId': actividad.id},
                   );
                 },
               );
@@ -147,29 +189,31 @@ class AllActividades extends StatelessWidget {
 class OtrasActividades extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance.collection('otras_actividades').get(),
+    final ApiService _apiService = ApiService();
+
+    return FutureBuilder<List<Actividad>>(
+      future: _apiService.fetchFutureActivities(), // Use your API service here
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text('No hay otras actividades disponibles'));
         } else {
-          var actividades = snapshot.data!.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          var actividades = snapshot.data!;
           return ListView.builder(
             itemCount: actividades.length,
             itemBuilder: (context, index) {
               var actividad = actividades[index];
               return ListTile(
-                title: Text(actividad['titulo'] ?? 'Sin título'),
-                subtitle: Text(actividad['descripcion'] ?? 'Sin descripción'),
+                title: Text(actividad.titulo ?? 'Sin título'),
+                subtitle: Text(actividad.descripcion ?? 'Sin descripción'),
                 onTap: () {
                   Navigator.pushNamed(
                     context,
                     '/activityDetail',
-                    arguments: {'activityId': actividad['id']},
+                    arguments: {'activityId': actividad.id},
                   );
                 },
               );

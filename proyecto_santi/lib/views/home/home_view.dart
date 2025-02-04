@@ -7,6 +7,7 @@ import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_large_landscape_layout.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
+import 'package:proyecto_santi/config.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
@@ -26,7 +27,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _futureActivities = _apiService.fetchActivities();
+    _futureActivities = _apiService.fetchFutureActivities();
   }
 
   @override
@@ -44,7 +45,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: _shouldShowAppBar()
+            appBar: shouldShowAppBar()
                 ? CustomAppBar(
               onToggleTheme: widget.onToggleTheme,
               title: 'Inicio',
@@ -114,9 +115,5 @@ class _HomeViewState extends State<HomeView> {
       ),
     )) ??
         false;
-  }
-
-  bool _shouldShowAppBar() {
-    return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
   }
 }
