@@ -241,7 +241,7 @@ class MenuDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double drawerWidth = constraints.maxWidth * 0.20;
+        double drawerWidth = constraints.maxWidth * 0.21;
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
           width: drawerWidth, // Adjust the width of the Drawer

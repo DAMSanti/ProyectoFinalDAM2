@@ -4,46 +4,50 @@ import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
 Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
-  return Stack(
-    children: [
-      Row(
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return Stack(
         children: [
-          SizedBox(
-            width: constraints.maxWidth * 0.5,
-            child: Center(
-              child: Image.asset(
-                'assets/logorecortado.png',
+          Row(
+            children: [
+              SizedBox(
+                width: constraints.maxWidth * 0.5,
+                child: Center(
+                  child: Image.asset(
+                    'assets/logorecortado.png',
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: constraints.maxWidth * 0.5,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0), // Adjust margin here
+                  child: _buildRightSide(context, usernameController, passwordController, _login, showLoginDialog),
+                ),
+              ),
+            ],
+          ),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Text(
+              'Width: ${constraints.maxWidth.toStringAsFixed(2)}\nHeight: ${constraints.maxHeight.toStringAsFixed(2)}',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                backgroundColor: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ),
-          SizedBox(
-            width: constraints.maxWidth * 0.5,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0), // Adjust margin here
-              child: _buildRightSide(context, usernameController, passwordController, _login, showLoginDialog),
-            ),
-          ),
         ],
-      ),
-      if (isLoading)
-        Center(
-          child: CircularProgressIndicator(
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-      Positioned(
-        top: 10,
-        left: 10,
-        child: Text(
-          'Width: ${constraints.maxWidth.toStringAsFixed(2)}\nHeight: ${constraints.maxHeight.toStringAsFixed(2)}',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            backgroundColor: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
-      ),
-    ],
+      );
+    },
   );
 }
 
@@ -52,9 +56,9 @@ Widget _buildRightSide(BuildContext context, TextEditingController usernameContr
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 32),
       decoration: BoxDecoration(
-        color:  Theme.of(context).brightness == Brightness.dark
-            ? lightTheme.primaryColor.withValues(alpha: 0.1)
-            : darkTheme.primaryColor.withValues(alpha: 0.1),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? lightTheme.primaryColor.withAlpha(25)
+            : darkTheme.primaryColor.withAlpha(25),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

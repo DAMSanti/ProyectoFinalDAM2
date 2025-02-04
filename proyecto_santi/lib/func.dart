@@ -4,11 +4,7 @@ import 'package:proyecto_santi/models/auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
-
-bool shouldShowAppBar() {
-  return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
-}
-
+// Funcion para mensaje popUp de salir
 Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
   return (await showDialog(
     context: context,
@@ -35,6 +31,12 @@ Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
   )) ?? false;
 }
 
+// Funcion que oculta appbar en web y escritorio
+bool shouldShowAppBar() {
+  return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+}
+
+// Funcion para hacer logout
 void logout(BuildContext context) {
   Provider.of<Auth>(context, listen: false).logout();
   Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);

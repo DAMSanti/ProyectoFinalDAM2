@@ -12,17 +12,21 @@ class HomePortraitLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        UserInformation(),
-        SizedBox(
-          height: 175,
-          child: ActivityList(activities: activities),
-        ),
-        Expanded(
-          child: CalendarView(activities: activities),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            UserInformation(),
+            SizedBox(
+              height: 175,
+              child: ActivityList(activities: activities),
+            ),
+            Expanded(
+              child: CalendarView(activities: activities),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -56,7 +56,7 @@ Widget loginPortraitLayout(BuildContext context, TextEditingController usernameC
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
-                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                backgroundColor: Colors.white.withAlpha(179),
               ),
             ),
           ),

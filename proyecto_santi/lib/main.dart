@@ -51,6 +51,7 @@ void main() async {
         await windowManager.show();
         await windowManager.focus();
       });
+      windowManager.setAspectRatio(16 / 9);
     }
 
     // Lanzamos la App con ChangeNotifierProvier para tener acceso a Auth

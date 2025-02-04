@@ -12,36 +12,45 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Column(
-            children: [
-              UserInformation(),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: activities.length,
-                  itemBuilder: (context, index) {
-                    final actividad = activities[index];
-                    return ActivityCardItem(
-                      actividad: actividad,
-                      isDarkTheme: Theme.of(context).brightness == Brightness.dark,
-                    );
-                  },
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: [
+                  UserInformation(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: activities.length,
+                      itemBuilder: (context, index) {
+                        final actividad = activities[index];
+                        return ActivityCardItem(
+                          actividad: actividad,
+                          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: SizedBox(
-            height: 285, // Adjust the height of the calendar
-            child: CalendarView(activities: activities),
-          ),
-        ),
-      ],
+            ),
+            Expanded(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: constraints.maxHeight, // Adjust the height of the calendar based on screen size
+                    child: CalendarView(activities: activities),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
