@@ -74,7 +74,7 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: AndroidAppBar(
         onToggleTheme: widget.onToggleTheme,
         title: 'Activity Details',
       ),

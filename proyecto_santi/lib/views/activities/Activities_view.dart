@@ -52,7 +52,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
       Scaffold(
         backgroundColor: Colors.transparent,
         appBar: shouldShowAppBar()
-            ? CustomAppBar(
+            ? AndroidAppBar(
           onToggleTheme: widget.onToggleTheme,
           title: 'Actividades',
         )
@@ -65,7 +65,7 @@ class _ActivitiesViewState extends State<ActivitiesView> {
                 : MenuLandscape();
           },
         )
-            : MenuDesktop(),
+            : null,
         body: Column(
           children: [
             SearchBar(

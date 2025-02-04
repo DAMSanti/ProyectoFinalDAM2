@@ -24,7 +24,7 @@ class ChatView extends StatelessWidget {
       return false; // Prevent the default back button behavior
     },
     child: Scaffold(
-      appBar: CustomAppBar(
+      appBar: AndroidAppBar(
         onToggleTheme: onToggleTheme,
         title: 'Chat',
       ),

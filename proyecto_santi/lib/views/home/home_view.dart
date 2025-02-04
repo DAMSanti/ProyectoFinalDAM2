@@ -46,7 +46,7 @@ class _HomeViewState extends State<HomeView> {
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: shouldShowAppBar()
-                ? CustomAppBar(
+                ? AndroidAppBar(
               onToggleTheme: widget.onToggleTheme,
               title: 'Inicio',
             )

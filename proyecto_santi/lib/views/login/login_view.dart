@@ -73,7 +73,7 @@ class LoginViewState extends State<LoginView> {
             ),
             Scaffold(
               backgroundColor: Colors.transparent,
-              appBar: CustomAppBar(
+              appBar: AndroidAppBar(
                 onToggleTheme: widget.onToggleTheme,
                 title: 'Login',
                 showMenuButton: false,

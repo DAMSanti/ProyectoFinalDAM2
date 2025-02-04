@@ -53,7 +53,7 @@ class _MapViewState extends State<MapView> {
         return false; // Prevent the default back button behavior
       },
       child: Scaffold(
-        appBar: CustomAppBar(
+        appBar: AndroidAppBar(
           onToggleTheme: widget.onToggleTheme,
           title: 'Mapa',
         ),
