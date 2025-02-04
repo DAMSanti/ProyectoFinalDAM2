@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;

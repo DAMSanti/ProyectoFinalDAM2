@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
-import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
 import 'package:proyecto_santi/views/chat/ChatList_view.dart';
 import 'package:proyecto_santi/views/activities/Activities_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
@@ -112,7 +112,6 @@ class _MyAppState extends State<MyApp> {
                   ChatListView(
                       onToggleTheme: _toggleTheme,
                       isDarkTheme: _themeMode == ThemeMode.dark),
-              // Cambia a ChatListView
             },
             onGenerateRoute: (settings) {
               if (settings.name == '/activityDetail') {

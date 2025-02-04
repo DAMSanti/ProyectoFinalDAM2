@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

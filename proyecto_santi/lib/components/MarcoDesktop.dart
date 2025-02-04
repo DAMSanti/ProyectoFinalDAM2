@@ -177,11 +177,10 @@ class MenuDesktop extends StatelessWidget {
         if (routeName == '/') {
           logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
+          Navigator.pushReplacementNamed(context, routeName);
+        } /*else {
           Navigator.pop(context);
-          Navigator.pushNamed(context, routeName);
-        } else {
-          Navigator.pop(context);
-        }
+        }*/
       },
     );
   }
