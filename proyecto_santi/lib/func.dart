@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_santi/models/auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
+
+
+bool shouldShowAppBar() {
+  return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+}
+
+Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
+  return (await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('¿Estás seguro?'),
+      content: Text('¿Quieres salir de la aplicación?'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text('No'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(true);
+            if (isHome) {
+              logout(context);
+              Navigator.pushReplacementNamed(context, '/login');
+            }
+          },
+          child: Text('Sí'),
+        ),
+      ],
+    ),
+  )) ?? false;
+}
+
+void logout(BuildContext context) {
+  Provider.of<Auth>(context, listen: false).logout();
+  Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
+}

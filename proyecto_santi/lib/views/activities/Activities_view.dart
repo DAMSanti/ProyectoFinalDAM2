@@ -5,7 +5,7 @@ import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/config.dart';
+import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 

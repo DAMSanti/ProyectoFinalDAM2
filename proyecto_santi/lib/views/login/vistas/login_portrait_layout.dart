@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
-Widget buildPortraitLayout(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget loginPortraitLayout(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return LayoutBuilder(
     builder: (context, constraints) {
       double imageSize = constraints.maxWidth * 0.5;

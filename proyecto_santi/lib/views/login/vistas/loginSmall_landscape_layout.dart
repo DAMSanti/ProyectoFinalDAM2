@@ -3,7 +3,7 @@ import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
-Widget buildSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
       Row(

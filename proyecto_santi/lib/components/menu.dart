@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/func.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Menu extends StatelessWidget {
@@ -107,18 +106,13 @@ class Menu extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    Provider.of<Auth>(context, listen: false).logout();
-    Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-  }
-
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
       title: Text(text),
       onTap: () {
         if (routeName == '/') {
-          _logout(context);
+          logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pop(context);
           Navigator.pushNamed(context, routeName);
@@ -223,18 +217,13 @@ class MenuLandscape extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    Provider.of<Auth>(context, listen: false).logout();
-    Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-  }
-
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
       title: Text(text),
       onTap: () {
         if (routeName == '/') {
-          _logout(context);
+          logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pop(context);
           Navigator.pushReplacementNamed(context, routeName);
@@ -352,18 +341,13 @@ class MenuDesktop extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    Provider.of<Auth>(context, listen: false).logout();
-    Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-  }
-
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
       title: Text(text),
       onTap: () {
         if (routeName == '/') {
-          _logout(context);
+          logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pop(context);
           Navigator.pushNamed(context, routeName);

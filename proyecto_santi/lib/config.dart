@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class SecureStorageConfig {
   static final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
@@ -34,8 +33,4 @@ class SecureStorageConfig {
       'measurementId': measurementId,
     };
   }
-}
-
-bool shouldShowAppBar() {
-  return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 }

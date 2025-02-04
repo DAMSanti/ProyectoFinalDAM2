@@ -7,7 +7,7 @@ import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_large_landscape_layout.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
-import 'package:proyecto_santi/config.dart';
+import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
@@ -33,7 +33,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop: () => onWillPopSalir(context, isHome: true),
       child: Stack(
         children: [
           Theme.of(context).brightness == Brightness.dark
@@ -94,26 +94,5 @@ class _HomeViewState extends State<HomeView> {
         },
       );
     }
-  }
-
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿Estás seguro?'),
-        content: Text('¿Quieres salir de la aplicación?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Sí'),
-          ),
-        ],
-      ),
-    )) ??
-        false;
   }
 }
