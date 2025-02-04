@@ -29,27 +29,6 @@ class _HomeViewState extends State<HomeView> {
     _futureActivities = _apiService.fetchActivities();
   }
 
-  Future<bool> _onWillPop() async {
-    return (await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿Estás seguro?'),
-        content: Text('¿Quieres salir de la aplicación?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Sí'),
-          ),
-        ],
-      ),
-    )) ??
-        false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -71,7 +50,7 @@ class _HomeViewState extends State<HomeView> {
               title: 'Inicio',
             )
                 : null,
-            drawer: MediaQuery.of(context).size.shortestSide < 600
+            drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
                 ? OrientationBuilder(
               builder: (context, orientation) {
                 return orientation == Orientation.portrait
@@ -100,10 +79,6 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  bool _shouldShowAppBar() {
-    return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
-  }
-
   Widget _buildLayout(BuildContext context, List<Actividad> activities) {
     if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return HomeLargeLandscapeLayout(activities: activities);
@@ -118,5 +93,30 @@ class _HomeViewState extends State<HomeView> {
         },
       );
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Estás seguro?'),
+        content: Text('¿Quieres salir de la aplicación?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Sí'),
+          ),
+        ],
+      ),
+    )) ??
+        false;
+  }
+
+  bool _shouldShowAppBar() {
+    return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
   }
 }

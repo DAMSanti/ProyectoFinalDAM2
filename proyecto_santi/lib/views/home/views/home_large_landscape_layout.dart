@@ -31,7 +31,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
       builder: (context, constraints) {
         return Row(
           children: [
-            Container(
+            SizedBox(
               width: constraints.maxWidth * 0.15, // Adjust width based on screen size
               child: MenuDesktop(),
             ),
@@ -46,7 +46,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     height: constraints.maxHeight * 0.19, // Fixed height for Próximas Actividades
                     child: Listener(
                       onPointerSignal: (pointerSignal) {

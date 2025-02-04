@@ -11,6 +11,8 @@ import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/config.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
@@ -21,6 +23,7 @@ void main() async {
   try {
     // Inicializamos Firebase con la info de la APi en secure storage. TODO: variables de entorno.
     await SecureStorageConfig.storeFirebaseConfig();
+    await initializeDateFormatting('es_ES', null);
 
     final config = await SecureStorageConfig
         .retrieveFirebaseConfig(); // Retrieve the config
@@ -77,47 +80,56 @@ class _MyAppState extends State<MyApp> {
   void _toggleTheme() {
     setState(() {
       _themeMode =
-          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
   // Construimos la App con las rutas y el tema
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ACEX',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: _themeMode,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => LoginView(onToggleTheme: _toggleTheme),
-        '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
-        '/actividades': (context) => ActivitiesView(
-            onToggleTheme: _toggleTheme,
-            isDarkTheme: _themeMode == ThemeMode.dark),
-        '/mapa': (context) => MapView(
-            onToggleTheme: _toggleTheme,
-            isDarkTheme: _themeMode == ThemeMode.dark),
-        '/chat': (context) => ChatListView(
-            onToggleTheme: _toggleTheme,
-            isDarkTheme: _themeMode == ThemeMode.dark), // Cambia a ChatListView
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/activityDetail') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) {
-              return ActivityDetailView(
-                actividad: args['activity'],
-                onToggleTheme: _toggleTheme,
-                isDarkTheme: _themeMode == ThemeMode.dark,
-              );
+    return ScreenUtilInit(
+        designSize: Size(360, 690),
+        builder: (context, child) {
+          return MaterialApp(
+            title: 'ACEX',
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: _themeMode,
+            initialRoute: '/',
+            routes: {
+              '/': (context) => LoginView(onToggleTheme: _toggleTheme),
+              '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
+              '/actividades': (context) =>
+                  ActivitiesView(
+                      onToggleTheme: _toggleTheme,
+                      isDarkTheme: _themeMode == ThemeMode.dark),
+              '/mapa': (context) =>
+                  MapView(
+                      onToggleTheme: _toggleTheme,
+                      isDarkTheme: _themeMode == ThemeMode.dark),
+              '/chat': (context) =>
+                  ChatListView(
+                      onToggleTheme: _toggleTheme,
+                      isDarkTheme: _themeMode == ThemeMode.dark),
+              // Cambia a ChatListView
+            },
+            onGenerateRoute: (settings) {
+              if (settings.name == '/activityDetail') {
+                final args = settings.arguments as Map<String, dynamic>;
+                return MaterialPageRoute(
+                  builder: (context) {
+                    return ActivityDetailView(
+                      actividad: args['activity'],
+                      onToggleTheme: _toggleTheme,
+                      isDarkTheme: _themeMode == ThemeMode.dark,
+                    );
+                  },
+                );
+              }
+              return null;
             },
           );
         }
-        return null;
-      },
     );
   }
 }
