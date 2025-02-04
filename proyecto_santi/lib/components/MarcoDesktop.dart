@@ -5,8 +5,9 @@ import 'package:proyecto_santi/views/home/components/home_user.dart';
 
 class MarcoDesktop extends StatelessWidget {
   final Widget content;
+  final VoidCallback onToggleTheme;
 
-  const MarcoDesktop({super.key, required this.content});
+  const MarcoDesktop({super.key, required this.content, required this.onToggleTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +24,16 @@ class MarcoDesktop extends StatelessWidget {
                 children: [
                   SizedBox(
                     height: 92, // Fixed height for AppBar
-                    child: DesktopBar(),
+                    child: DesktopBar(onToggleTheme: onToggleTheme),
                   ),
                   Expanded(
-                    child: content,
+                    child: Navigator(
+                      onGenerateRoute: (settings) {
+                        return MaterialPageRoute(
+                          builder: (context) => content,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -39,10 +46,9 @@ class MarcoDesktop extends StatelessWidget {
 }
 
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onToggleTheme;
 
-  const DesktopBar({
-    super.key,
-  });
+  const DesktopBar({super.key, required this.onToggleTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +59,12 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
           centerTitle: true,
           automaticallyImplyLeading: false,
           flexibleSpace: UserInformation(),
-          /*actions: [
+          actions: [
             IconButton(
               icon: Icon(Icons.brightness_6),
               onPressed: onToggleTheme,
             ),
-          ],*/
+          ],
         );
       },
     );
@@ -113,6 +119,7 @@ class MenuDesktop extends StatelessWidget {
                   'Menú',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: Colors.white,
+                    inherit: true, // Ensure inherit is true
                   ),
                 ),
               ),
@@ -172,15 +179,16 @@ class MenuDesktop extends StatelessWidget {
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
-      title: Text(text),
+      title: Text(
+        text,
+        style: TextStyle(inherit: true), // Ensure inherit is true
+      ),
       onTap: () {
         if (routeName == '/') {
           logout(context);
         } else if (ModalRoute.of(context)?.settings.name != routeName) {
           Navigator.pushReplacementNamed(context, routeName);
-        } /*else {
-          Navigator.pop(context);
-        }*/
+        }
       },
     );
   }

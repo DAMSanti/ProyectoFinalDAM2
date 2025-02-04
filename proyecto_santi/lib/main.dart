@@ -11,6 +11,7 @@ import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/config.dart';
+import 'package:proyecto_santi/components/MarcoDesktop.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -99,19 +100,18 @@ class _MyAppState extends State<MyApp> {
             initialRoute: '/',
             routes: {
               '/': (context) => LoginView(onToggleTheme: _toggleTheme),
-              '/home': (context) => HomeView(onToggleTheme: _toggleTheme),
-              '/actividades': (context) =>
-                  ActivitiesView(
-                      onToggleTheme: _toggleTheme,
-                      isDarkTheme: _themeMode == ThemeMode.dark),
-              '/mapa': (context) =>
-                  MapView(
-                      onToggleTheme: _toggleTheme,
-                      isDarkTheme: _themeMode == ThemeMode.dark),
-              '/chat': (context) =>
-                  ChatListView(
-                      onToggleTheme: _toggleTheme,
-                      isDarkTheme: _themeMode == ThemeMode.dark),
+              '/home': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
+                  ? MarcoDesktop(content: HomeView(onToggleTheme: _toggleTheme), onToggleTheme: _toggleTheme)
+                  : HomeView(onToggleTheme: _toggleTheme),
+              '/actividades': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
+                  ? MarcoDesktop(content: ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
+                  : ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
+              '/mapa': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
+                  ? MarcoDesktop(content: MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
+                  : MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
+              '/chat': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
+                  ? MarcoDesktop(content: ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
+                  : ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
             },
             onGenerateRoute: (settings) {
               if (settings.name == '/activityDetail') {

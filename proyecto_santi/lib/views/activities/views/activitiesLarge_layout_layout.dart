@@ -20,8 +20,7 @@ class ActivitiesLargeLandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MarcoDesktop(
-      content: WillPopScope(
+      return WillPopScope(
         onWillPop: () async {
           Navigator.pushReplacementNamed(context, '/home');
           return false;
@@ -73,8 +72,7 @@ class ActivitiesLargeLandscapeLayout extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
 

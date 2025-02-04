@@ -27,31 +27,31 @@ final ThemeData lightTheme = ThemeData(
       backgroundColor: colorAccentLight, // Color de fondo del botón
       foregroundColor: colorTextoLight, // Color del texto del botón
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
   // TEXTOS
   textTheme: TextTheme(
-    displayLarge: TextStyle(color: colorTextoLight),
-    displayMedium: TextStyle(color: colorTextoLight),
-    displaySmall: TextStyle(color: colorTextoLight),
-    headlineLarge: TextStyle(color: colorTextoLight),
-    headlineMedium: TextStyle(color: colorTextoLight),
-    headlineSmall: TextStyle(color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold),
-    bodyLarge: TextStyle(color: colorTextoLight),
-    bodyMedium: TextStyle(color: colorTextoLight),
-    bodySmall: TextStyle(color: colorTextoLight),
-    titleLarge: TextStyle(color: colorTextoLight),
-    titleMedium: TextStyle(color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(color: colorTextoLight),
-    labelLarge: TextStyle(color: colorTextoLight),
-    labelMedium: TextStyle(color: colorTextoLight),
-    labelSmall: TextStyle(color: colorTextoLight),
+    displayLarge: TextStyle(color: colorTextoLight, inherit: true),
+    displayMedium: TextStyle(color: colorTextoLight, inherit: true),
+    displaySmall: TextStyle(color: colorTextoLight, inherit: true),
+    headlineLarge: TextStyle(color: colorTextoLight, inherit: true),
+    headlineMedium: TextStyle(color: colorTextoLight, inherit: true),
+    headlineSmall: TextStyle(color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold, inherit: true),
+    bodyLarge: TextStyle(color: colorTextoLight, inherit: true),
+    bodyMedium: TextStyle(color: colorTextoLight, inherit: true),
+    bodySmall: TextStyle(color: colorTextoLight, inherit: true),
+    titleLarge: TextStyle(color: colorTextoLight, inherit: true),
+    titleMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 20, fontWeight: FontWeight.bold),
+    titleSmall: TextStyle(color: colorTextoLight, inherit: true),
+    labelLarge: TextStyle(color: colorTextoLight, inherit: true),
+    labelMedium: TextStyle(color: colorTextoLight, inherit: true),
+    labelSmall: TextStyle(color: colorTextoLight, inherit: true),
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
     color: Colors.transparent,
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20),
+    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
     iconTheme: IconThemeData(color: colorTextoLight),
   ),
   // CARDS
@@ -62,15 +62,15 @@ final ThemeData lightTheme = ThemeData(
   ),
   // LISTTILE
   listTileTheme: ListTileThemeData(
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold),
+    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     textColor: colorTextoLight,
     iconColor: colorTextoLight,
   ),
   // DIALOG
   dialogTheme: DialogTheme(
     backgroundColor: colorFondoLight,
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20),
-    contentTextStyle: TextStyle(color: colorTextoLight, fontSize: 16),
+    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
+    contentTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, inherit: true),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
@@ -84,8 +84,6 @@ final ThemeData lightTheme = ThemeData(
       secondary: colorFondoLight // Color específico para el DrawerHeader
   ),
 );
-
-
 
 
 const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);
@@ -108,31 +106,31 @@ final ThemeData darkTheme = ThemeData(
       backgroundColor: colorAccentDark, // Color de fondo del botón
       foregroundColor: colorTextoDark, // Color del texto del botón
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
   // TEXTOS
   textTheme: TextTheme(
-    displayLarge: TextStyle(color: colorTextoDark),
-    displayMedium: TextStyle(color: colorTextoDark),
-    displaySmall: TextStyle(color: colorTextoDark),
-    headlineLarge: TextStyle(color: colorTextoDark),
-    headlineMedium: TextStyle(color: colorTextoDark),
-    headlineSmall: TextStyle(color: colorTextoDark),
-    bodyLarge: TextStyle(color: colorTextoDark),
-    bodyMedium: TextStyle(color: colorTextoDark),
-    bodySmall: TextStyle(color: colorTextoDark),
-    titleLarge: TextStyle(color: colorTextoDark),
-    titleMedium: TextStyle(color: colorTextoDark, fontSize: 20, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(color: colorTextoDark),
-    labelLarge: TextStyle(color: colorTextoDark),
-    labelMedium: TextStyle(color: colorTextoDark),
-    labelSmall: TextStyle(color: colorTextoDark),
+    displayLarge: TextStyle(color: colorTextoDark, inherit: true),
+    displayMedium: TextStyle(color: colorTextoDark, inherit: true),
+    displaySmall: TextStyle(color: colorTextoDark, inherit: true),
+    headlineLarge: TextStyle(color: colorTextoDark, inherit: true),
+    headlineMedium: TextStyle(color: colorTextoDark, inherit: true),
+    headlineSmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 20, fontWeight: FontWeight.bold),
+    bodyLarge: TextStyle(color: colorTextoDark, inherit: true),
+    bodyMedium: TextStyle(color: colorTextoDark, inherit: true),
+    bodySmall: TextStyle(color: colorTextoDark, inherit: true),
+    titleLarge: TextStyle(color: colorTextoDark, inherit: true),
+    titleMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 20, fontWeight: FontWeight.bold),
+    titleSmall: TextStyle(color: colorTextoDark, inherit: true),
+    labelLarge: TextStyle(color: colorTextoDark, inherit: true),
+    labelMedium: TextStyle(color: colorTextoDark, inherit: true),
+    labelSmall: TextStyle(color: colorTextoDark, inherit: true),
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
     color: colorAccentDark,
-    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20),
+    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
     iconTheme: IconThemeData(color: colorTextoDark),
   ),
   // CARDS
@@ -149,10 +147,18 @@ final ThemeData darkTheme = ThemeData(
   // DIALOG
   dialogTheme: DialogTheme(
     backgroundColor: colorFondoDark,
-    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20),
-    contentTextStyle: TextStyle(color: colorTextoDark, fontSize: 16),
+    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
+    contentTextStyle: TextStyle(color: colorTextoDark, fontSize: 16, inherit: true),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
+  ),
+  // DRAWER
+  drawerTheme: DrawerThemeData(
+    backgroundColor: colorFondoDark,
+  ),
+  colorScheme: ColorScheme.dark(
+      primary: colorAccentDark,
+      secondary: colorFondoDark // Color específico para el DrawerHeader
   ),
 );

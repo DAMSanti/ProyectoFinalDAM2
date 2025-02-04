@@ -55,18 +55,6 @@ Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
                 color: Theme.of(context).primaryColor,
               ),
             ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: Text(
-              'Width: ${constraints.maxWidth.toStringAsFixed(2)}\nHeight: ${constraints.maxHeight.toStringAsFixed(2)}',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                backgroundColor: Colors.white.withAlpha(179),
-              ),
-            ),
-          ),
         ],
       );
     },

@@ -27,8 +27,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return MarcoDesktop(
-        content: LayoutBuilder(
+        return LayoutBuilder(
         builder: (context, constraints) {
           return Row(
             children: [
@@ -121,7 +120,6 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
             ],
           );
         },
-      )
-    );
+      );
   }
 }
