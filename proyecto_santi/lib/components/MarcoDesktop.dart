@@ -49,7 +49,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
     return OrientationBuilder(
       builder: (context, orientation) {
         return AppBar(
-          backgroundColor: Colors.amber,
+          backgroundColor: Color.fromARGB(255, 87, 116, 243),
           centerTitle: true,
           automaticallyImplyLeading: false,
           flexibleSpace: UserInformation(),

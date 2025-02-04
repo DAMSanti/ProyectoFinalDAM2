@@ -35,49 +35,67 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
               Expanded(
                 child: Column(
                   children: [
-                    //UserInformation(),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Text(
                         'Próximas Actividades',
-                        style: TextStyle(fontSize: 3.5.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 5.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    SizedBox(
-                      height: constraints.maxHeight * 0.19, // Fixed height for Próximas Actividades
-                      child: Listener(
-                        onPointerSignal: (pointerSignal) {
-                          if (pointerSignal is PointerScrollEvent) {
-                            final offset = _scrollController.offset +
-                                (pointerSignal.scrollDelta.dy * -2.5);
-                            _scrollController.animateTo(
-                              offset.clamp(
-                                0.0,
-                                _scrollController.position.maxScrollExtent,
-                              ),
-                              duration: Duration(milliseconds: 100),
-                              curve: Curves.ease,
-                            );
-                          }
-                        },
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          child: Row(
-                            children: widget.activities.map((actividad) {
-                              return Padding(
-                                padding: EdgeInsets.only(right: 16.0),
-                                child: SizedBox(
-                                  width: constraints.maxHeight * 0.35,
-                                  child: ActivityCardItem(
-                                    actividad: actividad,
-                                    isDarkTheme: Theme.of(context).brightness ==
-                                        Brightness.dark,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              offset: Offset(-4, -4),
+                              blurRadius: 10.0,
+                              spreadRadius: 1.0,
+                              blurStyle: BlurStyle.inner,
+                            ),
+                          ],
+                        ),
+                        child: SizedBox(
+                          height: constraints.maxHeight * 0.19,
+                          child: Listener(
+                            onPointerSignal: (pointerSignal) {
+                              if (pointerSignal is PointerScrollEvent) {
+                                final offset = _scrollController.offset +
+                                    (pointerSignal.scrollDelta.dy * -2.5);
+                                _scrollController.animateTo(
+                                  offset.clamp(
+                                    0.0,
+                                    _scrollController.position.maxScrollExtent,
                                   ),
-                                ),
-                              );
-                            }).toList(),
+                                  duration: Duration(milliseconds: 100),
+                                  curve: Curves.ease,
+                                );
+                              }
+                            },
+                            child: SingleChildScrollView(
+                              controller: _scrollController,
+                              scrollDirection: Axis.horizontal,
+                              physics: BouncingScrollPhysics(),
+                              child: Row(
+                                children: widget.activities.map((actividad) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 16.0),
+                                    child: SizedBox(
+                                      width: constraints.maxHeight * 0.35,
+                                      child: ActivityCardItem(
+                                        actividad: actividad,
+                                        isDarkTheme: Theme.of(context).brightness ==
+                                            Brightness.dark,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -89,7 +107,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                       padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
                       child: Text(
                         'Calendario de Actividades',
-                        style: TextStyle(fontSize: 3.5.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 5.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(

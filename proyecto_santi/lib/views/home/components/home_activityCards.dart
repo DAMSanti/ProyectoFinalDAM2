@@ -19,12 +19,12 @@ class ActivityList extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'Proximas Actividades',
-              style: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp),
+              style: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 16.dg : 3.5.sp, fontWeight: FontWeight.bold),
             ),
           ),
         ),
         SizedBox(
-          height: 130, // Adjust the height as needed
+          height: 134, // Adjust the height as needed
           child: ListView.builder(
             scrollDirection: Axis.horizontal, // Horizontal scrolling
             itemCount: activities.length,
@@ -58,8 +58,9 @@ class ActivityCardItem extends StatelessWidget {
       builder: (context, constraints) {
         return Container(
           width: 275.0, // Ajusta el ancho según sea necesario
-          margin: EdgeInsets.symmetric(horizontal: 8.0),
+          margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
           child: Card(
+            elevation: 8.0,
             color: Theme.of(context).brightness == Brightness.light
                 ? lightTheme.primaryColor.withOpacity(1)
                 : darkTheme.primaryColor.withOpacity(1),
@@ -94,14 +95,14 @@ class ActivityCardItem extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 6.0),
                         Text(
                           actividad.descripcion ?? 'Sin descripción',
                           style: TextStyle(
                             fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                           ),
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
+                          maxLines: MediaQuery.of(context).size.height > 800 ? 2 : 1,
                         ),
                       ],
                     ),

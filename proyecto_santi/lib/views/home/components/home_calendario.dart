@@ -90,13 +90,10 @@ class _CalendarViewState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux ||
-        Platform.isMacOS;
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final orientation = MediaQuery
-            .of(context)
-            .orientation;
+        final orientation = MediaQuery.of(context).orientation;
         return Center(
           child: Column(
             children: [
@@ -106,29 +103,28 @@ class _CalendarViewState extends State<CalendarView> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     'Calendario de Actividades',
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineSmall,
+                    style: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 16.dg : 3.5.sp, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               Container(
                 height: isWeb ? constraints.maxHeight * 0.8 : 252,
-                margin: isWeb ? EdgeInsets.symmetric(
-                    vertical: 16.0, horizontal: 220.0) : EdgeInsets.all(16.0),
+                margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 220.0) : EdgeInsets.all(16.0),
                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Theme
-                      .of(context)
-                      .brightness == Brightness.dark
-                      ? lightTheme.primaryColor.withOpacity(0.1)
-                      : darkTheme.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16.0),
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(4, 4),
+                      blurRadius: 10.0,
+                      spreadRadius: 1.0,
+                      blurStyle: BlurStyle.inner,
+                    ),
+                  ],
                 ),
-                child: SizedBox(
-                  child: isWeb ? _buildWebCalendar() : _buildWebCalendar(),
-                ),
+                child: isWeb ? _buildWebCalendar() : _buildWebCalendar(),
               ),
             ],
           ),
