@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activities/views/activityDetail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ActivityList extends StatelessWidget {
   final List<Actividad> activities;
@@ -18,7 +19,7 @@ class ActivityList extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'Proximas Actividades',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp),
             ),
           ),
         ),
@@ -56,13 +57,10 @@ class ActivityCardItem extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          width: constraints.maxWidth * 0.3,
-          // Adjust width based on available space
+          width: 275.0, // Ajusta el ancho según sea necesario
           margin: EdgeInsets.symmetric(horizontal: 8.0),
           child: Card(
-            color: Theme
-                .of(context)
-                .brightness == Brightness.light
+            color: Theme.of(context).brightness == Brightness.light
                 ? lightTheme.primaryColor.withOpacity(1)
                 : darkTheme.primaryColor.withOpacity(1),
             child: InkWell(
@@ -70,12 +68,11 @@ class ActivityCardItem extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ActivityDetailView(
-                          actividad: actividad,
-                          isDarkTheme: isDarkTheme,
-                          onToggleTheme: () {},
-                        ),
+                    builder: (context) => ActivityDetailView(
+                      actividad: actividad,
+                      isDarkTheme: isDarkTheme,
+                      onToggleTheme: () {},
+                    ),
                   ),
                 );
               },
@@ -90,23 +87,21 @@ class ActivityCardItem extends StatelessWidget {
                       children: [
                         Text(
                           actividad.titulo ?? 'Sin título',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .headlineSmall,
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                         SizedBox(height: 8.0),
                         Text(
                           actividad.descripcion ?? 'Sin descripción',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyMedium,
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                          ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
-                          textScaler: TextScaler.linear(constraints.maxWidth * 0.003),
                         ),
                       ],
                     ),
@@ -115,18 +110,14 @@ class ActivityCardItem extends StatelessWidget {
                       children: [
                         Text(
                           actividad.fini ?? 'Sin fecha',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyMedium,
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                          ),
                         ),
                         Text(
                           actividad.estado ?? 'Sin estado',
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Define tus colores globales
 const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
@@ -36,7 +37,7 @@ final ThemeData lightTheme = ThemeData(
     displaySmall: TextStyle(color: colorTextoLight),
     headlineLarge: TextStyle(color: colorTextoLight),
     headlineMedium: TextStyle(color: colorTextoLight),
-    headlineSmall: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold),
+    headlineSmall: TextStyle(color: colorTextoLight, fontSize: 20, fontWeight: FontWeight.bold),
     bodyLarge: TextStyle(color: colorTextoLight),
     bodyMedium: TextStyle(color: colorTextoLight),
     bodySmall: TextStyle(color: colorTextoLight),

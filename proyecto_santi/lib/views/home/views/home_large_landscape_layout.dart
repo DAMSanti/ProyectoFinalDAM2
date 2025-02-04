@@ -5,6 +5,7 @@ import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -43,7 +44,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       'Próximas Actividades',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: TextStyle(fontSize: 3.5.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   SizedBox(
@@ -85,11 +86,14 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: constraints.maxHeight * 0.05, // Fixed height for Calendario de Actividades
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
                     child: Text(
                       'Calendario de Actividades',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: TextStyle(fontSize: 3.5.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Expanded(
