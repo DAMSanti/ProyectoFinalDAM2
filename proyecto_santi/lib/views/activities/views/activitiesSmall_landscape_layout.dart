@@ -1,10 +1,10 @@
-// home_portrait_layout.dart
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
-import 'package:proyecto_santi/views/activities/Activities_view.dart';
+import 'package:proyecto_santi/views/activities/components/activities_Listas.dart';
+import 'package:proyecto_santi/views/activities/components/activities_Busqueda.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
@@ -64,7 +64,13 @@ class ActivitiesSmallLandscapeLayout extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: OtrasActividades(),
+                  child: OtrasActividades(
+                    selectedFilter: null,
+                    searchQuery: '',
+                    selectedDate: null,
+                    selectedCourse: null,
+                    selectedState: null,
+                  ),
                 ),
               ],
             ),

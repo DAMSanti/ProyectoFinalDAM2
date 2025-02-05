@@ -11,7 +11,6 @@ import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/config.dart';
-import 'package:proyecto_santi/components/MarcoDesktop.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -86,51 +85,64 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // Construimos la App con las rutas y el tema
+// Construimos la App con las rutas y el tema
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: Size(360, 690),
-        builder: (context, child) {
-          return MaterialApp(
-            title: 'ACEX',
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: _themeMode,
-            initialRoute: '/',
-            onGenerateRoute: (settings) {
-              final auth = Provider.of<Auth>(context, listen: false);
-              if (!auth.isAuthenticated && settings.name != '/') {
-                return MaterialPageRoute(builder: (context) => LoginView(onToggleTheme: _toggleTheme));
-              }
+      designSize: Size(360, 690),
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'ACEX',
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: _themeMode,
+          initialRoute: '/',
+          onGenerateRoute: (settings) {
+            final auth = Provider.of<Auth>(context, listen: false);
+            WidgetBuilder builder;
+
+            if (!auth.isAuthenticated && settings.name != '/') {
+              builder = (context) => LoginView(onToggleTheme: _toggleTheme);
+            } else {
               switch (settings.name) {
                 case '/':
-                  return MaterialPageRoute(builder: (context) => LoginView(onToggleTheme: _toggleTheme));
+                  builder = (context) => LoginView(onToggleTheme: _toggleTheme);
+                  break;
                 case '/home':
-                  return MaterialPageRoute(builder: (context) => HomeView(onToggleTheme: _toggleTheme));
+                  builder = (context) => HomeView(onToggleTheme: _toggleTheme);
+                  break;
                 case '/actividades':
-                  return MaterialPageRoute(builder: (context) => ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                  builder =
+                      (context) => ActivitiesView(onToggleTheme: _toggleTheme);
+                  break;
                 case '/mapa':
-                  return MaterialPageRoute(builder: (context) => MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                  builder = (context) =>
+                      MapView(onToggleTheme: _toggleTheme,
+                          isDarkTheme: _themeMode == ThemeMode.dark);
+                  break;
                 case '/chat':
-                  return MaterialPageRoute(builder: (context) => ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                  builder = (context) =>
+                      ChatListView(onToggleTheme: _toggleTheme,
+                          isDarkTheme: _themeMode == ThemeMode.dark);
+                  break;
                 case '/activityDetail':
                   final args = settings.arguments as Map<String, dynamic>;
-                  return MaterialPageRoute(
-                    builder: (context) {
-                      return ActivityDetailView(
+                  builder = (context) =>
+                      ActivityDetailView(
                         actividad: args['activity'],
                         onToggleTheme: _toggleTheme,
                         isDarkTheme: _themeMode == ThemeMode.dark,
                       );
-                    },
-                  );
+                  break;
                 default:
-                  return null;
+                  builder = (context) => LoginView(onToggleTheme: _toggleTheme);
+                  break;
               }
-            },
-          );
-        },
+            }
+            return MaterialPageRoute(builder: builder, settings: settings);
+          },
+        );
+      },
     );
   }
 }

@@ -93,7 +93,7 @@ class ActividadCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => ChatView(
                 activityId: actividad.id.toString(),
-                displayName: actividad.titulo ?? 'Chat',
+                displayName: actividad.titulo,
                 onToggleTheme: onToggleTheme,
                 isDarkTheme: isDarkTheme,
               ),
@@ -105,17 +105,17 @@ class ActividadCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(actividad.titulo ?? 'Sin título',
+              Text(actividad.titulo,
                   style: Theme.of(context).textTheme.headlineSmall),
               SizedBox(height: 8.0),
               Text(actividad.descripcion ?? 'Sin descripción',
                   style: Theme.of(context).textTheme.bodyMedium),
               SizedBox(height: 8.0),
               Text(
-                  'Fecha: ${actividad.fini ?? 'N/A'} - ${actividad.ffin ?? 'N/A'}',
+                  'Fecha: ${actividad.fini} - ${actividad.ffin}',
                   style: Theme.of(context).textTheme.bodyMedium),
               SizedBox(height: 8.0),
-              Text('Estado: ${actividad.estado ?? 'N/A'}',
+              Text('Estado: ${actividad.estado}',
                   style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),

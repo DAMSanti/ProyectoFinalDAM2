@@ -129,7 +129,7 @@ class ActivityCardItem extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              actividad.titulo ?? 'Sin título',
+                              actividad.titulo,
                               style: TextStyle(
                                 fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
                                 fontWeight: FontWeight.bold,
@@ -152,13 +152,13 @@ class ActivityCardItem extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              actividad.fini ?? 'Sin fecha',
+                              actividad.fini,
                               style: TextStyle(
                                 fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                               ),
                             ),
                             Text(
-                              actividad.estado ?? 'Sin estado',
+                              actividad.estado,
                               style: TextStyle(
                                 fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                                 fontWeight: FontWeight.bold,

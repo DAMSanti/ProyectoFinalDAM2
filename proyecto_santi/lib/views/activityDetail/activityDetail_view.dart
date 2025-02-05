@@ -109,17 +109,17 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.actividad.titulo ?? 'Sin título',
+                    widget.actividad.titulo,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text('Solicitante: ${widget.actividad.solicitante ?? 'N/A'}'),
+                  Text('Solicitante: ${widget.actividad.solicitante}'),
                   SizedBox(height: 8),
-                  Text('Fecha: ${widget.actividad.fini ?? 'N/A'} a ${widget.actividad.ffin ?? 'N/A'}'),
+                  Text('Fecha: ${widget.actividad.fini} a ${widget.actividad.ffin}'),
                   SizedBox(height: 8),
-                  Text('Tipo: ${widget.actividad.tipo ?? 'N/A'}'),
+                  Text('Tipo: ${widget.actividad.tipo}'),
                   SizedBox(height: 8),
-                  Text('Estado: ${widget.actividad.estado ?? 'N/A'}'),
+                  Text('Estado: ${widget.actividad.estado}'),
                   SizedBox(height: 16),
                   Text(
                     'Fotos de la Actividad',

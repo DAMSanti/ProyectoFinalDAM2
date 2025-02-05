@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
-import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -55,7 +54,7 @@ class _CalendarViewState extends State<CalendarView> {
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
-                    title: Text(actividad.titulo ?? 'Sin título'),
+                    title: Text(actividad.titulo),
                     subtitle: Text('Fecha de inicio: ${actividad.fini}'),
                     onTap: () {
                       Navigator.push(

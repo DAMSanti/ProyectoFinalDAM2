@@ -31,7 +31,7 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white54,
+                                color: Colors.black26,
                                 offset: Offset(-4, -4),
                                 blurRadius: 10.0,
                                 spreadRadius: 1.0,

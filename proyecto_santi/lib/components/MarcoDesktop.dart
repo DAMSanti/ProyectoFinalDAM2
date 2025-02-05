@@ -186,7 +186,7 @@ class MenuDesktop extends StatelessWidget {
       onTap: () {
         if (routeName == '/') {
           logout(context);
-        } else if (ModalRoute.of(context)?.settings.name != routeName) {
+        } else if (ModalRoute.of(context)?.settings.name != routeName && ModalRoute.of(context)?.settings.name != null) {
           Navigator.pushReplacementNamed(context, routeName);
         }
       },

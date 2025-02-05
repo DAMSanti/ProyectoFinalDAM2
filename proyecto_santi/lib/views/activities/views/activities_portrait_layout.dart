@@ -1,15 +1,9 @@
-// home_portrait_layout.dart
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/views/home/components/home_user.dart';
-import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
-import 'package:proyecto_santi/views/home/components/home_activityCards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/GradientBackground.dart';
-import 'package:proyecto_santi/views/activities/Activities_view.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
+import 'package:proyecto_santi/views/activities/components/activities_Listas.dart';
+import 'package:proyecto_santi/views/activities/components/activities_Busqueda.dart';
 
 class ActivitiesPortraitLayout extends StatelessWidget {
   final List<Actividad> activities;
@@ -35,19 +29,13 @@ class ActivitiesPortraitLayout extends StatelessWidget {
               : GradientBackgroundLight(child: Container()),
           Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: shouldShowAppBar()
-                ? AndroidAppBar(
-              onToggleTheme: onToggleTheme,
-              title: 'Actividades',
-            )
-                : null,
-            drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
-                ? OrientationBuilder(
+            drawer: OrientationBuilder(
               builder: (context, orientation) {
-                return orientation == Orientation.portrait ? Menu() : MenuLandscape();
+                return orientation == Orientation.portrait
+                    ? Menu()
+                    : MenuLandscape();
               },
-            )
-                : null,
+            ),
             body: Column(
               children: [
                 Busqueda(
@@ -58,17 +46,68 @@ class ActivitiesPortraitLayout extends StatelessWidget {
                     // Handle filter selection
                   },
                 ),
+                Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 Expanded(
-                  child: AllActividades(
-                    selectedFilter: null,
-                    searchQuery: '',
-                    selectedDate: null,
-                    selectedCourse: null,
-                    selectedState: null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 6.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.circular(12.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(-4, -4),
+                            blurRadius: 10.0,
+                            spreadRadius: 1.0,
+                            blurStyle: BlurStyle.inner,
+                          ),
+                        ],
+                      ),
+                      child: AllActividades(
+                        selectedFilter: null,
+                        searchQuery: '',
+                        selectedDate: null,
+                        selectedCourse: null,
+                        selectedState: null,
+                      ),
+                    ),
                   ),
                 ),
+                SizedBox(
+                  height: 24.0,
+                  child: Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                ),
                 Expanded(
-                  child: OtrasActividades(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 6.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.circular(12.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(-4, -4),
+                            blurRadius: 10.0,
+                            spreadRadius: 1.0,
+                            blurStyle: BlurStyle.inner,
+                          ),
+                        ],
+                      ),
+                      child: OtrasActividades(
+                        selectedFilter: null,
+                        searchQuery: '',
+                        selectedDate: null,
+                        selectedCourse: null,
+                        selectedState: null,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -76,10 +115,5 @@ class ActivitiesPortraitLayout extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  bool shouldShowAppBar() {
-    // Implement your logic to show or hide the AppBar
-    return true;
   }
 }
