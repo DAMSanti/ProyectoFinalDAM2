@@ -3,9 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
-import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
-import 'package:proyecto_santi/views/chat/ChatList_view.dart';
-import 'package:proyecto_santi/views/activities/Activities_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
+import 'package:proyecto_santi/views/chat/chat_list_view.dart';
+import 'package:proyecto_santi/views/activities/activities_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
@@ -69,13 +69,13 @@ void main() async {
 
 // Clase principal de la App
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system;
 
   void _toggleTheme() {

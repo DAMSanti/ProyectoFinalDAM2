@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlong;
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
@@ -12,13 +12,13 @@ class MapView extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
 
-  const MapView({Key? key, required this.onToggleTheme, required this.isDarkTheme}) : super(key: key);
+  const MapView({super.key, required this.onToggleTheme, required this.isDarkTheme});
 
   @override
-  _MapViewState createState() => _MapViewState();
+  MapViewState createState() => MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class MapViewState extends State<MapView> {
   final ApiService _apiService = ApiService();
   List<Actividad> activities = [];
   final latlong.LatLng _center = latlong.LatLng(43.353, -4.064);
@@ -75,9 +75,7 @@ class _MapViewState extends State<MapView> {
               markers: activities.map((actividad) {
                 return Marker(
                   point: latlong.LatLng(actividad.latitud!, actividad.longitud!),
-                  builder: (ctx) => Container(
-                    child: Icon(Icons.location_on, color: Colors.red),
-                  ),
+                  builder: (ctx) => Icon(Icons.location_on, color: Colors.red),
                 );
               }).toList(),
             ),

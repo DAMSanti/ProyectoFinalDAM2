@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_santi/views/chat/model/message.dart';
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 
 class ChatView extends StatelessWidget {
   final String activityId;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/MarcoDesktop.dart';
-import 'package:proyecto_santi/views/home/components/home_activityCards.dart';
+import 'package:proyecto_santi/components/marco_desktop.dart';
+import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:flutter/gestures.dart';

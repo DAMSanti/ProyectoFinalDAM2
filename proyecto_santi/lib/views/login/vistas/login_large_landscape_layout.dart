@@ -3,7 +3,7 @@ import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
-Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback _login, VoidCallback showLoginDialog) {
+Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
   return LayoutBuilder(
     builder: (context, constraints) {
       return Stack(
@@ -40,7 +40,7 @@ Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
                   SizedBox(
                     width: constraints.maxWidth * 0.25, // Fixed width
                     child: LoginButtons(
-                      onLoginPressed: _login,
+                      onLoginPressed: login,
                       onMicrosoftLoginPressed: showLoginDialog,
                     ),
                   ),

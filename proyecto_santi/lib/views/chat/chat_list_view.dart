@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
 
@@ -10,14 +10,13 @@ class ChatListView extends StatefulWidget {
   final bool isDarkTheme;
 
   const ChatListView(
-      {Key? key, required this.onToggleTheme, required this.isDarkTheme})
-      : super(key: key);
+      {super.key, required this.onToggleTheme, required this.isDarkTheme});
 
   @override
-  _ChatListViewState createState() => _ChatListViewState();
+  ChatListViewState createState() => ChatListViewState();
 }
 
-class _ChatListViewState extends State<ChatListView> {
+class ChatListViewState extends State<ChatListView> {
   late Future<List<Actividad>> _futureActivities;
   final ApiService _apiService = ApiService();
 
@@ -78,8 +77,7 @@ class ActividadCard extends StatelessWidget {
   final VoidCallback onToggleTheme;
 
   const ActividadCard(
-      {Key? key, required this.actividad, required this.isDarkTheme, required this.onToggleTheme,})
-      : super(key: key);
+      {super.key, required this.actividad, required this.isDarkTheme, required this.onToggleTheme,});
 
   @override
   Widget build(BuildContext context) {

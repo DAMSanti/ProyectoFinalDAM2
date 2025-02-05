@@ -5,10 +5,10 @@ class UserInformation extends StatefulWidget {
   const UserInformation({super.key});
 
   @override
-  _UserInformationState createState() => _UserInformationState();
+  UserInformationState createState() => UserInformationState();
 }
 
-class _UserInformationState extends State<UserInformation> {
+class UserInformationState extends State<UserInformation> {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
   String? _username;
   String? _correo;

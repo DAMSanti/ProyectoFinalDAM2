@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/tema/GradientBackground.dart';
-import 'package:proyecto_santi/views/activities/components/activities_Listas.dart';
-import 'package:proyecto_santi/views/activities/components/activities_Busqueda.dart';
+import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
+import 'package:proyecto_santi/views/activities/components/activities_busqueda.dart';
 
 class ActivitiesPortraitLayout extends StatelessWidget {
   final List<Actividad> activities;

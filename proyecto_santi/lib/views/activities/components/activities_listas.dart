@@ -19,10 +19,10 @@ class AllActividades extends StatefulWidget {
   });
 
   @override
-  _AllActividadesState createState() => _AllActividadesState();
+  AllActividadesState createState() => AllActividadesState();
 }
 
-class _AllActividadesState extends State<AllActividades> {
+class AllActividadesState extends State<AllActividades> {
   final ApiService _apiService = ApiService();
 
   @override
@@ -67,10 +67,10 @@ class OtrasActividades extends StatefulWidget {
   });
 
   @override
-  _OtrasActividadesState createState() => _OtrasActividadesState();
+  OtrasActividadesState createState() => OtrasActividadesState();
 }
 
-class _OtrasActividadesState extends State<OtrasActividades> {
+class OtrasActividadesState extends State<OtrasActividades> {
   final ApiService _apiService = ApiService();
 
   @override
@@ -105,10 +105,10 @@ class HoverableListItem extends StatefulWidget {
   HoverableListItem({required this.actividad});
 
   @override
-  _HoverableListItemState createState() => _HoverableListItemState();
+  HoverableListItemState createState() => HoverableListItemState();
 }
 
-class _HoverableListItemState extends State<HoverableListItem> {
+class HoverableListItemState extends State<HoverableListItem> {
   bool _isHovered = false;
 
   @override

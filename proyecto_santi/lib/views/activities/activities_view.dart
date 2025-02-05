@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/tema/GradientBackground.dart';
+import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:proyecto_santi/views/activities/views/activitiesLarge_landscape_layout.dart';
-import 'package:proyecto_santi/views/activities/views/activitiesSmall_landscape_layout.dart';
+import 'package:proyecto_santi/views/activities/views/activities_large_landscape_layout.dart';
+import 'package:proyecto_santi/views/activities/views/activities_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/activities/views/activities_portrait_layout.dart';
 import 'dart:io' show Platform;
 
@@ -17,10 +17,10 @@ class ActivitiesView extends StatefulWidget {
   const ActivitiesView({super.key, required this.onToggleTheme});
 
   @override
-  _ActivitiesViewState createState() => _ActivitiesViewState();
+  ActivitiesViewState createState() => ActivitiesViewState();
 }
 
-class _ActivitiesViewState extends State<ActivitiesView> {
+class ActivitiesViewState extends State<ActivitiesView> {
   late Future<List<Actividad>> _futureActivities;
   final ApiService _apiService = ApiService();
 

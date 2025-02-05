@@ -28,7 +28,7 @@ class Busqueda extends StatelessWidget {
               },
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.3),
+            fillColor: Colors.white.withValues(alpha: 0.3),
           ),
         ),
         if (showPopup)

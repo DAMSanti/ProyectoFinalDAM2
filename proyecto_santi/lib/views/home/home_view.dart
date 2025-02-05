@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_large_landscape_layout.dart';
-import 'package:proyecto_santi/tema/GradientBackground.dart';
+import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -17,10 +17,10 @@ class HomeView extends StatefulWidget {
   const HomeView({super.key, required this.onToggleTheme});
 
   @override
-  _HomeViewState createState() => _HomeViewState();
+  HomeViewState createState() => HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class HomeViewState extends State<HomeView> {
   late Future<List<Actividad>> _futureActivities;
   final ApiService _apiService = ApiService();
 

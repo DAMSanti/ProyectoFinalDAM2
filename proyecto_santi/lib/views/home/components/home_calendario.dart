@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activityDetail/activityDetail_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -12,10 +12,10 @@ class CalendarView extends StatefulWidget {
   const CalendarView({super.key, required this.activities});
 
   @override
-  _CalendarViewState createState() => _CalendarViewState();
+  CalendarViewState createState() => CalendarViewState();
 }
 
-class _CalendarViewState extends State<CalendarView> {
+class CalendarViewState extends State<CalendarView> {
   late final ValueNotifier<List<Actividad>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
@@ -182,7 +182,7 @@ class _CalendarViewState extends State<CalendarView> {
               color: Theme
                   .of(context)
                   .primaryColor
-                  .withOpacity(0.7),
+                  .withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
             markersAutoAligned: false,

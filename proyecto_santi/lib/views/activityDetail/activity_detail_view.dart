@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/components/appBar.dart';
+import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'dart:io';
 
@@ -13,17 +13,17 @@ class ActivityDetailView extends StatefulWidget {
   final VoidCallback onToggleTheme;
 
   const ActivityDetailView({
-    Key? key,
+    super.key,
     required this.actividad,
     required this.isDarkTheme,
     required this.onToggleTheme,
-  }) : super(key: key);
+  });
 
   @override
-  _ActivityDetailViewState createState() => _ActivityDetailViewState();
+  ActivityDetailViewState createState() => ActivityDetailViewState();
 }
 
-class _ActivityDetailViewState extends State<ActivityDetailView> {
+class ActivityDetailViewState extends State<ActivityDetailView> {
   late Future<List<Photo>> _futurePhotos;
   final ApiService _apiService = ApiService();
   bool isDataChanged = false;
@@ -126,13 +126,13 @@ class _ActivityDetailViewState extends State<ActivityDetailView> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Container(
+                  SizedBox(
                     height: 250.0, // Adjust the height as needed
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
                         if (isAdminOrSolicitante)
-                          Container(
+                          SizedBox(
                             height: 100.0, // Adjust the height as needed
                             child: IconButton(
                               icon: Icon(Icons.add_a_photo),
