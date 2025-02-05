@@ -40,9 +40,9 @@ class _UserInformationState extends State<UserInformation> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (_username != null) Text('$_username'),
-            if (_correo != null) Text('$_correo'),
-            if (_rol != null) Text('$_rol'),
+            if (_username != null) Text('$_username', style: Theme.of(context).textTheme.titleMedium?.copyWith(inherit: true)),
+            if (_correo != null)  Text('$_correo', style: Theme.of(context).textTheme.bodyMedium?.copyWith(inherit: true)),
+            if (_rol != null) Text('$_rol', style: Theme.of(context).textTheme.bodySmall?.copyWith(inherit: true)),
           ],
         ),
       ),

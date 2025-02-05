@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
-import 'package:proyecto_santi/models/Auth.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
@@ -83,7 +82,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildLayout(BuildContext context, List<Actividad> activities) {
     if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      return HomeLargeLandscapeLayout(activities: activities);
+      return HomeLargeLandscapeLayout(activities: activities, onToggleTheme: widget.onToggleTheme);
     } else {
       return OrientationBuilder(
         builder: (context, orientation) {

@@ -8,8 +8,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
+  final VoidCallback onToggleTheme;
 
-  const HomeLargeLandscapeLayout({super.key, required this.activities});
+  const HomeLargeLandscapeLayout({super.key, required this.activities, required this.onToggleTheme});
 
   @override
   State<HomeLargeLandscapeLayout> createState() =>
@@ -25,9 +26,12 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
-        return LayoutBuilder(
+    return MarcoDesktop(
+      onToggleTheme: widget.onToggleTheme,
+      content: LayoutBuilder(
         builder: (context, constraints) {
           return Row(
             children: [
@@ -120,6 +124,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
             ],
           );
         },
-      );
+      ),
+    );
   }
 }

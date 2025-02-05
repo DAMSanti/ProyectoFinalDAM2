@@ -55,7 +55,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
     return OrientationBuilder(
       builder: (context, orientation) {
         return AppBar(
-          backgroundColor: Color.fromARGB(255, 87, 116, 243),
+          backgroundColor: Color.fromARGB(255, 182, 190, 227),
           centerTitle: true,
           automaticallyImplyLeading: false,
           flexibleSpace: UserInformation(),
@@ -181,7 +181,7 @@ class MenuDesktop extends StatelessWidget {
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
       title: Text(
         text,
-        style: TextStyle(inherit: true), // Ensure inherit is true
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(inherit: true), // Ensure inherit is true
       ),
       onTap: () {
         if (routeName == '/') {

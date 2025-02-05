@@ -31,21 +31,9 @@ class ActivitiesLargeLandscapeLayout extends StatelessWidget {
                 ? GradientBackgroundDark(child: Container())
                 : GradientBackgroundLight(child: Container()),
             Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: shouldShowAppBar()
-                  ? AndroidAppBar(
+              body: MarcoDesktop(
                 onToggleTheme: onToggleTheme,
-                title: 'Actividades',
-              )
-                  : null,
-              drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
-                  ? OrientationBuilder(
-                builder: (context, orientation) {
-                  return orientation == Orientation.portrait ? Menu() : MenuLandscape();
-                },
-              )
-                  : null,
-              body: Column(
+                content: Column(
                 children: [
                   Busqueda(
                     onSearchQueryChanged: (query) {
@@ -70,11 +58,11 @@ class ActivitiesLargeLandscapeLayout extends StatelessWidget {
                 ],
               ),
             ),
+            ),
           ],
         ),
       );
   }
-
 
   bool shouldShowAppBar() {
     // Implement your logic to show or hide the AppBar
