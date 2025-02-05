@@ -72,7 +72,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(20);
+    return Size.fromHeight(92);
   }
 }
 

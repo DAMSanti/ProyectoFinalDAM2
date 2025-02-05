@@ -27,9 +27,6 @@ class ActivitiesLargeLandscapeLayout extends StatelessWidget {
         },
         child: Stack(
           children: [
-            Theme.of(context).brightness == Brightness.dark
-                ? GradientBackgroundDark(child: Container())
-                : GradientBackgroundLight(child: Container()),
             Scaffold(
               body: MarcoDesktop(
                 onToggleTheme: onToggleTheme,

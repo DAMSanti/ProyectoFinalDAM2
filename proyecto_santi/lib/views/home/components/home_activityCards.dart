@@ -88,7 +88,6 @@ class ActivityCardItem extends StatelessWidget {
         return Container(
           width: 275.0, // Ajusta el ancho según sea necesario
           margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-          child: Expanded(
             child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -173,7 +172,6 @@ class ActivityCardItem extends StatelessWidget {
                 ),
               ),
             ),
-          ),
         );
       },
     );
