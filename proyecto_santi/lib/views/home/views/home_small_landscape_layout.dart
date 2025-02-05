@@ -21,37 +21,37 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
               child: Column(
                 children: [
                   UserInformation(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(-4, -4),
-                      blurRadius: 10.0,
-                      spreadRadius: 1.0,
-                      blurStyle: BlurStyle.inner,
-                    ),
-                  ],
-                ),
-                child: Expanded(
-                    child: ListView.builder(
-                      itemCount: activities.length,
-                      itemBuilder: (context, index) {
-                        final actividad = activities[index];
-                        return ActivityCardItem(
-                          actividad: actividad,
-                          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
-                        );
-                      },
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white54,
+                                offset: Offset(-4, -4),
+                                blurRadius: 10.0,
+                                spreadRadius: 1.0,
+                                blurStyle: BlurStyle.inner,
+                              ),
+                            ],
+                          ),
+                          child: ListView.builder(
+                            itemCount: activities.length,
+                            itemBuilder: (context, index) {
+                              final actividad = activities[index];
+                              return ActivityCardItem(
+                                actividad: actividad,
+                                isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+                              );
+                            },
+                          ),
+                        ),
                     ),
                   ),
-              ),
-            ),
                 ],
               ),
             ),
