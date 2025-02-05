@@ -98,38 +98,39 @@ class _MyAppState extends State<MyApp> {
             darkTheme: darkTheme,
             themeMode: _themeMode,
             initialRoute: '/',
-            routes: {
-              '/': (context) => LoginView(onToggleTheme: _toggleTheme),
-              '/home': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
-                  ? MarcoDesktop(content: HomeView(onToggleTheme: _toggleTheme), onToggleTheme: _toggleTheme)
-                  : HomeView(onToggleTheme: _toggleTheme),
-              '/actividades': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
-                  ? MarcoDesktop(content: ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
-                  : ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
-              '/mapa': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
-                  ? MarcoDesktop(content: MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
-                  : MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
-              '/chat': (context) => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS
-                  ? MarcoDesktop(content: ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark), onToggleTheme: _toggleTheme)
-                  : ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark),
-            },
             onGenerateRoute: (settings) {
-              if (settings.name == '/activityDetail') {
-                final args = settings.arguments as Map<String, dynamic>;
-                return MaterialPageRoute(
-                  builder: (context) {
-                    return ActivityDetailView(
-                      actividad: args['activity'],
-                      onToggleTheme: _toggleTheme,
-                      isDarkTheme: _themeMode == ThemeMode.dark,
-                    );
-                  },
-                );
+              final auth = Provider.of<Auth>(context, listen: false);
+              if (!auth.isAuthenticated && settings.name != '/') {
+                return MaterialPageRoute(builder: (context) => LoginView(onToggleTheme: _toggleTheme));
               }
-              return null;
+              switch (settings.name) {
+                case '/':
+                  return MaterialPageRoute(builder: (context) => LoginView(onToggleTheme: _toggleTheme));
+                case '/home':
+                  return MaterialPageRoute(builder: (context) => HomeView(onToggleTheme: _toggleTheme));
+                case '/actividades':
+                  return MaterialPageRoute(builder: (context) => ActivitiesView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                case '/mapa':
+                  return MaterialPageRoute(builder: (context) => MapView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                case '/chat':
+                  return MaterialPageRoute(builder: (context) => ChatListView(onToggleTheme: _toggleTheme, isDarkTheme: _themeMode == ThemeMode.dark));
+                case '/activityDetail':
+                  final args = settings.arguments as Map<String, dynamic>;
+                  return MaterialPageRoute(
+                    builder: (context) {
+                      return ActivityDetailView(
+                        actividad: args['activity'],
+                        onToggleTheme: _toggleTheme,
+                        isDarkTheme: _themeMode == ThemeMode.dark,
+                      );
+                    },
+                  );
+                default:
+                  return null;
+              }
             },
           );
-        }
+        },
     );
   }
 }

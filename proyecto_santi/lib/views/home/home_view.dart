@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/appBar.dart';
 import 'package:proyecto_santi/components/menu.dart';
+import 'package:proyecto_santi/models/Auth.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
