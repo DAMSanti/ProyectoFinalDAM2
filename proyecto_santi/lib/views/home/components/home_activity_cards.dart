@@ -3,7 +3,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+/*
 class ActivityList extends StatelessWidget {
   final List<Actividad> activities;
 
@@ -70,7 +70,7 @@ class ActivityList extends StatelessWidget {
     );
   }
 }
-
+*/
 class ActivityCardItem extends StatelessWidget {
   final Actividad actividad;
   final bool isDarkTheme;
@@ -86,10 +86,9 @@ class ActivityCardItem extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
-          width: 275.0, // Ajusta el ancho según sea necesario
           margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.light
@@ -119,61 +118,75 @@ class ActivityCardItem extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              actividad.titulo,
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            SizedBox(height: 6.0),
-                            Text(
-                              actividad.descripcion ?? 'Sin descripción',
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: MediaQuery.of(context).size.height > 800 ? 2 : 1,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              actividad.fini,
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                              ),
-                            ),
-                            Text(
-                              actividad.estado,
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: ActivityInfo(actividad: actividad),
                 ),
               ),
             ),
         );
       },
+    );
+  }
+}
+
+class ActivityInfo extends StatelessWidget{
+  final Actividad actividad;
+
+  const ActivityInfo({
+    super.key,
+    required this.actividad,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                actividad.titulo,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              SizedBox(height: 6.0),
+              Text(
+                actividad.descripcion ?? 'Sin descripción',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: MediaQuery.of(context).size.height > 800 ? 2 : 1,
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                actividad.fini,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                ),
+              ),
+              Text(
+                actividad.estado,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,3 @@
-// home_small_landscape_layout.dart
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
