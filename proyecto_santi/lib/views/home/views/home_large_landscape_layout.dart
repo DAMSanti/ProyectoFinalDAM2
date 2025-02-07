@@ -63,19 +63,19 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                           ],
                         ),
                         child: SizedBox(
-                          height: constraints.maxHeight * 0.19,
+                          height: constraints.maxHeight * 0.20,
                           child: Listener(
                             onPointerSignal: (pointerSignal) {
                               if (pointerSignal is PointerScrollEvent) {
                                 final offset = _scrollController.offset +
-                                    (pointerSignal.scrollDelta.dy * -2.5);
+                                    (pointerSignal.scrollDelta.dy * -5.0);
                                 _scrollController.animateTo(
                                   offset.clamp(
                                     0.0,
                                     _scrollController.position.maxScrollExtent,
                                   ),
-                                  duration: Duration(milliseconds: 100),
-                                  curve: Curves.ease,
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
                                 );
                               }
                             },
@@ -88,7 +88,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                                   return Padding(
                                     padding: EdgeInsets.only(right: 16.0),
                                     child: SizedBox(
-                                      width: constraints.maxHeight * 0.35,
+                                      width: constraints.maxHeight * 0.53,
                                       child: ActivityCardItem(
                                         actividad: actividad,
                                         isDarkTheme: Theme.of(context).brightness ==

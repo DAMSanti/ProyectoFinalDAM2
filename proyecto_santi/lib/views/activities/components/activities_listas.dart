@@ -24,28 +24,48 @@ class AllActividades extends StatefulWidget {
 
 class AllActividadesState extends State<AllActividades> {
   final ApiService _apiService = ApiService();
+  List<Actividad> _allActividades = [];
+  List<Actividad> _filteredActividades = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities();
+  }
+
+  void _fetchActivities() async {
+    List<Actividad> actividades = await _apiService.fetchActivities();
+    setState(() {
+      _allActividades = actividades;
+      _filterActivities();
+    });
+  }
+
+  void _filterActivities() {
+    setState(() {
+      _filteredActividades = _allActividades.where((actividad) {
+        return actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+      }).toList();
+    });
+  }
+
+  @override
+  void didUpdateWidget(AllActividades oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchQuery != widget.searchQuery) {
+      _filterActivities();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Actividad>>(
-      future: _apiService.fetchActivities(), // Use your API service here
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No hay actividades disponibles'));
-        } else {
-          var actividades = snapshot.data!;
-          return ListView.builder(
-            itemCount: actividades.length,
-            itemBuilder: (context, index) {
-              var actividad = actividades[index];
-              return HoverableListItem(actividad: actividad);
-            },
-          );
-        }
+    return _filteredActividades.isEmpty
+        ? Center(child: Text('No hay actividades disponibles'))
+        : ListView.builder(
+      itemCount: _filteredActividades.length,
+      itemBuilder: (context, index) {
+        var actividad = _filteredActividades[index];
+        return HoverableListItem(actividad: actividad);
       },
     );
   }
@@ -138,15 +158,45 @@ class HoverableListItemState extends State<HoverableListItem> {
             title: Text(
               widget.actividad.titulo,
               style: TextStyle(
-                color: _isHovered ? Colors.blue : Colors.black,
+                color: _isHovered ? Colors.blue : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
+                    : darkTheme.textTheme.labelMedium?.color,
                 fontWeight: _isHovered ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            subtitle: Text(
-              widget.actividad.descripcion ?? 'Sin descripción',
-              style: TextStyle(
-                color: _isHovered ? Colors.blueGrey : Colors.grey,
-              ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.actividad.descripcion ?? 'Sin descripción',
+                  style: TextStyle(
+                    color: _isHovered ? Colors.blueGrey : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
+                        : darkTheme.textTheme.labelMedium?.color,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+                SizedBox(height: 6.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${widget.actividad.fini}',
+                      style: TextStyle(
+                        color: _isHovered ? Colors.blueGrey : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
+                            : darkTheme.textTheme.labelMedium?.color,
+                      ),
+                    ),
+                    Text(
+                      '${widget.actividad.estado}',
+                      style: TextStyle(
+                        color: _isHovered ? Colors.blueGrey : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
+                            : darkTheme.textTheme.labelMedium?.color,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
             onTap: () {
               Navigator.pushNamed(
