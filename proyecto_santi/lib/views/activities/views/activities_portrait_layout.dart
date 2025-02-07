@@ -5,7 +5,7 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
 import 'package:proyecto_santi/views/activities/components/activities_busqueda.dart';
 
-class ActivitiesPortraitLayout extends StatelessWidget {
+class ActivitiesPortraitLayout extends StatefulWidget {
   final List<Actividad> activities;
   final VoidCallback onToggleTheme;
 
@@ -14,6 +14,13 @@ class ActivitiesPortraitLayout extends StatelessWidget {
     required this.activities,
     required this.onToggleTheme,
   });
+
+  @override
+  _ActivitiesPortraitLayoutState createState() => _ActivitiesPortraitLayoutState();
+}
+
+class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +47,9 @@ class ActivitiesPortraitLayout extends StatelessWidget {
               children: [
                 Busqueda(
                   onSearchQueryChanged: (query) {
-                    // Handle search query change
+                    setState(() {
+                      searchQuery = query;
+                    });
                   },
                   onFilterSelected: (filter, date, course, state) {
                     // Handle filter selection
@@ -49,8 +58,7 @@ class ActivitiesPortraitLayout extends StatelessWidget {
                 Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 6.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       decoration: BoxDecoration(
@@ -68,7 +76,7 @@ class ActivitiesPortraitLayout extends StatelessWidget {
                       ),
                       child: AllActividades(
                         selectedFilter: null,
-                        searchQuery: '',
+                        searchQuery: searchQuery,
                         selectedDate: null,
                         selectedCourse: null,
                         selectedState: null,
@@ -82,8 +90,7 @@ class ActivitiesPortraitLayout extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 6.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       decoration: BoxDecoration(
@@ -101,7 +108,7 @@ class ActivitiesPortraitLayout extends StatelessWidget {
                       ),
                       child: OtrasActividades(
                         selectedFilter: null,
-                        searchQuery: '',
+                        searchQuery: searchQuery,
                         selectedDate: null,
                         selectedCourse: null,
                         selectedState: null,

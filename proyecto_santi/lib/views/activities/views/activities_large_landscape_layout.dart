@@ -12,17 +12,11 @@ class ActivitiesLargeLandscapeLayout extends StatefulWidget {
   const ActivitiesLargeLandscapeLayout({super.key, required this.activities, required this.onToggleTheme});
 
   @override
-  State<ActivitiesLargeLandscapeLayout> createState() => _ActivitiesLargeLandscapeLayout();
+  State<ActivitiesLargeLandscapeLayout> createState() => _ActivitiesLargeLandscapeLayoutState();
 }
 
-class _ActivitiesLargeLandscapeLayout extends State<ActivitiesLargeLandscapeLayout> {
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscapeLayout> {
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +28,8 @@ class _ActivitiesLargeLandscapeLayout extends State<ActivitiesLargeLandscapeLayo
       child: Stack(
         children: [
           Theme.of(context).brightness == Brightness.dark
-              ? GradientBackgroundDark(
-            child: Container(),
-          )
-              : GradientBackgroundLight(
-            child: Container(),
-          ),
+              ? GradientBackgroundDark(child: Container())
+              : GradientBackgroundLight(child: Container()),
           Scaffold(
             backgroundColor: Colors.transparent,
             body: MarcoDesktop(
@@ -50,7 +40,9 @@ class _ActivitiesLargeLandscapeLayout extends State<ActivitiesLargeLandscapeLayo
                   children: [
                     Busqueda(
                       onSearchQueryChanged: (query) {
-                        // Handle search query change
+                        setState(() {
+                          searchQuery = query;
+                        });
                       },
                       onFilterSelected: (filter, date, course, state) {
                         // Handle filter selection
@@ -58,66 +50,66 @@ class _ActivitiesLargeLandscapeLayout extends State<ActivitiesLargeLandscapeLayo
                     ),
                     Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                     Flexible(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(12.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(-4, -4),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                                blurStyle: BlurStyle.inner,
-                              ),
-                            ],
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  offset: Offset(-4, -4),
+                                  blurRadius: 10.0,
+                                  spreadRadius: 1.0,
+                                  blurStyle: BlurStyle.inner,
+                                ),
+                              ],
+                            ),
+                            child: AllActividades(
+                              selectedFilter: null,
+                              searchQuery: searchQuery,
+                              selectedDate: null,
+                              selectedCourse: null,
+                              selectedState: null,
+                            ),
                           ),
-                          child: AllActividades(
-                            selectedFilter: null,
-                            searchQuery: '',
-                            selectedDate: null,
-                            selectedCourse: null,
-                            selectedState: null,
-                          ),
-                        ),
-                      )
+                        )
                     ),
                     SizedBox(
                       height: 60.0,
                       child: Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                     ),
                     Flexible(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(12.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(-4, -4),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                                blurStyle: BlurStyle.inner,
-                              ),
-                            ],
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.circular(12.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  offset: Offset(-4, -4),
+                                  blurRadius: 10.0,
+                                  spreadRadius: 1.0,
+                                  blurStyle: BlurStyle.inner,
+                                ),
+                              ],
+                            ),
+                            child: OtrasActividades(
+                              selectedFilter: null,
+                              searchQuery: searchQuery,
+                              selectedDate: null,
+                              selectedCourse: null,
+                              selectedState: null,
+                            ),
                           ),
-                          child: OtrasActividades(
-                            selectedFilter: null,
-                            searchQuery: '',
-                            selectedDate: null,
-                            selectedCourse: null,
-                            selectedState: null,
-                          ),
-                        ),
-                      )
+                        )
                     ),
                   ],
                 ),
