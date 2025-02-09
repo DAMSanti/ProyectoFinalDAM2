@@ -6,6 +6,9 @@ import 'dart:io' show Platform;
 
 // Funcion para mensaje popUp de salir
 Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
+  if (!isHome) {
+    return true;
+  }
   return (await showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -19,10 +22,8 @@ Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(true);
-            if (isHome) {
-              logout(context);
-              Navigator.pushReplacementNamed(context, '/login');
-            }
+            logout(context);
+            Navigator.pushReplacementNamed(context, '/login');
           },
           child: Text('Sí'),
         ),

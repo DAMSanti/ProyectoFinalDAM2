@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 
 class AllActividades extends StatefulWidget {
   final String? selectedFilter;
@@ -92,28 +93,48 @@ class OtrasActividades extends StatefulWidget {
 
 class OtrasActividadesState extends State<OtrasActividades> {
   final ApiService _apiService = ApiService();
+  List<Actividad> _otrasActividades = [];
+  List<Actividad> _filteredOtrasActividades = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities();
+  }
+
+  void _fetchActivities() async {
+    List<Actividad> actividades = await _apiService.fetchActivities();
+    setState(() {
+      _otrasActividades = actividades;
+      _filterActivities();
+    });
+  }
+
+  void _filterActivities() {
+    setState(() {
+      _filteredOtrasActividades = _otrasActividades.where((actividad) {
+        return actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+      }).toList();
+    });
+  }
+
+  @override
+  void didUpdateWidget(OtrasActividades oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchQuery != widget.searchQuery) {
+      _filterActivities();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Actividad>>(
-      future: _apiService.fetchFutureActivities(), // Use your API service here
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No hay actividades disponibles'));
-        } else {
-          var actividades = snapshot.data!;
-          return ListView.builder(
-            itemCount: actividades.length,
-            itemBuilder: (context, index) {
-              var actividad = actividades[index];
-              return HoverableListItem(actividad: actividad);
-            },
-          );
-        }
+    return _filteredOtrasActividades.isEmpty
+        ? Center(child: Text('No hay actividades disponibles'))
+        : ListView.builder(
+      itemCount: _filteredOtrasActividades.length,
+      itemBuilder: (context, index) {
+        var actividad = _filteredOtrasActividades[index];
+        return HoverableListItem(actividad: actividad);
       },
     );
   }
@@ -199,10 +220,15 @@ class HoverableListItemState extends State<HoverableListItem> {
               ],
             ),
             onTap: () {
-              Navigator.pushNamed(
+              Navigator.push(
                 context,
-                '/activityDetail',
-                arguments: {'activityId': widget.actividad.id},
+                MaterialPageRoute(
+                  builder: (context) => ActivityDetailView(
+                    actividad: widget.actividad,
+                    isDarkTheme: false, //widget.isDarkTheme,
+                    onToggleTheme: () {},
+                  ),
+                ),
               );
             },
           ),

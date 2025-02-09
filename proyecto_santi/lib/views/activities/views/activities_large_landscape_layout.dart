@@ -17,6 +17,19 @@ class ActivitiesLargeLandscapeLayout extends StatefulWidget {
 
 class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscapeLayout> {
   String searchQuery = '';
+  final ValueNotifier<List<Actividad>> _filteredActivitiesNotifier = ValueNotifier([]);
+
+  @override
+  void initState() {
+    super.initState();
+    _filterActivities();
+  }
+
+  void _filterActivities() {
+    _filteredActivitiesNotifier.value = widget.activities.where((actividad) {
+      return actividad.titulo.toLowerCase().contains(searchQuery.toLowerCase());
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +55,7 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                       onSearchQueryChanged: (query) {
                         setState(() {
                           searchQuery = query;
+                          _filterActivities();
                         });
                       },
                       onFilterSelected: (filter, date, course, state) {
@@ -50,66 +64,76 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                     ),
                     Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                     Flexible(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(12.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  offset: Offset(-4, -4),
-                                  blurRadius: 10.0,
-                                  spreadRadius: 1.0,
-                                  blurStyle: BlurStyle.inner,
-                                ),
-                              ],
-                            ),
-                            child: AllActividades(
-                              selectedFilter: null,
-                              searchQuery: searchQuery,
-                              selectedDate: null,
-                              selectedCourse: null,
-                              selectedState: null,
-                            ),
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(-4, -4),
+                                blurRadius: 10.0,
+                                spreadRadius: 1.0,
+                                blurStyle: BlurStyle.inner,
+                              ),
+                            ],
                           ),
-                        )
+                          child: ValueListenableBuilder<List<Actividad>>(
+                            valueListenable: _filteredActivitiesNotifier,
+                            builder: (context, filteredActivities, child) {
+                              return AllActividades(
+                                selectedFilter: null,
+                                searchQuery: searchQuery,
+                                selectedDate: null,
+                                selectedCourse: null,
+                                selectedState: null,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(
                       height: 60.0,
                       child: Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                     ),
                     Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(12.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  offset: Offset(-4, -4),
-                                  blurRadius: 10.0,
-                                  spreadRadius: 1.0,
-                                  blurStyle: BlurStyle.inner,
-                                ),
-                              ],
-                            ),
-                            child: OtrasActividades(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(-4, -4),
+                                blurRadius: 10.0,
+                                spreadRadius: 1.0,
+                                blurStyle: BlurStyle.inner,
+                              ),
+                            ],
+                          ),
+                        child: ValueListenableBuilder<List<Actividad>>(
+                          valueListenable: _filteredActivitiesNotifier,
+                          builder: (context, filteredActivities, child) {
+                            return OtrasActividades(
                               selectedFilter: null,
                               searchQuery: searchQuery,
                               selectedDate: null,
                               selectedCourse: null,
                               selectedState: null,
-                            ),
-                          ),
-                        )
+                            );
+                          }
+                        ),
+                      ),
+                    ),
                     ),
                   ],
                 ),
