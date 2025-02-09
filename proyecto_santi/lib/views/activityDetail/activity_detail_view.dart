@@ -5,7 +5,13 @@ import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
-import 'dart:io';
+import 'package:proyecto_santi/views/activityDetail/views/activity_detail_large_landscape_layout.dart';
+import 'package:proyecto_santi/views/activityDetail/views/activity_detail_small_landscape_layout.dart';
+import 'package:proyecto_santi/views/activityDetail/views/activity_detail_portrait_layout.dart';
+import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/func.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class ActivityDetailView extends StatefulWidget {
   final Actividad actividad;
@@ -73,102 +79,84 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AndroidAppBar(
-        onToggleTheme: widget.onToggleTheme,
-        title: 'Activity Details',
-      ),
-      drawer: Menu(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (ModalRoute.of(context)?.settings.name != '/')
-                  IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ElevatedButton(
-                  onPressed: isDataChanged ? _saveChanges : null,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                    ),
-                  ),
-                  child: Text('Guardar'),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.actividad.titulo,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text('Solicitante: ${widget.actividad.solicitante}'),
-                  SizedBox(height: 8),
-                  Text('Fecha: ${widget.actividad.fini} a ${widget.actividad.ffin}'),
-                  SizedBox(height: 8),
-                  Text('Tipo: ${widget.actividad.tipo}'),
-                  SizedBox(height: 8),
-                  Text('Estado: ${widget.actividad.estado}'),
-                  SizedBox(height: 16),
-                  Text(
-                    'Fotos de la Actividad',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  SizedBox(
-                    height: 250.0, // Adjust the height as needed
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        if (isAdminOrSolicitante)
-                          SizedBox(
-                            height: 100.0, // Adjust the height as needed
-                            child: IconButton(
-                              icon: Icon(Icons.add_a_photo),
-                              onPressed: _showImagePicker,
-                            ),
-                          ),
-                        ...imagesActividad.map((photo) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            height: 100.0, // Adjust the height as needed
-                            child: Image.network(photo.urlFoto ?? '', fit: BoxFit.cover),
-                          );
-                        }),
-                        ...selectedImages.map((image) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            height: 100.0, // Adjust the height as needed
-                            child: Image.file(File(image.path), fit: BoxFit.cover),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Descripción de la Actividad',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(widget.actividad.descripcion ?? 'Sin descripción'),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return WillPopScope(
+      onWillPop: () => onWillPopSalir(context),
+      child: Stack(
+        children: [
+          Theme.of(context).brightness == Brightness.dark
+              ? GradientBackgroundDark(
+            child: Container(),
+          )
+              : GradientBackgroundLight(
+            child: Container(),
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: shouldShowAppBar()
+                ? AndroidAppBar(
+              onToggleTheme: widget.onToggleTheme,
+              title: 'Actividades',
+            )
+                : null,
+            drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                ? OrientationBuilder(
+              builder: (context, orientation) {
+                return orientation == Orientation.portrait
+                    ? Menu()
+                    : MenuLandscape();
+              },
+            )
+                : Menu(),
+            body: _buildLayout(context),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildLayout(BuildContext context) {
+    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      return ActivityDetailLargeLandscapeLayout(
+        actividad: widget.actividad,
+        isDarkTheme: widget.isDarkTheme,
+        onToggleTheme: widget.onToggleTheme,
+        isDataChanged: isDataChanged,
+        isAdminOrSolicitante: isAdminOrSolicitante,
+        imagesActividad: imagesActividad,
+        selectedImages: selectedImages,
+        showImagePicker: _showImagePicker,
+        saveChanges: _saveChanges,
+      );
+    } else {
+      return OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return ActivityDetailPortraitLayout(
+              actividad: widget.actividad,
+              isDarkTheme: widget.isDarkTheme,
+              onToggleTheme: widget.onToggleTheme,
+              isDataChanged: isDataChanged,
+              isAdminOrSolicitante: isAdminOrSolicitante,
+              imagesActividad: imagesActividad,
+              selectedImages: selectedImages,
+              showImagePicker: _showImagePicker,
+              saveChanges: _saveChanges,
+            );
+          } else {
+            return ActivityDetailSmallLandscapeLayout(
+              actividad: widget.actividad,
+              isDarkTheme: widget.isDarkTheme,
+              onToggleTheme: widget.onToggleTheme,
+              isDataChanged: isDataChanged,
+              isAdminOrSolicitante: isAdminOrSolicitante,
+              imagesActividad: imagesActividad,
+              selectedImages: selectedImages,
+              showImagePicker: _showImagePicker,
+              saveChanges: _saveChanges,
+            );
+          }
+        },
+      );
+    }
   }
 }
