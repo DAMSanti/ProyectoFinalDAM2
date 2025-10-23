@@ -1,0 +1,238 @@
+-- =============================================
+-- Script: Crear Base de Datos ACEXAPI
+-- Descripción: Script completo para crear la base de datos y todas las tablas
+-- Para SQL Server Management Studio 22
+-- =============================================
+
+USE master;
+GO
+
+-- Eliminar la base de datos si existe (solo para desarrollo)
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'ACEXAPI')
+BEGIN
+    ALTER DATABASE ACEXAPI SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE ACEXAPI;
+END
+GO
+
+-- Crear la base de datos
+CREATE DATABASE ACEXAPI
+GO
+
+USE ACEXAPI;
+GO
+
+-- =============================================
+-- TABLAS PRINCIPALES
+-- =============================================
+
+-- Tabla: Departamentos
+CREATE TABLE Departamentos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(200) NOT NULL,
+    Descripcion NVARCHAR(500) NULL
+);
+GO
+
+-- Tabla: Cursos
+CREATE TABLE Cursos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Nivel NVARCHAR(10) NULL,
+    Activo BIT NOT NULL DEFAULT 1
+);
+GO
+
+-- Tabla: Grupos
+CREATE TABLE Grupos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(100) NOT NULL,
+    NumeroAlumnos INT NOT NULL,
+    CursoId INT NOT NULL,
+    CONSTRAINT FK_Grupos_Cursos FOREIGN KEY (CursoId) REFERENCES Cursos(Id) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: Profesores
+CREATE TABLE Profesores (
+    Uuid UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Dni NVARCHAR(20) NOT NULL,
+    Nombre NVARCHAR(100) NOT NULL,
+    Apellidos NVARCHAR(100) NOT NULL,
+    Correo NVARCHAR(200) NOT NULL,
+    Telefono NVARCHAR(20) NULL,
+    FotoUrl NVARCHAR(MAX) NULL,
+    Activo BIT NOT NULL DEFAULT 1,
+    DepartamentoId INT NULL,
+    CONSTRAINT FK_Profesores_Departamentos FOREIGN KEY (DepartamentoId) REFERENCES Departamentos(Id) ON DELETE SET NULL
+);
+GO
+
+-- Índices únicos para Profesores
+CREATE UNIQUE INDEX IX_Profesores_Dni ON Profesores(Dni);
+CREATE UNIQUE INDEX IX_Profesores_Correo ON Profesores(Correo);
+GO
+
+-- Tabla: Localizaciones
+CREATE TABLE Localizaciones (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(200) NOT NULL,
+    Direccion NVARCHAR(500) NULL,
+    Ciudad NVARCHAR(100) NULL,
+    Provincia NVARCHAR(100) NULL,
+    CodigoPostal NVARCHAR(20) NULL
+);
+GO
+
+-- Tabla: EmpTransportes
+CREATE TABLE EmpTransportes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(200) NOT NULL,
+    Cif NVARCHAR(50) NULL,
+    Telefono NVARCHAR(20) NULL,
+    Email NVARCHAR(200) NULL,
+    Direccion NVARCHAR(500) NULL
+);
+GO
+
+-- Tabla: Actividades
+CREATE TABLE Actividades (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Nombre NVARCHAR(200) NOT NULL,
+    Descripcion NVARCHAR(1000) NULL,
+    FechaInicio DATETIME2 NOT NULL,
+    FechaFin DATETIME2 NULL,
+    PresupuestoEstimado DECIMAL(18,2) NULL,
+    CostoReal DECIMAL(18,2) NULL,
+    FolletoUrl NVARCHAR(MAX) NULL,
+    Aprobada BIT NOT NULL DEFAULT 0,
+    FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    DepartamentoId INT NULL,
+    LocalizacionId INT NULL,
+    EmpTransporteId INT NULL,
+    CONSTRAINT FK_Actividades_Departamentos FOREIGN KEY (DepartamentoId) REFERENCES Departamentos(Id) ON DELETE SET NULL,
+    CONSTRAINT FK_Actividades_Localizaciones FOREIGN KEY (LocalizacionId) REFERENCES Localizaciones(Id) ON DELETE SET NULL,
+    CONSTRAINT FK_Actividades_EmpTransportes FOREIGN KEY (EmpTransporteId) REFERENCES EmpTransportes(Id) ON DELETE SET NULL
+);
+GO
+
+-- Tabla: GrupoPartics (Grupos Participantes en Actividades)
+CREATE TABLE GrupoPartics (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ActividadId INT NOT NULL,
+    GrupoId INT NOT NULL,
+    NumeroParticipantes INT NOT NULL,
+    FechaRegistro DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_GrupoPartics_Actividades FOREIGN KEY (ActividadId) REFERENCES Actividades(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_GrupoPartics_Grupos FOREIGN KEY (GrupoId) REFERENCES Grupos(Id) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: ProfParticipantes (Profesores Participantes en Actividades)
+CREATE TABLE ProfParticipantes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ActividadId INT NOT NULL,
+    ProfesorUuid UNIQUEIDENTIFIER NOT NULL,
+    FechaRegistro DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    Observaciones NVARCHAR(500) NULL,
+    CONSTRAINT FK_ProfParticipantes_Actividades FOREIGN KEY (ActividadId) REFERENCES Actividades(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_ProfParticipantes_Profesores FOREIGN KEY (ProfesorUuid) REFERENCES Profesores(Uuid) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: ProfResponsables (Profesores Responsables de Actividades)
+CREATE TABLE ProfResponsables (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ActividadId INT NOT NULL,
+    ProfesorUuid UNIQUEIDENTIFIER NOT NULL,
+    EsCoordinador BIT NOT NULL DEFAULT 0,
+    FechaAsignacion DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    Observaciones NVARCHAR(500) NULL,
+    CONSTRAINT FK_ProfResponsables_Actividades FOREIGN KEY (ActividadId) REFERENCES Actividades(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_ProfResponsables_Profesores FOREIGN KEY (ProfesorUuid) REFERENCES Profesores(Uuid) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: Fotos
+CREATE TABLE Fotos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ActividadId INT NOT NULL,
+    Url NVARCHAR(MAX) NOT NULL,
+    UrlThumbnail NVARCHAR(MAX) NULL,
+    Descripcion NVARCHAR(500) NULL,
+    FechaSubida DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    TamanoBytes BIGINT NOT NULL,
+    CONSTRAINT FK_Fotos_Actividades FOREIGN KEY (ActividadId) REFERENCES Actividades(Id) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: Contratos
+CREATE TABLE Contratos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ActividadId INT NOT NULL,
+    NombreProveedor NVARCHAR(200) NOT NULL,
+    Descripcion NVARCHAR(1000) NULL,
+    Monto DECIMAL(18,2) NULL,
+    FechaContrato DATETIME2 NULL,
+    PresupuestoUrl NVARCHAR(MAX) NULL,
+    FacturaUrl NVARCHAR(MAX) NULL,
+    FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_Contratos_Actividades FOREIGN KEY (ActividadId) REFERENCES Actividades(Id) ON DELETE CASCADE
+);
+GO
+
+-- Tabla: Usuarios
+CREATE TABLE Usuarios (
+    Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    Email NVARCHAR(256) NOT NULL,
+    NombreCompleto NVARCHAR(200) NOT NULL,
+    Rol NVARCHAR(50) NOT NULL DEFAULT 'Usuario',
+    FechaCreacion DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    Activo BIT NOT NULL DEFAULT 1
+);
+GO
+
+-- Índice único para Usuarios
+CREATE UNIQUE INDEX IX_Usuarios_Email ON Usuarios(Email);
+GO
+
+-- =============================================
+-- DATOS INICIALES (SEED DATA)
+-- =============================================
+
+-- Insertar Departamentos
+INSERT INTO Departamentos (Nombre, Descripcion) VALUES
+    ('Informática', 'Departamento de Informática'),
+    ('Matemáticas', 'Departamento de Matemáticas'),
+    ('Lengua', 'Departamento de Lengua y Literatura');
+GO
+
+-- Insertar Cursos
+INSERT INTO Cursos (Nombre, Nivel, Activo) VALUES
+    ('1º ESO', 'ESO', 1),
+    ('2º ESO', 'ESO', 1),
+    ('1º Bach', 'BACH', 1);
+GO
+
+-- =============================================
+-- RESUMEN
+-- =============================================
+PRINT '================================================';
+PRINT 'Base de datos ACEXAPI creada exitosamente';
+PRINT '================================================';
+PRINT 'Tablas creadas:';
+PRINT '  - Departamentos (3 registros)';
+PRINT '  - Cursos (3 registros)';
+PRINT '  - Grupos';
+PRINT '  - Profesores';
+PRINT '  - Localizaciones';
+PRINT '  - EmpTransportes';
+PRINT '  - Actividades';
+PRINT '  - GrupoPartics';
+PRINT '  - ProfParticipantes';
+PRINT '  - ProfResponsables';
+PRINT '  - Fotos';
+PRINT '  - Contratos';
+PRINT '  - Usuarios';
+PRINT '================================================';
+GO

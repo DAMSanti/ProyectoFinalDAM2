@@ -34,6 +34,7 @@ Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
                     child: LoginForm(
                       usernameController: usernameController,
                       passwordController: passwordController,
+                      onSubmit: login,
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.02),

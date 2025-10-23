@@ -55,6 +55,7 @@ Widget _buildRightSide(BuildContext context, TextEditingController usernameContr
           LoginForm(
             usernameController: usernameController,
             passwordController: passwordController,
+            onSubmit: login,
           ),
           SizedBox(height: 7),
           LoginButtons(

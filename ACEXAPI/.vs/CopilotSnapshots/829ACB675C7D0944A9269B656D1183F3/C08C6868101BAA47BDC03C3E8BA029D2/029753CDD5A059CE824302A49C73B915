@@ -1,0 +1,173 @@
+﻿using System.Text;
+using ACEXAPI.Data;
+using ACEXAPI.Services;
+using Azure.Storage.Blobs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+// Swagger con soporte para JWT
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "ACEX API - Gestión de Actividades Extraescolares",
+        Version = "v1",
+        Description = "API para la gestión de actividades extraescolares del centro educativo",
+        Contact = new OpenApiContact
+        {
+            Name = "Equipo A1DAM",
+            Email = "contacto@acexapi.com"
+        }
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header usando el esquema Bearer. Ejemplo: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // Incluir comentarios XML si existen
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"]!;
+var key = Encoding.UTF8.GetBytes(jwtKey);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // En producción debe ser true
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFlutterApp", policy =>
+    {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "*" };
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// Memory Cache
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
+
+// File Storage Service
+if (builder.Configuration.GetValue<bool>("Azure:BlobStorage:Enabled"))
+{
+    var connectionString = builder.Configuration["Azure:BlobStorage:ConnectionString"];
+    builder.Services.AddSingleton(x => new BlobServiceClient(connectionString));
+    builder.Services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+}
+
+// Application Services
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IActividadService, ActividadService>();
+
+// FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// HTTP Client para notificaciones push (futuro)
+builder.Services.AddHttpClient();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ACEX API v1");
+        c.RoutePrefix = string.Empty; // Swagger en la raíz
+    });
+}
+
+app.UseHttpsRedirection();
+
+// Servir archivos estáticos (para almacenamiento local)
+app.UseStaticFiles();
+
+app.UseCors("AllowFlutterApp");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseResponseCaching();
+
+app.MapControllers();
+
+// Crear base de datos si no existe (solo desarrollo)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.EnsureCreatedAsync();
+}
+
+app.Run();

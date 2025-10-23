@@ -3,6 +3,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class ActivityCardItem extends StatefulWidget {
   final Actividad actividad;
@@ -23,47 +24,84 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return LayoutBuilder(
       builder: (context, constraints) {
         return MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
             margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            transform: _isHovered 
+                ? (Matrix4.identity()..translate(0.0, -8.0, 0.0))
+                : Matrix4.identity(),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? lightTheme.primaryColor
-                      : darkTheme.primaryColor,
-                  borderRadius: BorderRadius.circular(12.0),
+                  color: isDark ? colorAccentDark : colorAccentLight,
+                  borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(4, 4),
-                      blurRadius: 10.0,
-                      spreadRadius: 1.0,
-                      blurStyle: BlurStyle.inner,
+                      color: _isHovered 
+                          ? (isDark ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2))
+                          : Colors.black26,
+                      offset: _isHovered ? Offset(0, 12) : Offset(4, 4),
+                      blurRadius: _isHovered ? 24.0 : 10.0,
+                      spreadRadius: _isHovered ? 2.0 : 1.0,
                     ),
                   ],
+                  border: Border.all(
+                    color: _isHovered
+                        ? (isDark ? Colors.blue.withOpacity(0.5) : Colors.blue.withOpacity(0.3))
+                        : Colors.transparent,
+                    width: 2,
+                  ),
                 ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ActivityDetailView(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: Stack(
+                    children: [
+                      // Efecto de brillo en hover
+                      if (_isHovered)
+                        Positioned(
+                          top: -50,
+                          right: -50,
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  Colors.blue.withOpacity(0.1),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ActivityDetailView(
+                                actividad: widget.actividad,
+                                isDarkTheme: widget.isDarkTheme,
+                                onToggleTheme: () {},
+                              ),
+                            ),
+                          );
+                        },
+                        child: ActivityInfo(
                           actividad: widget.actividad,
-                          isDarkTheme: widget.isDarkTheme,
-                          onToggleTheme: () {},
+                          isHovered: _isHovered,
                         ),
                       ),
-                    );
-                  },
-                  child: ActivityInfo(
-                    actividad: widget.actividad,
-                    isHovered: _isHovered,
+                    ],
                   ),
                 ),
               ),
@@ -87,6 +125,16 @@ class ActivityInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Formatear la fecha a DD-MM-YYYY HH:MM
+    String formatearFecha(String fechaStr) {
+      try {
+        final fecha = DateTime.parse(fechaStr);
+        return DateFormat('dd-MM-yyyy HH:mm').format(fecha);
+      } catch (e) {
+        return fechaStr; // Si no se puede parsear, devolver la cadena original
+      }
+    }
+
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -101,8 +149,7 @@ class ActivityInfo extends StatelessWidget {
                 style: TextStyle(
                   fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
                   fontWeight: FontWeight.bold,
-                  color: isHovered ? Colors.blue : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
-                      : darkTheme.textTheme.labelMedium?.color,
+                  color: Color(0xFF1976d2), // Azul de los items del menú y "Próximas Actividades"
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -125,7 +172,7 @@ class ActivityInfo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                actividad.fini,
+                formatearFecha(actividad.fini),
                 style: TextStyle(
                   fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                 ),

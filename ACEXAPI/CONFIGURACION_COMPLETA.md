@@ -1,0 +1,317 @@
+# ? CONFIGURACIÓN COMPLETADA - ACEXAPI
+
+## ?? ¡TODO ESTÁ LISTO Y CORREGIDO!
+
+Tu aplicación ACEXAPI está completamente configurada, corregida y lista para usarse.
+
+### ?? Corrección Aplicada
+- ? **Problema resuelto:** Tabla Usuarios tenía un error de índice único
+- ? **Solución:** Columna Email cambiada de NVARCHAR(MAX) a NVARCHAR(256)
+- ? **Estado:** Base de datos completamente funcional
+- ?? **Detalles:** Ver `Scripts/CORRECCION_USUARIOS.md`
+
+---
+
+## ?? ESTADO ACTUAL
+
+### Base de Datos
+- ? **Servidor:** 127.0.0.1,1433 (SQL Server 2022 Developer Edition en Linux/Ubuntu)
+- ? **Base de Datos:** ACEXAPI - **CREADA Y OPERATIVA**
+- ? **Tablas:** 13 tablas creadas correctamente (incluyendo Usuarios corregida)
+- ? **Datos Iniciales:** 3 Departamentos y 3 Cursos
+- ? **Índices:** Todos los índices únicos funcionando correctamente
+
+### Connection String Configurado
+```json
+"Server=127.0.0.1,1433;Database=ACEXAPI;User Id=sa;Password=Semicrol_10;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+```
+
+### Compilación
+- ? **Build:** Exitoso
+- ? **Target Framework:** .NET 8
+- ? **Modelos:** Sincronizados con la base de datos
+
+---
+
+## ?? EJECUTAR LA APLICACIÓN
+
+### Opción 1: Desde Visual Studio
+```
+1. Presiona F5 o clic en "Start"
+2. Se abrirá automáticamente Swagger en tu navegador
+3. URL: https://localhost:{puerto}/
+```
+
+### Opción 2: Desde línea de comandos
+```powershell
+dotnet run
+```
+
+---
+
+## ?? TABLAS CREADAS (13)
+
+### Principales (8):
+1. ? **Actividades** - Actividades extraescolares
+2. ? **Cursos** - Niveles académicos (3 registros)
+3. ? **Departamentos** - Departamentos educativos (3 registros)
+4. ? **EmpTransportes** - Empresas de transporte
+5. ? **Grupos** - Grupos de estudiantes
+6. ? **Localizaciones** - Lugares de actividades
+7. ? **Profesores** - Información de profesores
+8. ? **Usuarios** - Usuarios del sistema
+
+### Relaciones (3):
+9. ? **GrupoPartics** - Grupos participantes en actividades
+10. ? **ProfParticipantes** - Profesores participantes
+11. ? **ProfResponsables** - Profesores responsables
+
+### Soporte (2):
+12. ? **Contratos** - Contratos y presupuestos
+13. ? **Fotos** - Imágenes de actividades
+
+---
+
+## ?? DATOS INICIALES
+
+### Departamentos (3 registros):
+- Informática - Departamento de Informática
+- Matemáticas - Departamento de Matemáticas
+- Lengua - Departamento de Lengua y Literatura
+
+### Cursos (3 registros):
+- 1º ESO (Nivel: ESO, Activo: Sí)
+- 2º ESO (Nivel: ESO, Activo: Sí)
+- 1º Bach (Nivel: BACH, Activo: Sí)
+
+---
+
+## ?? CONFIGURACIÓN APLICADA
+
+### appsettings.json
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=127.0.0.1,1433;Database=ACEXAPI;User Id=sa;Password=Semicrol_10;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+  }
+}
+```
+
+### Program.cs
+- DbContext configurado con SQL Server
+- JWT Authentication configurado
+- Swagger habilitado en desarrollo
+- CORS configurado para Flutter/Angular/React
+- EnsureCreatedAsync en desarrollo (opcional, la BD ya existe)
+
+---
+
+## ?? PROBAR LA API
+
+### 1. Abrir Swagger
+Una vez ejecutada la aplicación, Swagger se abre automáticamente en:
+```
+https://localhost:{puerto}/
+```
+
+### 2. Endpoints Disponibles (Ejemplos)
+
+#### Sin Autenticación:
+- `GET /api/departamentos` - Listar departamentos
+- `GET /api/cursos` - Listar cursos
+- `GET /api/actividades` - Listar actividades públicas
+
+#### Con Autenticación JWT:
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/actividades` - Crear actividad
+- `PUT /api/actividades/{id}` - Actualizar actividad
+- `DELETE /api/actividades/{id}` - Eliminar actividad
+
+### 3. Probar desde Swagger
+1. Expande un endpoint
+2. Clic en "Try it out"
+3. Completa los parámetros (si es necesario)
+4. Clic en "Execute"
+5. Ve la respuesta y el código de estado
+
+---
+
+## ?? SEGURIDAD
+
+### ?? IMPORTANTE - Para Producción:
+
+#### 1. No usar 'sa' en producción
+```sql
+-- Crear usuario específico
+USE master;
+GO
+CREATE LOGIN acexapi_user WITH PASSWORD = 'ContraseñaSegura123!';
+GO
+
+USE ACEXAPI;
+GO
+CREATE USER acexapi_user FOR LOGIN acexapi_user;
+GO
+
+ALTER ROLE db_datareader ADD MEMBER acexapi_user;
+ALTER ROLE db_datawriter ADD MEMBER acexapi_user;
+GO
+```
+
+#### 2. Usar User Secrets para desarrollo
+```powershell
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=127.0.0.1,1433;Database=ACEXAPI;User Id=sa;Password=Semicrol_10;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+```
+
+Después en appsettings.json:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": ""
+}
+```
+
+#### 3. Para producción usar Azure Key Vault o Variables de Entorno
+
+---
+
+## ?? SCRIPTS DISPONIBLES
+
+### Scripts/CreateDatabase.sql
+Crea la base de datos completa con todas las tablas y datos iniciales.
+**Status:** ? Ya ejecutado
+
+### Scripts/VerifyDatabase.sql
+Verifica que la base de datos y tablas existen correctamente.
+
+### Scripts/TestConnection.sql
+Prueba rápida de conexión en SSMS.
+
+### Scripts/TestConnection.ps1
+Script PowerShell para verificar conexión desde línea de comandos.
+
+---
+
+## ??? COMANDOS ÚTILES
+
+### Verificar conexión:
+```powershell
+sqlcmd -S "127.0.0.1,1433" -U sa -P "Semicrol_10" -Q "SELECT @@VERSION"
+```
+
+### Ver tablas:
+```powershell
+sqlcmd -S "127.0.0.1,1433" -U sa -P "Semicrol_10" -d ACEXAPI -Q "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
+```
+
+### Ejecutar script SQL:
+```powershell
+sqlcmd -S "127.0.0.1,1433" -U sa -P "Semicrol_10" -d ACEXAPI -i "Scripts\VerifyDatabase.sql"
+```
+
+### Ejecutar aplicación:
+```powershell
+dotnet run --project ACEXAPI.csproj
+```
+
+### Build:
+```powershell
+dotnet build
+```
+
+### Restaurar paquetes:
+```powershell
+dotnet restore
+```
+
+---
+
+## ?? PRÓXIMOS PASOS
+
+### 1. Crear Usuario Administrador
+Primero necesitas un usuario para acceder a la API:
+```sql
+USE ACEXAPI;
+GO
+
+INSERT INTO Usuarios (Email, NombreCompleto, Rol, Activo)
+VALUES 
+    ('admin@acexapi.com', 'Administrador Sistema', 'Administrador', 1),
+    ('coordinador@acexapi.com', 'Coordinador Actividades', 'Coordinador', 1);
+GO
+```
+
+### 2. Registrar Profesores
+```sql
+INSERT INTO Profesores (Dni, Nombre, Apellidos, Correo, Telefono, DepartamentoId, Activo)
+VALUES 
+    ('12345678A', 'Juan', 'García López', 'juan.garcia@centro.edu', '600123456', 1, 1),
+    ('87654321B', 'María', 'Martínez Sánchez', 'maria.martinez@centro.edu', '600654321', 2, 1);
+GO
+```
+
+### 3. Crear Grupos
+```sql
+INSERT INTO Grupos (Nombre, NumeroAlumnos, CursoId)
+VALUES 
+    ('1º ESO A', 25, 1),
+    ('1º ESO B', 28, 1),
+    ('2º ESO A', 26, 2);
+GO
+```
+
+### 4. Registrar Localizaciones
+```sql
+INSERT INTO Localizaciones (Nombre, Direccion, Ciudad, Provincia, CodigoPostal)
+VALUES 
+    ('Museo de Ciencias', 'Calle Principal 123', 'Madrid', 'Madrid', '28001'),
+    ('Parque Natural', 'Carretera Nacional km 45', 'Segovia', 'Segovia', '40001');
+GO
+```
+
+### 5. Crear Primera Actividad (desde Swagger)
+1. Ejecuta la aplicación (F5)
+2. Ve a Swagger
+3. Busca `POST /api/actividades`
+4. Crea tu primera actividad
+
+---
+
+## ?? SOPORTE
+
+### Revisar Logs
+Los logs de la aplicación aparecen en:
+- Visual Studio: Output window ? Show output from: Debug
+- Consola si ejecutas con `dotnet run`
+
+### SQL Server Management Studio
+Para gestionar la base de datos directamente:
+- Servidor: `127.0.0.1,1433`
+- Autenticación: SQL Server Authentication
+- Usuario: `sa`
+- Contraseña: `Semicrol_10`
+
+### Consultar Documentación
+- Scripts/README_DatabaseSetup.md - Guía detallada de la base de datos
+- Scripts/INSTRUCCIONES_CONFIGURACION.md - Guía de configuración completa
+
+---
+
+## ? CHECKLIST
+
+- [x] SQL Server corriendo
+- [x] Base de datos ACEXAPI creada
+- [x] 13 tablas creadas
+- [x] Datos iniciales insertados
+- [x] Connection string configurado
+- [x] Aplicación compila correctamente
+- [ ] Aplicación ejecutándose (presiona F5)
+- [ ] Swagger accesible
+- [ ] Primer usuario creado
+- [ ] Primera actividad registrada
+
+---
+
+**¡Tu API ACEXAPI está lista para usar!** ??
+
+Solo presiona F5 en Visual Studio y comienza a trabajar con la API.

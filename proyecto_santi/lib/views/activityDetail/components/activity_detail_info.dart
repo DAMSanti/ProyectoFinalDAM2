@@ -23,6 +23,7 @@ class ActivityDetailInfo extends StatelessWidget {
     required this.showImagePicker,
   });
 
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -87,7 +88,9 @@ class ActivityDetailInfo extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                '${actividad.solicitante.nombre} ${actividad.solicitante.apellidos}',
+                actividad.solicitante != null 
+                    ? '${actividad.solicitante!.nombre} ${actividad.solicitante!.apellidos}'
+                    : 'Sin solicitante',
                 style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -104,11 +107,11 @@ class ActivityDetailInfo extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              toBeginningOfSentenceCase('${actividad.tipo}') ?? '',
+              toBeginningOfSentenceCase(actividad.tipo) ?? '',
               style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
             ),
             Text(
-              '${actividad.estado}',
+              actividad.estado,
               style: TextStyle(
                   fontSize: !isWeb ? 13.dg : 4.sp, fontWeight: FontWeight.bold),
             ),

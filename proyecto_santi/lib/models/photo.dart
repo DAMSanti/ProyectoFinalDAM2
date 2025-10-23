@@ -1,4 +1,5 @@
 import 'actividad.dart';
+import 'package:proyecto_santi/config.dart';
 
 class Photo {
   final int id;
@@ -14,18 +15,28 @@ class Photo {
   });
 
   factory Photo.fromJson(Map<String, dynamic> json) {
-    final baseUrl = 'http://4.233.223.75:8080/imagenes/actividad/';
-    final imageName = json['urlFoto'].substring(json['urlFoto'].lastIndexOf("\\") + 1).replaceAll(" ", "_");
-    final activityId = json['actividad']['id'];
+    String? photoUrl;
+    
+    if (json['urlFoto'] != null) {
+      // Extrae el nombre del archivo desde la ruta del sistema
+      final urlFotoOriginal = json['urlFoto'] as String;
+      final imageName = urlFotoOriginal
+          .substring(urlFotoOriginal.lastIndexOf("\\") + 1)
+          .replaceAll(" ", "_");
+      final activityId = json['actividad']['id'];
+
+      // Construye la URL completa
+      photoUrl = '${AppConfig.imagenesBaseUrl}/actividad/$activityId/$imageName';
+    }
 
     return Photo(
       id: json['id'],
-      urlFoto: '$baseUrl$activityId/$imageName',
-      descripcion: json['descripcion'],
+      urlFoto: photoUrl,
+      descripcion: json['descripcion'] ?? '',
       actividad: Actividad.fromJson(json['actividad']),
     );
   }
-// $baseUrl${json['activityId']}/$imageNameAfterLastSlash
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -36,7 +36,8 @@ class LoginViewState extends State<LoginView> {
     final password = _passwordController.text;
 
     try {
-      final profesor = await _apiService.authenticate(username, password);
+      // Usar directamente el Auth provider en lugar de authenticate()
+      final success = await Provider.of<Auth>(context, listen: false).login(username, password);
 
       if (!mounted) return;
 
@@ -44,9 +45,10 @@ class LoginViewState extends State<LoginView> {
         isLoading = false;
       });
 
-      await Provider.of<Auth>(context, listen: false).login(username, password);
-      if (mounted) {
+      if (success) {
         Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        showLoginDialog();
       }
     } catch (e) {
       setState(() {

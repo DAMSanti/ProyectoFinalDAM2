@@ -20,6 +20,7 @@ class CalendarViewState extends State<CalendarView> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  DateTime? _hoveredDay;
 
   @override
   void initState() {
@@ -118,6 +119,8 @@ class CalendarViewState extends State<CalendarView> {
           titleCentered: true,
           titleTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 4.sp),
           headerPadding: EdgeInsets.all(2.0),
+          leftChevronIcon: _HoverIcon(icon: Icons.chevron_left),
+          rightChevronIcon: _HoverIcon(icon: Icons.chevron_right),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp),
@@ -137,6 +140,17 @@ class CalendarViewState extends State<CalendarView> {
             shape: BoxShape.circle,
           ),
           markersAutoAligned: false,
+        ),
+        calendarBuilders: CalendarBuilders(
+          defaultBuilder: (context, day, focusedDay) {
+            return _DayCell(
+              day: day,
+              isSelected: isSameDay(_selectedDay, day),
+              isToday: isSameDay(DateTime.now(), day),
+              isWeekend: day.weekday == DateTime.saturday || day.weekday == DateTime.sunday,
+              hasEvent: _getEventsForDay(day).isNotEmpty,
+            );
+          },
         ),
       ),
     );
@@ -185,6 +199,94 @@ class CalendarViewState extends State<CalendarView> {
           ],
         );
       },
+    );
+  }
+}
+
+// Widget personalizado para los íconos de las flechas con hover
+class _HoverIcon extends StatefulWidget {
+  final IconData icon;
+
+  const _HoverIcon({required this.icon});
+
+  @override
+  _HoverIconState createState() => _HoverIconState();
+}
+
+class _HoverIconState extends State<_HoverIcon> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: _isHovered ? Color(0xFF1976d2).withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(
+          widget.icon,
+          color: _isHovered ? Color(0xFF1976d2) : null,
+        ),
+      ),
+    );
+  }
+}
+
+// Widget personalizado para las celdas de los días con hover
+class _DayCell extends StatefulWidget {
+  final DateTime day;
+  final bool isSelected;
+  final bool isToday;
+  final bool isWeekend;
+  final bool hasEvent;
+
+  const _DayCell({
+    required this.day,
+    required this.isSelected,
+    required this.isToday,
+    required this.isWeekend,
+    required this.hasEvent,
+  });
+
+  @override
+  _DayCellState createState() => _DayCellState();
+}
+
+class _DayCellState extends State<_DayCell> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        margin: EdgeInsets.all(widget.isToday ? 2 : 4),
+        decoration: BoxDecoration(
+          color: _isHovered 
+              ? Color(0xFF1976d2).withOpacity(0.1)
+              : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            '${widget.day.day}',
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10 : 14,
+              color: widget.isWeekend
+                  ? Color.fromARGB(255, 209, 128, 128)
+                  : (_isHovered ? Color(0xFF1976d2) : null),
+              fontWeight: widget.isToday ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

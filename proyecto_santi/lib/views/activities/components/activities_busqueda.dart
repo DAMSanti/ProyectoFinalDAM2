@@ -8,14 +8,12 @@ class Busqueda extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var searchText = '';
     var showPopup = false;
 
     return Column(
       children: [
         TextField(
           onChanged: (text) {
-            searchText = text;
             onSearchQueryChanged(text);
           },
           decoration: InputDecoration(

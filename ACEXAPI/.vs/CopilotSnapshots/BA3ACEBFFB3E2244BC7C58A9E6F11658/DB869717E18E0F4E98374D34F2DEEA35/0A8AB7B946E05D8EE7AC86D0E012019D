@@ -1,0 +1,157 @@
+﻿# =============================================
+# GUÍA DE CONFIGURACIÓN ESPECÍFICA PARA TU SISTEMA
+# Instancias detectadas: SALAMARDO\SQLSERVER2014 y SALAMARDO\SQLSERVER2016
+# =============================================
+
+## ⚠️ IMPORTANTE - SERVICIOS NO ESTÁN EN EJECUCIÓN
+
+Tus instancias de SQL Server están instaladas pero los servicios no están corriendo.
+
+## PASO 1: INICIAR LOS SERVICIOS DE SQL SERVER
+
+### Opción A: Usando Services (Recomendado)
+1. Presiona `Win + R` y escribe: `services.msc`
+2. Busca el servicio: **SQL Server (SQLSERVER2016)** o **SQL Server (SQLSERVER2014)**
+3. Clic derecho → **Start** (Iniciar)
+4. También inicia **SQL Server Agent (SQLSERVER2016)** si está disponible
+5. Configura el servicio para inicio automático: Clic derecho → Properties → Startup type: **Automatic**
+
+### Opción B: Usando PowerShell (Como Administrador)
+```powershell
+# Ver servicios de SQL Server
+Get-Service | Where-Object { $_.DisplayName -like "*SQL Server*" }
+
+# Iniciar SQL Server 2016 (recomendado)
+Start-Service "MSSQL`$SQLSERVER2016"
+
+# O iniciar SQL Server 2014
+Start-Service "MSSQL`$SQLSERVER2014"
+```
+
+### Opción C: Usando SQL Server Configuration Manager
+1. Abre: **SQL Server Configuration Manager**
+2. Ve a: **SQL Server Services**
+3. Selecciona: **SQL Server (SQLSERVER2016)**
+4. Clic derecho → **Start**
+
+## PASO 2: CONECTARSE EN SQL SERVER MANAGEMENT STUDIO 22
+
+1. Abre **SQL Server Management Studio 22**
+2. En la ventana de conexión:
+   - **Server type:** Database Engine
+   - **Server name:** `SALAMARDO\SQLSERVER2016` (RECOMENDADO)
+     - Alternativa: `SALAMARDO\SQLSERVER2014`
+   - **Authentication:** Windows Authentication
+3. Clic en **Connect**
+
+## PASO 3: CREAR LA BASE DE DATOS
+
+1. Una vez conectado en SSMS, abre el archivo: **`Scripts/CreateDatabase.sql`**
+2. Presiona **F5** o clic en **Execute**
+3. Verifica en la ventana de mensajes que no haya errores
+4. Deberías ver el mensaje: "Base de datos ACEXAPI creada exitosamente"
+
+## PASO 4: VERIFICAR LA INSTALACIÓN
+
+1. En SSMS, abre el archivo: **`Scripts/VerifyDatabase.sql`**
+2. Ejecuta el script (F5)
+3. Verifica que:
+   - La base de datos ACEXAPI existe
+   - Las 13 tablas fueron creadas
+   - Los datos iniciales (3 departamentos y 3 cursos) están presentes
+
+## PASO 5: CONFIGURACIÓN YA ACTUALIZADA
+
+✅ Tu archivo `appsettings.json` ya está configurado con:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=SALAMARDO\\SQLSERVER2016;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+}
+```
+
+Si prefieres usar SQL Server 2014, cambia a:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=SALAMARDO\\SQLSERVER2014;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+}
+```
+
+## PASO 6: EJECUTAR TU APLICACIÓN
+
+1. En Visual Studio, presiona **F5** para ejecutar
+2. La aplicación debería:
+   - Conectarse a SQL Server
+   - Ya no intentar crear la base de datos (porque ya existe)
+   - Iniciar correctamente en modo Development
+
+## ESTRUCTURA DE LA BASE DE DATOS CREADA
+
+### Tablas Principales (8):
+1. **Departamentos** - Departamentos educativos (3 registros iniciales)
+2. **Cursos** - Niveles académicos (3 registros iniciales)
+3. **Grupos** - Grupos de estudiantes
+4. **Profesores** - Datos de profesores
+5. **Localizaciones** - Lugares de actividades
+6. **EmpTransportes** - Empresas de transporte
+7. **Actividades** - Actividades extraescolares
+8. **Usuarios** - Usuarios del sistema
+
+### Tablas de Relación (3):
+9. **GrupoPartics** - Grupos en actividades
+10. **ProfParticipantes** - Profesores participantes
+11. **ProfResponsables** - Profesores responsables
+
+### Tablas de Soporte (2):
+12. **Fotos** - Imágenes de actividades
+13. **Contratos** - Contratos y presupuestos
+
+## SOLUCIÓN DE PROBLEMAS
+
+### "El servicio no se puede iniciar"
+- Verifica que tienes permisos de administrador
+- Revisa los logs en Event Viewer
+
+### "Cannot open database 'ACEXAPI'"
+- Asegúrate de haber ejecutado el script CreateDatabase.sql
+- Verifica en SSMS que la base de datos existe en Databases
+
+### "Login failed for user"
+- Usa Windows Authentication (Trusted_Connection=true)
+- Verifica que tu usuario de Windows tiene permisos en SQL Server
+
+### La aplicación sigue sin conectarse
+1. Verifica el servicio: `Get-Service | Where-Object { $_.Name -like "*SQLSERVER2016*" }`
+2. Prueba la conexión en SSMS primero
+3. Revisa los logs de la aplicación para ver el error exacto
+
+## COMANDOS ÚTILES
+
+### Verificar servicios:
+```powershell
+Get-Service | Where-Object { $_.DisplayName -like "*SQL Server*" }
+```
+
+### Iniciar servicio:
+```powershell
+Start-Service "MSSQL$SQLSERVER2016"
+```
+
+### Detener servicio:
+```powershell
+Stop-Service "MSSQL$SQLSERVER2016"
+```
+
+### Ver bases de datos desde PowerShell:
+```powershell
+sqlcmd -S "SALAMARDO\SQLSERVER2016" -Q "SELECT name FROM sys.databases"
+```
+
+## PRÓXIMOS PASOS DESPUÉS DE LA CONFIGURACIÓN
+
+1. ✅ Crear usuarios en la tabla Usuarios
+2. ✅ Registrar profesores
+3. ✅ Crear grupos para los cursos existentes
+4. ✅ Comenzar a registrar actividades
+
+---
+**¡Listo!** Una vez que inicies el servicio de SQL Server y ejecutes el script CreateDatabase.sql en SSMS, tu aplicación debería funcionar correctamente.

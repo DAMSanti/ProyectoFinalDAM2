@@ -1,0 +1,34 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EntityFrameworkCore": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=SALAMARDO\\SQLSERVER2016;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+  },
+  "Jwt": {
+    "Key": "SuperSecretKeyForJWTTokenGeneration_ChangeThisInProduction_MustBe32CharactersOrMore!",
+    "Issuer": "ACEXAPI",
+    "Audience": "ACEXAPIUsers"
+  },
+  "Azure": {
+    "BlobStorage": {
+      "ConnectionString": "",
+      "Enabled": false
+    }
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:4200",
+      "http://localhost:5173"
+    ]
+  },
+  "Cache": {
+    "DefaultExpirationMinutes": 30
+  }
+}

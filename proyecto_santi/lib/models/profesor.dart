@@ -1,4 +1,4 @@
-import 'package:proyecto_santi/models/Departamento.dart';
+import 'package:proyecto_santi/models/departamento.dart';
 
 class Profesor {
   final String uuid;

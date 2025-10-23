@@ -201,14 +201,14 @@ class HoverableListItemState extends State<HoverableListItem> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${widget.actividad.fini}',
+                      widget.actividad.fini,
                       style: TextStyle(
                         color: _isHovered ? Colors.blueGrey : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
                             : darkTheme.textTheme.labelMedium?.color,
                       ),
                     ),
                     Text(
-                      '${widget.actividad.estado}',
+                      widget.actividad.estado,
                       style: TextStyle(
                         color: _isHovered ? Colors.blueGrey : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
                             : darkTheme.textTheme.labelMedium?.color,

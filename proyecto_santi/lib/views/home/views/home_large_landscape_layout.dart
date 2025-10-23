@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:proyecto_santi/components/marco_desktop.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -26,105 +25,148 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MarcoDesktop(
       onToggleTheme: widget.onToggleTheme,
       content: LayoutBuilder(
         builder: (context, constraints) {
-          return Row(
+          // Tamaño mínimo donde deja de ser responsive
+          final minWidth = 900.0;
+          final minHeight = 600.0;
+          
+          // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
+          final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
+          final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
+          
+          // Si necesitamos scroll, envolver en SingleChildScrollView
+          if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SizedBox(
+                  width: minWidth,
+                  height: minHeight,
+                  child: _buildContent(minWidth, minHeight),
+                ),
+              ),
+            );
+          }
+          
+          // Si no necesitamos scroll, usar el tamaño disponible (responsive)
+          return _buildContent(effectiveWidth, effectiveHeight);
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(double width, double height) {
+    return Builder(
+      builder: (context) {
+        return SizedBox(
+          width: width,
+          height: height,
+          child: Column(
             children: [
-              Expanded(
+              // Sección de actividades con scroll horizontal
+              SizedBox(
+                height: height * 0.25, // 25% de la altura
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        'Próximas Actividades',
-                        style: TextStyle(fontSize: 5.sp, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(-4, -4),
-                              blurRadius: 10.0,
-                              spreadRadius: 1.0,
-                              blurStyle: BlurStyle.inner,
-                            ),
-                          ],
-                        ),
-                        child: SizedBox(
-                          height: constraints.maxHeight * 0.20,
-                          child: Listener(
-                            onPointerSignal: (pointerSignal) {
-                              if (pointerSignal is PointerScrollEvent) {
-                                final offset = _scrollController.offset +
-                                    (pointerSignal.scrollDelta.dy * -5.0);
-                                _scrollController.animateTo(
-                                  offset.clamp(
-                                    0.0,
-                                    _scrollController.position.maxScrollExtent,
-                                  ),
-                                  duration: Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            },
-                            child: SingleChildScrollView(
-                              controller: _scrollController,
-                              scrollDirection: Axis.horizontal,
-                              physics: BouncingScrollPhysics(),
-                              child: Row(
-                                children: widget.activities.map((actividad) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(right: 16.0),
-                                    child: SizedBox(
-                                      width: constraints.maxHeight * 0.53,
-                                      child: ActivityCardItem(
-                                        actividad: actividad,
-                                        isDarkTheme: Theme.of(context).brightness ==
-                                            Brightness.dark,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: constraints.maxHeight * 0.05, // Fixed height for Calendario de Actividades
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                      child: Text(
-                        'Calendario de Actividades',
-                        style: TextStyle(fontSize: 5.sp, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    SizedBox(height: 12),
                     Expanded(
-                      child: Center(
-                        child: CalendarView(activities: widget.activities),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(-4, -4),
+                                blurRadius: 10.0,
+                                spreadRadius: 1.0,
+                                blurStyle: BlurStyle.inner,
+                              ),
+                            ],
+                          ),
+                          child: widget.activities.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No hay actividades próximas',
+                                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                                  ),
+                                )
+                              : Listener(
+                                  onPointerSignal: (pointerSignal) {
+                                    if (pointerSignal is PointerScrollEvent) {
+                                      final offset = _scrollController.offset +
+                                          (pointerSignal.scrollDelta.dy);
+                                      _scrollController.jumpTo(
+                                        offset.clamp(
+                                          0.0,
+                                          _scrollController.position.maxScrollExtent,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: ListView.builder(
+                                    controller: _scrollController,
+                                    scrollDirection: Axis.horizontal,
+                                    physics: BouncingScrollPhysics(),
+                                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                                    itemCount: widget.activities.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 16.0),
+                                        child: SizedBox(
+                                          width: width * 0.35,
+                                          child: ActivityCardItem(
+                                            actividad: widget.activities[index],
+                                            isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
+                    SizedBox(height: 12),
                   ],
                 ),
               ),
+              
+              // Título del calendario centrado
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Text(
+                  'Calendario de Actividades',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Calendario con ancho completo
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+                  child: SizedBox(
+                    width: width - 32, // Ancho completo menos padding
+                    child: CalendarView(activities: widget.activities),
+                  ),
+                ),
+              ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class LoginForm extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController passwordController;
+  final VoidCallback? onSubmit;
 
   const LoginForm({
     super.key,
     required this.usernameController,
     required this.passwordController,
+    this.onSubmit,
   });
 
   @override
@@ -20,6 +22,7 @@ class LoginForm extends StatelessWidget {
             labelText: 'Username',
             border: OutlineInputBorder(),
           ),
+          onSubmitted: (_) => onSubmit?.call(),
         ),
         SizedBox(height: 16),
         TextField(
@@ -29,6 +32,7 @@ class LoginForm extends StatelessWidget {
             border: OutlineInputBorder(),
           ),
           obscureText: true,
+          onSubmitted: (_) => onSubmit?.call(),
         ),
       ],
     );

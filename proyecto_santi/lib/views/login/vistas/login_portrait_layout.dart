@@ -32,6 +32,7 @@ Widget loginPortraitLayout(BuildContext context, TextEditingController usernameC
                 LoginForm(
                   usernameController: usernameController,
                   passwordController: passwordController,
+                  onSubmit: login,
                 ),
                 SizedBox(height: 16),
                 LoginButtons(

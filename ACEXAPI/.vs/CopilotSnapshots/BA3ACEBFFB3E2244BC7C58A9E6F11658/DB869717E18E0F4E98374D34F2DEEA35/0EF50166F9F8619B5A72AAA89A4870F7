@@ -1,0 +1,112 @@
+﻿# =============================================
+# Guía para Crear la Base de Datos ACEXAPI
+# SQL Server Management Studio 22
+# =============================================
+
+## PASOS PARA CREAR LA BASE DE DATOS:
+
+### 1. Abrir SQL Server Management Studio 22
+   - Abre SSMS
+   - Conéctate a tu instancia de SQL Server
+
+### 2. Identificar tu Instancia de SQL Server
+   Algunas instancias comunes:
+   - `localhost` o `.` (instancia por defecto)
+   - `.\SQLEXPRESS` (SQL Server Express)
+   - `(local)\SQLEXPRESS`
+   - Nombre de tu máquina: `TU_PC\SQLEXPRESS`
+
+### 3. Ejecutar el Script
+   - Abre el archivo: `Scripts/CreateDatabase.sql`
+   - Presiona F5 o clic en "Execute"
+   - Verifica que no haya errores en la ventana de mensajes
+
+### 4. Verificar la Creación
+   ```sql
+   USE ACEXAPI;
+   GO
+   
+   -- Ver todas las tablas
+   SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
+   
+   -- Ver datos iniciales
+   SELECT * FROM Departamentos;
+   SELECT * FROM Cursos;
+   ```
+
+## ACTUALIZAR EL CONNECTION STRING:
+
+Después de crear la base de datos, necesitas actualizar tu `appsettings.json`:
+
+### Si usas la instancia por defecto:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+}
+```
+
+### Si usas SQL Server Express:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=.\\SQLEXPRESS;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+}
+```
+
+### Si usas autenticación de SQL Server:
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=ACEXAPI;User Id=tu_usuario;Password=tu_contraseña;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+}
+```
+
+## ESTRUCTURA DE LA BASE DE DATOS:
+
+### Tablas Principales:
+1. **Departamentos** - Departamentos del centro educativo
+2. **Cursos** - Cursos académicos (ESO, Bachillerato, etc.)
+3. **Grupos** - Grupos de estudiantes por curso
+4. **Profesores** - Información de profesores
+5. **Localizaciones** - Lugares donde se realizan actividades
+6. **EmpTransportes** - Empresas de transporte
+7. **Actividades** - Actividades extraescolares
+
+### Tablas de Relación:
+8. **GrupoPartics** - Grupos que participan en actividades
+9. **ProfParticipantes** - Profesores participantes en actividades
+10. **ProfResponsables** - Profesores responsables de actividades
+
+### Tablas de Soporte:
+11. **Fotos** - Fotos de actividades
+12. **Contratos** - Contratos relacionados con actividades
+13. **Usuarios** - Usuarios del sistema
+
+## DATOS INICIALES INCLUIDOS:
+
+- 3 Departamentos: Informática, Matemáticas, Lengua
+- 3 Cursos: 1º ESO, 2º ESO, 1º Bach
+
+## SOLUCIÓN DE PROBLEMAS:
+
+### Error: "Cannot open database 'ACEXAPI'"
+- Verifica que estás conectado a la instancia correcta
+- Ejecuta: `SELECT @@SERVERNAME` para ver el nombre del servidor
+
+### Error: "Login failed for user"
+- Verifica los permisos de tu usuario
+- Si usas Windows Authentication, asegúrate de que tu usuario tiene permisos
+
+### La API no se conecta después de crear la BD
+- Verifica el connection string en appsettings.json
+- Asegúrate de que el nombre del servidor es correcto
+- Verifica que SQL Server Browser está iniciado (para instancias con nombre)
+
+## SERVICIOS DE SQL SERVER:
+
+Asegúrate de que estos servicios estén ejecutándose:
+1. SQL Server (MSSQLSERVER) o SQL Server (SQLEXPRESS)
+2. SQL Server Browser (si usas instancias con nombre)
+
+Para verificar:
+- Abre "Services" (services.msc)
+- Busca los servicios de SQL Server
+- Asegúrate de que están "Running"

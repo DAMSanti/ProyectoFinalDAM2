@@ -1,0 +1,156 @@
+﻿# =============================================
+# Script PowerShell: Detectar Instancias de SQL Server
+# Descripción: Ayuda a identificar qué instancias de SQL Server están disponibles
+# =============================================
+
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host "DETECTANDO INSTANCIAS DE SQL SERVER" -ForegroundColor Cyan
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host ""
+
+# 1. Verificar servicios de SQL Server en ejecución
+Write-Host "1. SERVICIOS DE SQL SERVER:" -ForegroundColor Yellow
+Write-Host "   Buscando servicios en ejecución..." -ForegroundColor Gray
+try {
+    $sqlServices = Get-Service | Where-Object { $_.DisplayName -like "*SQL Server*" -and $_.Status -eq "Running" }
+    
+    if ($sqlServices) {
+        foreach ($service in $sqlServices) {
+            Write-Host "   ✓ " -ForegroundColor Green -NoNewline
+            Write-Host "$($service.DisplayName) - Estado: $($service.Status)"
+        }
+    } else {
+        Write-Host "   ✗ No se encontraron servicios de SQL Server en ejecución" -ForegroundColor Red
+        Write-Host "   Sugerencia: Inicia SQL Server desde Services (services.msc)" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "   Error al buscar servicios: $_" -ForegroundColor Red
+}
+Write-Host ""
+
+# 2. Buscar instancias de SQL Server en la red
+Write-Host "2. INSTANCIAS DE SQL SERVER EN LA RED:" -ForegroundColor Yellow
+Write-Host "   Escaneando la red (esto puede tomar unos segundos)..." -ForegroundColor Gray
+try {
+    $instances = [System.Data.Sql.SqlDataSourceEnumerator]::Instance.GetDataSources()
+    
+    if ($instances.Rows.Count -gt 0) {
+        $instances | Format-Table ServerName, InstanceName, IsClustered, Version -AutoSize
+        
+        Write-Host "   CONNECTION STRINGS SUGERIDOS:" -ForegroundColor Green
+        foreach ($row in $instances) {
+            $serverName = $row["ServerName"]
+            $instanceName = $row["InstanceName"]
+            
+            if ($instanceName) {
+                $fullName = "$serverName\$instanceName"
+            } else {
+                $fullName = $serverName
+            }
+            
+            Write-Host "   Server=$fullName;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False" -ForegroundColor Cyan
+        }
+    } else {
+        Write-Host "   ✗ No se encontraron instancias de SQL Server" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "   Error al escanear instancias: $_" -ForegroundColor Red
+}
+Write-Host ""
+
+# 3. Verificar instalación de SQL Server Express
+Write-Host "3. SQL SERVER EXPRESS:" -ForegroundColor Yellow
+$sqlExpressPath = "C:\Program Files\Microsoft SQL Server"
+if (Test-Path $sqlExpressPath) {
+    Write-Host "   ✓ Carpeta de SQL Server encontrada: $sqlExpressPath" -ForegroundColor Green
+    
+    # Buscar versiones instaladas
+    $versions = Get-ChildItem $sqlExpressPath | Where-Object { $_.Name -match "^MSSQL" }
+    if ($versions) {
+        Write-Host "   Versiones instaladas:" -ForegroundColor Gray
+        foreach ($version in $versions) {
+            Write-Host "     - $($version.Name)" -ForegroundColor Gray
+        }
+    }
+} else {
+    Write-Host "   ✗ No se encontró la carpeta de SQL Server" -ForegroundColor Red
+}
+Write-Host ""
+
+# 4. Intentar conexiones comunes
+Write-Host "4. PROBANDO CONEXIONES COMUNES:" -ForegroundColor Yellow
+$connectionStrings = @(
+    "localhost",
+    ".",
+    ".\SQLEXPRESS",
+    "(local)\SQLEXPRESS",
+    "$env:COMPUTERNAME\SQLEXPRESS",
+    "$env:COMPUTERNAME"
+)
+
+foreach ($server in $connectionStrings) {
+    Write-Host "   Probando: $server ... " -ForegroundColor Gray -NoNewline
+    
+    try {
+        $connectionString = "Server=$server;Database=master;Integrated Security=True;Connection Timeout=3;TrustServerCertificate=True;Encrypt=False"
+        $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)
+        $connection.Open()
+        
+        if ($connection.State -eq "Open") {
+            Write-Host "✓ CONECTADO" -ForegroundColor Green
+            
+            $command = $connection.CreateCommand()
+            $command.CommandText = "SELECT @@VERSION"
+            $version = $command.ExecuteScalar()
+            
+            Write-Host "     Versión: $($version.Substring(0, 100))..." -ForegroundColor Gray
+            Write-Host "     CONNECTION STRING:" -ForegroundColor Cyan
+            Write-Host "     Server=$server;Database=ACEXAPI;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False" -ForegroundColor Cyan
+            
+            $connection.Close()
+        }
+    } catch {
+        Write-Host "✗ NO DISPONIBLE" -ForegroundColor Red
+    }
+}
+Write-Host ""
+
+# 5. Verificar si existe la base de datos ACEXAPI
+Write-Host "5. VERIFICAR BASE DE DATOS ACEXAPI:" -ForegroundColor Yellow
+foreach ($server in $connectionStrings) {
+    try {
+        $connectionString = "Server=$server;Database=master;Integrated Security=True;Connection Timeout=3;TrustServerCertificate=True;Encrypt=False"
+        $connection = New-Object System.Data.SqlClient.SqlConnection($connectionString)
+        $connection.Open()
+        
+        if ($connection.State -eq "Open") {
+            $command = $connection.CreateCommand()
+            $command.CommandText = "SELECT COUNT(*) FROM sys.databases WHERE name = 'ACEXAPI'"
+            $exists = $command.ExecuteScalar()
+            
+            if ($exists -gt 0) {
+                Write-Host "   ✓ Base de datos ACEXAPI encontrada en: $server" -ForegroundColor Green
+            }
+            
+            $connection.Close()
+        }
+    } catch {
+        # Ignorar errores silenciosamente
+    }
+}
+Write-Host ""
+
+# Resumen
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host "PRÓXIMOS PASOS:" -ForegroundColor Cyan
+Write-Host "================================================" -ForegroundColor Cyan
+Write-Host "1. Copia uno de los CONNECTION STRINGS de arriba (los que aparecen en verde)" -ForegroundColor White
+Write-Host "2. Pega el CONNECTION STRING en tu appsettings.json" -ForegroundColor White
+Write-Host "3. Abre SQL Server Management Studio 22" -ForegroundColor White
+Write-Host "4. Conéctate usando el servidor que funcionó" -ForegroundColor White
+Write-Host "5. Ejecuta el script: Scripts/CreateDatabase.sql" -ForegroundColor White
+Write-Host "6. Ejecuta tu aplicación" -ForegroundColor White
+Write-Host ""
+Write-Host "Si no aparece ninguna conexión exitosa, necesitas instalar SQL Server Express:" -ForegroundColor Yellow
+Write-Host "https://www.microsoft.com/sql-server/sql-server-downloads" -ForegroundColor Cyan
+Write-Host ""

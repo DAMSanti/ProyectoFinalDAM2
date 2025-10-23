@@ -1,0 +1,142 @@
+using Microsoft.EntityFrameworkCore;
+using ACEXAPI.Models;
+
+namespace ACEXAPI.Data;
+
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
+    public DbSet<Actividad> Actividades { get; set; }
+    public DbSet<Departamento> Departamentos { get; set; }
+    public DbSet<Profesor> Profesores { get; set; }
+    public DbSet<Curso> Cursos { get; set; }
+    public DbSet<Grupo> Grupos { get; set; }
+    public DbSet<Localizacion> Localizaciones { get; set; }
+    public DbSet<EmpTransporte> EmpTransportes { get; set; }
+    public DbSet<GrupoPartic> GrupoPartics { get; set; }
+    public DbSet<ProfParticipante> ProfParticipantes { get; set; }
+    public DbSet<ProfResponsable> ProfResponsables { get; set; }
+    public DbSet<Foto> Fotos { get; set; }
+    public DbSet<Contrato> Contratos { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Configurar índices únicos
+        modelBuilder.Entity<Profesor>()
+            .HasIndex(p => p.Dni)
+            .IsUnique();
+
+        modelBuilder.Entity<Profesor>()
+            .HasIndex(p => p.Correo)
+            .IsUnique();
+
+        modelBuilder.Entity<Usuario>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        // Configurar relaciones
+        modelBuilder.Entity<Actividad>()
+            .HasOne(a => a.Departamento)
+            .WithMany(d => d.Actividades)
+            .HasForeignKey(a => a.DepartamentoId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Actividad>()
+            .HasOne(a => a.Localizacion)
+            .WithMany(l => l.Actividades)
+            .HasForeignKey(a => a.LocalizacionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Actividad>()
+            .HasOne(a => a.EmpTransporte)
+            .WithMany(e => e.Actividades)
+            .HasForeignKey(a => a.EmpTransporteId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Profesor>()
+            .HasOne(p => p.Departamento)
+            .WithMany(d => d.Profesores)
+            .HasForeignKey(p => p.DepartamentoId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Grupo>()
+            .HasOne(g => g.Curso)
+            .WithMany(c => c.Grupos)
+            .HasForeignKey(g => g.CursoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<GrupoPartic>()
+            .HasOne(gp => gp.Actividad)
+            .WithMany(a => a.GruposParticipantes)
+            .HasForeignKey(gp => gp.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<GrupoPartic>()
+            .HasOne(gp => gp.Grupo)
+            .WithMany(g => g.ActividadesParticipantes)
+            .HasForeignKey(gp => gp.GrupoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfParticipante>()
+            .HasOne(pp => pp.Actividad)
+            .WithMany(a => a.ProfesoresParticipantes)
+            .HasForeignKey(pp => pp.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfParticipante>()
+            .HasOne(pp => pp.Profesor)
+            .WithMany(p => p.ActividadesParticipante)
+            .HasForeignKey(pp => pp.ProfesorUuid)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfResponsable>()
+            .HasOne(pr => pr.Actividad)
+            .WithMany(a => a.ProfesoresResponsables)
+            .HasForeignKey(pr => pr.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ProfResponsable>()
+            .HasOne(pr => pr.Profesor)
+            .WithMany(p => p.ActividadesResponsable)
+            .HasForeignKey(pr => pr.ProfesorUuid)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Foto>()
+            .HasOne(f => f.Actividad)
+            .WithMany(a => a.Fotos)
+            .HasForeignKey(f => f.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Contrato>()
+            .HasOne(c => c.Actividad)
+            .WithMany(a => a.Contratos)
+            .HasForeignKey(c => c.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Seed data inicial
+        SeedData(modelBuilder);
+    }
+
+    private void SeedData(ModelBuilder modelBuilder)
+    {
+        // Datos iniciales de ejemplo
+        modelBuilder.Entity<Departamento>().HasData(
+            new Departamento { Id = 1, Nombre = "Informática", Descripcion = "Departamento de Informática" },
+            new Departamento { Id = 2, Nombre = "Matemáticas", Descripcion = "Departamento de Matemáticas" },
+            new Departamento { Id = 3, Nombre = "Lengua", Descripcion = "Departamento de Lengua y Literatura" }
+        );
+
+        modelBuilder.Entity<Curso>().HasData(
+            new Curso { Id = 1, Nombre = "1º ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 2, Nombre = "2º ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 3, Nombre = "1º Bach", Nivel = "BACH", Activo = true }
+        );
+    }
+}

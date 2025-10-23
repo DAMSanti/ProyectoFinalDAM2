@@ -62,17 +62,6 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     }
   }
 
-  void _showCamera() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() {
-        selectedImages.add(image);
-        isDataChanged = true;
-      });
-    }
-  }
-
   void _saveChanges() {
     // Save changes logic here
   }

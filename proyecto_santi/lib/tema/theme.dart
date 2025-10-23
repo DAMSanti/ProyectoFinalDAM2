@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Define tus colores globales
 const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
@@ -50,12 +49,12 @@ final ThemeData lightTheme = ThemeData(
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
-    color: Colors.transparent,
+    backgroundColor: Colors.transparent,
     titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
     iconTheme: IconThemeData(color: colorTextoLight),
   ),
   // CARDS
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: colorAccentLight,
     shadowColor: Colors.grey,
     elevation: 4,
@@ -68,7 +67,7 @@ final ThemeData lightTheme = ThemeData(
     iconColor: colorTextoLight,
   ),
   // DIALOG
-  dialogTheme: DialogTheme(
+  dialogTheme: DialogThemeData(
     backgroundColor: colorFondoLight,
     titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
     contentTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, inherit: true),
@@ -130,12 +129,12 @@ final ThemeData darkTheme = ThemeData(
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
-    color: colorAccentDark,
+    backgroundColor: colorAccentDark,
     titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
     iconTheme: IconThemeData(color: colorTextoDark),
   ),
   // CARDS
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: colorAccentDark,
     shadowColor: Colors.grey,
     elevation: 4,
@@ -148,7 +147,7 @@ final ThemeData darkTheme = ThemeData(
     iconColor: colorTextoDark,
   ),
   // DIALOG
-  dialogTheme: DialogTheme(
+  dialogTheme: DialogThemeData(
     backgroundColor: colorFondoDark,
     titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
     contentTextStyle: TextStyle(color: colorTextoDark, fontSize: 16, inherit: true),

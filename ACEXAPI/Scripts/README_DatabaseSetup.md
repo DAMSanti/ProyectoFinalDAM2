@@ -1,0 +1,265 @@
+# =============================================
+# Guía para Crear la Base de Datos ACEXAPI
+# SQL Server Management Studio 22
+# Configuración: 127.0.0.1,1433 con SQL Server Authentication
+# =============================================
+
+## CONFIGURACIÓN DE TU SISTEMA
+
+- **Servidor:** 127.0.0.1,1433
+- **Autenticación:** SQL Server Authentication
+- **Usuario:** sa
+- **Contraseña:** Semicrol_10
+
+## PASOS PARA CREAR LA BASE DE DATOS:
+
+### 1. Verificar que SQL Server está corriendo
+
+#### Usando PowerShell (Recomendado):
+```powershell
+# Ejecuta en la carpeta del proyecto
+.\Scripts\TestConnection.ps1
+```
+
+Este script verificará:
+- ? Si SQL Server está corriendo
+- ? Si el puerto 1433 está accesible
+- ? Si las credenciales son correctas
+- ? Si la base de datos ACEXAPI existe
+
+#### Manualmente:
+- Presiona `Win + R` ? escribe `services.msc`
+- Busca "SQL Server (MSSQLSERVER)" o similar
+- Verifica que esté en estado "Running"
+
+### 2. Conectarse en SQL Server Management Studio 22
+
+1. Abre **SQL Server Management Studio 22**
+2. En la ventana de conexión:
+   - **Server name:** `127.0.0.1,1433` (o solo `127.0.0.1`)
+   - **Authentication:** SQL Server Authentication
+   - **Login:** `sa`
+   - **Password:** `Semicrol_10`
+   - ?? Trust server certificate (si aparece)
+3. Clic en **Connect**
+
+### 3. Ejecutar el Script de Creación
+
+1. Una vez conectado, abre: **File ? Open ? File**
+2. Navega a: `Scripts/CreateDatabase.sql`
+3. Presiona **F5** o clic en **Execute**
+4. Verifica en la ventana de mensajes:
+   ```
+   ================================================
+   Base de datos ACEXAPI creada exitosamente
+   ================================================
+   ```
+
+### 4. Verificar la Instalación
+
+1. En SSMS, abre el archivo: `Scripts/VerifyDatabase.sql`
+2. Presiona **F5** para ejecutar
+3. Deberías ver:
+   - La base de datos ACEXAPI existe
+   - 13 tablas creadas
+   - 3 departamentos iniciales
+   - 3 cursos iniciales
+
+## CONNECTION STRING CONFIGURADO
+
+Tu archivo `appsettings.json` ya está configurado:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=127.0.0.1,1433;Database=ACEXAPI;User Id=sa;Password=Semicrol_10;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+  }
+}
+```
+
+### ?? IMPORTANTE - Para Producción:
+
+1. **No uses el usuario 'sa' en producción**
+2. **Crea un usuario específico:**
+
+```sql
+-- Ejecuta en SSMS
+USE master;
+GO
+CREATE LOGIN acexapi_user WITH PASSWORD = 'TuContraseñaSegura123!';
+GO
+
+USE ACEXAPI;
+GO
+CREATE USER acexapi_user FOR LOGIN acexapi_user;
+GO
+
+ALTER ROLE db_datareader ADD MEMBER acexapi_user;
+ALTER ROLE db_datawriter ADD MEMBER acexapi_user;
+GO
+```
+
+3. **Usa User Secrets para desarrollo:**
+
+```powershell
+# En la carpeta del proyecto
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=127.0.0.1,1433;Database=ACEXAPI;User Id=sa;Password=Semicrol_10;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False"
+```
+
+## ESTRUCTURA DE LA BASE DE DATOS:
+
+### Tablas Principales:
+1. **Departamentos** - Departamentos del centro educativo (3 registros)
+2. **Cursos** - Cursos académicos (3 registros)
+3. **Grupos** - Grupos de estudiantes por curso
+4. **Profesores** - Información de profesores
+5. **Localizaciones** - Lugares donde se realizan actividades
+6. **EmpTransportes** - Empresas de transporte
+7. **Actividades** - Actividades extraescolares
+8. **Usuarios** - Usuarios del sistema
+
+### Tablas de Relación:
+9. **GrupoPartics** - Grupos que participan en actividades
+10. **ProfParticipantes** - Profesores participantes en actividades
+11. **ProfResponsables** - Profesores responsables de actividades
+
+### Tablas de Soporte:
+12. **Fotos** - Fotos de actividades
+13. **Contratos** - Contratos relacionados con actividades
+
+## DATOS INICIALES INCLUIDOS:
+
+### Departamentos:
+- Informática
+- Matemáticas
+- Lengua
+
+### Cursos:
+- 1º ESO
+- 2º ESO
+- 1º Bach
+
+## EJECUTAR LA APLICACIÓN:
+
+1. En Visual Studio, presiona **F5**
+2. La aplicación debería:
+   - Conectarse a SQL Server con las credenciales configuradas
+   - Verificar que la base de datos existe (no intentará crearla)
+   - Abrir Swagger automáticamente
+3. Accede a: `https://localhost:{puerto}/`
+
+## SOLUCIÓN DE PROBLEMAS:
+
+### "Login failed for user 'sa'"
+**Causa:** Contraseña incorrecta o autenticación SQL deshabilitada
+
+**Solución:**
+1. Verifica la contraseña en SSMS
+2. Habilita autenticación mixta:
+   - En SSMS: Clic derecho en servidor ? Properties
+   - Security ? SQL Server and Windows Authentication mode
+   - Reinicia el servicio SQL Server
+
+### "A network-related or instance-specific error"
+**Causa:** SQL Server no está corriendo o puerto bloqueado
+
+**Solución:**
+```powershell
+# Verificar servicio
+Get-Service | Where-Object { $_.DisplayName -like "*SQL Server*" }
+
+# Iniciar servicio
+Start-Service "MSSQLSERVER"
+
+# Probar puerto
+Test-NetConnection -ComputerName 127.0.0.1 -Port 1433
+```
+
+### "Cannot open database 'ACEXAPI'"
+**Causa:** La base de datos no fue creada
+
+**Solución:**
+1. Conéctate a SSMS
+2. Ejecuta `Scripts/CreateDatabase.sql`
+3. Verifica en Object Explorer: Databases ? ACEXAPI
+
+### "Certificate chain error" o problemas SSL
+**Causa:** Problemas de certificado SSL
+
+**Solución:**
+Ya está configurado en el connection string:
+- `TrustServerCertificate=True`
+- `Encrypt=False`
+
+### El puerto 1433 no responde
+**Causa:** Firewall o SQL Server no escucha en puerto correcto
+
+**Solución:**
+1. Abre SQL Server Configuration Manager
+2. SQL Server Network Configuration ? Protocols for MSSQLSERVER
+3. Verifica que TCP/IP está habilitado
+4. Propiedades de TCP/IP ? IP Addresses ? IPAll ? TCP Port = 1433
+5. Reinicia SQL Server
+
+## COMANDOS ÚTILES:
+
+### Verificar conexión desde PowerShell:
+```powershell
+.\Scripts\TestConnection.ps1
+```
+
+### Probar conexión manualmente:
+```powershell
+$conn = New-Object System.Data.SqlClient.SqlConnection("Server=127.0.0.1,1433;Database=master;User Id=sa;Password=Semicrol_10;TrustServerCertificate=True;Encrypt=False")
+$conn.Open()
+Write-Host "Estado: $($conn.State)"
+$conn.Close()
+```
+
+### Ver bases de datos desde línea de comandos:
+```powershell
+sqlcmd -S 127.0.0.1,1433 -U sa -P Semicrol_10 -Q "SELECT name FROM sys.databases"
+```
+
+### Ver tablas de ACEXAPI:
+```powershell
+sqlcmd -S 127.0.0.1,1433 -U sa -P Semicrol_10 -d ACEXAPI -Q "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"
+```
+
+## VERIFICACIÓN RÁPIDA:
+
+```sql
+-- Ejecuta en SSMS para verificar todo
+USE ACEXAPI;
+GO
+
+-- Ver tablas
+SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_TYPE = 'BASE TABLE' 
+ORDER BY TABLE_NAME;
+
+-- Ver datos iniciales
+SELECT * FROM Departamentos;
+SELECT * FROM Cursos;
+
+-- Contar registros
+SELECT 
+    (SELECT COUNT(*) FROM Departamentos) AS Departamentos,
+    (SELECT COUNT(*) FROM Cursos) AS Cursos,
+    (SELECT COUNT(*) FROM Profesores) AS Profesores,
+    (SELECT COUNT(*) FROM Actividades) AS Actividades;
+```
+
+## PRÓXIMOS PASOS:
+
+1. ? Crear usuarios administradores en la tabla Usuarios
+2. ? Registrar profesores del centro
+3. ? Crear grupos para cada curso
+4. ? Registrar localizaciones habituales
+5. ? Registrar empresas de transporte
+6. ? Comenzar a crear actividades
+
+---
+
+**¡Todo listo!** Una vez ejecutado el script CreateDatabase.sql, tu API estará completamente funcional. ??
