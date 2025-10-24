@@ -99,7 +99,7 @@ void main() {
       String? descripcion2 = 'Actividad interesante';
       
       expect(descripcion1 == null || descripcion1.isNotEmpty, true);
-      expect(descripcion2 == null || descripcion2.isNotEmpty, true);
+      expect(descripcion2.isNotEmpty, true);
     });
 
     test('Comentarios pueden contener múltiples líneas', () {

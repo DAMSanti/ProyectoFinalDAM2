@@ -4,8 +4,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
+import 'package:proyecto_santi/components/marco_desktop.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
 class MapView extends StatefulWidget {
@@ -47,10 +49,18 @@ class MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    // En desktop, el contenido se renderiza directamente (el DesktopShell proporciona el marco)
+    if (isDesktop) {
+      return _buildMapContent();
+    }
+    
+    // En mobile, usar Scaffold con AppBar y Drawer
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacementNamed(context, '/home');
-        return false; // Prevent the default back button behavior
+        return false;
       },
       child: Scaffold(
         appBar: AndroidAppBar(
@@ -58,10 +68,16 @@ class MapViewState extends State<MapView> {
           title: 'Mapa',
         ),
         drawer: Menu(),
-        body: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Platform.isWindows
-            ? FlutterMap(
+        body: _buildMapContent(),
+      ),
+    );
+  }
+
+  Widget _buildMapContent() {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : (kIsWeb || (!kIsWeb && Platform.isWindows))
+        ? FlutterMap(
           options: MapOptions(
             center: _center,
             zoom: 10.0,
@@ -96,8 +112,6 @@ class MapViewState extends State<MapView> {
               ),
             );
           }).toSet(),
-        ),
-      ),
-    );
+        );
   }
 }

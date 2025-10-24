@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -41,9 +41,16 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isDark ? colorAccentDark : colorAccentLight,
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [Color(0xFF1e3a5f), Color(0xFF2a4d7c)]
+                        : [Color(0xFFBBDEFB), Color(0xFFE3F2FD)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
+                    // Sombra principal
                     BoxShadow(
                       color: _isHovered 
                           ? (isDark ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2))
@@ -51,6 +58,24 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                       offset: _isHovered ? Offset(0, 12) : Offset(4, 4),
                       blurRadius: _isHovered ? 24.0 : 10.0,
                       spreadRadius: _isHovered ? 2.0 : 1.0,
+                    ),
+                    // Luz superior izquierda para efecto bisel
+                    BoxShadow(
+                      color: isDark 
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.white.withOpacity(0.4),
+                      offset: Offset(-2, -2),
+                      blurRadius: 6.0,
+                      spreadRadius: 0,
+                    ),
+                    // Sombra inferior derecha para efecto bisel
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.3),
+                      offset: Offset(2, 2),
+                      blurRadius: 6.0,
+                      spreadRadius: 0,
                     ),
                   ],
                   border: Border.all(
@@ -85,15 +110,9 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                         ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
+                          navigateToActivityDetailInShell(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => ActivityDetailView(
-                                actividad: widget.actividad,
-                                isDarkTheme: widget.isDarkTheme,
-                                onToggleTheme: () {},
-                              ),
-                            ),
+                            {'activity': widget.actividad},
                           );
                         },
                         child: ActivityInfo(

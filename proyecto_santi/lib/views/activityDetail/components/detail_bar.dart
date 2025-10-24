@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class DetailBar extends StatelessWidget {
   final bool isDataChanged;
   final VoidCallback onSaveChanges;
+  final VoidCallback? onRevertChanges;
 
   DetailBar({
     required this.isDataChanged,
     required this.onSaveChanges,
+    this.onRevertChanges,
   });
 
   @override
@@ -19,18 +22,40 @@ class DetailBar extends StatelessWidget {
           if (ModalRoute.of(context)?.settings.name != '/')
             IconButton(
               icon: Icon(Icons.arrow_back),
+              color: Colors.blue,
               onPressed: () {
-                Navigator.pop(context);
+                // Volver a la vista anterior (funciona tanto en shell como en mobile)
+                navigateBackFromDetail(context, '/home');
               },
             ),
-          ElevatedButton(
-            onPressed: isDataChanged ? onSaveChanges : null,
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.0),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isDataChanged && onRevertChanges != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: TextButton.icon(
+                    onPressed: onRevertChanges,
+                    icon: Icon(Icons.undo, size: 18),
+                    label: Text('Revertir'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                    ),
+                  ),
+                ),
+              ElevatedButton(
+                onPressed: isDataChanged ? onSaveChanges : null,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                ),
+                child: Text('Guardar'),
               ),
-            ),
-            child: Text('Guardar'),
+            ],
           ),
         ],
       ),

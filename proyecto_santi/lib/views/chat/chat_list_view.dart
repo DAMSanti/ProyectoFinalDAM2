@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
-import 'package:proyecto_santi/components/menu.dart';
-import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class ChatListView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -28,45 +29,56 @@ class ChatListViewState extends State<ChatListView> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    // En desktop, el contenido se renderiza directamente (el DesktopShell proporciona el marco)
+    if (isDesktop) {
+      return _buildChatList();
+    }
+    
+    // En mobile, usar Scaffold con AppBar y Drawer
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacementNamed(context, '/home');
-        return false; // Prevent the default back button behavior
+        return false;
       },
       child: Scaffold(
         appBar: AndroidAppBar(
           onToggleTheme: widget.onToggleTheme,
           title: 'Chats',
         ),
-        drawer: Menu(),
-        body: FutureBuilder<List<Actividad>>(
-          future: _futureActivities,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(
-                  child: Text('Error: ${snapshot.error}',
-                      style: TextStyle(color: Colors.red)));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text("No activities available"));
-            } else {
-              final actividades = snapshot.data!;
-              return ListView.builder(
-                itemCount: actividades.length,
-                itemBuilder: (context, index) {
-                  final actividad = actividades[index];
-                  return ActividadCard(
-                    actividad: actividad,
-                    isDarkTheme: widget.isDarkTheme,
-                    onToggleTheme: widget.onToggleTheme,
-                  );
-                },
-              );
-            }
-          },
-        ),
+        body: _buildChatList(),
       ),
+    );
+  }
+
+  Widget _buildChatList() {
+    return FutureBuilder<List<Actividad>>(
+      future: _futureActivities,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(
+              child: Text('Error: ${snapshot.error}',
+                  style: TextStyle(color: Colors.red)));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text("No activities available"));
+        } else {
+          final actividades = snapshot.data!;
+          return ListView.builder(
+            itemCount: actividades.length,
+            itemBuilder: (context, index) {
+              final actividad = actividades[index];
+              return ActividadCard(
+                actividad: actividad,
+                isDarkTheme: widget.isDarkTheme,
+                onToggleTheme: widget.onToggleTheme,
+              );
+            },
+          );
+        }
+      },
     );
   }
 }
@@ -85,18 +97,11 @@ class ActividadCard extends StatelessWidget {
       margin: EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          // Navigate to the ChatView of the activity
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatView(
-                activityId: actividad.id.toString(),
-                displayName: actividad.titulo,
-                onToggleTheme: onToggleTheme,
-                isDarkTheme: isDarkTheme,
-              ),
-            ),
-          );
+          // Navegar al chat usando el shell o navegación tradicional
+          navigateToChatInShell(context, {
+            'activityId': actividad.id.toString(),
+            'displayName': actividad.titulo,
+          });
         },
         child: Padding(
           padding: EdgeInsets.all(16.0),

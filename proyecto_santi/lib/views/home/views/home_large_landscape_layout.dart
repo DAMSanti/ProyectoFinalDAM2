@@ -27,37 +27,36 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return MarcoDesktop(
-      onToggleTheme: widget.onToggleTheme,
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          // Tamaño mínimo donde deja de ser responsive
-          final minWidth = 900.0;
-          final minHeight = 600.0;
-          
-          // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
-          final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
-          final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
-          
-          // Si necesitamos scroll, envolver en SingleChildScrollView
-          if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: SizedBox(
-                  width: minWidth,
-                  height: minHeight,
-                  child: _buildContent(minWidth, minHeight),
-                ),
+    // Ahora el contenido se renderiza directamente sin MarcoDesktop
+    // porque el DesktopShell ya proporciona el marco
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Tamaño mínimo donde deja de ser responsive
+        final minWidth = 900.0;
+        final minHeight = 600.0;
+        
+        // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
+        final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
+        final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
+        
+        // Si necesitamos scroll, envolver en SingleChildScrollView
+        if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SizedBox(
+                width: minWidth,
+                height: minHeight,
+                child: _buildContent(minWidth, minHeight),
               ),
-            );
-          }
-          
-          // Si no necesitamos scroll, usar el tamaño disponible (responsive)
-          return _buildContent(effectiveWidth, effectiveHeight);
-        },
-      ),
+            ),
+          );
+        }
+        
+        // Si no necesitamos scroll, usar el tamaño disponible (responsive)
+        return _buildContent(effectiveWidth, effectiveHeight);
+      },
     );
   }
 
@@ -80,7 +79,9 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
+                            color: Theme.of(context).brightness == Brightness.dark 
+                                ? Theme.of(context).scaffoldBackgroundColor
+                                : Color(0xFFDCECF8),
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: [
                               BoxShadow(
@@ -161,6 +162,8 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                       style: TextStyle(
                         fontSize: 24 * scaleFactor,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF1976d2),
+                        letterSpacing: 0.5,
                       ),
                       textAlign: TextAlign.center,
                     );

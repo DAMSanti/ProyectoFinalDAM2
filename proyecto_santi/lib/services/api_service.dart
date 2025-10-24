@@ -318,6 +318,23 @@ class ApiService {
     }
   }
 
+  /// Actualiza parcialmente una actividad (solo campos específicos)
+  Future<Actividad?> updateActividad(int id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put(
+        '${AppConfig.actividadEndpoint}/$id',
+        data: data,
+      );
+      
+      if (response.statusCode == 200) {
+        return Actividad.fromJson(response.data);
+      }
+      throw ApiException('Error al actualizar actividad', statusCode: response.statusCode);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   /// Elimina una actividad
   Future<bool> deleteActivity(int id) async {
     try {
@@ -379,6 +396,33 @@ class ApiService {
       );
 
       return response.statusCode == 200;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// Sube una foto individual para una actividad
+  Future<Photo?> uploadPhoto({
+    required int activityId,
+    required String imagePath,
+    String? descripcion,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'actividadId': activityId,
+        'descripcion': descripcion ?? '',
+        'foto': await MultipartFile.fromFile(imagePath),
+      });
+
+      final response = await _dio.post(
+        '${AppConfig.fotoEndpoint}/upload',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Photo.fromJson(response.data);
+      }
+      return null;
     } catch (e) {
       throw _handleError(e);
     }

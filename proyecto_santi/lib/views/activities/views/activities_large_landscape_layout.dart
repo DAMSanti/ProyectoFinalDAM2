@@ -45,9 +45,7 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
               : GradientBackgroundLight(child: Container()),
           Scaffold(
             backgroundColor: Colors.transparent,
-            body: MarcoDesktop(
-              onToggleTheme: widget.onToggleTheme,
-              content: Padding(
+            body: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
@@ -120,28 +118,27 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                               ),
                             ],
                           ),
-                        child: ValueListenableBuilder<List<Actividad>>(
-                          valueListenable: _filteredActivitiesNotifier,
-                          builder: (context, filteredActivities, child) {
-                            return OtrasActividades(
-                              selectedFilter: null,
-                              searchQuery: searchQuery,
-                              selectedDate: null,
-                              selectedCourse: null,
-                              selectedState: null,
-                            );
-                          }
+                          child: ValueListenableBuilder<List<Actividad>>(
+                            valueListenable: _filteredActivitiesNotifier,
+                            builder: (context, filteredActivities, child) {
+                              return OtrasActividades(
+                                selectedFilter: null,
+                                searchQuery: searchQuery,
+                                selectedDate: null,
+                                selectedCourse: null,
+                                selectedState: null,
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
   }
 }

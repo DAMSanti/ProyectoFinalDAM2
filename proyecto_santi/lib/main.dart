@@ -8,6 +8,7 @@ import 'package:proyecto_santi/views/chat/chat_list_view.dart';
 import 'package:proyecto_santi/views/activities/activities_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/map/map_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/config.dart';
@@ -88,6 +89,8 @@ class MyAppState extends State<MyApp> {
 // Construimos la App con las rutas y el tema
   @override
   Widget build(BuildContext context) {
+    final isDesktop = kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS));
+    
     return ScreenUtilInit(
       designSize: Size(360, 690),
       minTextAdapt: true,
@@ -103,7 +106,9 @@ class MyAppState extends State<MyApp> {
             final auth = Provider.of<Auth>(context, listen: false);
             WidgetBuilder builder;
 
+            // PROTECCIÓN DE RUTAS: Si no está autenticado y intenta acceder a rutas protegidas
             if (!auth.isAuthenticated && settings.name != '/') {
+              // Redirigir siempre al login
               builder = (context) => LoginView(onToggleTheme: _toggleTheme);
             } else {
               switch (settings.name) {
@@ -111,32 +116,52 @@ class MyAppState extends State<MyApp> {
                   builder = (context) => LoginView(onToggleTheme: _toggleTheme);
                   break;
                 case '/home':
-                  builder = (context) => HomeView(onToggleTheme: _toggleTheme);
-                  break;
                 case '/actividades':
-                  builder =
-                      (context) => ActivitiesView(onToggleTheme: _toggleTheme);
-                  break;
                 case '/mapa':
-                  builder = (context) =>
-                      MapView(onToggleTheme: _toggleTheme,
-                          isDarkTheme: _themeMode == ThemeMode.dark);
-                  break;
                 case '/chat':
-                  builder = (context) =>
-                      ChatListView(onToggleTheme: _toggleTheme,
-                          isDarkTheme: _themeMode == ThemeMode.dark);
+                  // En desktop/web, usar el shell que mantiene el menú fijo
+                  if (isDesktop) {
+                    String initialRoute = settings.name ?? '/home';
+                    builder = (context) => DesktopShell(
+                      onToggleTheme: _toggleTheme,
+                      initialRoute: initialRoute,
+                    );
+                  } else {
+                    // En mobile, usar las vistas individuales con navegación tradicional
+                    switch (settings.name) {
+                      case '/home':
+                        builder = (context) => HomeView(onToggleTheme: _toggleTheme);
+                        break;
+                      case '/actividades':
+                        builder = (context) => ActivitiesView(onToggleTheme: _toggleTheme);
+                        break;
+                      case '/mapa':
+                        builder = (context) => MapView(
+                          onToggleTheme: _toggleTheme,
+                          isDarkTheme: _themeMode == ThemeMode.dark,
+                        );
+                        break;
+                      case '/chat':
+                        builder = (context) => ChatListView(
+                          onToggleTheme: _toggleTheme,
+                          isDarkTheme: _themeMode == ThemeMode.dark,
+                        );
+                        break;
+                      default:
+                        builder = (context) => HomeView(onToggleTheme: _toggleTheme);
+                    }
+                  }
                   break;
                 case '/activityDetail':
                   final args = settings.arguments as Map<String, dynamic>;
-                  builder = (context) =>
-                      ActivityDetailView(
-                        actividad: args['activity'],
-                        onToggleTheme: _toggleTheme,
-                        isDarkTheme: _themeMode == ThemeMode.dark,
-                      );
+                  builder = (context) => ActivityDetailView(
+                    actividad: args['activity'],
+                    onToggleTheme: _toggleTheme,
+                    isDarkTheme: _themeMode == ThemeMode.dark,
+                  );
                   break;
                 default:
+                  // Cualquier ruta no definida redirige al login (protección adicional)
                   builder = (context) => LoginView(onToggleTheme: _toggleTheme);
                   break;
               }

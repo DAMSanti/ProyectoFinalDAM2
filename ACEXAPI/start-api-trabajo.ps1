@@ -6,27 +6,42 @@ Write-Host "INICIANDO API - ENTORNO TRABAJO" -ForegroundColor Blue
 Write-Host "================================" -ForegroundColor Blue
 Write-Host ""
 
-$apiPath = "G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI"
+$apiPath = "C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI"
+$appsettingsPath = Join-Path $apiPath "appsettings.json"
+$backupPath = Join-Path $apiPath "appsettings.backup.json"
+$trabajoPath = Join-Path $apiPath "appsettings.Trabajo.json"
 
-Write-Host "IMPORTANTE: Actualiza appsettings.Trabajo.json con tu configuracion del trabajo" -ForegroundColor Yellow
-Write-Host ""
 Write-Host "Configuracion actual:" -ForegroundColor Yellow
-Write-Host "  Servidor: TU_SERVIDOR_TRABAJO\SQLEXPRESS" -ForegroundColor White
+Write-Host "  Servidor: 127.0.0.1,1433" -ForegroundColor White
 Write-Host "  Base de datos: ACEXAPI" -ForegroundColor White
+Write-Host "  Autenticacion: SQL Server (sa)" -ForegroundColor White
 Write-Host ""
-
-$continuar = Read-Host "Has actualizado la configuracion? (S/N)"
-if ($continuar -ne "S" -and $continuar -ne "s") {
-    Write-Host "Cancelado. Actualiza appsettings.Trabajo.json primero" -ForegroundColor Red
-    exit 0
-}
 
 Set-Location $apiPath
+
+# Hacer backup del appsettings.json original
+Write-Host "Creando backup de configuracion..." -ForegroundColor Cyan
+Copy-Item $appsettingsPath $backupPath -Force
+
+# Copiar la configuracion de trabajo
+Write-Host "Aplicando configuracion de trabajo..." -ForegroundColor Cyan
+Copy-Item $trabajoPath $appsettingsPath -Force
 
 Write-Host ""
 Write-Host "Iniciando API..." -ForegroundColor Cyan
 Write-Host ""
+Write-Host "IMPORTANTE: Al cerrar la API (Ctrl+C), se restaurara la configuracion original" -ForegroundColor Yellow
+Write-Host ""
 
-# Iniciar la API con el entorno Trabajo
-$env:ASPNETCORE_ENVIRONMENT = "Trabajo"
-dotnet run
+try {
+    # Iniciar la API
+    dotnet run --launch-profile http
+}
+finally {
+    # Restaurar el appsettings.json original
+    Write-Host ""
+    Write-Host "Restaurando configuracion original..." -ForegroundColor Cyan
+    Copy-Item $backupPath $appsettingsPath -Force
+    Remove-Item $backupPath -Force
+    Write-Host "Configuracion restaurada!" -ForegroundColor Green
+}

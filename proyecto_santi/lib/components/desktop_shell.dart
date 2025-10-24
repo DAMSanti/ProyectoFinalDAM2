@@ -1,23 +1,252 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/components/marco_desktop.dart';
+import 'package:proyecto_santi/views/home/home_view.dart';
+import 'package:proyecto_santi/views/activities/activities_view.dart';
+import 'package:proyecto_santi/views/chat/chat_list_view.dart';
+import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
+import 'package:proyecto_santi/views/map/map_view.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:proyecto_santi/func.dart';
-import 'package:proyecto_santi/views/home/components/home_user.dart';
-import 'package:proyecto_santi/tema/theme.dart';
 
-class MarcoDesktop extends StatelessWidget {
-  final Widget content;
+/// Shell que mantiene el menú fijo y solo cambia el contenido
+class DesktopShell extends StatefulWidget {
   final VoidCallback onToggleTheme;
+  final String initialRoute;
 
-  const MarcoDesktop({super.key, required this.content, required this.onToggleTheme});
+  const DesktopShell({
+    super.key,
+    required this.onToggleTheme,
+    this.initialRoute = '/home',
+  });
+
+  @override
+  State<DesktopShell> createState() => _DesktopShellState();
+}
+
+class _DesktopShellState extends State<DesktopShell> {
+  late String _currentRoute;
+  String _previousRoute = '/home'; // Ruta anterior para volver atrás
+  Map<String, dynamic>? _activityDetailArgs;
+  Map<String, dynamic>? _chatViewArgs;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentRoute = widget.initialRoute;
+  }
+
+  // Método público para navegar entre rutas
+  void navigateTo(String route) {
+    if (route != _currentRoute) {
+      setState(() {
+        _previousRoute = _currentRoute; // Guardar la ruta actual como anterior
+        _currentRoute = route;
+        _activityDetailArgs = null; // Limpiar args cuando no es detalle
+        _chatViewArgs = null; // Limpiar args del chat
+      });
+    }
+  }
+
+  String _getTitleForRoute() {
+    switch (_currentRoute) {
+      case '/home':
+        return 'Próximas Actividades';
+      case '/actividades':
+        return 'Actividades';
+      case '/chat':
+        return 'Chat';
+      case '/chatView':
+        return _chatViewArgs?['displayName'] ?? 'Chat';
+      case '/mapa':
+        return 'Mapa';
+      case '/activityDetail':
+        return 'Detalle de Actividad';
+      default:
+        return 'Próximas Actividades';
+    }
+  }
+
+  // Método público para navegar al detalle de actividad
+  void navigateToActivityDetail(Map<String, dynamic> args) {
+    setState(() {
+      _previousRoute = _currentRoute; // Guardar ruta actual antes de ir al detalle
+      _currentRoute = '/activityDetail';
+      _activityDetailArgs = args;
+      _chatViewArgs = null;
+    });
+  }
+
+  // Método público para navegar al chat de una actividad
+  void navigateToChatView(Map<String, dynamic> args) {
+    setState(() {
+      _previousRoute = _currentRoute; // Guardar ruta actual antes de ir al chat
+      _currentRoute = '/chatView';
+      _chatViewArgs = args;
+      _activityDetailArgs = null;
+    });
+  }
+
+  // Método público para volver a la ruta anterior
+  void navigateBack() {
+    setState(() {
+      _currentRoute = _previousRoute;
+      _activityDetailArgs = null;
+    });
+  }
+
+  Widget _buildCurrentView() {
+    switch (_currentRoute) {
+      case '/home':
+        return HomeView(onToggleTheme: widget.onToggleTheme);
+      case '/actividades':
+        return ActivitiesView(onToggleTheme: widget.onToggleTheme);
+      case '/chat':
+        return ChatListView(
+          onToggleTheme: widget.onToggleTheme,
+          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        );
+      case '/chatView':
+        if (_chatViewArgs != null) {
+          return ChatView(
+            activityId: _chatViewArgs!['activityId'],
+            displayName: _chatViewArgs!['displayName'],
+            onToggleTheme: widget.onToggleTheme,
+            isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+          );
+        }
+        return ChatListView(
+          onToggleTheme: widget.onToggleTheme,
+          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        );
+      case '/mapa':
+        return MapView(
+          onToggleTheme: widget.onToggleTheme,
+          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        );
+      case '/activityDetail':
+        if (_activityDetailArgs != null) {
+          return ActivityDetailView(
+            actividad: _activityDetailArgs!['activity'],
+            onToggleTheme: widget.onToggleTheme,
+            isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+          );
+        }
+        return HomeView(onToggleTheme: widget.onToggleTheme);
+      default:
+        return HomeView(onToggleTheme: widget.onToggleTheme);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _DesktopShellScope(
+      state: this,
+      child: DesktopShellFrame(
+        currentRoute: _currentRoute,
+        currentTitle: _getTitleForRoute(),
+        onNavigate: navigateTo,
+        onToggleTheme: widget.onToggleTheme,
+        child: _buildCurrentView(),
+      ),
+    );
+  }
+}
+
+// InheritedWidget para acceder al estado del shell desde cualquier lugar
+class _DesktopShellScope extends InheritedWidget {
+  final _DesktopShellState state;
+
+  const _DesktopShellScope({
+    required this.state,
+    required super.child,
+  });
+
+  static _DesktopShellState? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_DesktopShellScope>()?.state;
+  }
+
+  @override
+  bool updateShouldNotify(_DesktopShellScope oldWidget) => false;
+}
+
+// Función helper para navegar al detalle de actividad desde cualquier lugar
+void navigateToActivityDetailInShell(BuildContext context, Map<String, dynamic> args) {
+  final shellState = _DesktopShellScope.of(context);
+  if (shellState != null) {
+    shellState.navigateToActivityDetail(args);
+  } else {
+    // Fallback para mobile o si no hay shell
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ActivityDetailView(
+          actividad: args['activity'],
+          onToggleTheme: () {},
+          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        ),
+      ),
+    );
+  }
+}
+
+// Función helper para volver atrás desde el detalle de actividad
+void navigateBackFromDetail(BuildContext context, String defaultRoute) {
+  final shellState = _DesktopShellScope.of(context);
+  if (shellState != null) {
+    // Si estamos en el shell, volver a la ruta anterior
+    shellState.navigateBack();
+  } else {
+    // Si no, usar navegación tradicional (mobile)
+    Navigator.pop(context);
+  }
+}
+
+// Función helper para navegar al chat de una actividad desde cualquier lugar
+void navigateToChatInShell(BuildContext context, Map<String, dynamic> args) {
+  final shellState = _DesktopShellScope.of(context);
+  if (shellState != null) {
+    shellState.navigateToChatView(args);
+  } else {
+    // Fallback para mobile o si no hay shell
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatView(
+          activityId: args['activityId'],
+          displayName: args['displayName'],
+          onToggleTheme: () {},
+          isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        ),
+      ),
+    );
+  }
+}
+
+/// Frame del shell con menú lateral y barra superior
+class DesktopShellFrame extends StatelessWidget {
+  final String currentRoute;
+  final String currentTitle;
+  final Function(String) onNavigate;
+  final VoidCallback onToggleTheme;
+  final Widget child;
+
+  const DesktopShellFrame({
+    super.key,
+    required this.currentRoute,
+    required this.currentTitle,
+    required this.onNavigate,
+    required this.onToggleTheme,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ancho mínimo del menú para evitar descuadres
         final minMenuWidth = 200.0;
         final menuWidth = constraints.maxWidth * 0.15;
         final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
-        
+
         return Stack(
           children: [
             Row(
@@ -27,17 +256,14 @@ class MarcoDesktop extends StatelessWidget {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 92, // Fixed height for AppBar
-                        child: DesktopBar(onToggleTheme: onToggleTheme),
+                        height: 92,
+                        child: DesktopBar(
+                          onToggleTheme: onToggleTheme,
+                          title: currentTitle,
+                        ),
                       ),
                       Expanded(
-                        child: Navigator(
-                          onGenerateRoute: (settings) {
-                            return MaterialPageRoute(
-                              builder: (context) => content,
-                            );
-                          },
-                        ),
+                        child: child,
                       ),
                     ],
                   ),
@@ -60,7 +286,10 @@ class MarcoDesktop extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: MenuDesktop(),
+                child: MenuDesktopStatic(
+                  currentRoute: currentRoute,
+                  onNavigate: onNavigate,
+                ),
               ),
             ),
           ],
@@ -70,115 +299,32 @@ class MarcoDesktop extends StatelessWidget {
   }
 }
 
-class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onToggleTheme;
-  final String? title;
+/// Menú lateral estático que usa callback en lugar de Navigator
+class MenuDesktopStatic extends StatelessWidget {
+  final String currentRoute;
+  final Function(String) onNavigate;
 
-  const DesktopBar({super.key, required this.onToggleTheme, this.title});
+  const MenuDesktopStatic({
+    super.key,
+    required this.currentRoute,
+    required this.onNavigate,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? [colorFondoDark, colorAccentDark]
-                  : [colorFondoLight, colorAccentLight],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Center(
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-              title: LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenHeight = MediaQuery.of(context).size.height;
-                  double scaleFactor = 1.0;
-                  if (screenHeight >= 2160) { // 4K
-                    scaleFactor = 1.6;
-                  } else if (screenHeight >= 1440) { // 2K/QHD
-                    scaleFactor = 1.3;
-                  } else if (screenHeight >= 1080) { // Full HD
-                    scaleFactor = 1.1;
-                  }
-                  
-                  return Text(
-                    title ?? 'Próximas Actividades',
-                    style: TextStyle(
-                      fontSize: 24 * scaleFactor,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1976d2), // Azul de los items del menú
-                      letterSpacing: 0.5,
-                    ),
-                  );
-                },
-              ),
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Center(child: UserInformation()),
-              ),
-              leadingWidth: 250,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Center(
-                    child: IconButton(
-                      icon: Icon(
-                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                        size: 24,
-                        color: isDark ? Colors.amber : Color(0xFF1976d2),
-                      ),
-                      onPressed: onToggleTheme,
-                      tooltip: 'Cambiar tema',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Size get preferredSize {
-    return Size.fromHeight(92);
-  }
-}
-
-class MenuDesktop extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double drawerWidth = constraints.maxWidth * 0.21;
-        return SizedBox(
-          width: drawerWidth,
-          child: Drawer(
-            shape: ContinuousRectangleBorder(),
-            child: _buildMenuContent(context),
-          ),
-        );
-      },
+    return Drawer(
+      shape: ContinuousRectangleBorder(),
+      child: _buildMenuContent(context),
     );
   }
 
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: isDark 
+          colors: isDark
               ? [Color(0xFF1a1a2e), Color(0xFF16213e)]
               : [Color(0xFFe3f2fd), Color(0xFFbbdefb)],
           begin: Alignment.topLeft,
@@ -187,7 +333,7 @@ class MenuDesktop extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          // Header modernizado
+          // Header
           Container(
             height: 140.0,
             decoration: BoxDecoration(
@@ -222,46 +368,32 @@ class MenuDesktop extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenHeight = MediaQuery.of(context).size.height;
-                    double scaleFactor = 1.0;
-                    if (screenHeight >= 2160) { // 4K
-                      scaleFactor = 1.6;
-                    } else if (screenHeight >= 1440) { // 2K/QHD
-                      scaleFactor = 1.3;
-                    } else if (screenHeight >= 1080) { // Full HD
-                      scaleFactor = 1.1;
-                    }
-                    
-                    return Column(
-                      children: [
-                        Text(
-                          'ACEX',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24 * scaleFactor,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        Text(
-                          'Sistema de Gestión',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12 * scaleFactor,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                Column(
+                  children: [
+                    Text(
+                      'ACEX',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                    Text(
+                      'Sistema de Gestión',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          
+
           SizedBox(height: 16),
-          
+
           // Items del menú
           Expanded(
             child: ListView(
@@ -297,8 +429,8 @@ class MenuDesktop extends StatelessWidget {
               ],
             ),
           ),
-          
-          // Separador con gradiente
+
+          // Separador
           Container(
             height: 1,
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -312,8 +444,8 @@ class MenuDesktop extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Items del footer
+
+          // Footer
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Column(
@@ -351,8 +483,8 @@ class MenuDesktop extends StatelessWidget {
     bool isSettings = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isCurrentRoute = ModalRoute.of(context)?.settings.name == routeName;
-    
+    final isCurrentRoute = currentRoute == routeName;
+
     return Container(
       decoration: BoxDecoration(
         gradient: isCurrentRoute
@@ -453,59 +585,31 @@ class MenuDesktop extends StatelessWidget {
                 },
               );
             } else if (!isCurrentRoute) {
-              Navigator.pushReplacementNamed(context, routeName);
+              onNavigate(routeName);
             }
           },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenHeight = MediaQuery.of(context).size.height;
-                    double scaleFactor = 1.0;
-                    if (screenHeight >= 2160) { // 4K
-                      scaleFactor = 1.5;
-                    } else if (screenHeight >= 1440) { // 2K/QHD
-                      scaleFactor = 1.25;
-                    } else if (screenHeight >= 1080) { // Full HD
-                      scaleFactor = 1.1;
-                    }
-                    
-                    return Icon(
-                      icon,
-                      color: isCurrentRoute
-                          ? Colors.white
-                          : (isDark ? Colors.white70 : Color(0xFF1976d2)),
-                      size: 24 * scaleFactor,
-                    );
-                  },
+                Icon(
+                  icon,
+                  color: isCurrentRoute
+                      ? Colors.white
+                      : (isDark ? Colors.white70 : Color(0xFF1976d2)),
+                  size: 24,
                 ),
                 SizedBox(width: 16),
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final screenHeight = MediaQuery.of(context).size.height;
-                      double scaleFactor = 1.0;
-                      if (screenHeight >= 2160) { // 4K
-                        scaleFactor = 1.5;
-                      } else if (screenHeight >= 1440) { // 2K/QHD
-                        scaleFactor = 1.25;
-                      } else if (screenHeight >= 1080) { // Full HD
-                        scaleFactor = 1.1;
-                      }
-                      
-                      return Text(
-                        text,
-                        style: TextStyle(
-                          color: isCurrentRoute
-                              ? Colors.white
-                              : (isDark ? Colors.white : Color(0xFF1976d2)),
-                          fontSize: 15 * scaleFactor,
-                          fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                      );
-                    },
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: isCurrentRoute
+                          ? Colors.white
+                          : (isDark ? Colors.white : Color(0xFF1976d2)),
+                      fontSize: 15,
+                      fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
+                    ),
                   ),
                 ),
                 if (isCurrentRoute)
