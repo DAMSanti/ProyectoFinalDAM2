@@ -116,11 +116,12 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                                     controller: _scrollController,
                                     scrollDirection: Axis.horizontal,
                                     physics: BouncingScrollPhysics(),
-                                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                                    padding: EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 16.0),
                                     itemCount: widget.activities.length,
                                     itemBuilder: (context, index) {
+                                      final isLast = index == widget.activities.length - 1;
                                       return Padding(
-                                        padding: const EdgeInsets.only(right: 16.0),
+                                        padding: EdgeInsets.only(right: isLast ? 0 : 16.0),
                                         child: SizedBox(
                                           width: width * 0.35,
                                           child: ActivityCardItem(
@@ -143,13 +144,27 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
               // Título del calendario centrado
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Text(
-                  'Calendario de Actividades',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenHeight = MediaQuery.of(context).size.height;
+                    double scaleFactor = 1.0;
+                    if (screenHeight >= 2160) { // 4K
+                      scaleFactor = 1.6;
+                    } else if (screenHeight >= 1440) { // 2K/QHD
+                      scaleFactor = 1.3;
+                    } else if (screenHeight >= 1080) { // Full HD
+                      scaleFactor = 1.1;
+                    }
+                    
+                    return Text(
+                      'Calendario de Actividades',
+                      style: TextStyle(
+                        fontSize: 24 * scaleFactor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
               ),
               

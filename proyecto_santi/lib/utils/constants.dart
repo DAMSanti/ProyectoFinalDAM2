@@ -1,5 +1,4 @@
 /// Constantes de la aplicación
-library;
 
 class AppConstants {
   // Información de la aplicación

@@ -73,10 +73,22 @@ class CalendarViewState extends State<CalendarView> {
 
   Widget _buildCalendar(BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Factor de escala para padding basado en resolución
+    double scaleFactor = 1.0;
+    if (screenHeight >= 2160) { // 4K
+      scaleFactor = 1.6;
+    } else if (screenHeight >= 1440) { // 2K/QHD
+      scaleFactor = 1.3;
+    } else if (screenHeight >= 1080) { // Full HD
+      scaleFactor = 1.1;
+    }
+    
     return Container(
       height: isWeb ? constraints.maxHeight * 0.8 : 252,
-      margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 220.0) : EdgeInsets.all(16.0),
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0 * scaleFactor, horizontal: 220.0 * scaleFactor) : EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(vertical: 16 * scaleFactor, horizontal: 16 * scaleFactor),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12.0),
@@ -117,22 +129,22 @@ class CalendarViewState extends State<CalendarView> {
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 4.sp),
-          headerPadding: EdgeInsets.all(2.0),
+          titleTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
+          headerPadding: EdgeInsets.all(2.0 * scaleFactor),
           leftChevronIcon: _HoverIcon(icon: Icons.chevron_left),
           rightChevronIcon: _HoverIcon(icon: Icons.chevron_right),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp),
-          weekendStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp),
+          weekdayStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
+          weekendStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
         ),
         calendarStyle: CalendarStyle(
-          defaultTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp),
-          weekendTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, color: Color.fromARGB(255, 209, 128, 128)),
-          selectedTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, color: Color.fromARGB(255, 210, 217, 221), fontWeight: FontWeight.bold),
-          todayTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, fontWeight: FontWeight.bold),
+          defaultTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
+          weekendTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), color: Color.fromARGB(255, 209, 128, 128)),
+          selectedTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), color: Color.fromARGB(255, 210, 217, 221), fontWeight: FontWeight.bold),
+          todayTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), fontWeight: FontWeight.bold),
           markersMaxCount: 1,
-          markerSizeScale: 1,
+          markerSizeScale: 1 * scaleFactor,
           cellMargin: EdgeInsets.all(0.0),
           markersAlignment: Alignment.center,
           markerDecoration: BoxDecoration(
@@ -149,6 +161,7 @@ class CalendarViewState extends State<CalendarView> {
               isToday: isSameDay(DateTime.now(), day),
               isWeekend: day.weekday == DateTime.saturday || day.weekday == DateTime.sunday,
               hasEvent: _getEventsForDay(day).isNotEmpty,
+              scaleFactor: scaleFactor,
             );
           },
         ),
@@ -244,6 +257,7 @@ class _DayCell extends StatefulWidget {
   final bool isToday;
   final bool isWeekend;
   final bool hasEvent;
+  final double scaleFactor;
 
   const _DayCell({
     required this.day,
@@ -251,6 +265,7 @@ class _DayCell extends StatefulWidget {
     required this.isToday,
     required this.isWeekend,
     required this.hasEvent,
+    required this.scaleFactor,
   });
 
   @override
@@ -278,7 +293,7 @@ class _DayCellState extends State<_DayCell> {
           child: Text(
             '${widget.day.day}',
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10 : 14,
+              fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10 : 14) * widget.scaleFactor,
               color: widget.isWeekend
                   ? Color.fromARGB(255, 209, 128, 128)
                   : (_isHovered ? Color(0xFF1976d2) : null),

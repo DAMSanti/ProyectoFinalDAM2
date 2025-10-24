@@ -77,14 +77,28 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               elevation: 0,
               centerTitle: true,
               automaticallyImplyLeading: false,
-              title: Text(
-                'Próximas Actividades',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2), // Azul de los items del menú
-                  letterSpacing: 0.5,
-                ),
+              title: LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenHeight = MediaQuery.of(context).size.height;
+                  double scaleFactor = 1.0;
+                  if (screenHeight >= 2160) { // 4K
+                    scaleFactor = 1.6;
+                  } else if (screenHeight >= 1440) { // 2K/QHD
+                    scaleFactor = 1.3;
+                  } else if (screenHeight >= 1080) { // Full HD
+                    scaleFactor = 1.1;
+                  }
+                  
+                  return Text(
+                    'Próximas Actividades',
+                    style: TextStyle(
+                      fontSize: 24 * scaleFactor,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1976d2), // Azul de los items del menú
+                      letterSpacing: 0.5,
+                    ),
+                  );
+                },
               ),
               leading: Padding(
                 padding: const EdgeInsets.only(left: 16.0),
@@ -195,21 +209,39 @@ class MenuDesktop extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 12),
-                Text(
-                  'ACEX',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                Text(
-                  'Sistema de Gestión',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenHeight = MediaQuery.of(context).size.height;
+                    double scaleFactor = 1.0;
+                    if (screenHeight >= 2160) { // 4K
+                      scaleFactor = 1.6;
+                    } else if (screenHeight >= 1440) { // 2K/QHD
+                      scaleFactor = 1.3;
+                    } else if (screenHeight >= 1080) { // Full HD
+                      scaleFactor = 1.1;
+                    }
+                    
+                    return Column(
+                      children: [
+                        Text(
+                          'ACEX',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24 * scaleFactor,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        Text(
+                          'Sistema de Gestión',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12 * scaleFactor,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -341,24 +373,52 @@ class MenuDesktop extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: isCurrentRoute
-                      ? Colors.white
-                      : (isDark ? Colors.white70 : Color(0xFF1976d2)),
-                  size: 24,
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenHeight = MediaQuery.of(context).size.height;
+                    double scaleFactor = 1.0;
+                    if (screenHeight >= 2160) { // 4K
+                      scaleFactor = 1.5;
+                    } else if (screenHeight >= 1440) { // 2K/QHD
+                      scaleFactor = 1.25;
+                    } else if (screenHeight >= 1080) { // Full HD
+                      scaleFactor = 1.1;
+                    }
+                    
+                    return Icon(
+                      icon,
+                      color: isCurrentRoute
+                          ? Colors.white
+                          : (isDark ? Colors.white70 : Color(0xFF1976d2)),
+                      size: 24 * scaleFactor,
+                    );
+                  },
                 ),
                 SizedBox(width: 16),
                 Expanded(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: isCurrentRoute
-                          ? Colors.white
-                          : (isDark ? Colors.white : Color(0xFF1976d2)),
-                      fontSize: 15,
-                      fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
-                    ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final screenHeight = MediaQuery.of(context).size.height;
+                      double scaleFactor = 1.0;
+                      if (screenHeight >= 2160) { // 4K
+                        scaleFactor = 1.5;
+                      } else if (screenHeight >= 1440) { // 2K/QHD
+                        scaleFactor = 1.25;
+                      } else if (screenHeight >= 1080) { // Full HD
+                        scaleFactor = 1.1;
+                      }
+                      
+                      return Text(
+                        text,
+                        style: TextStyle(
+                          color: isCurrentRoute
+                              ? Colors.white
+                              : (isDark ? Colors.white : Color(0xFF1976d2)),
+                          fontSize: 15 * scaleFactor,
+                          fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 if (isCurrentRoute)

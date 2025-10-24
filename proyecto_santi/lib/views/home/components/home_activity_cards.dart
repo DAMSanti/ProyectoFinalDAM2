@@ -135,8 +135,22 @@ class ActivityInfo extends StatelessWidget {
       }
     }
 
+    // Calcular factor de escala basado en la resolución
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Factor de escala: 1.0 para 1080p, escala hacia arriba para resoluciones mayores
+    double scaleFactor = 1.0;
+    if (screenHeight >= 2160) { // 4K
+      scaleFactor = 1.8;
+    } else if (screenHeight >= 1440) { // 2K/QHD
+      scaleFactor = 1.4;
+    } else if (screenHeight >= 1080) { // Full HD
+      scaleFactor = 1.2;
+    }
+
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0 * scaleFactor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,18 +161,18 @@ class ActivityInfo extends StatelessWidget {
               Text(
                 actividad.titulo,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
+                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp) * scaleFactor,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1976d2), // Azul de los items del menú y "Próximas Actividades"
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              SizedBox(height: 6.0),
+              SizedBox(height: 6.0 * scaleFactor),
               Text(
                 actividad.descripcion ?? 'Sin descripción',
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
                   color: isHovered ? Colors.blue : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
                       : darkTheme.textTheme.labelMedium?.color,
                 ),
@@ -167,20 +181,20 @@ class ActivityInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10.0), // Add spacing between the columns
+          SizedBox(height: 10.0 * scaleFactor), // Add spacing between the columns
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 formatearFecha(actividad.fini),
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
                 ),
               ),
               Text(
                 actividad.estado,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
+                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

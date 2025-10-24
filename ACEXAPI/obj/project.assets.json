@@ -4489,19 +4489,27 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\santiagota\\.nuget\\packages\\": {}
+    "C:\\Users\\rathm\\.nuget\\packages\\": {},
+    "G:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
+      "projectUniqueName": "G:\\ProyectoFinalC#\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
       "projectName": "ACEXAPI",
-      "projectPath": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
-      "packagesPath": "C:\\Users\\santiagota\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\obj\\",
+      "projectPath": "G:\\ProyectoFinalC#\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
+      "packagesPath": "C:\\Users\\rathm\\.nuget\\packages\\",
+      "outputPath": "G:\\ProyectoFinalC#\\ProyectoFinalDAM2\\ACEXAPI\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "G:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages",
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\santiagota\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\rathm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 24.2.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4509,6 +4517,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "G:\\Program Files\\DevExpress 24.2\\Components\\System\\Components\\Packages": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
