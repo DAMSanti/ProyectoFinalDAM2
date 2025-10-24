@@ -1,24 +1,24 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+﻿import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-/// Configuración de la aplicación
+/// ConfiguraciÃ³n de la aplicaciÃ³n
 class AppConfig {
   // URL base de la API (ACEXAPI C# .NET)
   // En web usamos la IP local porque localhost no funciona en el navegador
   static String get apiBaseUrl {
     if (kIsWeb) {
-      // Para web, usa la IP local de tu máquina
-      return 'http://192.168.9.190:5000/api';
+      // Para web, usa la IP local de tu mÃ¡quina
+      return 'http://192.168.1.42:5000/api';
     } else {
       // Para desktop/mobile, localhost funciona bien
       return 'http://localhost:5000/api';
     }
   }
   
-  // URL de imágenes
+  // URL de imÃ¡genes
   static String get imagenesBaseUrl {
     if (kIsWeb) {
-      return 'http://192.168.9.190:5000/uploads';
+      return 'http://192.168.1.42:5000/uploads';
     } else {
       return 'http://localhost:5000/uploads';
     }
@@ -52,7 +52,7 @@ class SecureStorageConfig {
   static const String _keyUserEmail = 'userEmail';
   static const String _keyUserUuid = 'userUuid';
 
-  /// Guarda la configuración de Firebase
+  /// Guarda la configuraciÃ³n de Firebase
   static Future<void> storeFirebaseConfig() async {
     await _secureStorage.write(key: _keyApiKey, value: 'AIzaSyDif9U1CH2ssVLTK0yDeh2-_C8SOlhTr7E');
     await _secureStorage.write(key: _keyAuthDomain, value: 'acexchat.firebaseapp.com');
@@ -63,7 +63,7 @@ class SecureStorageConfig {
     await _secureStorage.write(key: _keyMeasurementId, value: 'G-B2VED5543T');
   }
 
-  /// Recupera la configuración de Firebase
+  /// Recupera la configuraciÃ³n de Firebase
   static Future<Map<String, String?>> retrieveFirebaseConfig() async {
     return {
       'apiKey': await _secureStorage.read(key: _keyApiKey),
@@ -96,7 +96,7 @@ class SecureStorageConfig {
     await _secureStorage.delete(key: _keyUserUuid);
   }
 
-  /// Limpia toda la información almacenada
+  /// Limpia toda la informaciÃ³n almacenada
   static Future<void> clearAll() async {
     await _secureStorage.deleteAll();
   }

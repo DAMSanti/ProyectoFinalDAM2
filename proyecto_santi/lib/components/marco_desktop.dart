@@ -18,49 +18,29 @@ class MarcoDesktop extends StatelessWidget {
         final menuWidth = constraints.maxWidth * 0.15;
         final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
         
-        return Stack(
+        return Row(
           children: [
-            Row(
-              children: [
-                SizedBox(width: effectiveMenuWidth),
-                Expanded(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 92, // Fixed height for AppBar
-                        child: DesktopBar(onToggleTheme: onToggleTheme),
-                      ),
-                      Expanded(
-                        child: Navigator(
-                          onGenerateRoute: (settings) {
-                            return MaterialPageRoute(
-                              builder: (context) => content,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            SizedBox(
+              width: effectiveMenuWidth,
+              child: MenuDesktop(),
             ),
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: effectiveMenuWidth,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      offset: Offset(3, 0),
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 92, // Fixed height for AppBar
+                    child: DesktopBar(onToggleTheme: onToggleTheme),
+                  ),
+                  Expanded(
+                    child: Navigator(
+                      onGenerateRoute: (settings) {
+                        return MaterialPageRoute(
+                          builder: (context) => content,
+                        );
+                      },
                     ),
-                  ],
-                ),
-                child: MenuDesktop(),
+                  ),
+                ],
               ),
             ),
           ],
@@ -72,9 +52,8 @@ class MarcoDesktop extends StatelessWidget {
 
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
-  final String? title;
 
-  const DesktopBar({super.key, required this.onToggleTheme, this.title});
+  const DesktopBar({super.key, required this.onToggleTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -98,28 +77,14 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               elevation: 0,
               centerTitle: true,
               automaticallyImplyLeading: false,
-              title: LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenHeight = MediaQuery.of(context).size.height;
-                  double scaleFactor = 1.0;
-                  if (screenHeight >= 2160) { // 4K
-                    scaleFactor = 1.6;
-                  } else if (screenHeight >= 1440) { // 2K/QHD
-                    scaleFactor = 1.3;
-                  } else if (screenHeight >= 1080) { // Full HD
-                    scaleFactor = 1.1;
-                  }
-                  
-                  return Text(
-                    title ?? 'Próximas Actividades',
-                    style: TextStyle(
-                      fontSize: 24 * scaleFactor,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1976d2), // Azul de los items del menú
-                      letterSpacing: 0.5,
-                    ),
-                  );
-                },
+              title: Text(
+                'Próximas Actividades',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2), // Azul de los items del menú
+                  letterSpacing: 0.5,
+                ),
               ),
               leading: Padding(
                 padding: const EdgeInsets.only(left: 16.0),
@@ -130,14 +95,22 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Center(
-                    child: IconButton(
-                      icon: Icon(
-                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                        size: 24,
-                        color: isDark ? Colors.amber : Color(0xFF1976d2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? Colors.white.withOpacity(0.1)
+                            : Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed: onToggleTheme,
-                      tooltip: 'Cambiar tema',
+                      child: IconButton(
+                        icon: Icon(
+                          isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                          size: 24,
+                          color: isDark ? Colors.amber : Color(0xFF1976d2),
+                        ),
+                        onPressed: onToggleTheme,
+                        tooltip: 'Cambiar tema',
+                      ),
                     ),
                   ),
                 ),
@@ -222,39 +195,21 @@ class MenuDesktop extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenHeight = MediaQuery.of(context).size.height;
-                    double scaleFactor = 1.0;
-                    if (screenHeight >= 2160) { // 4K
-                      scaleFactor = 1.6;
-                    } else if (screenHeight >= 1440) { // 2K/QHD
-                      scaleFactor = 1.3;
-                    } else if (screenHeight >= 1080) { // Full HD
-                      scaleFactor = 1.1;
-                    }
-                    
-                    return Column(
-                      children: [
-                        Text(
-                          'ACEX',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24 * scaleFactor,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        Text(
-                          'Sistema de Gestión',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12 * scaleFactor,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                Text(
+                  'ACEX',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+                Text(
+                  'Sistema de Gestión',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -323,7 +278,6 @@ class MenuDesktop extends StatelessWidget {
                   icon: Icons.settings_rounded,
                   text: 'Configuración',
                   routeName: '/configuracion',
-                  isSettings: true,
                 ),
                 SizedBox(height: 8),
                 _buildDrawerItem(
@@ -348,7 +302,6 @@ class MenuDesktop extends StatelessWidget {
     required String text,
     required String routeName,
     bool isLogout = false,
-    bool isSettings = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCurrentRoute = ModalRoute.of(context)?.settings.name == routeName;
@@ -377,81 +330,9 @@ class MenuDesktop extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () async {
+          onTap: () {
             if (isLogout) {
-              // Mostrar diálogo de confirmación para salir
-              final shouldLogout = await showDialog<bool>(
-                context: context,
-                builder: (BuildContext dialogContext) {
-                  return AlertDialog(
-                    title: Text('Confirmar salida'),
-                    content: Text('¿Estás seguro de que quieres cerrar sesión?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: Text('No'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(dialogContext).pop(true),
-                        child: Text('Sí'),
-                      ),
-                    ],
-                  );
-                },
-              );
-              
-              if (shouldLogout == true) {
-                logout(context);
-              }
-            } else if (isSettings) {
-              // Mostrar ventana de configuración
-              showDialog(
-                context: context,
-                builder: (BuildContext dialogContext) {
-                  return AlertDialog(
-                    title: Text('Configuración'),
-                    content: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Opciones de la aplicación',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                          SizedBox(height: 16),
-                          ListTile(
-                            leading: Icon(Icons.palette),
-                            title: Text('Tema'),
-                            subtitle: Text(Theme.of(context).brightness == Brightness.dark 
-                                ? 'Modo oscuro' 
-                                : 'Modo claro'),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.info),
-                            title: Text('Versión'),
-                            subtitle: Text('1.0.0'),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.description),
-                            title: Text('Acerca de'),
-                            subtitle: Text('Sistema de Gestión ACEX'),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(dialogContext).pop(),
-                        child: Text('Cerrar'),
-                      ),
-                    ],
-                  );
-                },
-              );
+              logout(context);
             } else if (!isCurrentRoute) {
               Navigator.pushReplacementNamed(context, routeName);
             }
@@ -460,52 +341,24 @@ class MenuDesktop extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenHeight = MediaQuery.of(context).size.height;
-                    double scaleFactor = 1.0;
-                    if (screenHeight >= 2160) { // 4K
-                      scaleFactor = 1.5;
-                    } else if (screenHeight >= 1440) { // 2K/QHD
-                      scaleFactor = 1.25;
-                    } else if (screenHeight >= 1080) { // Full HD
-                      scaleFactor = 1.1;
-                    }
-                    
-                    return Icon(
-                      icon,
-                      color: isCurrentRoute
-                          ? Colors.white
-                          : (isDark ? Colors.white70 : Color(0xFF1976d2)),
-                      size: 24 * scaleFactor,
-                    );
-                  },
+                Icon(
+                  icon,
+                  color: isCurrentRoute
+                      ? Colors.white
+                      : (isDark ? Colors.white70 : Color(0xFF1976d2)),
+                  size: 24,
                 ),
                 SizedBox(width: 16),
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final screenHeight = MediaQuery.of(context).size.height;
-                      double scaleFactor = 1.0;
-                      if (screenHeight >= 2160) { // 4K
-                        scaleFactor = 1.5;
-                      } else if (screenHeight >= 1440) { // 2K/QHD
-                        scaleFactor = 1.25;
-                      } else if (screenHeight >= 1080) { // Full HD
-                        scaleFactor = 1.1;
-                      }
-                      
-                      return Text(
-                        text,
-                        style: TextStyle(
-                          color: isCurrentRoute
-                              ? Colors.white
-                              : (isDark ? Colors.white : Color(0xFF1976d2)),
-                          fontSize: 15 * scaleFactor,
-                          fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                      );
-                    },
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: isCurrentRoute
+                          ? Colors.white
+                          : (isDark ? Colors.white : Color(0xFF1976d2)),
+                      fontSize: 15,
+                      fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
+                    ),
                   ),
                 ),
                 if (isCurrentRoute)

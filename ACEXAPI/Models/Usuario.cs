@@ -27,8 +27,4 @@ public class Usuario
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
     
     public bool Activo { get; set; } = true;
-    
-    // Relación con Profesor (los usuarios son profesores)
-    public Guid? ProfesorUuid { get; set; }
-    public Profesor? Profesor { get; set; }
 }

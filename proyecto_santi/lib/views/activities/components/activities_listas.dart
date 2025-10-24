@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/api_service.dart';
-import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 
 class AllActividades extends StatefulWidget {
   final String? selectedFilter;
@@ -220,7 +220,16 @@ class HoverableListItemState extends State<HoverableListItem> {
               ],
             ),
             onTap: () {
-              navigateToActivityDetailInShell(context, {'activity': widget.actividad});
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ActivityDetailView(
+                    actividad: widget.actividad,
+                    isDarkTheme: false, //widget.isDarkTheme,
+                    onToggleTheme: () {},
+                  ),
+                ),
+              );
             },
           ),
         ),

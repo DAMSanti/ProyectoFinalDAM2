@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_santi/views/chat/model/message.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
-import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class ChatView extends StatelessWidget {
   final String activityId;
@@ -21,7 +20,7 @@ class ChatView extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-      navigateBackFromDetail(context, '/chat');
+      Navigator.pushReplacementNamed(context, '/chat');
       return false; // Prevent the default back button behavior
     },
     child: Scaffold(
@@ -90,7 +89,7 @@ class ChatView extends StatelessWidget {
               ? IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
-                  navigateBackFromDetail(context, '/chat');
+                  Navigator.pop(context);
                 },
              )
             : Container(),

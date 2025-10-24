@@ -37,7 +37,4 @@ public class Profesor
 
     public ICollection<ProfParticipante> ActividadesParticipante { get; set; } = new List<ProfParticipante>();
     public ICollection<ProfResponsable> ActividadesResponsable { get; set; } = new List<ProfResponsable>();
-    
-    // Relación con Usuario (un profesor puede tener un usuario para login)
-    public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

@@ -1,4 +1,5 @@
 /// Utilidades para validación de formularios
+library;
 
 class Validators {
   /// Valida que un campo no esté vacío

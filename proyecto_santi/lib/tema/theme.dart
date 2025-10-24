@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Define tus colores globales - Basados en el menú lateral
-const Color colorFondoLight = Color(0xFFbbdefb); // Azul claro del menú
+// Define tus colores globales
+const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
 const Color colorTextoLight = Color.fromARGB(255, 108, 124, 136);
-const Color colorAccentLight = Color(0xFFe3f2fd); // Azul muy claro del menú
+const Color colorAccentLight = Color.fromARGB(255, 150, 178, 200);
 const Color colorSoftLight = Color.fromARGB(255, 176, 196, 222);
 const Color colorAccentDLight = Color.fromARGB(255, 126, 136, 180);
 //0xFF6C7C88
@@ -86,10 +86,9 @@ final ThemeData lightTheme = ThemeData(
 );
 
 
-// Colores oscuros - Basados en el menú lateral
-const Color colorFondoDark = Color(0xFF16213e); // Azul oscuro del menú
+const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);
 const Color colorTextoDark = Color.fromARGB(255, 169, 231, 255);
-const Color colorAccentDark = Color(0xFF1a1a2e); // Azul muy oscuro del menú
+const Color colorAccentDark = Color.fromARGB(255, 32, 56, 71);
 
 // Tema oscuro
 final ThemeData darkTheme = ThemeData(

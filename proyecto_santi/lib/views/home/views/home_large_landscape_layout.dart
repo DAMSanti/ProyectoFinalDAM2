@@ -27,36 +27,37 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // Ahora el contenido se renderiza directamente sin MarcoDesktop
-    // porque el DesktopShell ya proporciona el marco
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Tamaño mínimo donde deja de ser responsive
-        final minWidth = 900.0;
-        final minHeight = 600.0;
-        
-        // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
-        final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
-        final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
-        
-        // Si necesitamos scroll, envolver en SingleChildScrollView
-        if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SizedBox(
-                width: minWidth,
-                height: minHeight,
-                child: _buildContent(minWidth, minHeight),
+    return MarcoDesktop(
+      onToggleTheme: widget.onToggleTheme,
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          // Tamaño mínimo donde deja de ser responsive
+          final minWidth = 900.0;
+          final minHeight = 600.0;
+          
+          // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
+          final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
+          final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
+          
+          // Si necesitamos scroll, envolver en SingleChildScrollView
+          if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SizedBox(
+                  width: minWidth,
+                  height: minHeight,
+                  child: _buildContent(minWidth, minHeight),
+                ),
               ),
-            ),
-          );
-        }
-        
-        // Si no necesitamos scroll, usar el tamaño disponible (responsive)
-        return _buildContent(effectiveWidth, effectiveHeight);
-      },
+            );
+          }
+          
+          // Si no necesitamos scroll, usar el tamaño disponible (responsive)
+          return _buildContent(effectiveWidth, effectiveHeight);
+        },
+      ),
     );
   }
 
@@ -79,9 +80,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark 
-                                ? Theme.of(context).scaffoldBackgroundColor
-                                : Color(0xFFDCECF8),
+                            color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: [
                               BoxShadow(
@@ -117,12 +116,11 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                                     controller: _scrollController,
                                     scrollDirection: Axis.horizontal,
                                     physics: BouncingScrollPhysics(),
-                                    padding: EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 16.0),
+                                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                                     itemCount: widget.activities.length,
                                     itemBuilder: (context, index) {
-                                      final isLast = index == widget.activities.length - 1;
                                       return Padding(
-                                        padding: EdgeInsets.only(right: isLast ? 0 : 16.0),
+                                        padding: const EdgeInsets.only(right: 16.0),
                                         child: SizedBox(
                                           width: width * 0.35,
                                           child: ActivityCardItem(
@@ -145,29 +143,13 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
               // Título del calendario centrado
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final screenHeight = MediaQuery.of(context).size.height;
-                    double scaleFactor = 1.0;
-                    if (screenHeight >= 2160) { // 4K
-                      scaleFactor = 1.6;
-                    } else if (screenHeight >= 1440) { // 2K/QHD
-                      scaleFactor = 1.3;
-                    } else if (screenHeight >= 1080) { // Full HD
-                      scaleFactor = 1.1;
-                    }
-                    
-                    return Text(
-                      'Calendario de Actividades',
-                      style: TextStyle(
-                        fontSize: 24 * scaleFactor,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1976d2),
-                        letterSpacing: 0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    );
-                  },
+                child: Text(
+                  'Calendario de Actividades',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
               

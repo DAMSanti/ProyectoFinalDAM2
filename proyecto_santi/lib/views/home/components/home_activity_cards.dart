@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -41,16 +41,9 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [Color(0xFF1e3a5f), Color(0xFF2a4d7c)]
-                        : [Color(0xFFBBDEFB), Color(0xFFE3F2FD)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: isDark ? colorAccentDark : colorAccentLight,
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
-                    // Sombra principal
                     BoxShadow(
                       color: _isHovered 
                           ? (isDark ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2))
@@ -58,24 +51,6 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                       offset: _isHovered ? Offset(0, 12) : Offset(4, 4),
                       blurRadius: _isHovered ? 24.0 : 10.0,
                       spreadRadius: _isHovered ? 2.0 : 1.0,
-                    ),
-                    // Luz superior izquierda para efecto bisel
-                    BoxShadow(
-                      color: isDark 
-                          ? Colors.white.withOpacity(0.05)
-                          : Colors.white.withOpacity(0.4),
-                      offset: Offset(-2, -2),
-                      blurRadius: 6.0,
-                      spreadRadius: 0,
-                    ),
-                    // Sombra inferior derecha para efecto bisel
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.grey.withOpacity(0.3),
-                      offset: Offset(2, 2),
-                      blurRadius: 6.0,
-                      spreadRadius: 0,
                     ),
                   ],
                   border: Border.all(
@@ -110,9 +85,15 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                         ),
                       InkWell(
                         onTap: () {
-                          navigateToActivityDetailInShell(
+                          Navigator.push(
                             context,
-                            {'activity': widget.actividad},
+                            MaterialPageRoute(
+                              builder: (context) => ActivityDetailView(
+                                actividad: widget.actividad,
+                                isDarkTheme: widget.isDarkTheme,
+                                onToggleTheme: () {},
+                              ),
+                            ),
                           );
                         },
                         child: ActivityInfo(
@@ -154,22 +135,8 @@ class ActivityInfo extends StatelessWidget {
       }
     }
 
-    // Calcular factor de escala basado en la resolución
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    // Factor de escala: 1.0 para 1080p, escala hacia arriba para resoluciones mayores
-    double scaleFactor = 1.0;
-    if (screenHeight >= 2160) { // 4K
-      scaleFactor = 1.8;
-    } else if (screenHeight >= 1440) { // 2K/QHD
-      scaleFactor = 1.4;
-    } else if (screenHeight >= 1080) { // Full HD
-      scaleFactor = 1.2;
-    }
-
     return Padding(
-      padding: EdgeInsets.all(16.0 * scaleFactor),
+      padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -180,18 +147,18 @@ class ActivityInfo extends StatelessWidget {
               Text(
                 actividad.titulo,
                 style: TextStyle(
-                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp) * scaleFactor,
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1976d2), // Azul de los items del menú y "Próximas Actividades"
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              SizedBox(height: 6.0 * scaleFactor),
+              SizedBox(height: 6.0),
               Text(
                 actividad.descripcion ?? 'Sin descripción',
                 style: TextStyle(
-                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                   color: isHovered ? Colors.blue : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
                       : darkTheme.textTheme.labelMedium?.color,
                 ),
@@ -200,20 +167,20 @@ class ActivityInfo extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10.0 * scaleFactor), // Add spacing between the columns
+          SizedBox(height: 10.0), // Add spacing between the columns
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 formatearFecha(actividad.fini),
                 style: TextStyle(
-                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                 ),
               ),
               Text(
                 actividad.estado,
                 style: TextStyle(
-                  fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * scaleFactor,
+                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),

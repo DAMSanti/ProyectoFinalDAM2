@@ -36,7 +36,7 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .AsQueryable();
 
-        // B�squeda
+        // B�squeda
         if (!string.IsNullOrWhiteSpace(queryParams.Search))
         {
             query = query.Where(a =>
@@ -82,8 +82,6 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
-            .Include(a => a.ProfesoresResponsables)
-                .ThenInclude(pr => pr.Profesor)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (actividad == null)
@@ -119,10 +117,7 @@ public class ActividadService : IActividadService
 
     public async Task<ActividadDto?> UpdateAsync(int id, ActividadUpdateDto dto, IFormFile? folleto)
     {
-        var actividad = await _context.Actividades
-            .Include(a => a.ProfesoresResponsables)
-            .FirstOrDefaultAsync(a => a.Id == id);
-            
+        var actividad = await _context.Actividades.FindAsync(id);
         if (actividad == null)
             return null;
 
@@ -136,35 +131,6 @@ public class ActividadService : IActividadService
         if (dto.DepartamentoId.HasValue) actividad.DepartamentoId = dto.DepartamentoId;
         if (dto.LocalizacionId.HasValue) actividad.LocalizacionId = dto.LocalizacionId;
         if (dto.EmpTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpTransporteId;
-
-        // Actualizar profesor responsable
-        if (dto.ProfesorResponsableUuid != null)
-        {
-            // Convertir string a Guid
-            if (Guid.TryParse(dto.ProfesorResponsableUuid, out Guid profesorUuid))
-            {
-                // Buscar si ya existe una relación de coordinador
-                var coordinadorExistente = actividad.ProfesoresResponsables
-                    .FirstOrDefault(pr => pr.EsCoordinador);
-
-                if (coordinadorExistente != null)
-                {
-                    // Actualizar el coordinador existente con el nuevo UUID
-                    coordinadorExistente.ProfesorUuid = profesorUuid;
-                }
-                else
-                {
-                    // Crear nueva relación como coordinador
-                    actividad.ProfesoresResponsables.Add(new ProfResponsable
-                    {
-                        ActividadId = actividad.Id,
-                        ProfesorUuid = profesorUuid,
-                        EsCoordinador = true,
-                        FechaAsignacion = DateTime.UtcNow
-                    });
-                }
-            }
-        }
 
         if (folleto != null)
         {
@@ -199,17 +165,6 @@ public class ActividadService : IActividadService
 
     private ActividadDto MapToDto(Actividad actividad)
     {
-        // Buscar el profesor coordinador (el que tiene EsCoordinador = true)
-        var profesorResponsable = actividad.ProfesoresResponsables
-            ?.FirstOrDefault(pr => pr.EsCoordinador)?.Profesor;
-        
-        // Si no hay coordinador, tomar el primero de la lista
-        if (profesorResponsable == null)
-        {
-            profesorResponsable = actividad.ProfesoresResponsables
-                ?.FirstOrDefault()?.Profesor;
-        }
-
         return new ActividadDto
         {
             Id = actividad.Id,
@@ -225,14 +180,8 @@ public class ActividadService : IActividadService
             DepartamentoNombre = actividad.Departamento?.Nombre,
             LocalizacionId = actividad.LocalizacionId,
             LocalizacionNombre = actividad.Localizacion?.Nombre,
-            Latitud = actividad.Localizacion?.Latitud,
-            Longitud = actividad.Localizacion?.Longitud,
             EmpTransporteId = actividad.EmpTransporteId,
-            EmpTransporteNombre = actividad.EmpTransporte?.Nombre,
-            ProfesorResponsableNombre = profesorResponsable != null 
-                ? $"{profesorResponsable.Nombre} {profesorResponsable.Apellidos}"
-                : null,
-            ProfesorResponsableUuid = profesorResponsable?.Uuid
+            EmpTransporteNombre = actividad.EmpTransporte?.Nombre
         };
     }
 }

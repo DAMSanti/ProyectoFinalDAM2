@@ -1,14 +1,17 @@
+import 'package:proyecto_santi/models/departamento.dart';
+
 class Profesor {
   final String uuid;
   final String dni;
   final String nombre;
   final String apellidos;
   final String correo;
-  final String? telefono;
-  final String? fotoUrl;
-  final bool activo;
-  final int? departamentoId;
-  final String? departamentoNombre;
+  final String password;
+  final String rol;
+  final int activo;
+  final String? urlFoto;
+  final int esJefeDep;
+  final Departamento depart;
 
   Profesor({
     required this.uuid,
@@ -16,25 +19,27 @@ class Profesor {
     required this.nombre,
     required this.apellidos,
     required this.correo,
-    this.telefono,
-    this.fotoUrl,
+    required this.password,
+    required this.rol,
     required this.activo,
-    this.departamentoId,
-    this.departamentoNombre,
+    this.urlFoto,
+    required this.esJefeDep,
+    required this.depart,
   });
 
   factory Profesor.fromJson(Map<String, dynamic> json) {
     return Profesor(
       uuid: json['uuid'],
-      dni: json['dni'] ?? '',
-      nombre: json['nombre'] ?? '',
-      apellidos: json['apellidos'] ?? '',
-      correo: json['correo'] ?? '',
-      telefono: json['telefono'],
-      fotoUrl: json['fotoUrl'],
-      activo: json['activo'] ?? false,
-      departamentoId: json['departamentoId'],
-      departamentoNombre: json['departamentoNombre'],
+      dni: json['dni'],
+      nombre: json['nombre'],
+      apellidos: json['apellidos'],
+      correo: json['correo'],
+      password: json['password'],
+      rol: json['rol'],
+      activo: json['activo'],
+      urlFoto: json['urlFoto'],
+      esJefeDep: json['esJefeDep'],
+      depart: Departamento.fromJson(json['depart']),
     );
   }
 
@@ -45,11 +50,12 @@ class Profesor {
       'nombre': nombre,
       'apellidos': apellidos,
       'correo': correo,
-      'telefono': telefono,
-      'fotoUrl': fotoUrl,
+      'password': password,
+      'rol': rol,
       'activo': activo,
-      'departamentoId': departamentoId,
-      'departamentoNombre': departamentoNombre,
+      'urlFoto': urlFoto,
+      'esJefeDep': esJefeDep,
+      'depart': depart.toJson(),
     };
   }
 }

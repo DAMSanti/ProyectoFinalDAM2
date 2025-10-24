@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -73,26 +73,12 @@ class CalendarViewState extends State<CalendarView> {
 
   Widget _buildCalendar(BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    // Factor de escala para padding basado en resolución
-    double scaleFactor = 1.0;
-    if (screenHeight >= 2160) { // 4K
-      scaleFactor = 1.6;
-    } else if (screenHeight >= 1440) { // 2K/QHD
-      scaleFactor = 1.3;
-    } else if (screenHeight >= 1080) { // Full HD
-      scaleFactor = 1.1;
-    }
-    
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Container(
       height: isWeb ? constraints.maxHeight * 0.8 : 252,
-      margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0 * scaleFactor, horizontal: 220.0 * scaleFactor) : EdgeInsets.all(16.0),
-      padding: EdgeInsets.symmetric(vertical: 16 * scaleFactor, horizontal: 16 * scaleFactor),
+      margin: isWeb ? EdgeInsets.symmetric(vertical: 16.0, horizontal: 220.0) : EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).scaffoldBackgroundColor : Color(0xFFD1E9F6),
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
@@ -131,30 +117,29 @@ class CalendarViewState extends State<CalendarView> {
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
-          headerPadding: EdgeInsets.all(2.0 * scaleFactor),
+          titleTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 4.sp),
+          headerPadding: EdgeInsets.all(2.0),
           leftChevronIcon: _HoverIcon(icon: Icons.chevron_left),
           rightChevronIcon: _HoverIcon(icon: Icons.chevron_right),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-          weekdayStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
-          weekendStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
+          weekdayStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp),
+          weekendStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp),
         ),
         calendarStyle: CalendarStyle(
-          defaultTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0)),
-          weekendTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), color: Color.fromARGB(255, 209, 128, 128)),
-          selectedTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), color: Colors.white, fontWeight: FontWeight.bold),
-          selectedDecoration: BoxDecoration(
-            color: Color(0xFF1976d2),
-            shape: BoxShape.circle,
-          ),
-          todayDecoration: BoxDecoration(
-            color: Color(0xFF64B5F6),
-            shape: BoxShape.circle,
-          ),
-          todayTextStyle: TextStyle(fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp) * (screenHeight >= 2160 ? 1.6 : screenHeight >= 1440 ? 1.3 : screenHeight >= 1080 ? 1.1 : 1.0), color: Colors.white, fontWeight: FontWeight.bold),
-          markersMaxCount: 0,
+          defaultTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp),
+          weekendTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, color: Color.fromARGB(255, 209, 128, 128)),
+          selectedTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, color: Color.fromARGB(255, 210, 217, 221), fontWeight: FontWeight.bold),
+          todayTextStyle: TextStyle(fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 4.sp, fontWeight: FontWeight.bold),
+          markersMaxCount: 1,
+          markerSizeScale: 1,
           cellMargin: EdgeInsets.all(0.0),
+          markersAlignment: Alignment.center,
+          markerDecoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.7),
+            shape: BoxShape.circle,
+          ),
+          markersAutoAligned: false,
         ),
         calendarBuilders: CalendarBuilders(
           defaultBuilder: (context, day, focusedDay) {
@@ -164,7 +149,6 @@ class CalendarViewState extends State<CalendarView> {
               isToday: isSameDay(DateTime.now(), day),
               isWeekend: day.weekday == DateTime.saturday || day.weekday == DateTime.sunday,
               hasEvent: _getEventsForDay(day).isNotEmpty,
-              scaleFactor: scaleFactor,
             );
           },
         ),
@@ -188,8 +172,19 @@ class CalendarViewState extends State<CalendarView> {
                     title: Text(actividad.titulo),
                     subtitle: Text('Fecha de inicio: ${actividad.fini}'),
                     onTap: () {
-                      Navigator.pop(context);
-                      navigateToActivityDetailInShell(context, {'activity': actividad});
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ActivityDetailView(
+                                actividad: actividad,
+                                isDarkTheme: Theme
+                                    .of(context)
+                                    .brightness == Brightness.dark,
+                                onToggleTheme: () {},
+                              ),
+                        ),
+                      );
                     },
                   ),
                 );
@@ -249,7 +244,6 @@ class _DayCell extends StatefulWidget {
   final bool isToday;
   final bool isWeekend;
   final bool hasEvent;
-  final double scaleFactor;
 
   const _DayCell({
     required this.day,
@@ -257,7 +251,6 @@ class _DayCell extends StatefulWidget {
     required this.isToday,
     required this.isWeekend,
     required this.hasEvent,
-    required this.scaleFactor,
   });
 
   @override
@@ -269,7 +262,6 @@ class _DayCellState extends State<_DayCell> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -277,23 +269,19 @@ class _DayCellState extends State<_DayCell> {
         duration: Duration(milliseconds: 200),
         margin: EdgeInsets.all(widget.isToday ? 2 : 4),
         decoration: BoxDecoration(
-          color: widget.hasEvent
-              ? (isDark ? Color(0xFF2a4d7c) : Color(0xFF90CAF9))
-              : (_isHovered 
-                  ? Color(0xFF1976d2).withOpacity(0.1)
-                  : Colors.transparent),
+          color: _isHovered 
+              ? Color(0xFF1976d2).withOpacity(0.1)
+              : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Center(
           child: Text(
             '${widget.day.day}',
             style: TextStyle(
-              fontSize: (MediaQuery.of(context).size.shortestSide < 400 ? 10 : 14) * widget.scaleFactor,
-              color: widget.hasEvent
-                  ? (isDark ? Colors.white : Color.fromARGB(255, 108, 124, 136))
-                  : (widget.isWeekend
-                      ? Color.fromARGB(255, 209, 128, 128)
-                      : (_isHovered ? Color(0xFF1976d2) : null)),
+              fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10 : 14,
+              color: widget.isWeekend
+                  ? Color.fromARGB(255, 209, 128, 128)
+                  : (_isHovered ? Color(0xFF1976d2) : null),
               fontWeight: widget.isToday ? FontWeight.bold : FontWeight.normal,
             ),
           ),

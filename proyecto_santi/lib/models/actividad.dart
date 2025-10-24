@@ -23,8 +23,6 @@ class Actividad {
   final double? importePorAlumno;
   double? latitud;
   double? longitud;
-  final String? profesorResponsableNombre;
-  final String? profesorResponsableUuid;
 
   Actividad({
     required this.id,
@@ -49,20 +47,11 @@ class Actividad {
     this.importePorAlumno,
     this.latitud,
     this.longitud,
-    this.profesorResponsableNombre,
-    this.profesorResponsableUuid,
   });
 
   factory Actividad.fromJson(Map<String, dynamic> json) {
     // Mapear desde la API de C# ACEXAPI
     final now = DateTime.now().toIso8601String();
-    
-    // Debug: Imprimir datos recibidos
-    print('[Actividad.fromJson] ID: ${json['id']}');
-    print('[Actividad.fromJson] Descripcion: ${json['descripcion']}');
-    print('[Actividad.fromJson] FechaInicio: ${json['fechaInicio']}');
-    print('[Actividad.fromJson] FechaFin: ${json['fechaFin']}');
-    print('[Actividad.fromJson] ProfesorResponsableNombre: ${json['profesorResponsableNombre']}');
     
     return Actividad(
       id: json['id'] ?? 0,
@@ -89,8 +78,6 @@ class Actividad {
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
       latitud: (json['latitud'] as num?)?.toDouble(),
       longitud: (json['longitud'] as num?)?.toDouble(),
-      profesorResponsableNombre: json['profesorResponsableNombre']?.toString(),
-      profesorResponsableUuid: json['profesorResponsableUuid']?.toString(),
     );
   }
 
@@ -118,8 +105,6 @@ class Actividad {
       'importePorAlumno': importePorAlumno,
       'latitud': latitud,
       'longitud': longitud,
-      'profesorResponsableNombre': profesorResponsableNombre,
-      'profesorResponsableUuid': profesorResponsableUuid,
     };
   }
 }

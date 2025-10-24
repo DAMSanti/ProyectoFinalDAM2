@@ -15,8 +15,6 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
   final List<XFile> selectedImages;
   final VoidCallback _showImagePicker;
   final VoidCallback _saveChanges;
-  final VoidCallback? _revertChanges;
-  final Function(Map<String, dynamic>) onActivityUpdate;
 
   const ActivityDetailSmallLandscapeLayout({
     super.key,
@@ -29,12 +27,9 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
     required this.selectedImages,
     required VoidCallback showImagePicker,
     required VoidCallback saveChanges,
-    VoidCallback? revertChanges,
-    required this.onActivityUpdate,
   })
       : _showImagePicker = showImagePicker,
-        _saveChanges = saveChanges,
-        _revertChanges = revertChanges;
+        _saveChanges = saveChanges;
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +45,13 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
                 imagesActividad: imagesActividad,
                 selectedImages: selectedImages,
                 showImagePicker: _showImagePicker,
-                onActivityUpdate: onActivityUpdate,
               ),
             ),
             Positioned(
               top: 0,
               left: 0,
               right: 0,
-              child: DetailBar(
-                isDataChanged: isDataChanged, 
-                onSaveChanges: _saveChanges,
-                onRevertChanges: _revertChanges,
-              ),
+              child: DetailBar(isDataChanged: isDataChanged, onSaveChanges: _saveChanges),
             ),
           ],
         );

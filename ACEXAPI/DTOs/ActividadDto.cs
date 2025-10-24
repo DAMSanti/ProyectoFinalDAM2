@@ -15,12 +15,8 @@ public class ActividadDto
     public string? DepartamentoNombre { get; set; }
     public int? LocalizacionId { get; set; }
     public string? LocalizacionNombre { get; set; }
-    public double? Latitud { get; set; }
-    public double? Longitud { get; set; }
     public int? EmpTransporteId { get; set; }
     public string? EmpTransporteNombre { get; set; }
-    public string? ProfesorResponsableNombre { get; set; }
-    public Guid? ProfesorResponsableUuid { get; set; }
 }
 
 public class ActividadCreateDto
@@ -47,7 +43,6 @@ public class ActividadUpdateDto
     public int? DepartamentoId { get; set; }
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
-    public string? ProfesorResponsableUuid { get; set; }
 }
 
 public class ActividadListDto

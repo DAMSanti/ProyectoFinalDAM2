@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/config.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/models/departamento.dart';
 
 /// Clase para manejar la autenticación de la aplicación con API C# ACEX
 class Auth extends ChangeNotifier {
@@ -40,11 +41,16 @@ class Auth extends ChangeNotifier {
           nombre: usuario?['nombreCompleto']?.toString().split(' ').first ?? 'Usuario',
           apellidos: usuario?['nombreCompleto']?.toString().split(' ').skip(1).join(' ') ?? '',
           correo: usuario?['email']?.toString() ?? email,
-          telefono: null,
-          fotoUrl: null,
-          activo: true,
-          departamentoId: null,
-          departamentoNombre: usuario?['rol']?.toString() ?? 'Usuario',
+          password: '',
+          rol: usuario?['rol']?.toString() ?? 'Usuario',
+          activo: 1,
+          urlFoto: null,
+          esJefeDep: 0,
+          depart: Departamento(
+            id: 0,
+            codigo: usuario?['rol']?.toString() ?? 'USR',
+            nombre: usuario?['rol']?.toString() ?? 'Usuario',
+          ),
         );
         
         _isAuthenticated = true;

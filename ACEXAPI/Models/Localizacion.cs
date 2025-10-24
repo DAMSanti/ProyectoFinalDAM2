@@ -23,11 +23,6 @@ public class Localizacion
     [MaxLength(20)]
     public string? CodigoPostal { get; set; }
 
-    // Coordenadas GPS para el mapa
-    public double? Latitud { get; set; }
-    
-    public double? Longitud { get; set; }
-
     // Relaciones
     public ICollection<Actividad> Actividades { get; set; } = new List<Actividad>();
 }
