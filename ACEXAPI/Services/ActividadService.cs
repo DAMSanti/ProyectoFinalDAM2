@@ -169,6 +169,8 @@ public class ActividadService : IActividadService
         if (dto.DepartamentoId.HasValue) actividad.DepartamentoId = dto.DepartamentoId;
         if (dto.LocalizacionId.HasValue) actividad.LocalizacionId = dto.LocalizacionId;
         if (dto.EmpTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpTransporteId;
+        if (dto.TransporteReq.HasValue) actividad.TransporteReq = dto.TransporteReq.Value;
+        if (dto.AlojamientoReq.HasValue) actividad.AlojamientoReq = dto.AlojamientoReq.Value;
         
         // Actualizar solicitante (profesor responsable)
         if (dto.SolicitanteId.HasValue)
@@ -265,6 +267,8 @@ public class ActividadService : IActividadService
             LocalizacionNombre = actividad.Localizacion?.Nombre,
             EmpTransporteId = actividad.EmpTransporteId,
             EmpTransporteNombre = actividad.EmpTransporte?.Nombre,
+            TransporteReq = actividad.TransporteReq,
+            AlojamientoReq = actividad.AlojamientoReq,
             Solicitante = solicitante
         };
     }

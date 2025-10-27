@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Actividad> Actividades { get; set; }
+    public DbSet<Alojamiento> Alojamientos { get; set; }
     public DbSet<Departamento> Departamentos { get; set; }
     public DbSet<Profesor> Profesores { get; set; }
     public DbSet<Curso> Cursos { get; set; }
@@ -43,6 +44,12 @@ public class ApplicationDbContext : DbContext
             .IsUnique();
 
         // Configurar relaciones
+        modelBuilder.Entity<Actividad>()
+            .HasOne(a => a.Alojamiento)
+            .WithMany(al => al.Actividades)
+            .HasForeignKey(a => a.AlojamientoId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         modelBuilder.Entity<Actividad>()
             .HasOne(a => a.Departamento)
             .WithMany(d => d.Actividades)

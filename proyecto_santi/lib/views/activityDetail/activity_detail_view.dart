@@ -77,7 +77,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   
   Future<void> _loadActivityDetails() async {
     try {
+      print('[DEBUG] Recargando actividad desde la API...');
       final actividadCompleta = await _actividadService.fetchActivityById(widget.actividad.id);
+      print('[DEBUG] Actividad recargada - transporteReq: ${actividadCompleta?.transporteReq}, alojamientoReq: ${actividadCompleta?.alojamientoReq}');
       setState(() {
         _actividadCompleta = actividadCompleta ?? widget.actividad;
         _actividadOriginal = actividadCompleta ?? widget.actividad; // Guardar copia original
@@ -344,6 +346,26 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       }
     }
     
+    // Comparar transporteReq
+    final transporteReq = _datosEditados!['transporteReq'] as int?;
+    if (transporteReq != null) {
+      print('[DEBUG] Comparando transporteReq: "$transporteReq" vs "${_actividadOriginal!.transporteReq}"');
+      if (transporteReq != _actividadOriginal!.transporteReq) {
+        print('[DEBUG] ¡CAMBIO DETECTADO en transporteReq!');
+        return true;
+      }
+    }
+    
+    // Comparar alojamientoReq
+    final alojamientoReq = _datosEditados!['alojamientoReq'] as int?;
+    if (alojamientoReq != null) {
+      print('[DEBUG] Comparando alojamientoReq: "$alojamientoReq" vs "${_actividadOriginal!.alojamientoReq}"');
+      if (alojamientoReq != _actividadOriginal!.alojamientoReq) {
+        print('[DEBUG] ¡CAMBIO DETECTADO en alojamientoReq!');
+        return true;
+      }
+    }
+    
     print('[DEBUG] No se detectaron cambios reales');
     return false;
   }
@@ -435,9 +457,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           hini: updatedData['hini'] ?? _actividadCompleta!.hini,
           hfin: updatedData['hfin'] ?? _actividadCompleta!.hfin,
           previstaIni: _actividadCompleta!.previstaIni,
-          transporteReq: _actividadCompleta!.transporteReq,
+          transporteReq: updatedData['transporteReq'] ?? _actividadCompleta!.transporteReq,
           comentTransporte: _actividadCompleta!.comentTransporte,
-          alojamientoReq: _actividadCompleta!.alojamientoReq,
+          alojamientoReq: updatedData['alojamientoReq'] ?? _actividadCompleta!.alojamientoReq,
           comentAlojamiento: _actividadCompleta!.comentAlojamiento,
           comentarios: _actividadCompleta!.comentarios,
           estado: updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente',
@@ -529,6 +551,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       if (hasActivityChanges) {
         try {
           print('[DEBUG] Guardando cambios de actividad...');
+          print('[DEBUG] transporteReq: ${_datosEditados!['transporteReq']} (original: ${_actividadOriginal!.transporteReq})');
+          print('[DEBUG] alojamientoReq: ${_datosEditados!['alojamientoReq']} (original: ${_actividadOriginal!.alojamientoReq})');
+          
           // Crear un objeto Actividad completo con los datos actualizados
           final actividadParaGuardar = Actividad(
             id: _actividadOriginal!.id,
@@ -540,9 +565,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             hini: _datosEditados!['hini'] ?? _actividadOriginal!.hini,
             hfin: _datosEditados!['hfin'] ?? _actividadOriginal!.hfin,
             previstaIni: _actividadOriginal!.previstaIni,
-            transporteReq: _actividadOriginal!.transporteReq,
+            transporteReq: _datosEditados!['transporteReq'] ?? _actividadOriginal!.transporteReq,
             comentTransporte: _actividadOriginal!.comentTransporte,
-            alojamientoReq: _actividadOriginal!.alojamientoReq,
+            alojamientoReq: _datosEditados!['alojamientoReq'] ?? _actividadOriginal!.alojamientoReq,
             comentAlojamiento: _actividadOriginal!.comentAlojamiento,
             comentarios: _actividadOriginal!.comentarios,
             estado: _datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente',
@@ -557,6 +582,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             costoReal: _actividadOriginal!.costoReal,
           );
           
+          print('[DEBUG] Objeto actividadParaGuardar creado:');
+          print('[DEBUG]   - transporteReq: ${actividadParaGuardar.transporteReq}');
+          print('[DEBUG]   - alojamientoReq: ${actividadParaGuardar.alojamientoReq}');
+          
           print('[DEBUG] Guardando actividad completa');
           
           // Usar updateActivity en lugar de updateActivityFields
@@ -566,6 +595,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           );
           
           if (actividadActualizada != null) {
+            print('[DEBUG] Actividad actualizada recibida del API:');
+            print('[DEBUG]   - transporteReq: ${actividadActualizada.transporteReq}');
+            print('[DEBUG]   - alojamientoReq: ${actividadActualizada.alojamientoReq}');
+            
             // La respuesta del API puede no incluir los objetos completos de Profesor y Departamento
             // Si se cambió el profesor o departamento, cargar los datos completos
             Profesor? profesorCompleto = actividadActualizada.solicitante;
@@ -632,6 +665,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             // Actualizar la actividad original con los nuevos datos completos
             _actividadOriginal = actividadCompletaConObjetos;
             _actividadCompleta = actividadCompletaConObjetos;
+            
+            print('[DEBUG] Actividad actualizada en memoria:');
+            print('[DEBUG]   - _actividadCompleta.transporteReq: ${_actividadCompleta!.transporteReq}');
+            print('[DEBUG]   - _actividadCompleta.alojamientoReq: ${_actividadCompleta!.alojamientoReq}');
+            
             // NO limpiar _datosEditados aquí, lo haremos al final después de guardar participantes
             print('[DEBUG] Actividad actualizada correctamente en BD con objetos completos');
           } else {
@@ -843,8 +881,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         // Recargar las fotos de la actividad
         final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
         
-        // Si hubo cambios en localizaciones, forzar recarga de la actividad completa
-        if (_datosEditados != null && _datosEditados!.containsKey('localizaciones_changed')) {
+        // Si hubo cambios en localizaciones o en campos de actividad (transporte/alojamiento), forzar recarga de la actividad completa
+        if (_datosEditados != null && 
+            (_datosEditados!.containsKey('localizaciones_changed') || 
+             _datosEditados!.containsKey('transporteReq') ||
+             _datosEditados!.containsKey('alojamientoReq'))) {
           await _loadActivityDetails();
         }
         

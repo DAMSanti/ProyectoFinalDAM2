@@ -1,6 +1,7 @@
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/models/alojamiento.dart';
 
 class Actividad {
   final int id;
@@ -14,8 +15,10 @@ class Actividad {
   final int previstaIni;
   final int transporteReq;
   final String? comentTransporte;
+  final double? precioTransporte;
   final int alojamientoReq;
   final String? comentAlojamiento;
+  final Alojamiento? alojamiento;
   final String? comentarios;
   final String estado;
   final String? comentEstado;
@@ -23,8 +26,8 @@ class Actividad {
   final String? urlFolleto;
   final Profesor? solicitante;
   final Departamento? departamento;
-  final Localizacion? localizacion; // Mantener por compatibilidad con LocalizacionId en BD
-  final List<Localizacion> localizaciones; // Nueva lista para múltiples localizaciones
+  final Localizacion? localizacion;
+  final List<Localizacion> localizaciones;
   final double? importePorAlumno;
   final double? presupuestoEstimado;
   final double? costoReal;
@@ -41,8 +44,10 @@ class Actividad {
     required this.previstaIni,
     required this.transporteReq,
     this.comentTransporte,
+    this.precioTransporte,
     required this.alojamientoReq,
     this.comentAlojamiento,
+    this.alojamiento,
     this.comentarios,
     required this.estado,
     this.comentEstado,
@@ -51,7 +56,7 @@ class Actividad {
     this.solicitante,
     this.departamento,
     this.localizacion,
-    this.localizaciones = const [], // Lista vacía por defecto
+    this.localizaciones = const [],
     this.importePorAlumno,
     this.presupuestoEstimado,
     this.costoReal,
@@ -79,6 +84,12 @@ class Actividad {
         codigo: '', // No tenemos el código en el DTO
         nombre: json['departamentoNombre'],
       );
+    }
+    
+    // Parsear el alojamiento si viene en el JSON
+    Alojamiento? alojamiento;
+    if (json['alojamiento'] != null && json['alojamiento'] is Map) {
+      alojamiento = Alojamiento.fromJson(json['alojamiento']);
     }
     
     // Parsear la localización si viene en el JSON
@@ -134,8 +145,10 @@ class Actividad {
       previstaIni: json['previstaIni'] as int? ?? 0,
       transporteReq: json['transporteReq'] as int? ?? 0,
       comentTransporte: json['comentTransporte']?.toString(),
+      precioTransporte: (json['precioTransporte'] as num?)?.toDouble(),
       alojamientoReq: json['alojamientoReq'] as int? ?? 0,
       comentAlojamiento: json['comentAlojamiento']?.toString(),
+      alojamiento: alojamiento, // Cambio: ahora es un objeto Alojamiento
       comentarios: json['comentarios']?.toString(),
       estado: (json['aprobada'] == true) ? 'Aprobada' : (json['estado']?.toString() ?? 'Pendiente'),
       comentEstado: json['comentEstado']?.toString(),
@@ -164,8 +177,10 @@ class Actividad {
       'previstaIni': previstaIni,
       'transporteReq': transporteReq,
       'comentTransporte': comentTransporte,
+      'precioTransporte': precioTransporte,
       'alojamientoReq': alojamientoReq,
       'comentAlojamiento': comentAlojamiento,
+      'alojamientoId': alojamiento?.id, // Enviar solo el ID del alojamiento
       'comentarios': comentarios,
       'aprobada': estado == 'Aprobada', // La API espera 'aprobada' como bool
       'comentEstado': comentEstado,

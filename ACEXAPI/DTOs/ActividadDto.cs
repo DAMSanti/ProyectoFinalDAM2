@@ -17,6 +17,8 @@ public class ActividadDto
     public string? LocalizacionNombre { get; set; }
     public int? EmpTransporteId { get; set; }
     public string? EmpTransporteNombre { get; set; }
+    public int TransporteReq { get; set; }
+    public int AlojamientoReq { get; set; }
     
     // Lista de localizaciones de la actividad
     public List<LocalizacionDto>? Localizaciones { get; set; }
@@ -60,6 +62,8 @@ public class ActividadUpdateDto
     public int? DepartamentoId { get; set; }
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
+    public int? TransporteReq { get; set; }
+    public int? AlojamientoReq { get; set; }
 }
 
 public class ActividadListDto

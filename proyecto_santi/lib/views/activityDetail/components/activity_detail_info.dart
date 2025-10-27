@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +27,7 @@ import 'dialogs/multi_select_profesor_dialog.dart';
 import 'dialogs/multi_select_grupo_dialog.dart';
 import 'images/network_image_with_delete.dart';
 import 'images/image_with_delete_button.dart';
+import 'activity_budget_section.dart';
 
 class ActivityDetailInfo extends StatefulWidget {
   final Actividad actividad;
@@ -1043,7 +1044,22 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     if (constraints.maxWidth < 800) {
       return Column(
         children: [
-          _buildPresupuesto(context, constraints),
+          ActivityBudgetSection(
+            actividad: widget.actividad,
+            isAdminOrSolicitante: widget.isAdminOrSolicitante,
+            totalAlumnosParticipantes: _totalAlumnosParticipantes,
+            onBudgetChanged: (budgetData) {
+              // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
+              setState(() {});
+              // Notificar al padre que hubo cambios para activar el botón guardar
+              if (widget.onActivityDataChanged != null) {
+                widget.onActivityDataChanged!({
+                  'budgetChanged': true,
+                  ...budgetData, // Incluir transporteReq y alojamientoReq
+                });
+              }
+            },
+          ),
           SizedBox(height: 16),
           _buildLocalizacion(context, constraints),
         ],
@@ -1056,7 +1072,22 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       children: [
         Expanded(
           flex: 1,
-          child: _buildPresupuesto(context, constraints),
+          child: ActivityBudgetSection(
+            actividad: widget.actividad,
+            isAdminOrSolicitante: widget.isAdminOrSolicitante,
+            totalAlumnosParticipantes: _totalAlumnosParticipantes,
+            onBudgetChanged: (budgetData) {
+              // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
+              setState(() {});
+              // Notificar al padre que hubo cambios para activar el botón guardar
+              if (widget.onActivityDataChanged != null) {
+                widget.onActivityDataChanged!({
+                  'budgetChanged': true,
+                  ...budgetData, // Incluir transporteReq y alojamientoReq
+                });
+              }
+            },
+          ),
         ),
         SizedBox(width: 16),
         Expanded(
@@ -1064,166 +1095,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           child: _buildLocalizacion(context, constraints),
         ),
       ],
-    );
-  }
-
-  Widget _buildPresupuesto(BuildContext context, BoxConstraints constraints) {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
-    // Calcular valores
-    final presupuesto = widget.actividad.presupuestoEstimado ?? 0.0;
-    final costoReal = widget.actividad.costoReal ?? 0.0;
-    final costoPorAlumno = _totalAlumnosParticipantes > 0 
-        ? presupuesto / _totalAlumnosParticipantes 
-        : 0.0;
-    
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Presupuesto y Gastos',
-                style: TextStyle(
-                  fontSize: !isWeb ? 18.dg : 6.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Implementar diálogo para añadir conceptos de gasto
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Funcionalidad en desarrollo'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: Icon(Icons.add, size: !isWeb ? 16.dg : 5.sp),
-                label: Text(
-                  'Añadir Gasto',
-                  style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1976d2),
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          // Grid de información presupuestaria
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final itemWidth = constraints.maxWidth > 600 
-                  ? constraints.maxWidth / 3 - 8 
-                  : constraints.maxWidth;
-              
-              return Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _buildPresupuestoCard(
-                    context,
-                    'Presupuesto Estimado',
-                    presupuesto,
-                    Icons.account_balance_wallet,
-                    Colors.blue,
-                    itemWidth,
-                    isWeb,
-                  ),
-                  _buildPresupuestoCard(
-                    context,
-                    'Coste Real',
-                    costoReal,
-                    Icons.euro,
-                    costoReal > presupuesto ? Colors.red : Colors.green,
-                    itemWidth,
-                    isWeb,
-                  ),
-                  _buildPresupuestoCard(
-                    context,
-                    'Coste por Alumno',
-                    costoPorAlumno,
-                    Icons.person,
-                    Colors.orange,
-                    itemWidth,
-                    isWeb,
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPresupuestoCard(
-    BuildContext context,
-    String titulo,
-    double valor,
-    IconData icono,
-    Color color,
-    double width,
-    bool isWeb,
-  ) {
-    return Container(
-      width: width > 600 ? width : double.infinity,
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[800]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 2,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icono,
-                color: color,
-                size: !isWeb ? 20.dg : 6.sp,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  titulo,
-                  style: TextStyle(
-                    fontSize: !isWeb ? 12.dg : 4.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            '${valor.toStringAsFixed(2)} €',
-            style: TextStyle(
-              fontSize: !isWeb ? 18.dg : 6.sp,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1314,7 +1185,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           else ...[
             // Mapa interactivo
             Container(
-              height: 400,
+              height: 600,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.white.withOpacity(0.1)),

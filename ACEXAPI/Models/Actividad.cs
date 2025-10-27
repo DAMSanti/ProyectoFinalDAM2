@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ACEXAPI.Models;
 
+[Table("Actividades")]
 public class Actividad
 {
     [Key]
@@ -20,10 +21,9 @@ public class Actividad
 
     public DateTime? FechaFin { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
+    // Campos que SÍ existen en la BD
     public decimal? PresupuestoEstimado { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
     public decimal? CostoReal { get; set; }
 
     public string? FolletoUrl { get; set; }
@@ -32,7 +32,20 @@ public class Actividad
 
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
-    // Relaciones
+    // Nuevos campos agregados recientemente
+    [Column("precio_transporte")]
+    public decimal? PrecioTransporte { get; set; }
+
+    [Column("transporte_req")]
+    public int TransporteReq { get; set; } = 0;
+
+    [Column("alojamiento_req")]
+    public int AlojamientoReq { get; set; } = 0;
+
+    // Relaciones - Estos campos SÍ existen en la BD con nombres PascalCase
+    public int? AlojamientoId { get; set; }
+    public Alojamiento? Alojamiento { get; set; }
+
     public int? DepartamentoId { get; set; }
     public Departamento? Departamento { get; set; }
 

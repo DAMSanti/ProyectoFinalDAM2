@@ -127,10 +127,13 @@ class ActividadService {
         'Aprobada': actividad.estado == 'Aprobada',
         'SolicitanteId': actividad.solicitante?.uuid,
         'DepartamentoId': actividad.departamento?.id,
+        'TransporteReq': actividad.transporteReq,
+        'AlojamientoReq': actividad.alojamientoReq,
         // LocalizacionId y EmpTransporteId son opcionales
       });
       
       print('[ActividadService] FormData preparado con SolicitanteId: ${actividad.solicitante?.uuid}');
+      print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, AlojamientoReq: ${actividad.alojamientoReq}');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
       
       final response = await _apiService.dio.put(
