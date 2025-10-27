@@ -615,3 +615,6 @@ G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\obj\Debug\net8.0\ACEXAPI.genrun
 G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\obj\Debug\net8.0\ref\ACEXAPI.dll
 G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Casa.json
 G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Trabajo.json
+C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.backup.json
+C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Casa.json
+C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Trabajo.json

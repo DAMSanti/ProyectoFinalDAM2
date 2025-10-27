@@ -7,18 +7,18 @@ class AppConfig {
   // En web usamos la IP local porque localhost no funciona en el navegador
   static String get apiBaseUrl {
     if (kIsWeb) {
-      // Para web, usa la IP local de tu mÃ¡quina
-      return 'http://192.168.1.42:5000/api';
+      // Para web, usa localhost en desarrollo
+      return 'http://localhost:5000/api';
     } else {
       // Para desktop/mobile, localhost funciona bien
       return 'http://localhost:5000/api';
     }
   }
   
-  // URL de imÃ¡genes
+  // URL de imágenes
   static String get imagenesBaseUrl {
     if (kIsWeb) {
-      return 'http://192.168.1.42:5000/uploads';
+      return 'http://localhost:5000/uploads';
     } else {
       return 'http://localhost:5000/uploads';
     }

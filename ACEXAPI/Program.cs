@@ -103,16 +103,18 @@ builder.Services.AddCors(options =>
     {
         var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "*" };
         
-        if (builder.Environment.IsDevelopment())
+        if (builder.Environment.IsDevelopment() || 
+            builder.Environment.EnvironmentName == "Trabajo" || 
+            builder.Environment.EnvironmentName == "Casa")
         {
-            // En desarrollo, permitir cualquier origen para facilitar testing
+            // En desarrollo, trabajo y casa, permitir cualquier origen para facilitar testing
             policy.AllowAnyOrigin()
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         }
         else
         {
-            // En producción, usar orígenes específicos
+            // En producción real, usar orígenes específicos
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyMethod()
                   .AllowAnyHeader()
@@ -156,17 +158,24 @@ var app = builder.Build();
 // Middleware de manejo de errores global
 app.UseErrorHandling();
 
-if (app.Environment.IsDevelopment())
+// Habilitar Swagger en Development, Trabajo y Casa (no en Production real)
+if (app.Environment.IsDevelopment() || 
+    app.Environment.EnvironmentName == "Trabajo" || 
+    app.Environment.EnvironmentName == "Casa")
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ACEX API v1");
-        c.RoutePrefix = string.Empty; // Swagger en la ra�z
+        c.RoutePrefix = string.Empty; // Swagger en la raíz
     });
 }
 
-app.UseHttpsRedirection();
+// Solo redirigir a HTTPS si estamos en un entorno con HTTPS configurado
+if (app.Environment.IsProduction() && app.Environment.EnvironmentName != "Casa" && app.Environment.EnvironmentName != "Trabajo")
+{
+    app.UseHttpsRedirection();
+}
 
 // Servir archivos est�ticos (para almacenamiento local)
 app.UseStaticFiles();
@@ -180,8 +189,10 @@ app.UseResponseCaching();
 
 app.MapControllers();
 
-// Crear base de datos si no existe (solo desarrollo)
-if (app.Environment.IsDevelopment())
+// Crear base de datos si no existe (Development, Trabajo, Casa)
+if (app.Environment.IsDevelopment() || 
+    app.Environment.EnvironmentName == "Trabajo" || 
+    app.Environment.EnvironmentName == "Casa")
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

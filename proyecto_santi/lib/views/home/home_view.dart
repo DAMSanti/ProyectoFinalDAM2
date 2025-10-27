@@ -32,6 +32,37 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    // Si estamos en web o desktop, devolver el contenido con fondo degradado
+    // pero sin Scaffold porque el DesktopShell ya proporciona el marco
+    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      return Stack(
+        children: [
+          Theme.of(context).brightness == Brightness.dark
+              ? GradientBackgroundDark(child: Container())
+              : GradientBackgroundLight(child: Container()),
+          FutureBuilder<List<Actividad>>(
+            future: _futureActivities,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('No hay actividades próximas.'));
+              } else {
+                // Usar HomeLargeLandscapeLayout que ya NO tiene MarcoDesktop
+                return HomeLargeLandscapeLayout(
+                  activities: snapshot.data!,
+                  onToggleTheme: widget.onToggleTheme,
+                );
+              }
+            },
+          ),
+        ],
+      );
+    }
+    
+    // Para móvil, mantener el Scaffold completo
     return WillPopScope(
       onWillPop: () => onWillPopSalir(context, isHome: true),
       child: Stack(
@@ -51,15 +82,7 @@ class HomeViewState extends State<HomeView> {
               title: 'Inicio',
             )
                 : null,
-            drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
-                ? OrientationBuilder(
-              builder: (context, orientation) {
-                return orientation == Orientation.portrait
-                    ? Menu()
-                    : MenuLandscape();
-              },
-            )
-                : Menu(),
+            drawer: Menu(),
             body: FutureBuilder<List<Actividad>>(
               future: _futureActivities,
               builder: (context, snapshot) {
@@ -68,9 +91,9 @@ class HomeViewState extends State<HomeView> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No activities found.'));
+                  return Center(child: Text('No hay actividades próximas.'));
                 } else {
-                  return _buildLayout(context, snapshot.data!);
+                  return _buildMobileLayout(context, snapshot.data!);
                 }
               },
             ),
@@ -80,19 +103,15 @@ class HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildLayout(BuildContext context, List<Actividad> activities) {
-    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      return HomeLargeLandscapeLayout(activities: activities, onToggleTheme: widget.onToggleTheme);
-    } else {
-      return OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.portrait) {
-            return HomePortraitLayout(activities: activities);
-          } else {
-            return HomeSmallLandscapeLayout(activities: activities);
-          }
-        },
-      );
-    }
+  Widget _buildMobileLayout(BuildContext context, List<Actividad> activities) {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.portrait) {
+          return HomePortraitLayout(activities: activities);
+        } else {
+          return HomeSmallLandscapeLayout(activities: activities);
+        }
+      },
+    );
   }
 }

@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
-import 'package:proyecto_santi/views/home/home_view.dart';
-import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
-import 'package:proyecto_santi/views/chat/chat_list_view.dart';
-import 'package:proyecto_santi/views/activities/activities_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/tema/theme.dart';
-import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/config.dart';
@@ -96,51 +92,16 @@ class MyAppState extends State<MyApp> {
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: _themeMode,
-          initialRoute: '/',
-          onGenerateRoute: (settings) {
-            final auth = Provider.of<Auth>(context, listen: false);
-            WidgetBuilder builder;
-
-            if (!auth.isAuthenticated && settings.name != '/') {
-              builder = (context) => LoginView(onToggleTheme: _toggleTheme);
-            } else {
-              switch (settings.name) {
-                case '/':
-                  builder = (context) => LoginView(onToggleTheme: _toggleTheme);
-                  break;
-                case '/home':
-                  builder = (context) => HomeView(onToggleTheme: _toggleTheme);
-                  break;
-                case '/actividades':
-                  builder =
-                      (context) => ActivitiesView(onToggleTheme: _toggleTheme);
-                  break;
-                case '/mapa':
-                  builder = (context) =>
-                      MapView(onToggleTheme: _toggleTheme,
-                          isDarkTheme: _themeMode == ThemeMode.dark);
-                  break;
-                case '/chat':
-                  builder = (context) =>
-                      ChatListView(onToggleTheme: _toggleTheme,
-                          isDarkTheme: _themeMode == ThemeMode.dark);
-                  break;
-                case '/activityDetail':
-                  final args = settings.arguments as Map<String, dynamic>;
-                  builder = (context) =>
-                      ActivityDetailView(
-                        actividad: args['activity'],
-                        onToggleTheme: _toggleTheme,
-                        isDarkTheme: _themeMode == ThemeMode.dark,
-                      );
-                  break;
-                default:
-                  builder = (context) => LoginView(onToggleTheme: _toggleTheme);
-                  break;
+          home: Consumer<Auth>(
+            builder: (context, auth, child) {
+              // Si no está autenticado, mostrar login
+              if (!auth.isAuthenticated) {
+                return LoginView(onToggleTheme: _toggleTheme);
               }
-            }
-            return MaterialPageRoute(builder: builder, settings: settings);
-          },
+              // Si está autenticado, mostrar el shell (que persiste)
+              return DesktopShell(onToggleTheme: _toggleTheme);
+            },
+          ),
         );
       },
     );

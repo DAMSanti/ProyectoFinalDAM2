@@ -40,5 +40,6 @@ bool shouldShowAppBar() {
 // Funcion para hacer logout
 void logout(BuildContext context) {
   Provider.of<Auth>(context, listen: false).logout();
-  Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
+  // Ya no necesitamos navegar manualmente, el Consumer en main.dart
+  // detectará el cambio de auth.isAuthenticated y mostrará el LoginView
 }

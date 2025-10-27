@@ -46,7 +46,9 @@ class LoginViewState extends State<LoginView> {
       });
 
       if (success) {
-        Navigator.pushReplacementNamed(context, '/home');
+        // Ya no necesitamos navegar manualmente, el Consumer en main.dart
+        // detectará el cambio de auth.isAuthenticated y mostrará el DesktopShell
+        // Navigator.pushReplacementNamed ya no es necesario
       } else {
         showLoginDialog();
       }

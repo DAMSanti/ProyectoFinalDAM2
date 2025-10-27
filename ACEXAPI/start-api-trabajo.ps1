@@ -6,13 +6,14 @@ Write-Host "INICIANDO API - ENTORNO TRABAJO" -ForegroundColor Blue
 Write-Host "================================" -ForegroundColor Blue
 Write-Host ""
 
-$apiPath = "G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI"
+# Obtener la ruta del directorio donde está este script
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$apiPath = $scriptPath
 
 Write-Host "IMPORTANTE: Actualiza appsettings.Trabajo.json con tu configuracion del trabajo" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Configuracion actual:" -ForegroundColor Yellow
-Write-Host "  Servidor: TU_SERVIDOR_TRABAJO\SQLEXPRESS" -ForegroundColor White
-Write-Host "  Base de datos: ACEXAPI" -ForegroundColor White
+Write-Host "  Archivo: $apiPath\appsettings.Trabajo.json" -ForegroundColor White
 Write-Host ""
 
 $continuar = Read-Host "Has actualizado la configuracion? (S/N)"
@@ -27,6 +28,5 @@ Write-Host ""
 Write-Host "Iniciando API..." -ForegroundColor Cyan
 Write-Host ""
 
-# Iniciar la API con el entorno Trabajo
-$env:ASPNETCORE_ENVIRONMENT = "Trabajo"
-dotnet run
+# Iniciar la API con el perfil Trabajo
+dotnet run --launch-profile Trabajo

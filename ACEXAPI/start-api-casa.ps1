@@ -6,7 +6,9 @@ Write-Host "INICIANDO API - ENTORNO CASA" -ForegroundColor Green
 Write-Host "=============================" -ForegroundColor Green
 Write-Host ""
 
-$apiPath = "G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI"
+# Obtener la ruta del directorio donde está este script
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$apiPath = $scriptPath
 
 Write-Host "Configuracion:" -ForegroundColor Yellow
 Write-Host "  Servidor: localhost\SQLEXPRESS" -ForegroundColor White
@@ -36,6 +38,5 @@ Write-Host ""
 Write-Host "Iniciando API..." -ForegroundColor Cyan
 Write-Host ""
 
-# Iniciar la API con el entorno Casa
-$env:ASPNETCORE_ENVIRONMENT = "Casa"
-dotnet run
+# Iniciar la API con el perfil Casa
+dotnet run --launch-profile Casa

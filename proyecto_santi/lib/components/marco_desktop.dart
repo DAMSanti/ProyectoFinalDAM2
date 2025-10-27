@@ -52,8 +52,13 @@ class MarcoDesktop extends StatelessWidget {
 
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
+  final String? title;
 
-  const DesktopBar({super.key, required this.onToggleTheme});
+  const DesktopBar({
+    super.key, 
+    required this.onToggleTheme,
+    this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +83,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               centerTitle: true,
               automaticallyImplyLeading: false,
               title: Text(
-                'Próximas Actividades',
+                title ?? 'Próximas Actividades',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -95,22 +100,14 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isDark 
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                    child: IconButton(
+                      icon: Icon(
+                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                        size: 24,
+                        color: isDark ? Colors.amber : Color(0xFF1976d2),
                       ),
-                      child: IconButton(
-                        icon: Icon(
-                          isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                          size: 24,
-                          color: isDark ? Colors.amber : Color(0xFF1976d2),
-                        ),
-                        onPressed: onToggleTheme,
-                        tooltip: 'Cambiar tema',
-                      ),
+                      onPressed: onToggleTheme,
+                      tooltip: 'Cambiar tema',
                     ),
                   ),
                 ),
