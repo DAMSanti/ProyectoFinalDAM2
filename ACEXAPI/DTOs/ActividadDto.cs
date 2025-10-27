@@ -25,6 +25,7 @@ public class ActividadDto
 public class ProfesorSimpleDto
 {
     public int Id { get; set; }
+    public Guid Uuid { get; set; }
     public string Nombre { get; set; } = string.Empty;
     public string Apellidos { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
@@ -52,6 +53,7 @@ public class ActividadUpdateDto
     public decimal? PresupuestoEstimado { get; set; }
     public decimal? CostoReal { get; set; }
     public bool? Aprobada { get; set; }
+    public Guid? SolicitanteId { get; set; }
     public int? DepartamentoId { get; set; }
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }

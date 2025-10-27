@@ -31,6 +31,7 @@ class AppConfig {
   // Endpoints de la API
   static const String actividadEndpoint = '/Actividad';
   static const String profesorEndpoint = '/Profesor';
+  static const String departamentosEndpoint = '/Departamento';
   static const String fotoEndpoint = '/Foto';
   static const String authEndpoint = '/Auth';
   static const String catalogosEndpoint = '/Catalogos';

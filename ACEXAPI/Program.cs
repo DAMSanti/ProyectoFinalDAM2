@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -177,10 +178,31 @@ if (app.Environment.IsProduction() && app.Environment.EnvironmentName != "Casa" 
     app.UseHttpsRedirection();
 }
 
-// Servir archivos est�ticos (para almacenamiento local)
+// CORS debe ir ANTES de UseStaticFiles para que funcione con las imágenes
+app.UseCors("AllowFlutterApp");
+
+// Servir archivos estáticos desde wwwroot (por defecto)
 app.UseStaticFiles();
 
-app.UseCors("AllowFlutterApp");
+// Servir archivos estáticos desde la carpeta wwwroot/uploads con ruta /uploads
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads",
+    OnPrepareResponse = ctx =>
+    {
+        // Agregar headers CORS manualmente para archivos estáticos
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type");
+    }
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -190,6 +212,8 @@ app.UseResponseCaching();
 app.MapControllers();
 
 // Crear base de datos si no existe (Development, Trabajo, Casa)
+// Comentado temporalmente para evitar problemas de conexión al inicio
+/*
 if (app.Environment.IsDevelopment() || 
     app.Environment.EnvironmentName == "Trabajo" || 
     app.Environment.EnvironmentName == "Casa")
@@ -198,5 +222,6 @@ if (app.Environment.IsDevelopment() ||
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await context.Database.EnsureCreatedAsync();
 }
+*/
 
 app.Run();

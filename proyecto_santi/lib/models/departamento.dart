@@ -1,19 +1,22 @@
 class Departamento {
   final int id;
-  final String codigo;
+  final String? codigo;
   final String nombre;
+  final String? descripcion;
 
   Departamento({
     required this.id,
-    required this.codigo,
+    this.codigo,
     required this.nombre,
+    this.descripcion,
   });
 
   factory Departamento.fromJson(Map<String, dynamic> json) {
     return Departamento(
-      id: json['id'],
+      id: json['id'] ?? json['Id'],
       codigo: json['codigo'],
-      nombre: json['nombre'],
+      nombre: json['nombre'] ?? json['Nombre'],
+      descripcion: json['descripcion'] ?? json['Descripcion'],
     );
   }
 
@@ -22,6 +25,7 @@ class Departamento {
       'id': id,
       'codigo': codigo,
       'nombre': nombre,
+      'descripcion': descripcion,
     };
   }
 }

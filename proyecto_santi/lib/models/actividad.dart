@@ -1,4 +1,5 @@
-import 'package:proyecto_santi/models/Profesor.dart';
+import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/models/departamento.dart';
 
 class Actividad {
   final int id;
@@ -20,7 +21,11 @@ class Actividad {
   final String? incidencias;
   final String? urlFolleto;
   final Profesor? solicitante;
+  final Departamento? departamento;
   final double? importePorAlumno;
+  
+  // TODO: Estas coordenadas deberían venir de la tabla Localizaciones
+  // Temporalmente las mantenemos aquí para compatibilidad con el mapa
   double? latitud;
   double? longitud;
 
@@ -44,6 +49,7 @@ class Actividad {
     this.incidencias,
     this.urlFolleto,
     this.solicitante,
+    this.departamento,
     this.importePorAlumno,
     this.latitud,
     this.longitud,
@@ -59,15 +65,56 @@ class Actividad {
       solicitante = Profesor.fromJson(json['solicitante']);
     }
     
+    // Parsear el departamento - la API puede devolver el objeto completo o solo el nombre
+    Departamento? departamento;
+    if (json['departamento'] != null && json['departamento'] is Map) {
+      // Viene el objeto completo desde la API antigua
+      departamento = Departamento.fromJson(json['departamento']);
+    } else if (json['departamentoId'] != null && json['departamentoNombre'] != null) {
+      // Desde ACEXAPI - viene separado
+      departamento = Departamento(
+        id: json['departamentoId'],
+        codigo: '', // No tenemos el código en el DTO
+        nombre: json['departamentoNombre'],
+      );
+    }
+    
+    // Parsear fechas de inicio y fin
+    final fechaInicioStr = json['fechaInicio']?.toString() ?? json['fini']?.toString() ?? now;
+    final fechaFinStr = json['fechaFin']?.toString() ?? json['ffin']?.toString() ?? now;
+    
+    // Extraer horas de las fechas si no vienen por separado
+    String horaInicio = json['hini']?.toString() ?? '00:00';
+    String horaFin = json['hfin']?.toString() ?? '00:00';
+    
+    // Si hini/hfin son "00:00", intentar extraer de fechaInicio/fechaFin
+    if (horaInicio == '00:00' && fechaInicioStr != now) {
+      try {
+        final dt = DateTime.parse(fechaInicioStr);
+        horaInicio = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      } catch (e) {
+        // Si falla el parseo, mantener 00:00
+      }
+    }
+    
+    if (horaFin == '00:00' && fechaFinStr != now) {
+      try {
+        final dt = DateTime.parse(fechaFinStr);
+        horaFin = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      } catch (e) {
+        // Si falla el parseo, mantener 00:00
+      }
+    }
+    
     return Actividad(
       id: json['id'] ?? 0,
       titulo: json['nombre']?.toString() ?? json['titulo']?.toString() ?? 'Sin título',
       tipo: json['tipo']?.toString() ?? 'Actividad',
       descripcion: json['descripcion']?.toString(),
-      fini: json['fechaInicio']?.toString() ?? json['fini']?.toString() ?? now,
-      ffin: json['fechaFin']?.toString() ?? json['ffin']?.toString() ?? now,
-      hini: json['hini']?.toString() ?? '00:00',
-      hfin: json['hfin']?.toString() ?? '00:00',
+      fini: fechaInicioStr,
+      ffin: fechaFinStr,
+      hini: horaInicio,
+      hfin: horaFin,
       previstaIni: json['previstaIni'] as int? ?? 0,
       transporteReq: json['transporteReq'] as int? ?? 0,
       comentTransporte: json['comentTransporte']?.toString(),
@@ -79,6 +126,7 @@ class Actividad {
       incidencias: json['incidencias']?.toString(),
       urlFolleto: json['folletoUrl']?.toString() ?? json['urlFolleto']?.toString(),
       solicitante: solicitante,
+      departamento: departamento,
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
       latitud: (json['latitud'] as num?)?.toDouble(),
       longitud: (json['longitud'] as num?)?.toDouble(),
@@ -88,11 +136,11 @@ class Actividad {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'titulo': titulo,
+      'nombre': titulo, // La API espera 'nombre', no 'titulo'
       'tipo': tipo,
       'descripcion': descripcion,
-      'fini': fini,
-      'ffin': ffin,
+      'fechaInicio': fini, // La API espera 'fechaInicio'
+      'fechaFin': ffin, // La API espera 'fechaFin'
       'hini': hini,
       'hfin': hfin,
       'previstaIni': previstaIni,
@@ -101,12 +149,13 @@ class Actividad {
       'alojamientoReq': alojamientoReq,
       'comentAlojamiento': comentAlojamiento,
       'comentarios': comentarios,
-      'estado': estado,
+      'aprobada': estado == 'Aprobada', // La API espera 'aprobada' como bool
       'comentEstado': comentEstado,
       'incidencias': incidencias,
-      'urlFolleto': urlFolleto,
-      'solicitante': solicitante?.toJson(),
-      'importePorAlumno': importePorAlumno,
+      'folletoUrl': urlFolleto, // La API espera 'folletoUrl'
+      'solicitanteId': solicitante?.uuid, // Enviar solo el ID
+      'departamentoId': departamento?.id, // Enviar solo el ID
+      'presupuestoEstimado': importePorAlumno,
       'latitud': latitud,
       'longitud': longitud,
     };

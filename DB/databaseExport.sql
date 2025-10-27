@@ -42,10 +42,13 @@ CREATE TABLE `actividades` (
   `incidencias` text CHARACTER SET utf8mb3 COLLATE utf8mb3_spanish_ci,
   `url_folleto` text CHARACTER SET utf8mb3 COLLATE utf8mb3_spanish_ci,
   `solicitante_id` char(36) CHARACTER SET utf8mb3 COLLATE utf8mb3_spanish_ci NOT NULL,
+  `departamento_id` int DEFAULT NULL,
   `importe_por_alumno` decimal(5,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_actividades_profesores2_idx` (`solicitante_id`),
-  CONSTRAINT `fk_actividades_profesores2` FOREIGN KEY (`solicitante_id`) REFERENCES `profesores` (`uuid`) ON UPDATE CASCADE
+  KEY `fk_actividades_departamentos_idx` (`departamento_id`),
+  CONSTRAINT `fk_actividades_profesores2` FOREIGN KEY (`solicitante_id`) REFERENCES `profesores` (`uuid`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_actividades_departamentos` FOREIGN KEY (`departamento_id`) REFERENCES `departamentos` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_spanish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

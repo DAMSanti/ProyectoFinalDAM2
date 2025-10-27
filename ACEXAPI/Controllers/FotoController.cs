@@ -31,7 +31,7 @@ public class FotoController : ControllerBase
     public async Task<ActionResult<List<FotoDto>>> GetAll()
     {
         var fotos = await _context.Fotos
-            .Select(f => MapToDto(f))
+            .Select(f => FotoDto.FromEntity(f))
             .ToListAsync();
 
         return Ok(fotos);
@@ -44,7 +44,7 @@ public class FotoController : ControllerBase
         if (foto == null)
             return NotFound(new { message = "Foto no encontrada" });
 
-        return Ok(MapToDto(foto));
+        return Ok(FotoDto.FromEntity(foto));
     }
 
     [HttpGet("actividad/{actividadId}")]
@@ -52,7 +52,7 @@ public class FotoController : ControllerBase
     {
         var fotos = await _context.Fotos
             .Where(f => f.ActividadId == actividadId)
-            .Select(f => MapToDto(f))
+            .Select(f => FotoDto.FromEntity(f))
             .ToListAsync();
 
         return Ok(fotos);
@@ -90,7 +90,7 @@ public class FotoController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(fotosCreadas.Select(f => MapToDto(f)).ToList());
+        return Ok(fotosCreadas.Select(f => FotoDto.FromEntity(f)).ToList());
     }
 
     [HttpDelete("{id}")]
@@ -111,19 +111,5 @@ public class FotoController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
-
-    private FotoDto MapToDto(Foto foto)
-    {
-        return new FotoDto
-        {
-            Id = foto.Id,
-            ActividadId = foto.ActividadId,
-            Url = foto.Url,
-            UrlThumbnail = foto.UrlThumbnail,
-            Descripcion = foto.Descripcion,
-            FechaSubida = foto.FechaSubida,
-            TamanoBytes = foto.TamanoBytes
-        };
     }
 }

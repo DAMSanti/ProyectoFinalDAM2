@@ -5,35 +5,63 @@ class Photo {
   final int id;
   final String? urlFoto;
   String descripcion;
-  final Actividad actividad;
+  final Actividad? actividad;
+  final int? actividadId;
 
   Photo({
     required this.id,
     required this.urlFoto,
     required this.descripcion,
-    required this.actividad,
+    this.actividad,
+    this.actividadId,
   });
 
   factory Photo.fromJson(Map<String, dynamic> json) {
     String? photoUrl;
     
-    if (json['urlFoto'] != null) {
-      // Extrae el nombre del archivo desde la ruta del sistema
-      final urlFotoOriginal = json['urlFoto'] as String;
-      final imageName = urlFotoOriginal
-          .substring(urlFotoOriginal.lastIndexOf("\\") + 1)
-          .replaceAll(" ", "_");
-      final activityId = json['actividad']['id'];
+    // Manejar tanto 'urlFoto' como 'url'
+    final urlField = json['urlFoto'] ?? json['url'];
+    
+    if (urlField != null) {
+      final urlString = urlField as String;
+      
+      // Si la URL ya es completa (empieza con http), usarla directamente
+      if (urlString.startsWith('http://') || urlString.startsWith('https://')) {
+        photoUrl = urlString;
+      } else {
+        // Si es una ruta relativa que empieza con /uploads, usar imagenesBaseUrl
+        if (urlString.startsWith('/uploads') || urlString.startsWith('uploads')) {
+          // Eliminar la barra inicial y 'uploads/' si existe
+          String relativePath = urlString.startsWith('/') ? urlString.substring(1) : urlString;
+          if (relativePath.startsWith('uploads/')) {
+            relativePath = relativePath.substring(8); // Quitar 'uploads/'
+          }
+          photoUrl = '${AppConfig.imagenesBaseUrl}/$relativePath';
+        } else {
+          // Para otras rutas, usar apiBaseUrl
+          final relativePath = urlString.startsWith('/') ? urlString.substring(1) : urlString;
+          photoUrl = '${AppConfig.apiBaseUrl}/$relativePath';
+        }
+      }
+    }
 
-      // Construye la URL completa
-      photoUrl = '${AppConfig.imagenesBaseUrl}/actividad/$activityId/$imageName';
+    // Manejar actividad opcional
+    Actividad? actividadObj;
+    int? actId;
+    
+    if (json['actividad'] != null) {
+      actividadObj = Actividad.fromJson(json['actividad']);
+      actId = actividadObj.id;
+    } else if (json['actividadId'] != null) {
+      actId = json['actividadId'];
     }
 
     return Photo(
       id: json['id'],
       urlFoto: photoUrl,
       descripcion: json['descripcion'] ?? '',
-      actividad: Actividad.fromJson(json['actividad']),
+      actividad: actividadObj,
+      actividadId: actId,
     );
   }
 
@@ -42,7 +70,8 @@ class Photo {
       'id': id,
       'urlFoto': urlFoto,
       'descripcion': descripcion,
-      'actividad': actividad.toJson(),
+      if (actividad != null) 'actividad': actividad!.toJson(),
+      if (actividadId != null) 'actividadId': actividadId,
     };
   }
 }

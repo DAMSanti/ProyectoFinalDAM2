@@ -119,7 +119,10 @@ public class ActividadService : IActividadService
 
     public async Task<ActividadDto?> UpdateAsync(int id, ActividadUpdateDto dto, IFormFile? folleto)
     {
-        var actividad = await _context.Actividades.FindAsync(id);
+        var actividad = await _context.Actividades
+            .Include(a => a.ProfesoresResponsables)
+            .FirstOrDefaultAsync(a => a.Id == id);
+            
         if (actividad == null)
             return null;
 
@@ -133,6 +136,25 @@ public class ActividadService : IActividadService
         if (dto.DepartamentoId.HasValue) actividad.DepartamentoId = dto.DepartamentoId;
         if (dto.LocalizacionId.HasValue) actividad.LocalizacionId = dto.LocalizacionId;
         if (dto.EmpTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpTransporteId;
+        
+        // Actualizar solicitante (profesor responsable)
+        if (dto.SolicitanteId.HasValue)
+        {
+            // Eliminar responsable actual
+            var responsableActual = actividad.ProfesoresResponsables.FirstOrDefault();
+            if (responsableActual != null)
+            {
+                _context.ProfResponsables.Remove(responsableActual);
+            }
+            
+            // Añadir nuevo responsable
+            actividad.ProfesoresResponsables.Add(new ProfResponsable
+            {
+                ActividadId = actividad.Id,
+                ProfesorUuid = dto.SolicitanteId.Value,
+                EsCoordinador = true
+            });
+        }
 
         if (folleto != null)
         {
@@ -145,7 +167,16 @@ public class ActividadService : IActividadService
 
         await _context.SaveChangesAsync();
 
-        return MapToDto(actividad);
+        // Recargar la actividad con todas las relaciones para MapToDto
+        var actividadActualizada = await _context.Actividades
+            .Include(a => a.Departamento)
+            .Include(a => a.Localizacion)
+            .Include(a => a.EmpTransporte)
+            .Include(a => a.ProfesoresResponsables)
+                .ThenInclude(pr => pr.Profesor)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        return MapToDto(actividadActualizada!);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -176,6 +207,7 @@ public class ActividadService : IActividadService
             solicitante = new ProfesorSimpleDto
             {
                 Id = primerResponsable.Profesor.Uuid.GetHashCode(), // Convertir Guid a int para el frontend
+                Uuid = primerResponsable.Profesor.Uuid,
                 Nombre = primerResponsable.Profesor.Nombre,
                 Apellidos = primerResponsable.Profesor.Apellidos,
                 Email = primerResponsable.Profesor.Correo,

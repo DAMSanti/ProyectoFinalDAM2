@@ -33,7 +33,7 @@ class Profesor {
     // Si viene el formato simple de la API (ProfesorSimpleDto)
     if (json.containsKey('email') && !json.containsKey('correo')) {
       return Profesor(
-        uuid: json['id']?.toString() ?? '',
+        uuid: json['uuid']?.toString() ?? json['id']?.toString() ?? '',
         dni: '',
         nombre: json['nombre'] ?? '',
         apellidos: json['apellidos'] ?? '',
@@ -44,6 +44,29 @@ class Profesor {
         urlFoto: json['fotoUrl'],
         esJefeDep: 0,
         depart: null,
+      );
+    }
+    
+    // Si viene el formato de la API con telefono y departamentoId (formato actual)
+    if (json.containsKey('telefono') || json.containsKey('departamentoId')) {
+      return Profesor(
+        uuid: json['uuid']?.toString() ?? '',
+        dni: json['dni']?.toString() ?? '',
+        nombre: json['nombre']?.toString() ?? '',
+        apellidos: json['apellidos']?.toString() ?? '',
+        correo: json['correo']?.toString() ?? '',
+        password: '',
+        rol: 'Profesor',
+        activo: json['activo'] == true ? 1 : 0,
+        urlFoto: json['fotoUrl'],
+        esJefeDep: 0,
+        depart: json['departamentoId'] != null 
+          ? Departamento(
+              id: json['departamentoId'],
+              nombre: json['departamentoNombre']?.toString() ?? '',
+              codigo: null,
+            )
+          : null,
       );
     }
     

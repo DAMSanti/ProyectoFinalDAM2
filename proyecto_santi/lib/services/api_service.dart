@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/photo.dart';
+import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/config.dart';
 
 /// Excepción personalizada para errores de la API
@@ -304,16 +305,82 @@ class ApiService {
   /// Actualiza una actividad existente
   Future<Actividad?> updateActivity(int id, Actividad actividad) async {
     try {
+      print('[API] ========== UPDATE ACTIVITY ==========');
+      print('[API] ID: $id');
+      
+      // Preparar FormData en lugar de JSON
+      final formData = FormData.fromMap({
+        'Nombre': actividad.titulo,
+        'Descripcion': actividad.descripcion,
+        'FechaInicio': actividad.fini,
+        'FechaFin': actividad.ffin,
+        'PresupuestoEstimado': actividad.importePorAlumno,
+        'Aprobada': actividad.estado == 'Aprobada',
+        'SolicitanteId': actividad.solicitante?.uuid,
+        'DepartamentoId': actividad.departamento?.id,
+        // LocalizacionId y EmpTransporteId son opcionales
+      });
+      
+      print('[API] FormData preparado con SolicitanteId: ${actividad.solicitante?.uuid}');
+      print('[API] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
+      
       final response = await _dio.put(
         '${AppConfig.actividadEndpoint}/$id',
-        data: actividad.toJson(),
+        data: formData,
       );
       
+      print('[API] Response status: ${response.statusCode}');
+      
       if (response.statusCode == 200) {
+        print('[API] Actividad actualizada correctamente');
         return Actividad.fromJson(response.data);
       }
       throw ApiException('Error al actualizar actividad', statusCode: response.statusCode);
     } catch (e) {
+      print('[API] ========== ERROR EN UPDATE ==========');
+      print('[API] Error: $e');
+      if (e is DioException) {
+        print('[API] Response data: ${e.response?.data}');
+      }
+      throw _handleError(e);
+    }
+  }
+
+  /// Actualiza campos específicos de una actividad
+  Future<Actividad?> updateActivityFields(int id, Map<String, dynamic> fields) async {
+    try {
+      print('[API] ========== UPDATE ACTIVITY FIELDS ==========');
+      print('[API] ID: $id');
+      print('[API] Campos a actualizar: $fields');
+      print('[API] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
+      
+      final response = await _dio.put(
+        '${AppConfig.actividadEndpoint}/$id',
+        data: fields,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      
+      print('[API] Response status: ${response.statusCode}');
+      print('[API] Response data: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        print('[API] Actividad actualizada correctamente');
+        return Actividad.fromJson(response.data);
+      }
+      throw ApiException('Error al actualizar actividad', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API] ========== ERROR EN UPDATE ==========');
+      print('[API] Error tipo: ${e.runtimeType}');
+      print('[API] Error detalles: $e');
+      if (e is DioException) {
+        print('[API] Response data: ${e.response?.data}');
+        print('[API] Response headers: ${e.response?.headers}');
+      }
       throw _handleError(e);
     }
   }
@@ -384,6 +451,39 @@ class ApiService {
     }
   }
 
+  /// Sube fotos desde bytes (compatible con web)
+  Future<bool> uploadPhotosFromBytes({
+    required int activityId,
+    required List<int> bytes,
+    required String filename,
+    String? descripcion,
+  }) async {
+    try {
+      // Crear MultipartFile desde los bytes
+      final multipartFile = MultipartFile.fromBytes(
+        bytes,
+        filename: filename,
+      );
+
+      // Crear FormData con el formato que espera la API
+      FormData formData = FormData.fromMap({
+        'actividadId': activityId,
+        'descripcion': descripcion ?? '',
+        'fotos': [multipartFile], // Enviar como lista
+      });
+
+      final response = await _dio.post(
+        '${AppConfig.fotoEndpoint}/upload',
+        data: formData,
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('[API] Error uploading photo: $e');
+      throw _handleError(e);
+    }
+  }
+
   /// Elimina una foto
   Future<bool> deletePhoto(int id) async {
     try {
@@ -399,14 +499,27 @@ class ApiService {
   /// Obtiene todos los profesores
   Future<List<Profesor>> fetchProfesores() async {
     try {
+      print('[API] Fetching profesores from: ${AppConfig.profesorEndpoint}');
       final response = await _dio.get(AppConfig.profesorEndpoint);
+      
+      print('[API] Response status: ${response.statusCode}');
+      print('[API] Response data type: ${response.data.runtimeType}');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        return data.map((json) => Profesor.fromJson(json)).toList();
+        print('[API] Raw data: $data');
+        
+        final profesores = data.map((json) {
+          print('[API] Parsing profesor: $json');
+          return Profesor.fromJson(json);
+        }).toList();
+        
+        print('[API] Parsed ${profesores.length} profesores');
+        return profesores;
       }
       throw ApiException('Error al obtener profesores', statusCode: response.statusCode);
     } catch (e) {
+      print('[API ERROR] fetchProfesores: $e');
       throw _handleError(e);
     }
   }
@@ -451,6 +564,36 @@ class ApiService {
       final response = await _dio.delete('${AppConfig.profesorEndpoint}/$uuid');
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // ==================== DEPARTAMENTOS ====================
+
+  /// Obtiene todos los departamentos
+  Future<List<Departamento>> fetchDepartamentos() async {
+    try {
+      print('[API] Fetching departamentos from: ${AppConfig.departamentosEndpoint}');
+      final response = await _dio.get(AppConfig.departamentosEndpoint);
+      
+      print('[API] Response status: ${response.statusCode}');
+      print('[API] Response data type: ${response.data.runtimeType}');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        print('[API] Raw data: $data');
+        
+        final departamentos = data.map((json) {
+          print('[API] Parsing departamento: $json');
+          return Departamento.fromJson(json);
+        }).toList();
+        
+        print('[API] Parsed ${departamentos.length} departamentos');
+        return departamentos;
+      }
+      throw ApiException('Error al obtener departamentos', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchDepartamentos: $e');
       throw _handleError(e);
     }
   }

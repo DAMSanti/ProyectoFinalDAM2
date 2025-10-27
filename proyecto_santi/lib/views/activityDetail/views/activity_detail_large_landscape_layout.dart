@@ -15,7 +15,10 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   final List<XFile> selectedImages;
   final VoidCallback _showImagePicker;
   final Function(int) _removeSelectedImage;
+  final Function(int)? _removeApiImage;
   final VoidCallback _saveChanges;
+  final VoidCallback? _revertChanges;
+  final Function(Map<String, dynamic>)? onActivityDataChanged;
 
   const ActivityDetailLargeLandscapeLayout({
     super.key,
@@ -28,10 +31,15 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
     required this.selectedImages,
     required VoidCallback showImagePicker,
     required Function(int) removeSelectedImage,
+    Function(int)? removeApiImage,
     required VoidCallback saveChanges,
+    VoidCallback? revertChanges,
+    this.onActivityDataChanged,
   })  : _showImagePicker = showImagePicker,
         _removeSelectedImage = removeSelectedImage,
-        _saveChanges = saveChanges;
+        _removeApiImage = removeApiImage,
+        _saveChanges = saveChanges,
+        _revertChanges = revertChanges;
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +56,19 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
                 selectedImages: selectedImages,
                 showImagePicker: _showImagePicker,
                 removeSelectedImage: _removeSelectedImage,
+                removeApiImage: _removeApiImage,
+                onActivityDataChanged: onActivityDataChanged,
               ),
             ),
             Positioned(
               top: 0,
               left: 0,
               right: 0,
-              child: DetailBar(isDataChanged: isDataChanged, onSaveChanges: _saveChanges),
+              child: DetailBar(
+                isDataChanged: isDataChanged,
+                onSaveChanges: _saveChanges,
+                onRevertChanges: _revertChanges,
+              ),
             ),
           ],
         );
