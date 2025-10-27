@@ -769,6 +769,7 @@ class ApiService {
     }
   }
 
+
   Future<void> deleteFolleto(int actividadId) async {
     try {
       print('[API] Deleting folleto for actividad $actividadId');
