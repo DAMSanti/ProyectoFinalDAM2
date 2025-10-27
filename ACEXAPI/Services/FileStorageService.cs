@@ -81,7 +81,11 @@ public class AzureBlobStorageService : IFileStorageService
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        // Conservar el nombre original con timestamp para evitar colisiones
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
+        var extension = Path.GetExtension(file.FileName);
+        var fileName = $"{timestamp}_{originalFileName}{extension}";
         var blobClient = containerClient.GetBlobClient(fileName);
 
         using var stream = file.OpenReadStream();
@@ -123,7 +127,7 @@ public class AzureBlobStorageService : IFileStorageService
     }
 }
 
-// Implementación local para desarrollo
+// Implementaciï¿½n local para desarrollo
 public class LocalFileStorageService : IFileStorageService
 {
     private readonly IWebHostEnvironment _environment;
@@ -200,7 +204,11 @@ public class LocalFileStorageService : IFileStorageService
             Directory.CreateDirectory(containerPath);
         }
 
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        // Conservar el nombre original con timestamp para evitar colisiones
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
+        var extension = Path.GetExtension(file.FileName);
+        var fileName = $"{timestamp}_{originalFileName}{extension}";
         var filePath = Path.Combine(containerPath, fileName);
 
         using var stream = new FileStream(filePath, FileMode.Create);

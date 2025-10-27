@@ -11,6 +11,7 @@ import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/models/grupo_participante.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -50,6 +51,12 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   int? _editingGrupoId; // ID del grupo que se está editando
+  
+  // Variables para el folleto
+  String? _folletoFileName;
+  String? _folletoFilePath;
+  bool _folletoChanged = false;
+  bool _folletoMarkedForDeletion = false;
 
   int get _totalAlumnosParticipantes {
     return _gruposParticipantes.fold(0, (sum, gp) => sum + gp.numeroParticipantes);
@@ -131,6 +138,80 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         'gruposParticipantes': _gruposParticipantes,
       });
     }
+  }
+
+  Future<void> _selectFolleto() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        withData: kIsWeb, // Importante para web
+      );
+
+      if (result != null) {
+        final file = result.files.single;
+        setState(() {
+          _folletoFileName = file.name;
+          // En web, usar bytes en lugar de path
+          if (kIsWeb) {
+            _folletoFilePath = null; // No disponible en web
+            // Guardar bytes para subir después
+            if (file.bytes != null) {
+              // Notificar con los bytes directamente
+              if (widget.onActivityDataChanged != null) {
+                widget.onActivityDataChanged!({
+                  'folletoFileName': file.name,
+                  'folletoBytes': file.bytes,
+                });
+              }
+            }
+          } else {
+            _folletoFilePath = file.path;
+            if (widget.onActivityDataChanged != null) {
+              widget.onActivityDataChanged!({
+                'folletoFileName': file.name,
+                'folletoFilePath': file.path,
+              });
+            }
+          }
+          _folletoChanged = true;
+        });
+      }
+    } catch (e) {
+      print('[ERROR] Error al seleccionar folleto: $e');
+    }
+  }
+
+  void _deleteFolleto() {
+    setState(() {
+      _folletoMarkedForDeletion = true;
+      _folletoFileName = null;
+      _folletoFilePath = null;
+      
+      // Notificar el cambio para activar el botón guardar
+      if (widget.onActivityDataChanged != null) {
+        widget.onActivityDataChanged!({
+          'deleteFolleto': true,
+        });
+      }
+    });
+  }
+
+  String _extractFileName(String url) {
+    // Extraer el nombre del archivo de la URL
+    final parts = url.split('/');
+    if (parts.isEmpty) return 'folleto.pdf';
+    
+    final fileName = parts.last;
+    
+    // Si el nombre tiene formato "timestamp_nombreOriginal.pdf", extraer solo el nombre original
+    final timestampPattern = RegExp(r'^\d+_(.+)$');
+    final match = timestampPattern.firstMatch(fileName);
+    if (match != null && match.groupCount >= 1) {
+      return match.group(1)!;
+    }
+    
+    return fileName;
   }
 
   @override
@@ -293,13 +374,59 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           ],
         ),
         SizedBox(height: 12),
-        // Vacío (izquierda) y Estado (derecha)
+        // Folleto (izquierda) y Estado (derecha)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Espacio vacío
-            SizedBox.shrink(),
+            // Folleto con icono (izquierda)
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.picture_as_pdf, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      // Mostrar "Sin folleto" si está marcado para eliminación o no hay folleto
+                      _folletoMarkedForDeletion 
+                          ? 'Sin folleto' 
+                          : (_folletoFileName ?? 
+                              (widget.actividad.urlFolleto != null 
+                                  ? _extractFileName(widget.actividad.urlFolleto!)
+                                  : 'Sin folleto')),
+                      style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (widget.isAdminOrSolicitante) ...[
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.upload_file, color: Color(0xFF1976d2)),
+                      iconSize: !isWeb ? 16.dg : 5.sp,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                      onPressed: _selectFolleto,
+                      tooltip: 'Subir folleto PDF',
+                    ),
+                    // Botón X para eliminar folleto (solo si hay folleto)
+                    if (!_folletoMarkedForDeletion && 
+                        (_folletoFileName != null || widget.actividad.urlFolleto != null)) ...[
+                      SizedBox(width: 8),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.red),
+                        iconSize: !isWeb ? 16.dg : 5.sp,
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        onPressed: _deleteFolleto,
+                        tooltip: 'Eliminar folleto',
+                      ),
+                    ],
+                  ],
+                ],
+              ),
+            ),
+            SizedBox(width: 16),
             // Estado con icono (derecha)
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -1207,6 +1334,11 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
   int? _selectedDepartamentoId;
   bool _aprobada = false;
   
+  // Variables para el folleto
+  String? _folletoFileName;
+  String? _folletoFilePath;
+  bool _folletoChanged = false;
+  
   List<Profesor> _profesores = [];
   List<Departamento> _departamentos = [];
   bool _isLoading = true;
@@ -1460,6 +1592,12 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       hasChanges = true;
     }
     
+    // Comparar folleto
+    if (_folletoChanged) {
+      print('[DIALOG] CAMBIO en folleto detectado');
+      hasChanges = true;
+    }
+    
     print('[DIALOG] ¿Hay cambios?: $hasChanges');
     
     // Solo notificar si hubo cambios
@@ -1476,6 +1614,12 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
         'departamentoId': _selectedDepartamentoId,
         'aprobada': _aprobada,
       };
+      
+      // Añadir folleto si cambió
+      if (_folletoChanged && _folletoFilePath != null && _folletoFileName != null) {
+        data['folletoFilePath'] = _folletoFilePath!;
+        data['folletoFileName'] = _folletoFileName!;
+      }
       
       widget.onSave(data);
     } else {

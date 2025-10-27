@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
@@ -728,6 +729,57 @@ class ApiService {
       return response.statusCode == 200;
     } catch (e) {
       print('[API ERROR] updateGruposParticipantes: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Sube un folleto PDF a una actividad
+  Future<String> uploadFolleto(int actividadId, {String? filePath, Uint8List? fileBytes, required String fileName}) async {
+    try {
+      print('[API] Uploading folleto for actividad $actividadId');
+      
+      MultipartFile multipartFile;
+      if (fileBytes != null) {
+        // Web: usar bytes
+        multipartFile = MultipartFile.fromBytes(fileBytes, filename: fileName);
+      } else if (filePath != null) {
+        // Móvil/Desktop: usar path
+        multipartFile = await MultipartFile.fromFile(filePath, filename: fileName);
+      } else {
+        throw Exception('Se requiere filePath o fileBytes');
+      }
+      
+      final formData = FormData.fromMap({
+        'folleto': multipartFile,
+      });
+      
+      final response = await _dio.post(
+        '/Actividad/$actividadId/folleto',
+        data: formData,
+      );
+      
+      if (response.statusCode == 200) {
+        return response.data['folletoUrl'];
+      } else {
+        throw Exception('Error al subir el folleto');
+      }
+    } catch (e) {
+      print('[API ERROR] uploadFolleto: $e');
+      throw _handleError(e);
+    }
+  }
+
+  Future<void> deleteFolleto(int actividadId) async {
+    try {
+      print('[API] Deleting folleto for actividad $actividadId');
+      
+      final response = await _dio.delete('/Actividad/$actividadId/folleto');
+      
+      if (response.statusCode != 200) {
+        throw Exception('Error al eliminar el folleto');
+      }
+    } catch (e) {
+      print('[API ERROR] deleteFolleto: $e');
       throw _handleError(e);
     }
   }

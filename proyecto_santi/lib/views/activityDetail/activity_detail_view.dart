@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -159,6 +160,17 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       if (_datosEditados!.containsKey('profesoresParticipantes') || 
           _datosEditados!.containsKey('gruposParticipantes')) {
         print('[DEBUG] Hay cambios en participantes');
+        return true;
+      }
+    }
+
+    // Verificar si se seleccionó o cambió un folleto (archivo PDF)
+    if (_datosEditados != null) {
+      if (_datosEditados!.containsKey('folletoFileName') ||
+          _datosEditados!.containsKey('folletoBytes') ||
+          _datosEditados!.containsKey('folletoFilePath') ||
+          _datosEditados!.containsKey('deleteFolleto')) {
+        print('[DEBUG] Hay cambios en folleto (nuevo PDF seleccionado o marcado para eliminación)');
         return true;
       }
     }
@@ -423,7 +435,21 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       // Esto se ejecuta cada vez que se edita, así que siempre compara con los últimos valores
       isDataChanged = _hasRealChanges();
       
-      print('[DEBUG] Datos actualizados: $updatedData');
+      // Evitar imprimir datos binarios en bruto (ej. fichero en bytes)
+      try {
+        final safeUpdated = Map<String, dynamic>.from(updatedData);
+        if (safeUpdated.containsKey('folletoBytes')) {
+          final bytes = safeUpdated['folletoBytes'];
+          final len = (bytes is List<int>) ? bytes.length : null;
+          safeUpdated['folletoBytes'] = '<bytes length: ${len ?? 'unknown'}>';
+        }
+        if (safeUpdated.containsKey('selectedImages')) {
+          safeUpdated['selectedImages'] = '<images count: ${selectedImages.length}>';
+        }
+        print('[DEBUG] Datos actualizados: $safeUpdated');
+      } catch (e) {
+        print('[DEBUG] Datos actualizados (no se pudo serializar completamente)');
+      }
       print('[DEBUG] ¿Hay cambios reales?: $isDataChanged');
     });
   }
@@ -668,6 +694,53 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           print('[DEBUG] Grupos participantes guardados correctamente');
         } catch (e) {
           print('[ERROR] Error guardando grupos participantes: $e');
+          print('[ERROR] Stack trace: ${StackTrace.current}');
+          success = false;
+        }
+      }
+
+      // 6. Eliminar folleto si se marcó para eliminación
+      if (_datosEditados != null && _datosEditados!.containsKey('deleteFolleto') && _datosEditados!['deleteFolleto'] == true) {
+        try {
+          print('[DEBUG] Eliminando folleto...');
+          await _apiService.deleteFolleto(widget.actividad.id);
+          print('[DEBUG] Folleto eliminado correctamente');
+        } catch (e) {
+          print('[ERROR] Error eliminando folleto: $e');
+          success = false;
+        }
+      }
+
+      // 7. Subir folleto si cambió
+      if (_datosEditados != null && _datosEditados!.containsKey('folletoFileName')) {
+        try {
+          print('[DEBUG] Subiendo folleto...');
+          final folletoName = _datosEditados!['folletoFileName'] as String;
+          
+          String folletoUrl;
+          if (_datosEditados!.containsKey('folletoBytes')) {
+            // Web: usar bytes
+            final folletoBytes = _datosEditados!['folletoBytes'] as Uint8List;
+            folletoUrl = await _apiService.uploadFolleto(
+              widget.actividad.id,
+              fileBytes: folletoBytes,
+              fileName: folletoName,
+            );
+          } else if (_datosEditados!.containsKey('folletoFilePath')) {
+            // Móvil/Desktop: usar path
+            final folletoPath = _datosEditados!['folletoFilePath'] as String;
+            folletoUrl = await _apiService.uploadFolleto(
+              widget.actividad.id,
+              filePath: folletoPath,
+              fileName: folletoName,
+            );
+          } else {
+            throw Exception('No se encontró path ni bytes del folleto');
+          }
+          
+          print('[DEBUG] Folleto subido correctamente: $folletoUrl');
+        } catch (e) {
+          print('[ERROR] Error subiendo folleto: $e');
           print('[ERROR] Stack trace: ${StackTrace.current}');
           success = false;
         }

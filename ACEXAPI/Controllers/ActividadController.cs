@@ -143,5 +143,40 @@ public class ActividadController : ControllerBase
 
         return Ok(new { message = "Grupos participantes actualizados correctamente" });
     }
+
+    /// <summary>
+    /// Sube o actualiza el folleto PDF de una actividad
+    /// </summary>
+    [HttpPost("{id}/folleto")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadFolleto(int id, IFormFile folleto)
+    {
+        if (folleto == null || folleto.Length == 0)
+            return BadRequest(new { message = "No se proporcionó ningún archivo" });
+
+        // Validar que sea un PDF
+        if (!folleto.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase) &&
+            !folleto.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            return BadRequest(new { message = "El archivo debe ser un PDF" });
+
+        var result = await _actividadService.UpdateFolletoAsync(id, folleto);
+        if (result == null)
+            return NotFound(new { message = "Actividad no encontrada" });
+
+        return Ok(new { message = "Folleto subido correctamente", folletoUrl = result });
+    }
+
+    [HttpDelete("{id}/folleto")]
+    public async Task<IActionResult> DeleteFolleto(int id)
+    {
+        var result = await _actividadService.DeleteFolletoAsync(id);
+        if (!result)
+            return NotFound(new { message = "Actividad no encontrada o no tiene folleto" });
+
+        return Ok(new { message = "Folleto eliminado correctamente" });
+    }
 }
 

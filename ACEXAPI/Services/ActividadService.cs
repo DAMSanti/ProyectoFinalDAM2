@@ -16,6 +16,8 @@ public interface IActividadService
     Task<bool> UpdateProfesoresParticipantesAsync(int actividadId, List<string> profesoresIds);
     Task<List<GrupoParticipanteDto>> GetGruposParticipantesAsync(int actividadId);
     Task<bool> UpdateGruposParticipantesAsync(int actividadId, List<GrupoParticipanteUpdateDto> grupos);
+    Task<string?> UpdateFolletoAsync(int actividadId, IFormFile folleto);
+    Task<bool> DeleteFolletoAsync(int actividadId);
 }
 
 public class ActividadService : IActividadService
@@ -324,6 +326,45 @@ public class ActividadService : IActividadService
         }
 
         await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<string?> UpdateFolletoAsync(int actividadId, IFormFile folleto)
+    {
+        // Verificar que la actividad existe
+        var actividad = await _context.Actividades.FindAsync(actividadId);
+        if (actividad == null)
+            return null;
+
+        // Eliminar el folleto anterior si existe
+        if (!string.IsNullOrEmpty(actividad.FolletoUrl))
+        {
+            await _fileStorage.DeleteFileAsync(actividad.FolletoUrl);
+        }
+
+        // Subir el nuevo folleto
+        var folletoUrl = await _fileStorage.UploadFileAsync(folleto, "folletos");
+        
+        // Actualizar la URL en la base de datos
+        actividad.FolletoUrl = folletoUrl;
+        await _context.SaveChangesAsync();
+
+        return folletoUrl;
+    }
+
+    public async Task<bool> DeleteFolletoAsync(int actividadId)
+    {
+        var actividad = await _context.Actividades.FindAsync(actividadId);
+        if (actividad == null || string.IsNullOrEmpty(actividad.FolletoUrl))
+            return false;
+
+        // Eliminar el archivo del storage
+        await _fileStorage.DeleteFileAsync(actividad.FolletoUrl);
+
+        // Eliminar la referencia en la base de datos
+        actividad.FolletoUrl = null;
+        await _context.SaveChangesAsync();
+
         return true;
     }
 }
