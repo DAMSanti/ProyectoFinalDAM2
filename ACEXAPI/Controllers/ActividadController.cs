@@ -20,7 +20,7 @@ public class ActividadController : ControllerBase
     }
 
     /// <summary>
-    /// Obtiene todas las actividades con paginación, filtrado y ordenamiento
+    /// Obtiene todas las actividades con paginaciï¿½n, filtrado y ordenamiento
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedResult<ActividadListDto>), StatusCodes.Status200OK)]
@@ -89,4 +89,59 @@ public class ActividadController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Obtiene los profesores participantes de una actividad
+    /// </summary>
+    [HttpGet("{id}/profesores-participantes")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<string>>> GetProfesoresParticipantes(int id)
+    {
+        var profesoresIds = await _actividadService.GetProfesoresParticipantesAsync(id);
+        return Ok(profesoresIds);
+    }
+
+    /// <summary>
+    /// Actualiza los profesores participantes de una actividad
+    /// </summary>
+    [HttpPut("{id}/profesores-participantes")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateProfesoresParticipantes(int id, [FromBody] List<string> profesoresIds)
+    {
+        var result = await _actividadService.UpdateProfesoresParticipantesAsync(id, profesoresIds);
+        if (!result)
+            return NotFound(new { message = "Actividad no encontrada" });
+
+        return Ok(new { message = "Profesores participantes actualizados correctamente" });
+    }
+
+    /// <summary>
+    /// Obtiene los grupos participantes de una actividad
+    /// </summary>
+    [HttpGet("{id}/grupos-participantes")]
+    [ProducesResponseType(typeof(List<GrupoParticipanteDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<GrupoParticipanteDto>>> GetGruposParticipantes(int id)
+    {
+        var grupos = await _actividadService.GetGruposParticipantesAsync(id);
+        return Ok(grupos);
+    }
+
+    /// <summary>
+    /// Actualiza los grupos participantes de una actividad
+    /// </summary>
+    [HttpPut("{id}/grupos-participantes")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateGruposParticipantes(int id, [FromBody] List<GrupoParticipanteUpdateDto> grupos)
+    {
+        var result = await _actividadService.UpdateGruposParticipantesAsync(id, grupos);
+        if (!result)
+            return NotFound(new { message = "Actividad no encontrada" });
+
+        return Ok(new { message = "Grupos participantes actualizados correctamente" });
+    }
 }
+

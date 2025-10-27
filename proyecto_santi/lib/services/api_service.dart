@@ -3,6 +3,8 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/departamento.dart';
+import 'package:proyecto_santi/models/curso.dart';
+import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/config.dart';
 
 /// Excepción personalizada para errores de la API
@@ -594,6 +596,138 @@ class ApiService {
       throw ApiException('Error al obtener departamentos', statusCode: response.statusCode);
     } catch (e) {
       print('[API ERROR] fetchDepartamentos: $e');
+      throw _handleError(e);
+    }
+  }
+
+  // ==================== CURSOS ====================
+
+  /// Obtiene todos los cursos
+  Future<List<Curso>> fetchCursos() async {
+    try {
+      print('[API] Fetching cursos from: /Curso');
+      final response = await _dio.get('/Curso');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        final cursos = data.map((json) => Curso.fromJson(json)).toList();
+        print('[API] Parsed ${cursos.length} cursos');
+        return cursos;
+      }
+      throw ApiException('Error al obtener cursos', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchCursos: $e');
+      throw _handleError(e);
+    }
+  }
+
+  // ==================== GRUPOS ====================
+
+  /// Obtiene todos los grupos (necesitaremos crear el endpoint en el backend)
+  Future<List<Grupo>> fetchGrupos() async {
+    try {
+      print('[API] Fetching grupos from: /Grupo');
+      final response = await _dio.get('/Grupo');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        final grupos = data.map((json) => Grupo.fromJson(json)).toList();
+        print('[API] Parsed ${grupos.length} grupos');
+        return grupos;
+      }
+      throw ApiException('Error al obtener grupos', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchGrupos: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Obtiene los grupos de un curso específico
+  Future<List<Grupo>> fetchGruposByCurso(int cursoId) async {
+    try {
+      print('[API] Fetching grupos for curso $cursoId');
+      final response = await _dio.get('/Curso/$cursoId/grupos');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        final grupos = data.map((json) => Grupo.fromJson(json)).toList();
+        print('[API] Parsed ${grupos.length} grupos for curso $cursoId');
+        return grupos;
+      }
+      throw ApiException('Error al obtener grupos del curso', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchGruposByCurso: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Obtiene los profesores participantes de una actividad
+  Future<List<String>> fetchProfesoresParticipantes(int actividadId) async {
+    try {
+      print('[API] Fetching profesores participantes for actividad $actividadId');
+      final response = await _dio.get('/Actividad/$actividadId/profesores-participantes');
+      
+      print('[API] Response status: ${response.statusCode}');
+      print('[API] Response data: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        final result = data.map((e) => e.toString()).toList();
+        print('[API] Profesores participantes IDs: $result');
+        return result;
+      }
+      throw ApiException('Error al obtener profesores participantes', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchProfesoresParticipantes: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Actualiza los profesores participantes de una actividad
+  Future<bool> updateProfesoresParticipantes(int actividadId, List<String> profesoresIds) async {
+    try {
+      print('[API] Updating profesores participantes for actividad $actividadId');
+      final response = await _dio.put(
+        '/Actividad/$actividadId/profesores-participantes',
+        data: profesoresIds,
+      );
+      
+      return response.statusCode == 200;
+    } catch (e) {
+      print('[API ERROR] updateProfesoresParticipantes: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Obtiene los grupos participantes de una actividad
+  Future<List<Map<String, dynamic>>> fetchGruposParticipantes(int actividadId) async {
+    try {
+      print('[API] Fetching grupos participantes for actividad $actividadId');
+      final response = await _dio.get('/Actividad/$actividadId/grupos-participantes');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List;
+        return data.map((e) => e as Map<String, dynamic>).toList();
+      }
+      throw ApiException('Error al obtener grupos participantes', statusCode: response.statusCode);
+    } catch (e) {
+      print('[API ERROR] fetchGruposParticipantes: $e');
+      throw _handleError(e);
+    }
+  }
+
+  /// Actualiza los grupos participantes de una actividad
+  Future<bool> updateGruposParticipantes(int actividadId, List<Map<String, dynamic>> grupos) async {
+    try {
+      print('[API] Updating grupos participantes for actividad $actividadId');
+      final response = await _dio.put(
+        '/Actividad/$actividadId/grupos-participantes',
+        data: grupos,
+      );
+      
+      return response.statusCode == 200;
+    } catch (e) {
+      print('[API ERROR] updateGruposParticipantes: $e');
       throw _handleError(e);
     }
   }

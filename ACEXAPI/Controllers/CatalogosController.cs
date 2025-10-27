@@ -189,6 +189,126 @@ public class CursoController : ControllerBase
 
         return NoContent();
     }
+    
+    // Obtener grupos de un curso específico
+    [HttpGet("{id}/grupos")]
+    public async Task<ActionResult<List<GrupoDto>>> GetGruposByCurso(int id)
+    {
+        var grupos = await _context.Grupos
+            .Include(g => g.Curso)
+            .Where(g => g.CursoId == id)
+            .Select(g => new GrupoDto
+            {
+                Id = g.Id,
+                Nombre = g.Nombre,
+                NumeroAlumnos = g.NumeroAlumnos,
+                CursoId = g.CursoId,
+                CursoNombre = g.Curso.Nombre
+            })
+            .ToListAsync();
+
+        return Ok(grupos);
+    }
+}
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class GrupoController : ControllerBase
+{
+    private readonly ApplicationDbContext _context;
+
+    public GrupoController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<GrupoDto>>> GetAll()
+    {
+        var grupos = await _context.Grupos
+            .Include(g => g.Curso)
+            .Select(g => new GrupoDto
+            {
+                Id = g.Id,
+                Nombre = g.Nombre,
+                NumeroAlumnos = g.NumeroAlumnos,
+                CursoId = g.CursoId,
+                CursoNombre = g.Curso.Nombre
+            })
+            .ToListAsync();
+
+        return Ok(grupos);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<GrupoDto>> GetById(int id)
+    {
+        var grupo = await _context.Grupos
+            .Include(g => g.Curso)
+            .FirstOrDefaultAsync(g => g.Id == id);
+            
+        if (grupo == null)
+            return NotFound();
+
+        return Ok(new GrupoDto
+        {
+            Id = grupo.Id,
+            Nombre = grupo.Nombre,
+            NumeroAlumnos = grupo.NumeroAlumnos,
+            CursoId = grupo.CursoId,
+            CursoNombre = grupo.Curso.Nombre
+        });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Administrador")]
+    public async Task<ActionResult<GrupoDto>> Create(GrupoDto dto)
+    {
+        var grupo = new Grupo
+        {
+            Nombre = dto.Nombre,
+            NumeroAlumnos = dto.NumeroAlumnos,
+            CursoId = dto.CursoId
+        };
+
+        _context.Grupos.Add(grupo);
+        await _context.SaveChangesAsync();
+
+        dto.Id = grupo.Id;
+        return CreatedAtAction(nameof(GetById), new { id = grupo.Id }, dto);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<ActionResult<GrupoDto>> Update(int id, GrupoDto dto)
+    {
+        var grupo = await _context.Grupos.FindAsync(id);
+        if (grupo == null)
+            return NotFound();
+
+        grupo.Nombre = dto.Nombre;
+        grupo.NumeroAlumnos = dto.NumeroAlumnos;
+        grupo.CursoId = dto.CursoId;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(dto);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var grupo = await _context.Grupos.FindAsync(id);
+        if (grupo == null)
+            return NotFound();
+
+        _context.Grupos.Remove(grupo);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
 
 [ApiController]

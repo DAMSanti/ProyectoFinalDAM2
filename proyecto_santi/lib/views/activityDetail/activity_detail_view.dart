@@ -154,6 +154,15 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       return true;
     }
     
+    // Verificar si hay cambios en participantes (profesores o grupos)
+    if (_datosEditados != null) {
+      if (_datosEditados!.containsKey('profesoresParticipantes') || 
+          _datosEditados!.containsKey('gruposParticipantes')) {
+        print('[DEBUG] Hay cambios en participantes');
+        return true;
+      }
+    }
+    
     // Verificar si hay cambios en los datos editados
     if (_datosEditados == null || _actividadOriginal == null) {
       print('[DEBUG] No hay datos editados o actividad original');
@@ -325,14 +334,29 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       selectedImages.clear();
       imagesToDelete.clear();
       
+      // Recargar participantes desde la base de datos
+      // Esto lo haremos recargando el widget ActivityDetailInfo
+      
       // Desactivar el botón guardar
       isDataChanged = false;
     });
+    
+    // Forzar recarga de participantes
+    _loadActivityDetails();
   }
   
   void _handleActivityDataChanged(Map<String, dynamic> updatedData) async {
-    // Actualizar los datos editados (siempre con los últimos valores del diálogo)
-    _datosEditados = Map<String, dynamic>.from(updatedData);
+    print('[DEBUG] _handleActivityDataChanged llamado con: ${updatedData.keys}');
+    
+    // Si _datosEditados es null, inicializarlo
+    if (_datosEditados == null) {
+      _datosEditados = {};
+    }
+    
+    // Fusionar los datos actualizados con los existentes
+    _datosEditados!.addAll(updatedData);
+    
+    print('[DEBUG] _datosEditados después de actualizar: ${_datosEditados!.keys}');
     
     // Buscar el profesor y departamento actualizados si cambiaron
     dynamic nuevoProfesor = _actividadCompleta?.solicitante;
@@ -441,9 +465,22 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     try {
       bool success = true;
       
+      print('[DEBUG] ========== Iniciando guardado ==========');
+      print('[DEBUG] _datosEditados keys: ${_datosEditados?.keys}');
+      print('[DEBUG] selectedImages: ${selectedImages.length}');
+      print('[DEBUG] imagesToDelete: ${imagesToDelete.length}');
+      
       // 1. Guardar cambios en los datos de la actividad (nombre, descripción, etc.)
-      if (_datosEditados != null) {
+      // Solo si hay cambios en campos de actividad (no participantes)
+      final hasActivityChanges = _datosEditados != null && 
+          _datosEditados!.keys.any((key) => 
+            key != 'profesoresParticipantes' && 
+            key != 'gruposParticipantes'
+          );
+      
+      if (hasActivityChanges) {
         try {
+          print('[DEBUG] Guardando cambios de actividad...');
           // Crear un objeto Actividad completo con los datos actualizados
           final actividadParaGuardar = Actividad(
             id: _actividadOriginal!.id,
@@ -545,7 +582,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             // Actualizar la actividad original con los nuevos datos completos
             _actividadOriginal = actividadCompletaConObjetos;
             _actividadCompleta = actividadCompletaConObjetos;
-            _datosEditados = null;
+            // NO limpiar _datosEditados aquí, lo haremos al final después de guardar participantes
             print('[DEBUG] Actividad actualizada correctamente en BD con objetos completos');
           } else {
             success = false;
@@ -574,6 +611,68 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         success = success && uploadSuccess;
       }
 
+      // 4. Guardar profesores participantes
+      if (_datosEditados != null && _datosEditados!.containsKey('profesoresParticipantes')) {
+        try {
+          print('[DEBUG] Guardando profesores participantes...');
+          final profesoresParticipantes = _datosEditados!['profesoresParticipantes'] as List<dynamic>;
+          print('[DEBUG] Profesores a guardar: ${profesoresParticipantes.length}');
+          
+          // Extraer los UUIDs de los objetos Profesor
+          final profesoresIds = profesoresParticipantes.map((p) {
+            if (p is Map<String, dynamic>) {
+              return p['uuid'] as String;
+            } else {
+              // Es un objeto Profesor
+              return (p as dynamic).uuid as String;
+            }
+          }).toList();
+          
+          print('[DEBUG] UUIDs a guardar: $profesoresIds');
+          await _apiService.updateProfesoresParticipantes(widget.actividad.id, profesoresIds);
+          print('[DEBUG] Profesores participantes guardados correctamente');
+        } catch (e) {
+          print('[ERROR] Error guardando profesores participantes: $e');
+          print('[ERROR] Stack trace: ${StackTrace.current}');
+          success = false;
+        }
+      }
+
+      // 5. Guardar grupos participantes
+      if (_datosEditados != null && _datosEditados!.containsKey('gruposParticipantes')) {
+        try {
+          print('[DEBUG] Guardando grupos participantes...');
+          final gruposParticipantes = _datosEditados!['gruposParticipantes'] as List<dynamic>;
+          print('[DEBUG] Grupos a guardar: ${gruposParticipantes.length}');
+          
+          // Extraer los datos de los objetos GrupoParticipante
+          final gruposData = gruposParticipantes.map((gp) {
+            if (gp is Map<String, dynamic>) {
+              return {
+                'grupoId': gp['grupoId'] as int,
+                'numeroParticipantes': gp['numeroParticipantes'] as int,
+              };
+            } else {
+              // Es un objeto GrupoParticipante
+              final grupoId = (gp as dynamic).grupo.id as int;
+              final numParticipantes = (gp as dynamic).numeroParticipantes as int;
+              return {
+                'grupoId': grupoId,
+                'numeroParticipantes': numParticipantes,
+              };
+            }
+          }).toList();
+          
+          print('[DEBUG] Datos de grupos a guardar: $gruposData');
+          await _apiService.updateGruposParticipantes(widget.actividad.id, gruposData);
+          print('[DEBUG] Grupos participantes guardados correctamente');
+        } catch (e) {
+          print('[ERROR] Error guardando grupos participantes: $e');
+          print('[ERROR] Stack trace: ${StackTrace.current}');
+          success = false;
+        }
+      }
+
       // Cerrar diálogo de carga
       if (mounted) {
         Navigator.of(context).pop();
@@ -588,6 +687,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             selectedImages.clear();
             imagesToDelete.clear();
             isDataChanged = false;
+            _datosEditados = null; // Limpiar datos editados después de guardar exitosamente
           });
 
           _showMessage('Cambios guardados correctamente', isError: false);

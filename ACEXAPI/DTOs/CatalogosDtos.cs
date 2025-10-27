@@ -71,3 +71,17 @@ public class ProfResponsableDto
     public bool EsCoordinador { get; set; }
     public string? Observaciones { get; set; }
 }
+
+public class GrupoParticipanteDto
+{
+    public int GrupoId { get; set; }
+    public string GrupoNombre { get; set; } = string.Empty;
+    public int NumeroAlumnos { get; set; }
+    public int NumeroParticipantes { get; set; }
+}
+
+public class GrupoParticipanteUpdateDto
+{
+    public int GrupoId { get; set; }
+    public int NumeroParticipantes { get; set; }
+}

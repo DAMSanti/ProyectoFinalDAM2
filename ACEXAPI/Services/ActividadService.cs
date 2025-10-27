@@ -12,6 +12,10 @@ public interface IActividadService
     Task<ActividadDto> CreateAsync(ActividadCreateDto dto, IFormFile? folleto);
     Task<ActividadDto?> UpdateAsync(int id, ActividadUpdateDto dto, IFormFile? folleto);
     Task<bool> DeleteAsync(int id);
+    Task<List<string>> GetProfesoresParticipantesAsync(int actividadId);
+    Task<bool> UpdateProfesoresParticipantesAsync(int actividadId, List<string> profesoresIds);
+    Task<List<GrupoParticipanteDto>> GetGruposParticipantesAsync(int actividadId);
+    Task<bool> UpdateGruposParticipantesAsync(int actividadId, List<GrupoParticipanteUpdateDto> grupos);
 }
 
 public class ActividadService : IActividadService
@@ -234,5 +238,92 @@ public class ActividadService : IActividadService
             EmpTransporteNombre = actividad.EmpTransporte?.Nombre,
             Solicitante = solicitante
         };
+    }
+
+    public async Task<List<string>> GetProfesoresParticipantesAsync(int actividadId)
+    {
+        var profesoresIds = await _context.Set<ProfParticipante>()
+            .Where(pp => pp.ActividadId == actividadId)
+            .Select(pp => pp.ProfesorUuid.ToString())
+            .ToListAsync();
+
+        return profesoresIds;
+    }
+
+    public async Task<bool> UpdateProfesoresParticipantesAsync(int actividadId, List<string> profesoresIds)
+    {
+        // Verificar que la actividad existe
+        var actividad = await _context.Actividades.FindAsync(actividadId);
+        if (actividad == null)
+            return false;
+
+        // Eliminar los participantes actuales
+        var participantesActuales = await _context.Set<ProfParticipante>()
+            .Where(pp => pp.ActividadId == actividadId)
+            .ToListAsync();
+        
+        _context.Set<ProfParticipante>().RemoveRange(participantesActuales);
+
+        // Agregar los nuevos participantes
+        foreach (var profesorId in profesoresIds)
+        {
+            if (Guid.TryParse(profesorId, out var uuid))
+            {
+                _context.Set<ProfParticipante>().Add(new ProfParticipante
+                {
+                    ActividadId = actividadId,
+                    ProfesorUuid = uuid
+                });
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<List<GrupoParticipanteDto>> GetGruposParticipantesAsync(int actividadId)
+    {
+        var grupos = await _context.Set<GrupoPartic>()
+            .Include(gp => gp.Grupo)
+            .Where(gp => gp.ActividadId == actividadId)
+            .Select(gp => new GrupoParticipanteDto
+            {
+                GrupoId = gp.GrupoId,
+                GrupoNombre = gp.Grupo.Nombre,
+                NumeroAlumnos = gp.Grupo.NumeroAlumnos,
+                NumeroParticipantes = gp.NumeroParticipantes
+            })
+            .ToListAsync();
+
+        return grupos;
+    }
+
+    public async Task<bool> UpdateGruposParticipantesAsync(int actividadId, List<GrupoParticipanteUpdateDto> grupos)
+    {
+        // Verificar que la actividad existe
+        var actividad = await _context.Actividades.FindAsync(actividadId);
+        if (actividad == null)
+            return false;
+
+        // Eliminar los grupos participantes actuales
+        var gruposActuales = await _context.Set<GrupoPartic>()
+            .Where(gp => gp.ActividadId == actividadId)
+            .ToListAsync();
+        
+        _context.Set<GrupoPartic>().RemoveRange(gruposActuales);
+
+        // Agregar los nuevos grupos participantes
+        foreach (var grupo in grupos)
+        {
+            _context.Set<GrupoPartic>().Add(new GrupoPartic
+            {
+                ActividadId = actividadId,
+                GrupoId = grupo.GrupoId,
+                NumeroParticipantes = grupo.NumeroParticipantes
+            });
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

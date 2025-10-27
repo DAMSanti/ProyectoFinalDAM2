@@ -6,13 +6,16 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
+import 'package:proyecto_santi/models/curso.dart';
+import 'package:proyecto_santi/models/grupo.dart';
+import 'package:proyecto_santi/models/grupo_participante.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-class ActivityDetailInfo extends StatelessWidget {
+class ActivityDetailInfo extends StatefulWidget {
   final Actividad actividad;
   final bool isAdminOrSolicitante;
   final List<Photo> imagesActividad;
@@ -35,6 +38,102 @@ class ActivityDetailInfo extends StatelessWidget {
   });
 
   @override
+  State<ActivityDetailInfo> createState() => _ActivityDetailInfoState();
+}
+
+class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
+  final ApiService _apiService = ApiService();
+  List<Profesor> _profesoresParticipantes = [];
+  List<GrupoParticipante> _gruposParticipantes = [];
+  List<Profesor> _profesoresParticipantesOriginales = [];
+  List<GrupoParticipante> _gruposParticipantesOriginales = [];
+  bool _loadingProfesores = false;
+  bool _loadingGrupos = false;
+  int? _editingGrupoId; // ID del grupo que se está editando
+
+  int get _totalAlumnosParticipantes {
+    return _gruposParticipantes.fold(0, (sum, gp) => sum + gp.numeroParticipantes);
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+    // Cargar participantes desde la base de datos
+    _loadParticipantes();
+  }
+  
+  Future<void> _loadParticipantes() async {
+    try {
+      print('[PARTICIPANTES] Cargando participantes para actividad ${widget.actividad.id}');
+      
+      // Cargar profesores participantes
+      final profesoresIds = await _apiService.fetchProfesoresParticipantes(widget.actividad.id);
+      print('[PARTICIPANTES] IDs de profesores participantes: $profesoresIds');
+      
+      final todosLosProfesores = await _apiService.fetchProfesores();
+      print('[PARTICIPANTES] Total profesores en sistema: ${todosLosProfesores.length}');
+      
+      // Cargar grupos participantes
+      final gruposData = await _apiService.fetchGruposParticipantes(widget.actividad.id);
+      print('[PARTICIPANTES] Grupos participantes data: $gruposData');
+      
+      final todosLosGrupos = await _apiService.fetchGrupos();
+      print('[PARTICIPANTES] Total grupos en sistema: ${todosLosGrupos.length}');
+      
+      setState(() {
+        // Filtrar profesores que participan - convertir UUIDs a lowercase para comparar
+        _profesoresParticipantes = todosLosProfesores
+            .where((p) => profesoresIds.any((id) => id.toLowerCase() == p.uuid.toLowerCase()))
+            .toList();
+        
+        print('[PARTICIPANTES] Profesores participantes filtrados: ${_profesoresParticipantes.length}');
+        
+        // Construir lista de grupos participantes
+        _gruposParticipantes = gruposData.map((data) {
+          final grupoId = data['grupoId'] as int;
+          final numParticipantes = data['numeroParticipantes'] as int;
+          final grupo = todosLosGrupos.firstWhere((g) => g.id == grupoId);
+          
+          return GrupoParticipante(
+            grupo: grupo,
+            numeroParticipantes: numParticipantes,
+          );
+        }).toList();
+        
+        print('[PARTICIPANTES] Grupos participantes construidos: ${_gruposParticipantes.length}');
+        
+        // Guardar copias originales
+        _profesoresParticipantesOriginales = List.from(_profesoresParticipantes);
+        _gruposParticipantesOriginales = _gruposParticipantes.map((gp) => 
+          GrupoParticipante(
+            grupo: gp.grupo,
+            numeroParticipantes: gp.numeroParticipantes,
+          )
+        ).toList();
+      });
+      
+      print('[PARTICIPANTES] Participantes cargados exitosamente');
+    } catch (e) {
+      print('[ERROR] Error cargando participantes: $e');
+      print('[ERROR] Stack trace: ${StackTrace.current}');
+      // Inicializar listas vacías en caso de error
+      setState(() {
+        _profesoresParticipantesOriginales = [];
+        _gruposParticipantesOriginales = [];
+      });
+    }
+  }
+  
+  void _notifyChanges() {
+    if (widget.onActivityDataChanged != null) {
+      widget.onActivityDataChanged!({
+        'profesoresParticipantes': _profesoresParticipantes,
+        'gruposParticipantes': _gruposParticipantes,
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -47,6 +146,8 @@ class ActivityDetailInfo extends StatelessWidget {
               _buildHeader(context, constraints),
               SizedBox(height: 16),
               _buildImages(context, constraints),
+              SizedBox(height: 16),
+              _buildParticipantes(context, constraints),
               SizedBox(height: 16),
               _buildComentarios(context, constraints)
             ],
@@ -61,8 +162,8 @@ class ActivityDetailInfo extends StatelessWidget {
         kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     // Parsear fechas y horas
-    final DateTime fechaInicio = DateTime.parse(actividad.fini);
-    final DateTime fechaFin = DateTime.parse(actividad.ffin);
+    final DateTime fechaInicio = DateTime.parse(widget.actividad.fini);
+    final DateTime fechaFin = DateTime.parse(widget.actividad.ffin);
     
     // Extraer solo la parte de fecha (sin hora) para comparar
     final fechaInicioSolo = DateTime(fechaInicio.year, fechaInicio.month, fechaInicio.day);
@@ -74,8 +175,8 @@ class ActivityDetailInfo extends StatelessWidget {
     final String formattedEndDate = dateFormat.format(fechaFin);
     
     // Formatear horas (hini y hfin vienen como "HH:mm" o "HH:mm:ss")
-    String horaInicio = actividad.hini;
-    String horaFin = actividad.hfin;
+    String horaInicio = widget.actividad.hini;
+    String horaFin = widget.actividad.hfin;
     
     // Si las horas tienen formato HH:mm:ss, quitar los segundos
     if (horaInicio.length > 5 && horaInicio.substring(5, 6) == ':') {
@@ -98,7 +199,7 @@ class ActivityDetailInfo extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                actividad.titulo,
+                widget.actividad.titulo,
                 style: TextStyle(
                     fontSize: !isWeb ? 20.dg : 7.sp,
                     fontWeight: FontWeight.bold),
@@ -125,7 +226,7 @@ class ActivityDetailInfo extends StatelessWidget {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      actividad.descripcion ?? 'Sin descripción',
+                      widget.actividad.descripcion ?? 'Sin descripción',
                       style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -165,8 +266,8 @@ class ActivityDetailInfo extends StatelessWidget {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      actividad.solicitante != null 
-                          ? '${actividad.solicitante!.nombre} ${actividad.solicitante!.apellidos}'
+                      widget.actividad.solicitante != null 
+                          ? '${widget.actividad.solicitante!.nombre} ${widget.actividad.solicitante!.apellidos}'
                           : 'Sin solicitante',
                       style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                       overflow: TextOverflow.ellipsis,
@@ -184,7 +285,7 @@ class ActivityDetailInfo extends StatelessWidget {
                 Icon(Icons.business, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
                 SizedBox(width: 8),
                 Text(
-                  actividad.departamento?.nombre ?? 'Sin departamento',
+                  widget.actividad.departamento?.nombre ?? 'Sin departamento',
                   style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                 ),
               ],
@@ -207,7 +308,7 @@ class ActivityDetailInfo extends StatelessWidget {
                 Icon(Icons.check_circle, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
                 SizedBox(width: 8),
                 Text(
-                  actividad.estado,
+                  widget.actividad.estado,
                   style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                 ),
               ],
@@ -223,13 +324,13 @@ class ActivityDetailInfo extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return EditActivityDialog(
-          actividad: actividad,
+          actividad: widget.actividad,
           onSave: (updatedData) {
             print('Datos actualizados: $updatedData');
             
             // Notificar al padre que hubo cambios
-            if (onActivityDataChanged != null) {
-              onActivityDataChanged!(updatedData);
+            if (widget.onActivityDataChanged != null) {
+              widget.onActivityDataChanged!(updatedData);
             }
           },
         );
@@ -248,15 +349,458 @@ class ActivityDetailInfo extends StatelessWidget {
         SizedBox(height: 8),
         _HorizontalImageScroller(
           constraints: constraints,
-          isAdminOrSolicitante: isAdminOrSolicitante,
-          showImagePicker: showImagePicker,
-          imagesActividad: imagesActividad,
-          selectedImages: selectedImages,
+          isAdminOrSolicitante: widget.isAdminOrSolicitante,
+          showImagePicker: widget.showImagePicker,
+          imagesActividad: widget.imagesActividad,
+          selectedImages: widget.selectedImages,
           onDeleteImage: (index) => _showDeleteConfirmationDialog(context, index),
-          onDeleteApiImage: removeApiImage, // Pasar la función
+          onDeleteApiImage: widget.removeApiImage, // Pasar la función
         ),
       ],
     );
+  }
+
+  Widget _buildParticipantes(BuildContext context, BoxConstraints constraints) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Participantes',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 16),
+        // Layout responsivo: dos columnas en pantallas anchas, una columna en móvil
+        constraints.maxWidth > 800
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildProfesoresParticipantes(context),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: _buildGruposParticipantes(context),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  _buildProfesoresParticipantes(context),
+                  SizedBox(height: 16),
+                  _buildGruposParticipantes(context),
+                ],
+              ),
+      ],
+    );
+  }
+
+  Widget _buildProfesoresParticipantes(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Profesores Participantes',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              if (widget.isAdminOrSolicitante)
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline, size: 20, color: Color(0xFF1976d2)),
+                  onPressed: _loadingProfesores ? null : () {
+                    _showAddProfesorDialog(context);
+                  },
+                  tooltip: 'Agregar profesor',
+                ),
+            ],
+          ),
+          SizedBox(height: 12),
+          // Lista de profesores participantes
+          _profesoresParticipantes.isEmpty
+              ? Text(
+                  'Sin profesores participantes',
+                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                )
+              : ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 300),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: _profesoresParticipantes.map((profesor) {
+                    return Card(
+                      margin: EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color(0xFF1976d2),
+                          child: Text(
+                            profesor.nombre.substring(0, 1).toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text('${profesor.nombre} ${profesor.apellidos}'),
+                        subtitle: Text(profesor.correo, style: TextStyle(fontSize: 12)),
+                        trailing: widget.isAdminOrSolicitante
+                            ? IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                onPressed: () {
+                                  setState(() {
+                                    _profesoresParticipantes.removeWhere((p) => p.uuid == profesor.uuid);
+                                  });
+                                  _notifyChanges();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Profesor eliminado')),
+                                  );
+                                },
+                                tooltip: 'Eliminar profesor',
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGruposParticipantes(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Grupos/Cursos Participantes',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  if (_gruposParticipantes.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 4),
+                      child: Text(
+                        'Total alumnos: $_totalAlumnosParticipantes',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              if (widget.isAdminOrSolicitante)
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline, size: 20, color: Color(0xFF1976d2)),
+                  onPressed: _loadingGrupos ? null : () {
+                    _showAddGrupoDialog(context);
+                  },
+                  tooltip: 'Agregar grupo',
+                ),
+            ],
+          ),
+          SizedBox(height: 12),
+          // Lista de grupos participantes
+          _gruposParticipantes.isEmpty
+              ? Text(
+                  'Sin grupos participantes',
+                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                )
+              : ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 300),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: _gruposParticipantes.map((grupoParticipante) {
+                    final isEditing = _editingGrupoId == grupoParticipante.grupo.id;
+                    
+                    return Card(
+                      margin: EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Color(0xFF1976d2),
+                          child: Text(
+                            grupoParticipante.grupo.nombre.substring(0, 1).toUpperCase(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(grupoParticipante.grupo.nombre),
+                        subtitle: isEditing
+                            ? _buildEditableParticipantes(grupoParticipante)
+                            : InkWell(
+                                onTap: widget.isAdminOrSolicitante 
+                                  ? () {
+                                      setState(() {
+                                        _editingGrupoId = grupoParticipante.grupo.id;
+                                      });
+                                    }
+                                  : null,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '${grupoParticipante.numeroParticipantes}/${grupoParticipante.grupo.numeroAlumnos} alumnos',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: widget.isAdminOrSolicitante 
+                                          ? Colors.blue 
+                                          : null,
+                                        decoration: widget.isAdminOrSolicitante 
+                                          ? TextDecoration.underline 
+                                          : null,
+                                      ),
+                                    ),
+                                    if (widget.isAdminOrSolicitante)
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 4),
+                                        child: Icon(Icons.edit, size: 14, color: Colors.blue),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                        trailing: widget.isAdminOrSolicitante
+                            ? IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                onPressed: () {
+                                  setState(() {
+                                    _gruposParticipantes.removeWhere(
+                                      (gp) => gp.grupo.id == grupoParticipante.grupo.id
+                                    );
+                                  });
+                                  _notifyChanges();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Grupo eliminado')),
+                                  );
+                                },
+                                tooltip: 'Eliminar grupo',
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddProfesorDialog(BuildContext context) async {
+    setState(() => _loadingProfesores = true);
+    
+    try {
+      // Cargar todos los profesores desde la API
+      final profesores = await _apiService.fetchProfesores();
+      
+      if (!mounted) return;
+      
+      // Mostrar diálogo con selección múltiple
+      final selectedProfesores = await showDialog<List<Profesor>>(
+        context: context,
+        builder: (BuildContext context) {
+          return _MultiSelectProfesorDialog(
+            profesores: profesores,
+            profesoresYaSeleccionados: _profesoresParticipantes,
+          );
+        },
+      );
+      
+      if (selectedProfesores != null && selectedProfesores.isNotEmpty) {
+        setState(() {
+          // Agregar solo los profesores que no están ya en la lista
+          for (var profesor in selectedProfesores) {
+            if (!_profesoresParticipantes.any((p) => p.uuid == profesor.uuid)) {
+              _profesoresParticipantes.add(profesor);
+            }
+          }
+        });
+        
+        _notifyChanges();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${selectedProfesores.length} profesor(es) agregado(s)')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar profesores: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingProfesores = false);
+      }
+    }
+  }
+
+  void _showAddGrupoDialog(BuildContext context) async {
+    setState(() => _loadingGrupos = true);
+    
+    try {
+      // Cargar todos los cursos y grupos desde la API
+      final cursos = await _apiService.fetchCursos();
+      final todosLosGrupos = await _apiService.fetchGrupos();
+      
+      if (!mounted) return;
+      
+      // Mostrar diálogo con selección de cursos/grupos
+      final gruposSeleccionados = await showDialog<List<Grupo>>(
+        context: context,
+        builder: (BuildContext context) {
+          return _MultiSelectGrupoDialog(
+            cursos: cursos,
+            grupos: todosLosGrupos,
+            gruposYaSeleccionados: _gruposParticipantes.map((gp) => gp.grupo).toList(),
+          );
+        },
+      );
+      
+      if (gruposSeleccionados != null && gruposSeleccionados.isNotEmpty) {
+        setState(() {
+          // Agregar los grupos seleccionados con el número total de alumnos por defecto
+          for (var grupo in gruposSeleccionados) {
+            if (!_gruposParticipantes.any((gp) => gp.grupo.id == grupo.id)) {
+              _gruposParticipantes.add(GrupoParticipante(
+                grupo: grupo,
+                numeroParticipantes: grupo.numeroAlumnos, // Por defecto, todos los alumnos
+              ));
+            }
+          }
+        });
+        
+        _notifyChanges();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${gruposSeleccionados.length} grupo(s) agregado(s)')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar grupos: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingGrupos = false);
+      }
+    }
+  }
+
+  Widget _buildEditableParticipantes(GrupoParticipante grupoParticipante) {
+    final controller = TextEditingController(
+      text: grupoParticipante.numeroParticipantes.toString(),
+    );
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 50,
+          child: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            style: TextStyle(fontSize: 12),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+              ),
+            ),
+            onSubmitted: (value) {
+              _saveEditedParticipantes(grupoParticipante, value);
+            },
+          ),
+        ),
+        Text(
+          '/${grupoParticipante.grupo.numeroAlumnos} alumnos',
+          style: TextStyle(fontSize: 12),
+        ),
+        SizedBox(width: 8),
+        IconButton(
+          icon: Icon(Icons.check, color: Colors.green, size: 16),
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(),
+          onPressed: () {
+            _saveEditedParticipantes(grupoParticipante, controller.text);
+          },
+          tooltip: 'Guardar',
+        ),
+        IconButton(
+          icon: Icon(Icons.close, color: Colors.red, size: 16),
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints(),
+          onPressed: () {
+            setState(() {
+              _editingGrupoId = null;
+            });
+          },
+          tooltip: 'Cancelar',
+        ),
+      ],
+    );
+  }
+
+  void _saveEditedParticipantes(GrupoParticipante grupoParticipante, String value) {
+    final nuevoNumero = int.tryParse(value);
+    
+    if (nuevoNumero == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor ingrese un número válido')),
+      );
+      return;
+    }
+    
+    if (nuevoNumero <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('El número debe ser mayor a 0')),
+      );
+      return;
+    }
+    
+    if (nuevoNumero > grupoParticipante.grupo.numeroAlumnos) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'El número no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
+          ),
+        ),
+      );
+      return;
+    }
+    
+    setState(() {
+      grupoParticipante.numeroParticipantes = nuevoNumero;
+      _editingGrupoId = null;
+    });
+    
+    _notifyChanges();
   }
 
   Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
@@ -268,7 +812,7 @@ class ActivityDetailInfo extends StatelessWidget {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 8),
-        Text(actividad.comentarios ?? 'Sin comentarios'),
+        Text(widget.actividad.comentarios ?? 'Sin comentarios'),
       ],
     );
   }
@@ -290,7 +834,7 @@ class ActivityDetailInfo extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Cerrar el diálogo
-                removeSelectedImage(index); // Eliminar la imagen
+                widget.removeSelectedImage(index); // Eliminar la imagen
               },
               child: Text('Aceptar'),
             ),
@@ -1210,6 +1754,382 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Widget de diálogo de selección múltiple de profesores
+class _MultiSelectProfesorDialog extends StatefulWidget {
+  final List<Profesor> profesores;
+  final List<Profesor> profesoresYaSeleccionados;
+
+  const _MultiSelectProfesorDialog({
+    required this.profesores,
+    required this.profesoresYaSeleccionados,
+  });
+
+  @override
+  State<_MultiSelectProfesorDialog> createState() => _MultiSelectProfesorDialogState();
+}
+
+class _MultiSelectProfesorDialogState extends State<_MultiSelectProfesorDialog> {
+  final List<Profesor> _selectedProfesores = [];
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // No pre-seleccionamos ninguno, el usuario elegirá
+  }
+
+  List<Profesor> get _filteredProfesores {
+    if (_searchQuery.isEmpty) {
+      return widget.profesores;
+    }
+    
+    return widget.profesores.where((profesor) {
+      final fullName = '${profesor.nombre} ${profesor.apellidos}'.toLowerCase();
+      final email = profesor.correo.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      return fullName.contains(query) || email.contains(query);
+    }).toList();
+  }
+
+  bool _isProfesorYaParticipante(Profesor profesor) {
+    return widget.profesoresYaSeleccionados.any((p) => p.uuid == profesor.uuid);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Agregar Profesores Participantes'),
+      content: Container(
+        width: double.maxFinite,
+        height: 500,
+        child: Column(
+          children: [
+            // Buscador
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Buscar profesor...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+            SizedBox(height: 16),
+            
+            // Contador de seleccionados
+            if (_selectedProfesores.isNotEmpty)
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text(
+                      '${_selectedProfesores.length} profesor(es) seleccionado(s)',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ],
+                ),
+              ),
+            SizedBox(height: 8),
+            
+            // Lista de profesores con checkboxes
+            Expanded(
+              child: _filteredProfesores.isEmpty
+                  ? Center(child: Text('No se encontraron profesores'))
+                  : ListView.builder(
+                      itemCount: _filteredProfesores.length,
+                      itemBuilder: (context, index) {
+                        final profesor = _filteredProfesores[index];
+                        final yaParticipante = _isProfesorYaParticipante(profesor);
+                        final isSelected = _selectedProfesores.any((p) => p.uuid == profesor.uuid);
+                        
+                        return CheckboxListTile(
+                          title: Text('${profesor.nombre} ${profesor.apellidos}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(profesor.correo, style: TextStyle(fontSize: 12)),
+                              if (yaParticipante)
+                                Text(
+                                  'Ya participa',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.orange,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          value: isSelected,
+                          enabled: !yaParticipante,
+                          onChanged: yaParticipante
+                              ? null
+                              : (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      _selectedProfesores.add(profesor);
+                                    } else {
+                                      _selectedProfesores.removeWhere((p) => p.uuid == profesor.uuid);
+                                    }
+                                  });
+                                },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: _selectedProfesores.isEmpty
+              ? null
+              : () => Navigator.of(context).pop(_selectedProfesores),
+          child: Text('Agregar (${_selectedProfesores.length})'),
+        ),
+      ],
+    );
+  }
+}
+
+// Widget de diálogo de selección múltiple de grupos/cursos
+class _MultiSelectGrupoDialog extends StatefulWidget {
+  final List<Curso> cursos;
+  final List<Grupo> grupos;
+  final List<Grupo> gruposYaSeleccionados;
+
+  const _MultiSelectGrupoDialog({
+    required this.cursos,
+    required this.grupos,
+    required this.gruposYaSeleccionados,
+  });
+
+  @override
+  State<_MultiSelectGrupoDialog> createState() => _MultiSelectGrupoDialogState();
+}
+
+class _MultiSelectGrupoDialogState extends State<_MultiSelectGrupoDialog> {
+  final List<Grupo> _selectedGrupos = [];
+  final Set<int> _expandedCursos = {};
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  List<Curso> get _filteredCursos {
+    if (_searchQuery.isEmpty) {
+      return widget.cursos;
+    }
+    
+    return widget.cursos.where((curso) {
+      final cursoName = curso.nombre.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      
+      // Incluir el curso si su nombre coincide o si alguno de sus grupos coincide
+      final coincideCurso = cursoName.contains(query);
+      final algunGrupoCoincide = _getGruposDeCurso(curso.id).any(
+        (grupo) => grupo.nombre.toLowerCase().contains(query)
+      );
+      
+      return coincideCurso || algunGrupoCoincide;
+    }).toList();
+  }
+
+  List<Grupo> _getGruposDeCurso(int cursoId) {
+    return widget.grupos.where((g) => g.cursoId == cursoId).toList();
+  }
+
+  bool _isGrupoYaParticipante(Grupo grupo) {
+    return widget.gruposYaSeleccionados.any((g) => g.id == grupo.id);
+  }
+
+  void _toggleCurso(int cursoId) {
+    final gruposCurso = _getGruposDeCurso(cursoId);
+    final todosSeleccionados = gruposCurso.every(
+      (g) => _selectedGrupos.any((sg) => sg.id == g.id) || _isGrupoYaParticipante(g)
+    );
+    
+    setState(() {
+      if (todosSeleccionados) {
+        // Deseleccionar todos los grupos del curso
+        _selectedGrupos.removeWhere((g) => gruposCurso.any((gc) => gc.id == g.id));
+      } else {
+        // Seleccionar todos los grupos del curso que no estén ya participando
+        for (var grupo in gruposCurso) {
+          if (!_isGrupoYaParticipante(grupo) && !_selectedGrupos.any((g) => g.id == grupo.id)) {
+            _selectedGrupos.add(grupo);
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Agregar Grupos/Cursos Participantes'),
+      content: Container(
+        width: double.maxFinite,
+        height: 500,
+        child: Column(
+          children: [
+            // Buscador
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Buscar curso o grupo...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+            SizedBox(height: 16),
+            
+            // Contador de seleccionados
+            if (_selectedGrupos.isNotEmpty)
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text(
+                      '${_selectedGrupos.length} grupo(s) seleccionado(s)',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ],
+                ),
+              ),
+            SizedBox(height: 8),
+            
+            // Lista de cursos con grupos expandibles
+            Expanded(
+              child: _filteredCursos.isEmpty
+                  ? Center(child: Text('No se encontraron cursos'))
+                  : ListView.builder(
+                      itemCount: _filteredCursos.length,
+                      itemBuilder: (context, index) {
+                        final curso = _filteredCursos[index];
+                        final grupos = _getGruposDeCurso(curso.id);
+                        final isExpanded = _expandedCursos.contains(curso.id);
+                        final todosGruposSeleccionados = grupos.isNotEmpty && grupos.every(
+                          (g) => _selectedGrupos.any((sg) => sg.id == g.id) || _isGrupoYaParticipante(g)
+                        );
+                        
+                        return Column(
+                          children: [
+                            // Curso con checkbox para seleccionar todos sus grupos
+                            Card(
+                              color: Colors.blue.withOpacity(0.1),
+                              child: CheckboxListTile(
+                                title: Text(
+                                  curso.nombre,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text('${grupos.length} grupo(s)'),
+                                value: todosGruposSeleccionados,
+                                tristate: true,
+                                onChanged: (value) => _toggleCurso(curso.id),
+                                secondary: IconButton(
+                                  icon: Icon(
+                                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isExpanded) {
+                                        _expandedCursos.remove(curso.id);
+                                      } else {
+                                        _expandedCursos.add(curso.id);
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            // Grupos del curso (expandibles)
+                            if (isExpanded)
+                              Padding(
+                                padding: EdgeInsets.only(left: 32),
+                                child: Column(
+                                  children: grupos.map((grupo) {
+                                    final yaParticipante = _isGrupoYaParticipante(grupo);
+                                    final isSelected = _selectedGrupos.any((g) => g.id == grupo.id);
+                                    
+                                    return CheckboxListTile(
+                                      title: Text(grupo.nombre),
+                                      subtitle: Text(
+                                        '${grupo.numeroAlumnos} alumnos${yaParticipante ? " - Ya participa" : ""}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: yaParticipante ? Colors.orange : null,
+                                        ),
+                                      ),
+                                      value: isSelected,
+                                      enabled: !yaParticipante,
+                                      onChanged: yaParticipante
+                                          ? null
+                                          : (bool? value) {
+                                              setState(() {
+                                                if (value == true) {
+                                                  _selectedGrupos.add(grupo);
+                                                } else {
+                                                  _selectedGrupos.removeWhere((g) => g.id == grupo.id);
+                                                }
+                                              });
+                                            },
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: _selectedGrupos.isEmpty
+              ? null
+              : () => Navigator.of(context).pop(_selectedGrupos),
+          child: Text('Agregar (${_selectedGrupos.length})'),
+        ),
+      ],
     );
   }
 }
