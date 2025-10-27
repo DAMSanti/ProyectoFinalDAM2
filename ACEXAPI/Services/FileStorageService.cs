@@ -134,13 +134,24 @@ public class LocalFileStorageService : IFileStorageService
     private readonly ILogger<LocalFileStorageService> _logger;
     private const string UploadsFolder = "uploads";
 
+    private string GetWebRootPath() => _environment.WebRootPath ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+
     public LocalFileStorageService(IWebHostEnvironment environment, ILogger<LocalFileStorageService> logger)
     {
         _environment = environment;
         _logger = logger;
 
+        // Obtener el WebRootPath o usar ContentRootPath/wwwroot si es null
+        var webRootPath = GetWebRootPath();
+        
+        // Crear carpeta wwwroot si no existe
+        if (!Directory.Exists(webRootPath))
+        {
+            Directory.CreateDirectory(webRootPath);
+        }
+
         // Crear carpeta de uploads si no existe
-        var uploadsPath = Path.Combine(_environment.WebRootPath, UploadsFolder);
+        var uploadsPath = Path.Combine(webRootPath, UploadsFolder);
         if (!Directory.Exists(uploadsPath))
         {
             Directory.CreateDirectory(uploadsPath);
@@ -149,7 +160,7 @@ public class LocalFileStorageService : IFileStorageService
 
     public async Task<(string url, string? thumbnailUrl, long size)> UploadImageAsync(IFormFile file, string containerName)
     {
-        var containerPath = Path.Combine(_environment.WebRootPath, UploadsFolder, containerName);
+        var containerPath = Path.Combine(GetWebRootPath(), UploadsFolder, containerName);
         if (!Directory.Exists(containerPath))
         {
             Directory.CreateDirectory(containerPath);
@@ -198,7 +209,7 @@ public class LocalFileStorageService : IFileStorageService
 
     public async Task<string> UploadFileAsync(IFormFile file, string containerName)
     {
-        var containerPath = Path.Combine(_environment.WebRootPath, UploadsFolder, containerName);
+        var containerPath = Path.Combine(GetWebRootPath(), UploadsFolder, containerName);
         if (!Directory.Exists(containerPath))
         {
             Directory.CreateDirectory(containerPath);
@@ -221,7 +232,7 @@ public class LocalFileStorageService : IFileStorageService
     {
         try
         {
-            var filePath = Path.Combine(_environment.WebRootPath, fileUrl.TrimStart('/'));
+            var filePath = Path.Combine(GetWebRootPath(), fileUrl.TrimStart('/'));
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -240,7 +251,7 @@ public class LocalFileStorageService : IFileStorageService
     {
         try
         {
-            var filePath = Path.Combine(_environment.WebRootPath, fileUrl.TrimStart('/'));
+            var filePath = Path.Combine(GetWebRootPath(), fileUrl.TrimStart('/'));
             if (File.Exists(filePath))
             {
                 return Task.FromResult<Stream?>(new FileStream(filePath, FileMode.Open, FileAccess.Read));

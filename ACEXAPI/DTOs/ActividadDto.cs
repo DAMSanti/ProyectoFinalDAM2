@@ -18,6 +18,9 @@ public class ActividadDto
     public int? EmpTransporteId { get; set; }
     public string? EmpTransporteNombre { get; set; }
     
+    // Lista de localizaciones de la actividad
+    public List<LocalizacionDto>? Localizaciones { get; set; }
+    
     // Información del profesor responsable/solicitante
     public ProfesorSimpleDto? Solicitante { get; set; }
 }
@@ -66,4 +69,33 @@ public class ActividadListDto
     public DateTime FechaInicio { get; set; }
     public bool Aprobada { get; set; }
     public string? DepartamentoNombre { get; set; }
+}
+
+public class LocalizacionDto
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+    public string? Direccion { get; set; }
+    public string? Ciudad { get; set; }
+    public string? Provincia { get; set; }
+    public string? CodigoPostal { get; set; }
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
+    public bool EsPrincipal { get; set; }
+    public int Orden { get; set; }
+    public string? Icono { get; set; }
+}
+
+public class AddLocalizacionDto
+{
+    public bool EsPrincipal { get; set; } = false;
+    public int Orden { get; set; } = 0;
+    public string? Icono { get; set; }
+}
+
+public class UpdateLocalizacionDto
+{
+    public bool EsPrincipal { get; set; }
+    public int Orden { get; set; }
+    public string? Icono { get; set; }
 }

@@ -1,5 +1,6 @@
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
+import 'package:proyecto_santi/models/localizacion.dart';
 
 class Actividad {
   final int id;
@@ -22,12 +23,11 @@ class Actividad {
   final String? urlFolleto;
   final Profesor? solicitante;
   final Departamento? departamento;
+  final Localizacion? localizacion; // Mantener por compatibilidad con LocalizacionId en BD
+  final List<Localizacion> localizaciones; // Nueva lista para múltiples localizaciones
   final double? importePorAlumno;
-  
-  // TODO: Estas coordenadas deberían venir de la tabla Localizaciones
-  // Temporalmente las mantenemos aquí para compatibilidad con el mapa
-  double? latitud;
-  double? longitud;
+  final double? presupuestoEstimado;
+  final double? costoReal;
 
   Actividad({
     required this.id,
@@ -50,9 +50,11 @@ class Actividad {
     this.urlFolleto,
     this.solicitante,
     this.departamento,
+    this.localizacion,
+    this.localizaciones = const [], // Lista vacía por defecto
     this.importePorAlumno,
-    this.latitud,
-    this.longitud,
+    this.presupuestoEstimado,
+    this.costoReal,
   });
 
   factory Actividad.fromJson(Map<String, dynamic> json) {
@@ -77,6 +79,20 @@ class Actividad {
         codigo: '', // No tenemos el código en el DTO
         nombre: json['departamentoNombre'],
       );
+    }
+    
+    // Parsear la localización si viene en el JSON
+    Localizacion? localizacion;
+    if (json['localizacion'] != null && json['localizacion'] is Map) {
+      localizacion = Localizacion.fromJson(json['localizacion']);
+    }
+    
+    // Parsear la lista de localizaciones si viene en el JSON
+    List<Localizacion> localizaciones = [];
+    if (json['localizaciones'] != null && json['localizaciones'] is List) {
+      localizaciones = (json['localizaciones'] as List)
+          .map((loc) => Localizacion.fromJson(loc))
+          .toList();
     }
     
     // Parsear fechas de inicio y fin
@@ -127,9 +143,11 @@ class Actividad {
       urlFolleto: json['folletoUrl']?.toString() ?? json['urlFolleto']?.toString(),
       solicitante: solicitante,
       departamento: departamento,
+      localizacion: localizacion,
+      localizaciones: localizaciones,
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
-      latitud: (json['latitud'] as num?)?.toDouble(),
-      longitud: (json['longitud'] as num?)?.toDouble(),
+      presupuestoEstimado: (json['presupuestoEstimado'] as num?)?.toDouble(),
+      costoReal: (json['costoReal'] as num?)?.toDouble(),
     );
   }
 
@@ -155,9 +173,9 @@ class Actividad {
       'folletoUrl': urlFolleto, // La API espera 'folletoUrl'
       'solicitanteId': solicitante?.uuid, // Enviar solo el ID
       'departamentoId': departamento?.id, // Enviar solo el ID
-      'presupuestoEstimado': importePorAlumno,
-      'latitud': latitud,
-      'longitud': longitud,
+      'localizacionId': localizacion?.id, // Enviar solo el ID
+      'presupuestoEstimado': presupuestoEstimado ?? importePorAlumno,
+      'costoReal': costoReal,
     };
   }
 }

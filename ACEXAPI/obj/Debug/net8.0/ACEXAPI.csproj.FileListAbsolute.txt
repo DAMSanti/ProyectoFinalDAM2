@@ -618,3 +618,4 @@ G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Tr
 C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.backup.json
 C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Casa.json
 C:\Users\santiagota\source\repos\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.Trabajo.json
+G:\ProyectoFinalCSharp\ProyectoFinalDAM2\ACEXAPI\bin\Debug\net8.0\appsettings.backup.json

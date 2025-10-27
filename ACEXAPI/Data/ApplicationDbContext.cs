@@ -23,12 +23,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<Foto> Fotos { get; set; }
     public DbSet<Contrato> Contratos { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<ActividadLocalizacion> ActividadLocalizaciones { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurar índices únicos
+        // Configurar ï¿½ndices ï¿½nicos
         modelBuilder.Entity<Profesor>()
             .HasIndex(p => p.Dni)
             .IsUnique();
@@ -120,6 +121,23 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(c => c.ActividadId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Configurar relaciÃ³n muchos-a-muchos entre Actividades y Localizaciones
+        modelBuilder.Entity<ActividadLocalizacion>()
+            .HasOne(al => al.Actividad)
+            .WithMany(a => a.ActividadLocalizaciones)
+            .HasForeignKey(al => al.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ActividadLocalizacion>()
+            .HasOne(al => al.Localizacion)
+            .WithMany(l => l.ActividadLocalizaciones)
+            .HasForeignKey(al => al.LocalizacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ActividadLocalizacion>()
+            .HasIndex(al => new { al.ActividadId, al.LocalizacionId })
+            .IsUnique();
+
         // Seed data inicial
         SeedData(modelBuilder);
     }
@@ -128,15 +146,15 @@ public class ApplicationDbContext : DbContext
     {
         // Datos iniciales de ejemplo
         modelBuilder.Entity<Departamento>().HasData(
-            new Departamento { Id = 1, Nombre = "Informática", Descripcion = "Departamento de Informática" },
-            new Departamento { Id = 2, Nombre = "Matemáticas", Descripcion = "Departamento de Matemáticas" },
+            new Departamento { Id = 1, Nombre = "Informï¿½tica", Descripcion = "Departamento de Informï¿½tica" },
+            new Departamento { Id = 2, Nombre = "Matemï¿½ticas", Descripcion = "Departamento de Matemï¿½ticas" },
             new Departamento { Id = 3, Nombre = "Lengua", Descripcion = "Departamento de Lengua y Literatura" }
         );
 
         modelBuilder.Entity<Curso>().HasData(
-            new Curso { Id = 1, Nombre = "1º ESO", Nivel = "ESO", Activo = true },
-            new Curso { Id = 2, Nombre = "2º ESO", Nivel = "ESO", Activo = true },
-            new Curso { Id = 3, Nombre = "1º Bach", Nivel = "BACH", Activo = true }
+            new Curso { Id = 1, Nombre = "1ï¿½ ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 2, Nombre = "2ï¿½ ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 3, Nombre = "1ï¿½ Bach", Nivel = "BACH", Activo = true }
         );
     }
 }

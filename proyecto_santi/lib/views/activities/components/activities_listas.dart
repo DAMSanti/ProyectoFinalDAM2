@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class AllActividades extends StatefulWidget {
@@ -24,18 +24,21 @@ class AllActividades extends StatefulWidget {
 }
 
 class AllActividadesState extends State<AllActividades> {
-  final ApiService _apiService = ApiService();
+  late final ApiService _apiService;
+  late final ActividadService _actividadService;
   List<Actividad> _allActividades = [];
   List<Actividad> _filteredActividades = [];
 
   @override
   void initState() {
     super.initState();
+    _apiService = ApiService();
+    _actividadService = ActividadService(_apiService);
     _fetchActivities();
   }
 
   void _fetchActivities() async {
-    List<Actividad> actividades = await _apiService.fetchActivities();
+    List<Actividad> actividades = await _actividadService.fetchActivities();
     setState(() {
       _allActividades = actividades;
       _filterActivities();
@@ -92,18 +95,21 @@ class OtrasActividades extends StatefulWidget {
 }
 
 class OtrasActividadesState extends State<OtrasActividades> {
-  final ApiService _apiService = ApiService();
+  late final ApiService _apiService;
+  late final ActividadService _actividadService;
   List<Actividad> _otrasActividades = [];
   List<Actividad> _filteredOtrasActividades = [];
 
   @override
   void initState() {
     super.initState();
+    _apiService = ApiService();
+    _actividadService = ActividadService(_apiService);
     _fetchActivities();
   }
 
   void _fetchActivities() async {
-    List<Actividad> actividades = await _apiService.fetchActivities();
+    List<Actividad> actividades = await _actividadService.fetchActivities();
     setState(() {
       _otrasActividades = actividades;
       _filterActivities();

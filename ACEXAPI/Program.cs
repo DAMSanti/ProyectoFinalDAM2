@@ -14,7 +14,12 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Configurar UTF-8 para caracteres especiales (tildes, ñ, etc.)
+        options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    });
 builder.Services.AddEndpointsApiExplorer();
 
 // Swagger con soporte para JWT
@@ -212,7 +217,8 @@ app.UseResponseCaching();
 app.MapControllers();
 
 // Crear base de datos si no existe (Development, Trabajo, Casa)
-// Comentado temporalmente para evitar problemas de conexión al inicio
+// Comentado porque las tablas ya están creadas
+// Descomentar solo si necesitas recrear la base de datos
 /*
 if (app.Environment.IsDevelopment() || 
     app.Environment.EnvironmentName == "Trabajo" || 

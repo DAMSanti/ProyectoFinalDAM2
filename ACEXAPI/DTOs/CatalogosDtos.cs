@@ -24,16 +24,6 @@ public class GrupoDto
     public string? CursoNombre { get; set; }
 }
 
-public class LocalizacionDto
-{
-    public int Id { get; set; }
-    public string Nombre { get; set; } = string.Empty;
-    public string? Direccion { get; set; }
-    public string? Ciudad { get; set; }
-    public string? Provincia { get; set; }
-    public string? CodigoPostal { get; set; }
-}
-
 public class EmpTransporteDto
 {
     public int Id { get; set; }

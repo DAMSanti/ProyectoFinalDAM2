@@ -178,5 +178,77 @@ public class ActividadController : ControllerBase
 
         return Ok(new { message = "Folleto eliminado correctamente" });
     }
+
+    /// <summary>
+    /// Obtiene todas las localizaciones de una actividad
+    /// </summary>
+    [HttpGet("{id}/localizaciones")]
+    [ProducesResponseType(typeof(List<LocalizacionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<LocalizacionDto>>> GetLocalizaciones(int id)
+    {
+        var localizaciones = await _actividadService.GetLocalizacionesAsync(id);
+        return Ok(localizaciones);
+    }
+
+    /// <summary>
+    /// Añade una localización a una actividad
+    /// </summary>
+    [HttpPost("{id}/localizaciones/{localizacionId}")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddLocalizacion(int id, int localizacionId, [FromBody] AddLocalizacionDto? dto = null)
+    {
+        var result = await _actividadService.AddLocalizacionAsync(
+            id, 
+            localizacionId, 
+            dto?.EsPrincipal ?? false, 
+            dto?.Orden ?? 0,
+            dto?.Icono
+        );
+        if (!result)
+            return NotFound(new { message = "Actividad o localización no encontrada" });
+
+        return Ok(new { message = "Localización añadida correctamente" });
+    }
+
+    /// <summary>
+    /// Elimina una localización de una actividad
+    /// </summary>
+    [HttpDelete("{id}/localizaciones/{localizacionId}")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveLocalizacion(int id, int localizacionId)
+    {
+        var result = await _actividadService.RemoveLocalizacionAsync(id, localizacionId);
+        if (!result)
+            return NotFound(new { message = "Relación no encontrada" });
+
+        return Ok(new { message = "Localización eliminada correctamente" });
+    }
+
+    /// <summary>
+    /// Actualiza el orden y si es principal de una localización en una actividad
+    /// </summary>
+    [HttpPut("{id}/localizaciones/{localizacionId}")]
+    [Authorize(Roles = "Administrador,Coordinador")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateLocalizacion(int id, int localizacionId, [FromBody] UpdateLocalizacionDto dto)
+    {
+        var result = await _actividadService.UpdateLocalizacionAsync(
+            id, 
+            localizacionId, 
+            dto.EsPrincipal, 
+            dto.Orden,
+            dto.Icono
+        );
+        if (!result)
+            return NotFound(new { message = "Relación no encontrada" });
+
+        return Ok(new { message = "Localización actualizada correctamente" });
+    }
 }
 

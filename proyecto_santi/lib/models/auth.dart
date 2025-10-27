@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/config.dart';
-import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 
 /// Clase para manejar la autenticación de la aplicación con API C# ACEX
 class Auth extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  late final AuthService _authService;
+  late final ProfesorService _profesorService;
+  
   bool _isAuthenticated = false;
   Profesor? _currentUser;
   String? _jwtToken;
+  
+  Auth() {
+    _authService = AuthService(_apiService);
+    _profesorService = ProfesorService(_apiService);
+  }
 
   bool get isAuthenticated => _isAuthenticated;
   Profesor? get currentUser => _currentUser;
@@ -19,11 +27,10 @@ class Auth extends ChangeNotifier {
   Future<bool> login(String email, String password) async {
     try {
       // La API C# de ACEX valida email y password
-      final loginResult = await _apiService.login(email, password);
+      final loginResult = await _authService.login(email, password);
       
       if (loginResult != null && loginResult['token'] != null) {
         _jwtToken = loginResult['token'];
-        _apiService.setToken(_jwtToken);
         
         final usuario = loginResult['usuario'];
         
@@ -70,7 +77,7 @@ class Auth extends ChangeNotifier {
     _isAuthenticated = false;
     _currentUser = null;
     _jwtToken = null;
-    _apiService.setToken(null);
+    _authService.logout();
     
     // Limpia las credenciales almacenadas
     await SecureStorageConfig.clearUserCredentials();
@@ -105,7 +112,7 @@ class Auth extends ChangeNotifier {
   Future<void> updateCurrentUser() async {
     if (_currentUser != null && _jwtToken != null) {
       try {
-        final updatedProfesor = await _apiService.getProfesorByUuid(_currentUser!.uuid);
+        final updatedProfesor = await _profesorService.getProfesorByUuid(_currentUser!.uuid);
         if (updatedProfesor != null) {
           _currentUser = updatedProfesor;
           notifyListeners();

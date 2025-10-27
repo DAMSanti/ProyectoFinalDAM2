@@ -3,7 +3,7 @@ import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
-import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:proyecto_santi/views/activities/views/activities_large_landscape_layout.dart';
@@ -22,12 +22,15 @@ class ActivitiesView extends StatefulWidget {
 
 class ActivitiesViewState extends State<ActivitiesView> {
   late Future<List<Actividad>> _futureActivities;
-  final ApiService _apiService = ApiService();
+  late final ApiService _apiService;
+  late final ActividadService _actividadService;
 
   @override
   void initState() {
     super.initState();
-    _futureActivities = _apiService.fetchFutureActivities();
+    _apiService = ApiService();
+    _actividadService = ActividadService(_apiService);
+    _futureActivities = _actividadService.fetchFutureActivities();
   }
 
   @override

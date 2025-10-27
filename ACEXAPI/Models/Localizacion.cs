@@ -23,6 +23,16 @@ public class Localizacion
     [MaxLength(20)]
     public string? CodigoPostal { get; set; }
 
+    public double? Latitud { get; set; }
+
+    public double? Longitud { get; set; }
+
+    public bool EsPrincipal { get; set; } = false;
+
+    [MaxLength(50)]
+    public string? Icono { get; set; }
+
     // Relaciones
     public ICollection<Actividad> Actividades { get; set; } = new List<Actividad>();
+    public ICollection<ActividadLocalizacion> ActividadLocalizaciones { get; set; } = new List<ActividadLocalizacion>();
 }

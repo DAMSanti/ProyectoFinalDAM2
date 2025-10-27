@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/profesor.dart';
@@ -9,12 +12,21 @@ import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/models/grupo_participante.dart';
-import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/services/services.dart';
+import 'package:proyecto_santi/widgets/localizaciones_map_widget.dart';
+import 'package:proyecto_santi/utils/icon_helper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:io';
-import 'dart:ui' as ui;
+import 'localizaciones/add_localizacion_dialog.dart';
+import 'localizaciones/edit_localizacion_dialog.dart';
+import 'localizaciones/localizacion_card.dart';
+import 'dialogs/edit_activity_dialog.dart';
+import 'dialogs/multi_select_profesor_dialog.dart';
+import 'dialogs/multi_select_grupo_dialog.dart';
+import 'images/network_image_with_delete.dart';
+import 'images/image_with_delete_button.dart';
 
 class ActivityDetailInfo extends StatefulWidget {
   final Actividad actividad;
@@ -43,13 +55,19 @@ class ActivityDetailInfo extends StatefulWidget {
 }
 
 class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
-  final ApiService _apiService = ApiService();
+  late final ApiService _apiService;
+  late final ProfesorService _profesorService;
+  late final CatalogoService _catalogoService;
+  late final LocalizacionService _localizacionService;
   List<Profesor> _profesoresParticipantes = [];
   List<GrupoParticipante> _gruposParticipantes = [];
   List<Profesor> _profesoresParticipantesOriginales = [];
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
+  List<Localizacion> _localizaciones = [];
+  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localización
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
+  bool _loadingLocalizaciones = false;
   int? _editingGrupoId; // ID del grupo que se está editando
   
   // Variables para el folleto
@@ -65,8 +83,64 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   @override
   void initState() {
     super.initState();
+    _apiService = ApiService();
+    _profesorService = ProfesorService(_apiService);
+    _catalogoService = CatalogoService(_apiService);
+    _localizacionService = LocalizacionService(_apiService);
     // Cargar participantes desde la base de datos
     _loadParticipantes();
+    // Cargar localizaciones
+    _loadLocalizaciones();
+  }
+  
+  Future<void> _loadLocalizaciones() async {
+    setState(() {
+      _loadingLocalizaciones = true;
+    });
+    
+    try {
+      print('[LOCALIZACIONES] Cargando localizaciones para actividad ${widget.actividad.id}');
+      final localizacionesData = await _localizacionService.fetchLocalizaciones(widget.actividad.id);
+      print('[LOCALIZACIONES] Localizaciones cargadas: ${localizacionesData.length}');
+      
+      // Debug: imprimir datos recibidos del API
+      print('[DEBUG ICONOS] Datos recibidos del API:');
+      for (var data in localizacionesData) {
+        print('[DEBUG ICONOS] Loc ID: ${data['id']}, Nombre: ${data['nombre']}, Icono: ${data['icono']}, EsPrincipal: ${data['esPrincipal']}');
+      }
+      
+      setState(() {
+        _localizaciones = localizacionesData.map((data) => Localizacion.fromJson(data)).toList();
+        
+        // Inicializar iconos desde la base de datos o usar por defecto
+        for (var loc in _localizaciones) {
+          print('[DEBUG ICONOS] Procesando Loc ID: ${loc.id}, Icono desde modelo: ${loc.icono}');
+          
+          if (!_iconosLocalizaciones.containsKey(loc.id)) {
+            // Si la localización tiene un icono guardado en la BD, usarlo
+            if (loc.icono != null && loc.icono!.isNotEmpty) {
+              final iconData = IconHelper.getIcon(
+                loc.icono,
+                defaultIcon: loc.esPrincipal ? Icons.location_pin : Icons.location_on,
+              );
+              _iconosLocalizaciones[loc.id] = iconData;
+              print('[DEBUG ICONOS] Asignado icono desde BD: ${loc.icono} -> ${iconData.codePoint}');
+            } else {
+              // Si no tiene icono guardado, usar el icono por defecto según si es principal
+              _iconosLocalizaciones[loc.id] = loc.esPrincipal ? Icons.location_pin : Icons.location_on;
+              print('[DEBUG ICONOS] Usando icono por defecto para loc ${loc.id}');
+            }
+          }
+        }
+        
+        _loadingLocalizaciones = false;
+      });
+    } catch (e) {
+      print('[LOCALIZACIONES ERROR] Error al cargar localizaciones: $e');
+      setState(() {
+        _loadingLocalizaciones = false;
+      });
+    }
   }
   
   Future<void> _loadParticipantes() async {
@@ -74,17 +148,17 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       print('[PARTICIPANTES] Cargando participantes para actividad ${widget.actividad.id}');
       
       // Cargar profesores participantes
-      final profesoresIds = await _apiService.fetchProfesoresParticipantes(widget.actividad.id);
+      final profesoresIds = await _profesorService.fetchProfesoresParticipantes(widget.actividad.id);
       print('[PARTICIPANTES] IDs de profesores participantes: $profesoresIds');
       
-      final todosLosProfesores = await _apiService.fetchProfesores();
+      final todosLosProfesores = await _profesorService.fetchProfesores();
       print('[PARTICIPANTES] Total profesores en sistema: ${todosLosProfesores.length}');
       
       // Cargar grupos participantes
-      final gruposData = await _apiService.fetchGruposParticipantes(widget.actividad.id);
+      final gruposData = await _catalogoService.fetchGruposParticipantes(widget.actividad.id);
       print('[PARTICIPANTES] Grupos participantes data: $gruposData');
       
-      final todosLosGrupos = await _apiService.fetchGrupos();
+      final todosLosGrupos = await _catalogoService.fetchGrupos();
       print('[PARTICIPANTES] Total grupos en sistema: ${todosLosGrupos.length}');
       
       setState(() {
@@ -229,6 +303,8 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               _buildImages(context, constraints),
               SizedBox(height: 16),
               _buildParticipantes(context, constraints),
+              SizedBox(height: 16),
+              _buildPresupuestoYLocalizacion(context, constraints),
               SizedBox(height: 16),
               _buildComentarios(context, constraints)
             ],
@@ -480,8 +556,37 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           showImagePicker: widget.showImagePicker,
           imagesActividad: widget.imagesActividad,
           selectedImages: widget.selectedImages,
-          onDeleteImage: (index) => _showDeleteConfirmationDialog(context, index),
-          onDeleteApiImage: widget.removeApiImage, // Pasar la función
+          onDeleteImage: (index) => widget.removeSelectedImage(index),
+          onDeleteApiImage: (index) async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Confirmar eliminación'),
+                  content: Text('¿Estás seguro de que deseas eliminar esta foto?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text('Eliminar'),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    ),
+                  ],
+                );
+              },
+            );
+            
+            if (confirmed == true) {
+              // Aquí iría la lógica para eliminar de la API
+              // Por ahora solo mostramos un mensaje
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Foto marcada para eliminar')),
+              );
+            }
+          },
         ),
       ],
     );
@@ -734,7 +839,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     
     try {
       // Cargar todos los profesores desde la API
-      final profesores = await _apiService.fetchProfesores();
+      final profesores = await _profesorService.fetchProfesores();
       
       if (!mounted) return;
       
@@ -742,7 +847,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       final selectedProfesores = await showDialog<List<Profesor>>(
         context: context,
         builder: (BuildContext context) {
-          return _MultiSelectProfesorDialog(
+          return MultiSelectProfesorDialog(
             profesores: profesores,
             profesoresYaSeleccionados: _profesoresParticipantes,
           );
@@ -785,8 +890,8 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     
     try {
       // Cargar todos los cursos y grupos desde la API
-      final cursos = await _apiService.fetchCursos();
-      final todosLosGrupos = await _apiService.fetchGrupos();
+      final cursos = await _catalogoService.fetchCursos();
+      final todosLosGrupos = await _catalogoService.fetchGrupos();
       
       if (!mounted) return;
       
@@ -794,7 +899,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       final gruposSeleccionados = await showDialog<List<Grupo>>(
         context: context,
         builder: (BuildContext context) {
-          return _MultiSelectGrupoDialog(
+          return MultiSelectGrupoDialog(
             cursos: cursos,
             grupos: todosLosGrupos,
             gruposYaSeleccionados: _gruposParticipantes.map((gp) => gp.grupo).toList(),
@@ -930,268 +1035,434 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     _notifyChanges();
   }
 
-  Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
-    return Column(
+  Widget _buildPresupuestoYLocalizacion(BuildContext context, BoxConstraints constraints) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    // En pantallas pequeñas (< 800px), mostrar en columna
+    // En pantallas grandes, mostrar en fila (50/50)
+    if (constraints.maxWidth < 800) {
+      return Column(
+        children: [
+          _buildPresupuesto(context, constraints),
+          SizedBox(height: 16),
+          _buildLocalizacion(context, constraints),
+        ],
+      );
+    }
+    
+    // Layout horizontal para pantallas grandes
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Descripción de la Actividad',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Expanded(
+          flex: 1,
+          child: _buildPresupuesto(context, constraints),
         ),
-        SizedBox(height: 8),
-        Text(widget.actividad.comentarios ?? 'Sin comentarios'),
+        SizedBox(width: 16),
+        Expanded(
+          flex: 1,
+          child: _buildLocalizacion(context, constraints),
+        ),
       ],
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, int index) {
-    showDialog(
+  Widget _buildPresupuesto(BuildContext context, BoxConstraints constraints) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    // Calcular valores
+    final presupuesto = widget.actividad.presupuestoEstimado ?? 0.0;
+    final costoReal = widget.actividad.costoReal ?? 0.0;
+    final costoPorAlumno = _totalAlumnosParticipantes > 0 
+        ? presupuesto / _totalAlumnosParticipantes 
+        : 0.0;
+    
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Presupuesto y Gastos',
+                style: TextStyle(
+                  fontSize: !isWeb ? 18.dg : 6.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2),
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // TODO: Implementar diálogo para añadir conceptos de gasto
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Funcionalidad en desarrollo'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.add, size: !isWeb ? 16.dg : 5.sp),
+                label: Text(
+                  'Añadir Gasto',
+                  style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF1976d2),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          // Grid de información presupuestaria
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = constraints.maxWidth > 600 
+                  ? constraints.maxWidth / 3 - 8 
+                  : constraints.maxWidth;
+              
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildPresupuestoCard(
+                    context,
+                    'Presupuesto Estimado',
+                    presupuesto,
+                    Icons.account_balance_wallet,
+                    Colors.blue,
+                    itemWidth,
+                    isWeb,
+                  ),
+                  _buildPresupuestoCard(
+                    context,
+                    'Coste Real',
+                    costoReal,
+                    Icons.euro,
+                    costoReal > presupuesto ? Colors.red : Colors.green,
+                    itemWidth,
+                    isWeb,
+                  ),
+                  _buildPresupuestoCard(
+                    context,
+                    'Coste por Alumno',
+                    costoPorAlumno,
+                    Icons.person,
+                    Colors.orange,
+                    itemWidth,
+                    isWeb,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPresupuestoCard(
+    BuildContext context,
+    String titulo,
+    double valor,
+    IconData icono,
+    Color color,
+    double width,
+    bool isWeb,
+  ) {
+    return Container(
+      width: width > 600 ? width : double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icono,
+                color: color,
+                size: !isWeb ? 20.dg : 6.sp,
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  titulo,
+                  style: TextStyle(
+                    fontSize: !isWeb ? 12.dg : 4.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            '${valor.toStringAsFixed(2)} €',
+            style: TextStyle(
+              fontSize: !isWeb ? 18.dg : 6.sp,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocalizacion(BuildContext context, BoxConstraints constraints) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    return Container(
+      constraints: BoxConstraints(minHeight: 500), // Altura mínima igual al contenedor de presupuesto
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: Color(0xFF1976d2),
+                    size: !isWeb ? 24.dg : 7.sp,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Localizaciones',
+                    style: TextStyle(
+                      fontSize: !isWeb ? 18.dg : 6.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1976d2),
+                    ),
+                  ),
+                  if (_localizaciones.isNotEmpty)
+                    Container(
+                      margin: EdgeInsets.only(left: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1976d2).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${_localizaciones.length}',
+                        style: TextStyle(
+                          fontSize: !isWeb ? 12.dg : 4.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1976d2),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              if (widget.isAdminOrSolicitante)
+                ElevatedButton.icon(
+                  onPressed: _loadingLocalizaciones ? null : () {
+                    _showAddLocalizacionDialog(context);
+                  },
+                  icon: Icon(
+                    Icons.add_location,
+                    size: !isWeb ? 16.dg : 5.sp,
+                  ),
+                  label: Text(
+                    'Añadir',
+                    style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF1976d2),
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 16),
+          
+          // Loading state
+          if (_loadingLocalizaciones)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          // Siempre mostrar el mapa
+          else ...[
+            // Mapa interactivo
+            Container(
+              height: 400,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: LocalizacionesMapWidget(
+                localizaciones: _localizaciones,
+                iconosLocalizaciones: _iconosLocalizaciones,
+                onLocalizacionTapped: (localizacion) {
+                  print('[MAP] Localización seleccionada: ${localizacion.nombre}');
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Método para mostrar el diálogo de añadir localización
+  void _showAddLocalizacionDialog(BuildContext context) async {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        return AddLocalizacionDialog(
+          actividadId: widget.actividad.id,
+          localizacionesExistentes: _localizaciones,
+          onLocalizacionAdded: () {
+            if (widget.onActivityDataChanged != null) {
+              widget.onActivityDataChanged!({'localizaciones_changed': true});
+            }
+          },
+        );
+      },
+    );
+
+    // Si hay cambios, actualizar el estado local
+    if (result != null && result['hasChanges'] == true) {
+      final localizacionesRecibidas = List<Localizacion>.from(result['localizaciones']);
+      print('[DEBUG SAVE ICONOS] Localizaciones recibidas del diálogo: ${localizacionesRecibidas.length}');
+      
+      for (var loc in localizacionesRecibidas) {
+        print('[DEBUG SAVE ICONOS] Loc ID: ${loc.id}, Nombre: ${loc.nombre}, Icono: ${loc.icono}');
+      }
+      
+      setState(() {
+        _localizaciones = localizacionesRecibidas;
+        
+        if (result.containsKey('iconos')) {
+          final iconosDelDialogo = result['iconos'] as Map<int, IconData>;
+          _iconosLocalizaciones = Map<int, IconData>.from(iconosDelDialogo);
+          print('[DEBUG SAVE ICONOS] Iconos recibidos del diálogo: ${_iconosLocalizaciones.length}');
+          for (var entry in _iconosLocalizaciones.entries) {
+            print('[DEBUG SAVE ICONOS] ID: ${entry.key}, IconData codePoint: ${entry.value.codePoint}');
+          }
+        }
+      });
+      
+      if (widget.onActivityDataChanged != null) {
+        widget.onActivityDataChanged!({
+          'localizaciones_changed': true,
+          'localizaciones_modificadas': _localizaciones,
+        });
+      }
+    }
+  }
+
+  // Método para mostrar confirmación de eliminación de imagen
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, int index) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text('Eliminar imagen'),
-          content: Text('¿Está seguro que quiere eliminar la imagen?'),
+          title: Text('Eliminar foto'),
+          content: Text('¿Estás seguro de que deseas eliminar esta foto?'),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
-              },
+              onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text('Cancelar'),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
-                widget.removeSelectedImage(index); // Eliminar la imagen
-              },
-              child: Text('Aceptar'),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Eliminar'),
             ),
           ],
         );
       },
     );
-  }
-}
 
-// Widget para mostrar la imagen con botón de eliminar en hover
-class _ImageWithDeleteButton extends StatefulWidget {
-  final XFile image;
-  final double maxHeight;
-  final VoidCallback onDelete;
-
-  const _ImageWithDeleteButton({
-    required this.image,
-    required this.maxHeight,
-    required this.onDelete,
-  });
-
-  @override
-  _ImageWithDeleteButtonState createState() => _ImageWithDeleteButtonState();
-}
-
-class _ImageWithDeleteButtonState extends State<_ImageWithDeleteButton> {
-  bool _isHovering = false;
-  double? _aspectRatio;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImageDimensions();
-  }
-
-  Future<void> _loadImageDimensions() async {
-    try {
-      final bytes = await widget.image.readAsBytes();
-      final codec = await ui.instantiateImageCodec(bytes);
-      final frame = await codec.getNextFrame();
-      final image = frame.image;
-      setState(() {
-        _aspectRatio = image.width / image.height;
-      });
-    } catch (e) {
-      print('Error loading image dimensions: $e');
-      setState(() {
-        _aspectRatio = 1.0; // Default to square if error
-      });
+    if (confirm == true && widget.removeApiImage != null) {
+      widget.removeApiImage!(index);
     }
   }
 
-  Future<Widget> _buildImageWidget(XFile image) async {
-    if (kIsWeb) {
-      final bytes = await image.readAsBytes();
-      return Image.memory(bytes, fit: BoxFit.contain);
-    } else {
-      return Image.file(File(image.path), fit: BoxFit.contain);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_aspectRatio == null) {
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
-        width: widget.maxHeight, // Usar un ancho temporal
-        height: widget.maxHeight,
-        child: Center(child: CircularProgressIndicator()),
-      );
+  // Método para construir sección de comentarios
+  Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    if (widget.actividad.comentarios == null || widget.actividad.comentarios!.isEmpty) {
+      return SizedBox.shrink();
     }
 
-    final width = widget.maxHeight * _aspectRatio!;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
-        width: width,
-        height: widget.maxHeight,
-        child: Stack(
-          children: [
-            // Imagen
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: FutureBuilder<Widget>(
-                future: _buildImageWidget(widget.image),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return snapshot.data!;
-                  }
-                  return Center(child: CircularProgressIndicator());
-                },
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.comment,
+                color: Color(0xFF1976d2),
+                size: !isWeb ? 24.dg : 7.sp,
               ),
-            ),
-            // Botón de eliminar (solo visible en hover)
-            if (_isHovering)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: GestureDetector(
-                  onTap: widget.onDelete,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
+              SizedBox(width: 8),
+              Text(
+                'Comentarios',
+                style: TextStyle(
+                  fontSize: !isWeb ? 18.dg : 6.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2),
                 ),
               ),
-          ],
-        ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Text(
+            widget.actividad.comentarios!,
+            style: TextStyle(
+              fontSize: !isWeb ? 14.dg : 4.5.sp,
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// Widget para mostrar imágenes de red con aspect ratio y botón de eliminar
-class _NetworkImageWithDelete extends StatefulWidget {
-  final String imageUrl;
-  final double maxHeight;
-  final VoidCallback? onDelete;
-  final bool showDeleteButton;
-
-  const _NetworkImageWithDelete({
-    required this.imageUrl,
-    required this.maxHeight,
-    this.onDelete,
-    this.showDeleteButton = false,
-  });
-
-  @override
-  _NetworkImageWithDeleteState createState() => _NetworkImageWithDeleteState();
-}
-
-class _NetworkImageWithDeleteState extends State<_NetworkImageWithDelete> {
-  bool _isHovering = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
-        height: widget.maxHeight,
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                widget.imageUrl,
-                key: ValueKey(widget.imageUrl),
-                fit: BoxFit.contain,
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Container(
-                    width: widget.maxHeight,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: widget.maxHeight,
-                    color: Colors.grey[300],
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error, color: Colors.red),
-                        SizedBox(height: 8),
-                        Text(
-                          'Error al cargar imagen',
-                          style: TextStyle(fontSize: 10),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Botón de eliminar (solo visible en hover y si showDeleteButton es true)
-            if (_isHovering && widget.showDeleteButton && widget.onDelete != null)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: GestureDetector(
-                  onTap: widget.onDelete,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget con estado para scroll horizontal
+// Widget para scroll horizontal de imágenes
 class _HorizontalImageScroller extends StatefulWidget {
   final BoxConstraints constraints;
   final bool isAdminOrSolicitante;
@@ -1199,7 +1470,7 @@ class _HorizontalImageScroller extends StatefulWidget {
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
   final Function(int) onDeleteImage;
-  final Function(int)? onDeleteApiImage; // Nueva función
+  final Function(int)? onDeleteApiImage;
 
   const _HorizontalImageScroller({
     required this.constraints,
@@ -1208,7 +1479,7 @@ class _HorizontalImageScroller extends StatefulWidget {
     required this.imagesActividad,
     required this.selectedImages,
     required this.onDeleteImage,
-    this.onDeleteApiImage, // Opcional
+    this.onDeleteApiImage,
   });
 
   @override
@@ -1255,7 +1526,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
             child: Listener(
               onPointerSignal: (pointerSignal) {
                 if (pointerSignal is PointerScrollEvent) {
-                  // Capturar el scroll de la rueda del ratón y aplicarlo horizontalmente
                   final newOffset = _scrollController.offset + pointerSignal.scrollDelta.dy;
                   _scrollController.jumpTo(newOffset.clamp(
                     0.0,
@@ -1275,7 +1545,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                       ...widget.imagesActividad.asMap().entries.map((entry) {
                         final index = entry.key;
                         final photo = entry.value;
-                        return _NetworkImageWithDelete(
+                        return NetworkImageWithDelete(
                           imageUrl: photo.urlFoto ?? '',
                           maxHeight: 200.0,
                           showDeleteButton: widget.isAdminOrSolicitante,
@@ -1287,7 +1557,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                       ...widget.selectedImages.asMap().entries.map((entry) {
                         final index = entry.key;
                         final image = entry.value;
-                        return _ImageWithDeleteButton(
+                        return ImageWithDeleteButton(
                           image: image,
                           maxHeight: 200.0,
                           onDelete: () => widget.onDeleteImage(index),
@@ -1305,975 +1575,3 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
   }
 }
 
-// ============================================
-// EDIT ACTIVITY DIALOG
-// ============================================
-
-class EditActivityDialog extends StatefulWidget {
-  final Actividad actividad;
-  final Function(Map<String, dynamic>) onSave;
-
-  const EditActivityDialog({
-    Key? key,
-    required this.actividad,
-    required this.onSave,
-  }) : super(key: key);
-
-  @override
-  State<EditActivityDialog> createState() => _EditActivityDialogState();
-}
-
-class _EditActivityDialogState extends State<EditActivityDialog> {
-  late TextEditingController _nombreController;
-  late TextEditingController _descripcionController;
-  late DateTime _fechaInicio;
-  late DateTime _fechaFin;
-  late TimeOfDay _horaInicio;
-  late TimeOfDay _horaFin;
-  String? _selectedProfesorId;
-  int? _selectedDepartamentoId;
-  bool _aprobada = false;
-  
-  // Variables para el folleto
-  String? _folletoFileName;
-  String? _folletoFilePath;
-  bool _folletoChanged = false;
-  
-  List<Profesor> _profesores = [];
-  List<Departamento> _departamentos = [];
-  bool _isLoading = true;
-  final ApiService _apiService = ApiService();
-
-  @override
-  void initState() {
-    super.initState();
-    
-    // Inicializar controladores
-    _nombreController = TextEditingController(text: widget.actividad.titulo);
-    _descripcionController = TextEditingController(text: widget.actividad.descripcion ?? '');
-    
-    // Parsear fechas y horas
-    _fechaInicio = DateTime.parse(widget.actividad.fini);
-    _fechaFin = DateTime.parse(widget.actividad.ffin);
-    
-    // Parsear horas (formato HH:mm:ss o HH:mm)
-    final horaIniParts = widget.actividad.hini.split(':');
-    _horaInicio = TimeOfDay(
-      hour: int.parse(horaIniParts[0]),
-      minute: int.parse(horaIniParts[1]),
-    );
-    
-    final horaFinParts = widget.actividad.hfin.split(':');
-    _horaFin = TimeOfDay(
-      hour: int.parse(horaFinParts[0]),
-      minute: int.parse(horaFinParts[1]),
-    );
-    
-    // Estado
-    _aprobada = widget.actividad.estado.toLowerCase() == 'aprobada';
-    
-    // Cargar datos
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    try {
-      print('[DEBUG] Iniciando carga de datos...');
-      
-      // Cargar profesores desde la API
-      final profesores = await _apiService.fetchProfesores();
-      print('[DEBUG] Profesores cargados: ${profesores.length}');
-      for (var p in profesores) {
-        print('[DEBUG] - Profesor: ${p.nombre} ${p.apellidos} (${p.uuid}) - ${p.correo}');
-      }
-      
-      // Cargar departamentos desde la API
-      final departamentos = await _apiService.fetchDepartamentos();
-      print('[DEBUG] Departamentos cargados: ${departamentos.length}');
-      for (var d in departamentos) {
-        print('[DEBUG] - Departamento: ${d.nombre} (${d.id})');
-      }
-      
-      setState(() {
-        _profesores = profesores;
-        _departamentos = departamentos;
-        
-        // Seleccionar valores actuales
-        if (widget.actividad.solicitante != null) {
-          // Buscar el profesor por correo electrónico ya que el UUID puede no coincidir
-          final profesor = _profesores.firstWhere(
-            (p) => p.correo.toLowerCase() == widget.actividad.solicitante!.correo.toLowerCase(),
-            orElse: () => _profesores.first,
-          );
-          _selectedProfesorId = profesor.uuid;
-          print('[DEBUG] Solicitante email: ${widget.actividad.solicitante!.correo}');
-          print('[DEBUG] Profesor seleccionado: ${profesor.nombre} ${profesor.apellidos} (${profesor.uuid})');
-        }
-        if (widget.actividad.departamento != null) {
-          _selectedDepartamentoId = widget.actividad.departamento!.id;
-          print('[DEBUG] Departamento seleccionado: $_selectedDepartamentoId');
-        }
-        
-        _isLoading = false;
-      });
-      
-      print('[DEBUG] Estado actualizado, isLoading: $_isLoading');
-    } catch (e, stackTrace) {
-      print('[Error] Cargando datos: $e');
-      print('[Error] StackTrace: $stackTrace');
-      setState(() {
-        _isLoading = false;
-      });
-      
-      // Mostrar error al usuario
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cargar datos: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _nombreController.dispose();
-    _descripcionController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: isStartDate ? _fechaInicio : _fechaFin,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-      locale: const Locale('es', 'ES'),
-    );
-    
-    if (picked != null) {
-      setState(() {
-        if (isStartDate) {
-          _fechaInicio = picked;
-        } else {
-          _fechaFin = picked;
-        }
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context, bool isStartTime) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: isStartTime ? _horaInicio : _horaFin,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-    
-    if (picked != null) {
-      setState(() {
-        if (isStartTime) {
-          _horaInicio = picked;
-        } else {
-          _horaFin = picked;
-        }
-      });
-    }
-  }
-
-  void _handleSave() {
-    // Validar campos
-    if (_nombreController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El nombre es obligatorio')),
-      );
-      return;
-    }
-    
-    print('[DIALOG] ========== Verificando cambios en el diálogo ==========');
-    
-    // Verificar si hubo cambios reales antes de notificar
-    bool hasChanges = false;
-    
-    // Comparar nombre
-    print('[DIALOG] Comparando nombre: "${_nombreController.text.trim()}" vs "${widget.actividad.titulo.trim()}"');
-    if (_nombreController.text.trim() != widget.actividad.titulo.trim()) {
-      print('[DIALOG] CAMBIO en nombre detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar descripción
-    print('[DIALOG] Comparando descripción: "${_descripcionController.text.trim()}" vs "${(widget.actividad.descripcion ?? '').trim()}"');
-    if (_descripcionController.text.trim() != (widget.actividad.descripcion ?? '').trim()) {
-      print('[DIALOG] CAMBIO en descripción detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar fechas (solo hasta segundos)
-    final fechaInicioOriginal = DateTime.parse(widget.actividad.fini);
-    final fechaInicioNormalizada = DateTime(_fechaInicio.year, _fechaInicio.month, _fechaInicio.day,
-                                            _fechaInicio.hour, _fechaInicio.minute, _fechaInicio.second);
-    final fechaOriginalNormalizada = DateTime(fechaInicioOriginal.year, fechaInicioOriginal.month, fechaInicioOriginal.day,
-                                               fechaInicioOriginal.hour, fechaInicioOriginal.minute, fechaInicioOriginal.second);
-    print('[DIALOG] Comparando fechaInicio: $fechaInicioNormalizada vs $fechaOriginalNormalizada');
-    if (fechaInicioNormalizada != fechaOriginalNormalizada) {
-      print('[DIALOG] CAMBIO en fechaInicio detectado');
-      hasChanges = true;
-    }
-    
-    final fechaFinOriginal = DateTime.parse(widget.actividad.ffin);
-    final fechaFinNormalizada = DateTime(_fechaFin.year, _fechaFin.month, _fechaFin.day,
-                                         _fechaFin.hour, _fechaFin.minute, _fechaFin.second);
-    final fechaFinOriginalNormalizada = DateTime(fechaFinOriginal.year, fechaFinOriginal.month, fechaFinOriginal.day,
-                                                  fechaFinOriginal.hour, fechaFinOriginal.minute, fechaFinOriginal.second);
-    print('[DIALOG] Comparando fechaFin: $fechaFinNormalizada vs $fechaFinOriginalNormalizada');
-    if (fechaFinNormalizada != fechaFinOriginalNormalizada) {
-      print('[DIALOG] CAMBIO en fechaFin detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar horas (normalizar a formato HH:mm)
-    final hiniNueva = '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}';
-    String hiniOriginal = widget.actividad.hini;
-    // Si la hora original tiene formato HH:mm:ss, quitarle los segundos
-    if (hiniOriginal.length > 5 && hiniOriginal.substring(5, 6) == ':') {
-      hiniOriginal = hiniOriginal.substring(0, 5);
-    }
-    print('[DIALOG] Comparando hini: "$hiniNueva" vs "$hiniOriginal"');
-    if (hiniNueva != hiniOriginal) {
-      print('[DIALOG] CAMBIO en hini detectado');
-      hasChanges = true;
-    }
-    
-    final hfinNueva = '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}';
-    String hfinOriginal = widget.actividad.hfin;
-    // Si la hora original tiene formato HH:mm:ss, quitarle los segundos
-    if (hfinOriginal.length > 5 && hfinOriginal.substring(5, 6) == ':') {
-      hfinOriginal = hfinOriginal.substring(0, 5);
-    }
-    print('[DIALOG] Comparando hfin: "$hfinNueva" vs "$hfinOriginal"');
-    if (hfinNueva != hfinOriginal) {
-      print('[DIALOG] CAMBIO en hfin detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar profesor - buscar por email en lugar de UUID
-    String? profesorOriginalId;
-    if (widget.actividad.solicitante != null && _profesores.isNotEmpty) {
-      final profesor = _profesores.firstWhere(
-        (p) => p.correo.toLowerCase() == widget.actividad.solicitante!.correo.toLowerCase(),
-        orElse: () => _profesores.first,
-      );
-      profesorOriginalId = profesor.uuid;
-    }
-    print('[DIALOG] Comparando profesorId: "$_selectedProfesorId" vs "$profesorOriginalId"');
-    if (_selectedProfesorId != profesorOriginalId) {
-      print('[DIALOG] CAMBIO en profesorId detectado');
-      hasChanges = true;
-    }
-    
-    print('[DIALOG] Comparando departamentoId: "$_selectedDepartamentoId" vs "${widget.actividad.departamento?.id}"');
-    if (_selectedDepartamentoId != widget.actividad.departamento?.id) {
-      print('[DIALOG] CAMBIO en departamentoId detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar estado (aprobada se mapea a estado "Aprobada" o "Pendiente")
-    final estadoOriginal = (widget.actividad.estado == 'Aprobada');
-    print('[DIALOG] Comparando aprobada: "$_aprobada" vs "$estadoOriginal" (estado: "${widget.actividad.estado}")');
-    if (_aprobada != estadoOriginal) {
-      print('[DIALOG] CAMBIO en aprobada detectado');
-      hasChanges = true;
-    }
-    
-    // Comparar folleto
-    if (_folletoChanged) {
-      print('[DIALOG] CAMBIO en folleto detectado');
-      hasChanges = true;
-    }
-    
-    print('[DIALOG] ¿Hay cambios?: $hasChanges');
-    
-    // Solo notificar si hubo cambios
-    if (hasChanges) {
-      print('[DIALOG] Notificando cambios al padre');
-      final data = {
-        'nombre': _nombreController.text.trim(),
-        'descripcion': _descripcionController.text.trim(),
-        'fechaInicio': _fechaInicio.toIso8601String(),
-        'fechaFin': _fechaFin.toIso8601String(),
-        'hini': '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}:00',
-        'hfin': '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}:00',
-        'profesorId': _selectedProfesorId,
-        'departamentoId': _selectedDepartamentoId,
-        'aprobada': _aprobada,
-      };
-      
-      // Añadir folleto si cambió
-      if (_folletoChanged && _folletoFilePath != null && _folletoFileName != null) {
-        data['folletoFilePath'] = _folletoFilePath!;
-        data['folletoFileName'] = _folletoFileName!;
-      }
-      
-      widget.onSave(data);
-    } else {
-      print('[DIALOG] No hay cambios, no se notifica al padre');
-    }
-    
-    Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        width: 600,
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFF1976d2),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Editar Actividad',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Content
-            Expanded(
-              child: _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Nombre
-                          TextField(
-                            controller: _nombreController,
-                            decoration: InputDecoration(
-                              labelText: 'Nombre *',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Descripción
-                          TextField(
-                            controller: _descripcionController,
-                            decoration: InputDecoration(
-                              labelText: 'Descripción',
-                              border: OutlineInputBorder(),
-                            ),
-                            maxLines: 3,
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Fecha Inicio
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectDate(context, true),
-                                  icon: Icon(Icons.calendar_today),
-                                  label: Text(
-                                    'Fecha Inicio: ${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectTime(context, true),
-                                  icon: Icon(Icons.access_time),
-                                  label: Text(
-                                    'Hora: ${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Fecha Fin
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectDate(context, false),
-                                  icon: Icon(Icons.calendar_today),
-                                  label: Text(
-                                    'Fecha Fin: ${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectTime(context, false),
-                                  icon: Icon(Icons.access_time),
-                                  label: Text(
-                                    'Hora: ${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Profesor Responsable
-                          DropdownButtonFormField<String>(
-                            value: _profesores.any((p) => p.uuid == _selectedProfesorId) 
-                                ? _selectedProfesorId 
-                                : null,
-                            decoration: InputDecoration(
-                              labelText: 'Profesor Responsable',
-                              border: OutlineInputBorder(),
-                            ),
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem<String>(
-                                value: null,
-                                child: Text('Seleccionar profesor...'),
-                              ),
-                              ..._profesores.map((profesor) {
-                                return DropdownMenuItem<String>(
-                                  value: profesor.uuid,
-                                  child: Text('${profesor.nombre} ${profesor.apellidos}'),
-                                );
-                              }).toList(),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedProfesorId = value;
-                              });
-                            },
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Departamento
-                          DropdownButtonFormField<int>(
-                            value: _departamentos.any((d) => d.id == _selectedDepartamentoId) 
-                                ? _selectedDepartamentoId 
-                                : null,
-                            decoration: InputDecoration(
-                              labelText: 'Departamento',
-                              border: OutlineInputBorder(),
-                            ),
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem<int>(
-                                value: null,
-                                child: Text('Seleccionar departamento...'),
-                              ),
-                              ..._departamentos.map((departamento) {
-                                return DropdownMenuItem<int>(
-                                  value: departamento.id,
-                                  child: Text(departamento.nombre),
-                                );
-                              }).toList(),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDepartamentoId = value;
-                              });
-                            },
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Estado (Radio Buttons)
-                          Text(
-                            'Estado',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text('Pendiente'),
-                                  value: false,
-                                  groupValue: _aprobada,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _aprobada = value!;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text('Aprobada'),
-                                  value: true,
-                                  groupValue: _aprobada,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _aprobada = value!;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-            ),
-            
-            // Actions
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('Cancelar'),
-                  ),
-                  SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _handleSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1976d2),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: Text('Guardar'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget de diálogo de selección múltiple de profesores
-class _MultiSelectProfesorDialog extends StatefulWidget {
-  final List<Profesor> profesores;
-  final List<Profesor> profesoresYaSeleccionados;
-
-  const _MultiSelectProfesorDialog({
-    required this.profesores,
-    required this.profesoresYaSeleccionados,
-  });
-
-  @override
-  State<_MultiSelectProfesorDialog> createState() => _MultiSelectProfesorDialogState();
-}
-
-class _MultiSelectProfesorDialogState extends State<_MultiSelectProfesorDialog> {
-  final List<Profesor> _selectedProfesores = [];
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    // No pre-seleccionamos ninguno, el usuario elegirá
-  }
-
-  List<Profesor> get _filteredProfesores {
-    if (_searchQuery.isEmpty) {
-      return widget.profesores;
-    }
-    
-    return widget.profesores.where((profesor) {
-      final fullName = '${profesor.nombre} ${profesor.apellidos}'.toLowerCase();
-      final email = profesor.correo.toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      return fullName.contains(query) || email.contains(query);
-    }).toList();
-  }
-
-  bool _isProfesorYaParticipante(Profesor profesor) {
-    return widget.profesoresYaSeleccionados.any((p) => p.uuid == profesor.uuid);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Agregar Profesores Participantes'),
-      content: Container(
-        width: double.maxFinite,
-        height: 500,
-        child: Column(
-          children: [
-            // Buscador
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Buscar profesor...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            
-            // Contador de seleccionados
-            if (_selectedProfesores.isNotEmpty)
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_selectedProfesores.length} profesor(es) seleccionado(s)',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ],
-                ),
-              ),
-            SizedBox(height: 8),
-            
-            // Lista de profesores con checkboxes
-            Expanded(
-              child: _filteredProfesores.isEmpty
-                  ? Center(child: Text('No se encontraron profesores'))
-                  : ListView.builder(
-                      itemCount: _filteredProfesores.length,
-                      itemBuilder: (context, index) {
-                        final profesor = _filteredProfesores[index];
-                        final yaParticipante = _isProfesorYaParticipante(profesor);
-                        final isSelected = _selectedProfesores.any((p) => p.uuid == profesor.uuid);
-                        
-                        return CheckboxListTile(
-                          title: Text('${profesor.nombre} ${profesor.apellidos}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(profesor.correo, style: TextStyle(fontSize: 12)),
-                              if (yaParticipante)
-                                Text(
-                                  'Ya participa',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.orange,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          value: isSelected,
-                          enabled: !yaParticipante,
-                          onChanged: yaParticipante
-                              ? null
-                              : (bool? value) {
-                                  setState(() {
-                                    if (value == true) {
-                                      _selectedProfesores.add(profesor);
-                                    } else {
-                                      _selectedProfesores.removeWhere((p) => p.uuid == profesor.uuid);
-                                    }
-                                  });
-                                },
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: _selectedProfesores.isEmpty
-              ? null
-              : () => Navigator.of(context).pop(_selectedProfesores),
-          child: Text('Agregar (${_selectedProfesores.length})'),
-        ),
-      ],
-    );
-  }
-}
-
-// Widget de diálogo de selección múltiple de grupos/cursos
-class _MultiSelectGrupoDialog extends StatefulWidget {
-  final List<Curso> cursos;
-  final List<Grupo> grupos;
-  final List<Grupo> gruposYaSeleccionados;
-
-  const _MultiSelectGrupoDialog({
-    required this.cursos,
-    required this.grupos,
-    required this.gruposYaSeleccionados,
-  });
-
-  @override
-  State<_MultiSelectGrupoDialog> createState() => _MultiSelectGrupoDialogState();
-}
-
-class _MultiSelectGrupoDialogState extends State<_MultiSelectGrupoDialog> {
-  final List<Grupo> _selectedGrupos = [];
-  final Set<int> _expandedCursos = {};
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  List<Curso> get _filteredCursos {
-    if (_searchQuery.isEmpty) {
-      return widget.cursos;
-    }
-    
-    return widget.cursos.where((curso) {
-      final cursoName = curso.nombre.toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      
-      // Incluir el curso si su nombre coincide o si alguno de sus grupos coincide
-      final coincideCurso = cursoName.contains(query);
-      final algunGrupoCoincide = _getGruposDeCurso(curso.id).any(
-        (grupo) => grupo.nombre.toLowerCase().contains(query)
-      );
-      
-      return coincideCurso || algunGrupoCoincide;
-    }).toList();
-  }
-
-  List<Grupo> _getGruposDeCurso(int cursoId) {
-    return widget.grupos.where((g) => g.cursoId == cursoId).toList();
-  }
-
-  bool _isGrupoYaParticipante(Grupo grupo) {
-    return widget.gruposYaSeleccionados.any((g) => g.id == grupo.id);
-  }
-
-  void _toggleCurso(int cursoId) {
-    final gruposCurso = _getGruposDeCurso(cursoId);
-    final todosSeleccionados = gruposCurso.every(
-      (g) => _selectedGrupos.any((sg) => sg.id == g.id) || _isGrupoYaParticipante(g)
-    );
-    
-    setState(() {
-      if (todosSeleccionados) {
-        // Deseleccionar todos los grupos del curso
-        _selectedGrupos.removeWhere((g) => gruposCurso.any((gc) => gc.id == g.id));
-      } else {
-        // Seleccionar todos los grupos del curso que no estén ya participando
-        for (var grupo in gruposCurso) {
-          if (!_isGrupoYaParticipante(grupo) && !_selectedGrupos.any((g) => g.id == grupo.id)) {
-            _selectedGrupos.add(grupo);
-          }
-        }
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Agregar Grupos/Cursos Participantes'),
-      content: Container(
-        width: double.maxFinite,
-        height: 500,
-        child: Column(
-          children: [
-            // Buscador
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Buscar curso o grupo...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            
-            // Contador de seleccionados
-            if (_selectedGrupos.isNotEmpty)
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 20, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text(
-                      '${_selectedGrupos.length} grupo(s) seleccionado(s)',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ],
-                ),
-              ),
-            SizedBox(height: 8),
-            
-            // Lista de cursos con grupos expandibles
-            Expanded(
-              child: _filteredCursos.isEmpty
-                  ? Center(child: Text('No se encontraron cursos'))
-                  : ListView.builder(
-                      itemCount: _filteredCursos.length,
-                      itemBuilder: (context, index) {
-                        final curso = _filteredCursos[index];
-                        final grupos = _getGruposDeCurso(curso.id);
-                        final isExpanded = _expandedCursos.contains(curso.id);
-                        final todosGruposSeleccionados = grupos.isNotEmpty && grupos.every(
-                          (g) => _selectedGrupos.any((sg) => sg.id == g.id) || _isGrupoYaParticipante(g)
-                        );
-                        
-                        return Column(
-                          children: [
-                            // Curso con checkbox para seleccionar todos sus grupos
-                            Card(
-                              color: Colors.blue.withOpacity(0.1),
-                              child: CheckboxListTile(
-                                title: Text(
-                                  curso.nombre,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text('${grupos.length} grupo(s)'),
-                                value: todosGruposSeleccionados,
-                                tristate: true,
-                                onChanged: (value) => _toggleCurso(curso.id),
-                                secondary: IconButton(
-                                  icon: Icon(
-                                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      if (isExpanded) {
-                                        _expandedCursos.remove(curso.id);
-                                      } else {
-                                        _expandedCursos.add(curso.id);
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                            // Grupos del curso (expandibles)
-                            if (isExpanded)
-                              Padding(
-                                padding: EdgeInsets.only(left: 32),
-                                child: Column(
-                                  children: grupos.map((grupo) {
-                                    final yaParticipante = _isGrupoYaParticipante(grupo);
-                                    final isSelected = _selectedGrupos.any((g) => g.id == grupo.id);
-                                    
-                                    return CheckboxListTile(
-                                      title: Text(grupo.nombre),
-                                      subtitle: Text(
-                                        '${grupo.numeroAlumnos} alumnos${yaParticipante ? " - Ya participa" : ""}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: yaParticipante ? Colors.orange : null,
-                                        ),
-                                      ),
-                                      value: isSelected,
-                                      enabled: !yaParticipante,
-                                      onChanged: yaParticipante
-                                          ? null
-                                          : (bool? value) {
-                                              setState(() {
-                                                if (value == true) {
-                                                  _selectedGrupos.add(grupo);
-                                                } else {
-                                                  _selectedGrupos.removeWhere((g) => g.id == grupo.id);
-                                                }
-                                              });
-                                            },
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: _selectedGrupos.isEmpty
-              ? null
-              : () => Navigator.of(context).pop(_selectedGrupos),
-          child: Text('Agregar (${_selectedGrupos.length})'),
-        ),
-      ],
-    );
-  }
-}

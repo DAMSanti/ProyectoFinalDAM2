@@ -47,4 +47,5 @@ public class Actividad
     public ICollection<ProfResponsable> ProfesoresResponsables { get; set; } = new List<ProfResponsable>();
     public ICollection<Foto> Fotos { get; set; } = new List<Foto>();
     public ICollection<Contrato> Contratos { get; set; } = new List<Contrato>();
+    public ICollection<ActividadLocalizacion> ActividadLocalizaciones { get; set; } = new List<ActividadLocalizacion>();
 }

@@ -1,0 +1,151 @@
+Se cambió el contexto de la base de datos a 'ACEXAPI'.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 13
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 13
+El nombre de columna 'Especialidad' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 13
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 13
+El nombre de columna 'Especialidad' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Pais' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Latitud' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Longitud' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Descripcion' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Pais' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Latitud' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Longitud' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Descripcion' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'ContactoPrincipal' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Web' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Activa' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'ContactoPrincipal' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Web' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Activa' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 5
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 6
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 7
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 8
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 9
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'Tipo' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'HoraInicio' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'HoraFin' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 21
+El nombre de columna 'NumAlumnosEstimado' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 22
+El nombre de columna 'Realizada' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 22
+El nombre de columna 'SolicitanteId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'Tipo' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'HoraInicio' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 20
+El nombre de columna 'HoraFin' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 21
+El nombre de columna 'NumAlumnosEstimado' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 22
+El nombre de columna 'Realizada' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 22
+El nombre de columna 'SolicitanteId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 18
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 18
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 26
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 26
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 34
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 34
+El nombre de columna 'NumAlumnos' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 9
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 10
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 12
+El nombre de columna 'Email' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 16
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 16
+El nombre de columna 'EsResponsablePrincipal' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 19
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 19
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 19
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 19
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 27
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 27
+El nombre de columna 'EsResponsablePrincipal' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 30
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 30
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 30
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 30
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 38
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 38
+El nombre de columna 'EsResponsablePrincipal' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 41
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 41
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 41
+El nombre de columna 'ProfesorId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 41
+El nombre de columna 'Rol' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'EmpTransporteId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Contratada' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Importe' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'FechaContratacion' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'EmpTransporteId' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Contratada' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'Importe' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 11
+El nombre de columna 'FechaContratacion' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 39
+El nombre de columna 'Tipo' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 43
+El nombre de columna 'NumAlumnosEstimado' no es válido.
+Mensaje 207, Nivel 16, Estado 1, Servidor DESKTOP-60OUS5M\SQLEXPRESS, Línea 45
+El nombre de columna 'Realizada' no es válido.

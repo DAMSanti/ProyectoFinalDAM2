@@ -5,7 +5,8 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
-import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_large_landscape_layout.dart';
@@ -35,7 +36,12 @@ class ActivityDetailView extends StatefulWidget {
 
 class ActivityDetailViewState extends State<ActivityDetailView> {
   late Future<List<Photo>> _futurePhotos;
-  final ApiService _apiService = ApiService();
+  late final ApiService _apiService;
+  late final ActividadService _actividadService;
+  late final ProfesorService _profesorService;
+  late final CatalogoService _catalogoService;
+  late final PhotoService _photoService;
+  late final LocalizacionService _localizacionService;
   bool isDataChanged = false;
   bool isAdminOrSolicitante = true;
   List<Photo> imagesActividad = [];
@@ -54,8 +60,14 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   @override
   void initState() {
     super.initState();
+    _apiService = ApiService();
+    _actividadService = ActividadService(_apiService);
+    _profesorService = ProfesorService(_apiService);
+    _catalogoService = CatalogoService(_apiService);
+    _photoService = PhotoService(_apiService);
+    _localizacionService = LocalizacionService(_apiService);
     _loadActivityDetails();
-    _futurePhotos = _apiService.fetchPhotosByActivityId(widget.actividad.id);
+    _futurePhotos = _photoService.fetchPhotosByActivityId(widget.actividad.id);
     _futurePhotos.then((photos) {
       setState(() {
         imagesActividad = photos;
@@ -65,7 +77,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   
   Future<void> _loadActivityDetails() async {
     try {
-      final actividadCompleta = await _apiService.fetchActivityById(widget.actividad.id);
+      final actividadCompleta = await _actividadService.fetchActivityById(widget.actividad.id);
       setState(() {
         _actividadCompleta = actividadCompleta ?? widget.actividad;
         _actividadOriginal = actividadCompleta ?? widget.actividad; // Guardar copia original
@@ -83,7 +95,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
   Future<void> _loadPhotos() async {
     try {
-      final photos = await _apiService.fetchPhotosByActivityId(widget.actividad.id);
+      final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
       setState(() {
         imagesActividad = photos;
       });
@@ -370,6 +382,15 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     
     print('[DEBUG] _datosEditados después de actualizar: ${_datosEditados!.keys}');
     
+    // Si hay cambios en localizaciones, marcar como cambio
+    if (updatedData.containsKey('localizaciones_changed') && updatedData['localizaciones_changed'] == true) {
+      setState(() {
+        isDataChanged = true;
+      });
+      print('[DEBUG] Cambios en localizaciones detectados - botón Guardar activado');
+      return;
+    }
+    
     // Buscar el profesor y departamento actualizados si cambiaron
     dynamic nuevoProfesor = _actividadCompleta?.solicitante;
     dynamic nuevoDepartamento = _actividadCompleta?.departamento;
@@ -377,7 +398,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Si cambió el profesor, buscar el nuevo
     if (updatedData['profesorId'] != null) {
       try {
-        final profesores = await _apiService.fetchProfesores();
+        final profesores = await _profesorService.fetchProfesores();
         final profesorEncontrado = profesores.where((p) => p.uuid == updatedData['profesorId']).toList();
         if (profesorEncontrado.isNotEmpty) {
           nuevoProfesor = profesorEncontrado.first;
@@ -390,7 +411,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Si cambió el departamento, buscar el nuevo
     if (updatedData['departamentoId'] != null) {
       try {
-        final departamentos = await _apiService.fetchDepartamentos();
+        final departamentos = await _catalogoService.fetchDepartamentos();
         final departamentoEncontrado = departamentos.where((d) => d.id == updatedData['departamentoId']).toList();
         if (departamentoEncontrado.isNotEmpty) {
           nuevoDepartamento = departamentoEncontrado.first;
@@ -425,9 +446,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           urlFolleto: _actividadCompleta!.urlFolleto,
           solicitante: nuevoProfesor,
           departamento: nuevoDepartamento,
+          localizacion: _actividadCompleta!.localizacion,
           importePorAlumno: _actividadCompleta!.importePorAlumno,
-          latitud: _actividadCompleta!.latitud,
-          longitud: _actividadCompleta!.longitud,
+          presupuestoEstimado: _actividadCompleta!.presupuestoEstimado,
+          costoReal: _actividadCompleta!.costoReal,
         );
       }
       
@@ -529,15 +551,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             urlFolleto: _actividadOriginal!.urlFolleto,
             solicitante: _actividadCompleta?.solicitante,
             departamento: _actividadCompleta?.departamento,
+            localizacion: _actividadOriginal!.localizacion,
             importePorAlumno: _actividadOriginal!.importePorAlumno,
-            latitud: _actividadOriginal!.latitud,
-            longitud: _actividadOriginal!.longitud,
+            presupuestoEstimado: _actividadOriginal!.presupuestoEstimado,
+            costoReal: _actividadOriginal!.costoReal,
           );
           
           print('[DEBUG] Guardando actividad completa');
           
           // Usar updateActivity en lugar de updateActivityFields
-          final actividadActualizada = await _apiService.updateActivity(
+          final actividadActualizada = await _actividadService.updateActivity(
             widget.actividad.id,
             actividadParaGuardar,
           );
@@ -551,12 +574,12 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             // Si tenemos un UUID de profesor pero no el objeto completo, cargarlo
             if (_datosEditados!.containsKey('profesorId') && _datosEditados!['profesorId'] != null) {
               try {
-                final profesores = await _apiService.fetchProfesores();
+                final profesores = await _profesorService.fetchProfesores();
                 profesorCompleto = profesores.firstWhere(
                   (p) => p.uuid == _datosEditados!['profesorId'],
                   orElse: () => actividadActualizada.solicitante ?? _actividadOriginal!.solicitante!,
                 );
-                print('[DEBUG] Profesor completo cargado: ${profesorCompleto.nombre}');
+                print('[DEBUG] Profesor completo cargado: ${profesorCompleto?.nombre}');
               } catch (e) {
                 print('[ERROR] Error cargando profesor completo: $e');
                 profesorCompleto = actividadActualizada.solicitante;
@@ -566,12 +589,12 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             // Si tenemos un ID de departamento pero no el objeto completo, cargarlo
             if (_datosEditados!.containsKey('departamentoId') && _datosEditados!['departamentoId'] != null) {
               try {
-                final departamentos = await _apiService.fetchDepartamentos();
+                final departamentos = await _catalogoService.fetchDepartamentos();
                 departamentoCompleto = departamentos.firstWhere(
                   (d) => d.id == _datosEditados!['departamentoId'],
                   orElse: () => actividadActualizada.departamento ?? _actividadOriginal!.departamento!,
                 );
-                print('[DEBUG] Departamento completo cargado: ${departamentoCompleto.nombre}');
+                print('[DEBUG] Departamento completo cargado: ${departamentoCompleto?.nombre}');
               } catch (e) {
                 print('[ERROR] Error cargando departamento completo: $e');
                 departamentoCompleto = actividadActualizada.departamento;
@@ -600,9 +623,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               urlFolleto: actividadActualizada.urlFolleto,
               solicitante: profesorCompleto,
               departamento: departamentoCompleto,
+              localizacion: actividadActualizada.localizacion,
               importePorAlumno: actividadActualizada.importePorAlumno,
-              latitud: actividadActualizada.latitud,
-              longitud: actividadActualizada.longitud,
+              presupuestoEstimado: actividadActualizada.presupuestoEstimado,
+              costoReal: actividadActualizada.costoReal,
             );
             
             // Actualizar la actividad original con los nuevos datos completos
@@ -623,7 +647,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       if (imagesToDelete.isNotEmpty) {
         for (int photoId in imagesToDelete) {
           try {
-            await _apiService.deletePhoto(photoId);
+            await _photoService.deletePhoto(photoId);
           } catch (e) {
             print('[ActivityDetail] Error eliminando foto $photoId: $e');
             success = false;
@@ -655,7 +679,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           }).toList();
           
           print('[DEBUG] UUIDs a guardar: $profesoresIds');
-          await _apiService.updateProfesoresParticipantes(widget.actividad.id, profesoresIds);
+          await _profesorService.updateProfesoresParticipantes(widget.actividad.id, profesoresIds);
           print('[DEBUG] Profesores participantes guardados correctamente');
         } catch (e) {
           print('[ERROR] Error guardando profesores participantes: $e');
@@ -690,7 +714,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           }).toList();
           
           print('[DEBUG] Datos de grupos a guardar: $gruposData');
-          await _apiService.updateGruposParticipantes(widget.actividad.id, gruposData);
+          await _catalogoService.updateGruposParticipantes(widget.actividad.id, gruposData);
           print('[DEBUG] Grupos participantes guardados correctamente');
         } catch (e) {
           print('[ERROR] Error guardando grupos participantes: $e');
@@ -703,7 +727,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       if (_datosEditados != null && _datosEditados!.containsKey('deleteFolleto') && _datosEditados!['deleteFolleto'] == true) {
         try {
           print('[DEBUG] Eliminando folleto...');
-          await _apiService.deleteFolleto(widget.actividad.id);
+          await _actividadService.deleteFolleto(widget.actividad.id);
           print('[DEBUG] Folleto eliminado correctamente');
         } catch (e) {
           print('[ERROR] Error eliminando folleto: $e');
@@ -721,7 +745,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           if (_datosEditados!.containsKey('folletoBytes')) {
             // Web: usar bytes
             final folletoBytes = _datosEditados!['folletoBytes'] as Uint8List;
-            folletoUrl = await _apiService.uploadFolleto(
+            folletoUrl = await _actividadService.uploadFolleto(
               widget.actividad.id,
               fileBytes: folletoBytes,
               fileName: folletoName,
@@ -729,7 +753,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           } else if (_datosEditados!.containsKey('folletoFilePath')) {
             // Móvil/Desktop: usar path
             final folletoPath = _datosEditados!['folletoFilePath'] as String;
-            folletoUrl = await _apiService.uploadFolleto(
+            folletoUrl = await _actividadService.uploadFolleto(
               widget.actividad.id,
               filePath: folletoPath,
               fileName: folletoName,
@@ -746,6 +770,70 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         }
       }
 
+      // 8. Guardar localizaciones si cambiaron
+      if (_datosEditados != null && _datosEditados!.containsKey('localizaciones_modificadas')) {
+        try {
+          print('[DEBUG] Guardando localizaciones...');
+          final localizacionesNuevas = _datosEditados!['localizaciones_modificadas'] as List<Localizacion>;
+          final localizacionesOriginales = await _localizacionService.fetchLocalizaciones(widget.actividad.id);
+          
+          // Convertir a listas de IDs para comparar
+          final idsOriginales = localizacionesOriginales.map((l) => l['id'] as int).toSet();
+          final idsNuevos = localizacionesNuevas.where((l) => l.id > 0).map((l) => l.id).toSet();
+          
+          // 1. Eliminar localizaciones que ya no están
+          for (var loc in localizacionesOriginales) {
+            final id = loc['id'] as int;
+            if (!idsNuevos.contains(id)) {
+              await _localizacionService.removeLocalizacion(widget.actividad.id, id);
+              print('[DEBUG] Localización eliminada: $id');
+            }
+          }
+          
+          // 2. Añadir nuevas localizaciones (las que tienen ID negativo)
+          for (var loc in localizacionesNuevas.where((l) => l.id < 0)) {
+            // Crear en catálogo primero
+            final nuevaLocalizacion = await _localizacionService.createLocalizacion(
+              nombre: loc.nombre,
+              direccion: loc.direccion,
+              ciudad: loc.ciudad,
+              provincia: loc.provincia,
+              codigoPostal: loc.codigoPostal,
+              latitud: loc.latitud,
+              longitud: loc.longitud,
+              icono: loc.icono,
+            );
+            
+            if (nuevaLocalizacion != null) {
+              final localizacionId = nuevaLocalizacion['id'] as int;
+              await _localizacionService.addLocalizacion(
+                widget.actividad.id,
+                localizacionId,
+                esPrincipal: loc.esPrincipal,
+                icono: loc.icono,
+              );
+              print('[DEBUG] Nueva localización creada y añadida: $localizacionId');
+            }
+          }
+          
+          // 3. Actualizar las existentes (principal e icono)
+          for (var loc in localizacionesNuevas.where((l) => l.id > 0)) {
+            await _localizacionService.updateLocalizacion(
+              widget.actividad.id,
+              loc.id,
+              esPrincipal: loc.esPrincipal,
+              icono: loc.icono,
+            );
+          }
+          
+          print('[DEBUG] Localizaciones guardadas correctamente');
+        } catch (e) {
+          print('[ERROR] Error guardando localizaciones: $e');
+          print('[ERROR] Stack trace: ${StackTrace.current}');
+          success = false;
+        }
+      }
+
       // Cerrar diálogo de carga
       if (mounted) {
         Navigator.of(context).pop();
@@ -753,7 +841,13 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
       if (success) {
         // Recargar las fotos de la actividad
-        final photos = await _apiService.fetchPhotosByActivityId(widget.actividad.id);
+        final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
+        
+        // Si hubo cambios en localizaciones, forzar recarga de la actividad completa
+        if (_datosEditados != null && _datosEditados!.containsKey('localizaciones_changed')) {
+          await _loadActivityDetails();
+        }
+        
         if (mounted) {
           setState(() {
             imagesActividad = photos;
@@ -816,7 +910,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         final fileName = xFile.name;
 
         // Subir la imagen usando el método del ApiService
-        bool success = await _apiService.uploadPhotosFromBytes(
+        bool success = await _photoService.uploadPhotosFromBytes(
           activityId: widget.actividad.id,
           bytes: bytes,
           filename: fileName,

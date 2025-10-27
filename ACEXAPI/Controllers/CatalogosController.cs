@@ -334,7 +334,11 @@ public class LocalizacionController : ControllerBase
                 Direccion = l.Direccion,
                 Ciudad = l.Ciudad,
                 Provincia = l.Provincia,
-                CodigoPostal = l.CodigoPostal
+                CodigoPostal = l.CodigoPostal,
+                Latitud = l.Latitud,
+                Longitud = l.Longitud,
+                EsPrincipal = l.EsPrincipal,
+                Icono = l.Icono
             })
             .ToListAsync();
 
@@ -355,7 +359,11 @@ public class LocalizacionController : ControllerBase
             Direccion = localizacion.Direccion,
             Ciudad = localizacion.Ciudad,
             Provincia = localizacion.Provincia,
-            CodigoPostal = localizacion.CodigoPostal
+            CodigoPostal = localizacion.CodigoPostal,
+            Latitud = localizacion.Latitud,
+            Longitud = localizacion.Longitud,
+            EsPrincipal = localizacion.EsPrincipal,
+            Icono = localizacion.Icono
         });
     }
 
@@ -369,7 +377,11 @@ public class LocalizacionController : ControllerBase
             Direccion = dto.Direccion,
             Ciudad = dto.Ciudad,
             Provincia = dto.Provincia,
-            CodigoPostal = dto.CodigoPostal
+            CodigoPostal = dto.CodigoPostal,
+            Latitud = dto.Latitud,
+            Longitud = dto.Longitud,
+            EsPrincipal = dto.EsPrincipal,
+            Icono = dto.Icono
         };
 
         _context.Localizaciones.Add(localizacion);
@@ -392,6 +404,10 @@ public class LocalizacionController : ControllerBase
         localizacion.Ciudad = dto.Ciudad;
         localizacion.Provincia = dto.Provincia;
         localizacion.CodigoPostal = dto.CodigoPostal;
+        localizacion.Latitud = dto.Latitud;
+        localizacion.Longitud = dto.Longitud;
+        localizacion.EsPrincipal = dto.EsPrincipal;
+        localizacion.Icono = dto.Icono;
 
         await _context.SaveChangesAsync();
 

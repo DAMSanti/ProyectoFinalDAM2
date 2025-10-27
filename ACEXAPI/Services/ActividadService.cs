@@ -18,6 +18,10 @@ public interface IActividadService
     Task<bool> UpdateGruposParticipantesAsync(int actividadId, List<GrupoParticipanteUpdateDto> grupos);
     Task<string?> UpdateFolletoAsync(int actividadId, IFormFile folleto);
     Task<bool> DeleteFolletoAsync(int actividadId);
+    Task<List<LocalizacionDto>> GetLocalizacionesAsync(int actividadId);
+    Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono);
+    Task<bool> RemoveLocalizacionAsync(int actividadId, int localizacionId);
+    Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono);
 }
 
 public class ActividadService : IActividadService
@@ -90,12 +94,35 @@ public class ActividadService : IActividadService
             .Include(a => a.EmpTransporte)
             .Include(a => a.ProfesoresResponsables)
                 .ThenInclude(pr => pr.Profesor)
+            .Include(a => a.ActividadLocalizaciones)
+                .ThenInclude(al => al.Localizacion)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (actividad == null)
             return null;
 
-        return MapToDto(actividad);
+        var dto = MapToDto(actividad);
+        
+        // Añadir las localizaciones
+        dto.Localizaciones = actividad.ActividadLocalizaciones
+            .OrderBy(al => al.Orden)
+            .Select(al => new LocalizacionDto
+            {
+                Id = al.Localizacion!.Id,
+                Nombre = al.Localizacion.Nombre,
+                Direccion = al.Localizacion.Direccion,
+                Ciudad = al.Localizacion.Ciudad,
+                Provincia = al.Localizacion.Provincia,
+                CodigoPostal = al.Localizacion.CodigoPostal,
+                Latitud = al.Localizacion.Latitud,
+                Longitud = al.Localizacion.Longitud,
+                EsPrincipal = al.EsPrincipal,
+                Orden = al.Orden,
+                Icono = al.Localizacion.Icono
+            })
+            .ToList();
+
+        return dto;
     }
 
     public async Task<ActividadDto> CreateAsync(ActividadCreateDto dto, IFormFile? folleto)
@@ -363,6 +390,132 @@ public class ActividadService : IActividadService
 
         // Eliminar la referencia en la base de datos
         actividad.FolletoUrl = null;
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<List<LocalizacionDto>> GetLocalizacionesAsync(int actividadId)
+    {
+        var localizaciones = await _context.ActividadLocalizaciones
+            .Include(al => al.Localizacion)
+            .Where(al => al.ActividadId == actividadId)
+            .OrderBy(al => al.Orden)
+            .Select(al => new LocalizacionDto
+            {
+                Id = al.Localizacion!.Id,
+                Nombre = al.Localizacion.Nombre,
+                Direccion = al.Localizacion.Direccion,
+                Ciudad = al.Localizacion.Ciudad,
+                Provincia = al.Localizacion.Provincia,
+                CodigoPostal = al.Localizacion.CodigoPostal,
+                Latitud = al.Localizacion.Latitud,
+                Longitud = al.Localizacion.Longitud,
+                EsPrincipal = al.EsPrincipal,
+                Orden = al.Orden,
+                Icono = al.Localizacion.Icono
+            })
+            .ToListAsync();
+
+        return localizaciones;
+    }
+
+    public async Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null)
+    {
+        // Verificar que la actividad y localización existen
+        var actividadExists = await _context.Actividades.AnyAsync(a => a.Id == actividadId);
+        var localizacion = await _context.Localizaciones.FindAsync(localizacionId);
+
+        if (!actividadExists || localizacion == null)
+            return false;
+
+        // Actualizar el icono en la tabla Localizaciones si se proporciona
+        if (!string.IsNullOrEmpty(icono))
+        {
+            localizacion.Icono = icono;
+        }
+
+        // Verificar que no existe ya la relación
+        var exists = await _context.ActividadLocalizaciones
+            .AnyAsync(al => al.ActividadId == actividadId && al.LocalizacionId == localizacionId);
+
+        if (exists)
+            return false;
+
+        // Si se marca como principal, quitar el flag de las demás
+        if (esPrincipal)
+        {
+            var otrasLocalizaciones = await _context.ActividadLocalizaciones
+                .Where(al => al.ActividadId == actividadId && al.EsPrincipal)
+                .ToListAsync();
+
+            foreach (var loc in otrasLocalizaciones)
+            {
+                loc.EsPrincipal = false;
+            }
+        }
+
+        // Crear la relación
+        var actividadLocalizacion = new ActividadLocalizacion
+        {
+            ActividadId = actividadId,
+            LocalizacionId = localizacionId,
+            EsPrincipal = esPrincipal,
+            Orden = orden,
+            FechaAsignacion = DateTime.UtcNow
+        };
+
+        _context.ActividadLocalizaciones.Add(actividadLocalizacion);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> RemoveLocalizacionAsync(int actividadId, int localizacionId)
+    {
+        var actividadLocalizacion = await _context.ActividadLocalizaciones
+            .FirstOrDefaultAsync(al => al.ActividadId == actividadId && al.LocalizacionId == localizacionId);
+
+        if (actividadLocalizacion == null)
+            return false;
+
+        _context.ActividadLocalizaciones.Remove(actividadLocalizacion);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null)
+    {
+        var actividadLocalizacion = await _context.ActividadLocalizaciones
+            .Include(al => al.Localizacion)
+            .FirstOrDefaultAsync(al => al.ActividadId == actividadId && al.LocalizacionId == localizacionId);
+
+        if (actividadLocalizacion == null)
+            return false;
+
+        // Actualizar el icono en la tabla Localizaciones si se proporciona
+        if (!string.IsNullOrEmpty(icono) && actividadLocalizacion.Localizacion != null)
+        {
+            actividadLocalizacion.Localizacion.Icono = icono;
+        }
+
+        // Si se marca como principal, quitar el flag de las demás
+        if (esPrincipal && !actividadLocalizacion.EsPrincipal)
+        {
+            var otrasLocalizaciones = await _context.ActividadLocalizaciones
+                .Where(al => al.ActividadId == actividadId && al.EsPrincipal && al.Id != actividadLocalizacion.Id)
+                .ToListAsync();
+
+            foreach (var loc in otrasLocalizaciones)
+            {
+                loc.EsPrincipal = false;
+            }
+        }
+
+        actividadLocalizacion.EsPrincipal = esPrincipal;
+        actividadLocalizacion.Orden = orden;
+
         await _context.SaveChangesAsync();
 
         return true;
