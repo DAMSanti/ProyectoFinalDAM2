@@ -53,6 +53,12 @@ class Actividad {
     // Mapear desde la API de C# ACEXAPI
     final now = DateTime.now().toIso8601String();
     
+    // Parsear el solicitante si viene en el JSON
+    Profesor? solicitante;
+    if (json['solicitante'] != null) {
+      solicitante = Profesor.fromJson(json['solicitante']);
+    }
+    
     return Actividad(
       id: json['id'] ?? 0,
       titulo: json['nombre']?.toString() ?? json['titulo']?.toString() ?? 'Sin título',
@@ -72,9 +78,7 @@ class Actividad {
       comentEstado: json['comentEstado']?.toString(),
       incidencias: json['incidencias']?.toString(),
       urlFolleto: json['folletoUrl']?.toString() ?? json['urlFolleto']?.toString(),
-      solicitante: json['solicitante'] != null 
-          ? Profesor.fromJson(json['solicitante']) 
-          : null,
+      solicitante: solicitante,
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
       latitud: (json['latitud'] as num?)?.toDouble(),
       longitud: (json['longitud'] as num?)?.toDouble(),

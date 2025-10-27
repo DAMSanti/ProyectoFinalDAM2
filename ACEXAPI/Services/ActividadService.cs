@@ -36,7 +36,7 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .AsQueryable();
 
-        // Búsqueda
+        // Bï¿½squeda
         if (!string.IsNullOrWhiteSpace(queryParams.Search))
         {
             query = query.Where(a =>
@@ -82,6 +82,8 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
+            .Include(a => a.ProfesoresResponsables)
+                .ThenInclude(pr => pr.Profesor)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (actividad == null)
@@ -165,6 +167,22 @@ public class ActividadService : IActividadService
 
     private ActividadDto MapToDto(Actividad actividad)
     {
+        // Obtener el primer profesor responsable como solicitante
+        var primerResponsable = actividad.ProfesoresResponsables.FirstOrDefault();
+        ProfesorSimpleDto? solicitante = null;
+        
+        if (primerResponsable?.Profesor != null)
+        {
+            solicitante = new ProfesorSimpleDto
+            {
+                Id = primerResponsable.Profesor.Uuid.GetHashCode(), // Convertir Guid a int para el frontend
+                Nombre = primerResponsable.Profesor.Nombre,
+                Apellidos = primerResponsable.Profesor.Apellidos,
+                Email = primerResponsable.Profesor.Correo,
+                FotoUrl = primerResponsable.Profesor.FotoUrl
+            };
+        }
+        
         return new ActividadDto
         {
             Id = actividad.Id,
@@ -181,7 +199,8 @@ public class ActividadService : IActividadService
             LocalizacionId = actividad.LocalizacionId,
             LocalizacionNombre = actividad.Localizacion?.Nombre,
             EmpTransporteId = actividad.EmpTransporteId,
-            EmpTransporteNombre = actividad.EmpTransporte?.Nombre
+            EmpTransporteNombre = actividad.EmpTransporte?.Nombre,
+            Solicitante = solicitante
         };
     }
 }

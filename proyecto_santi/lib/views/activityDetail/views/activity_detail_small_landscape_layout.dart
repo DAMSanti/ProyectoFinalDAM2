@@ -14,6 +14,7 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
   final VoidCallback _showImagePicker;
+  final Function(int) _removeSelectedImage;
   final VoidCallback _saveChanges;
 
   const ActivityDetailSmallLandscapeLayout({
@@ -26,9 +27,11 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
     required this.imagesActividad,
     required this.selectedImages,
     required VoidCallback showImagePicker,
+    required Function(int) removeSelectedImage,
     required VoidCallback saveChanges,
   })
       : _showImagePicker = showImagePicker,
+        _removeSelectedImage = removeSelectedImage,
         _saveChanges = saveChanges;
 
   @override
@@ -45,6 +48,7 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
                 imagesActividad: imagesActividad,
                 selectedImages: selectedImages,
                 showImagePicker: _showImagePicker,
+                removeSelectedImage: _removeSelectedImage,
               ),
             ),
             Positioned(

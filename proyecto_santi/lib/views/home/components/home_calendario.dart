@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -172,18 +172,12 @@ class CalendarViewState extends State<CalendarView> {
                     title: Text(actividad.titulo),
                     subtitle: Text('Fecha de inicio: ${actividad.fini}'),
                     onTap: () {
-                      Navigator.push(
+                      // Cerrar el diálogo primero
+                      Navigator.of(context).pop();
+                      // Luego navegar al detalle usando el shell
+                      navigateToActivityDetailInShell(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ActivityDetailView(
-                                actividad: actividad,
-                                isDarkTheme: Theme
-                                    .of(context)
-                                    .brightness == Brightness.dark,
-                                onToggleTheme: () {},
-                              ),
-                        ),
+                        {'activity': actividad},
                       );
                     },
                   ),

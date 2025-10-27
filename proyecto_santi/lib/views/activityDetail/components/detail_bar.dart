@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class DetailBar extends StatelessWidget {
   final bool isDataChanged;
@@ -16,16 +17,17 @@ class DetailBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (ModalRoute.of(context)?.settings.name != '/')
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: Color(0xFF1976d2)),
+            onPressed: () {
+              navigateBackFromDetail(context, '/home');
+            },
+          ),
           ElevatedButton(
             onPressed: isDataChanged ? onSaveChanges : null,
             style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF1976d2),
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),

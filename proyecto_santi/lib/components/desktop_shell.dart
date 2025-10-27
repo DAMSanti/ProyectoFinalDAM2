@@ -168,6 +168,11 @@ class _DesktopShellScope extends InheritedWidget {
   bool updateShouldNotify(_DesktopShellScope oldWidget) => false;
 }
 
+// Función helper para verificar si estamos dentro del shell
+bool isInsideDesktopShell(BuildContext context) {
+  return _DesktopShellScope.of(context) != null;
+}
+
 // Función helper para navegar al detalle de actividad desde cualquier lugar
 void navigateToActivityDetailInShell(BuildContext context, Map<String, dynamic> args) {
   final shellState = _DesktopShellScope.of(context);

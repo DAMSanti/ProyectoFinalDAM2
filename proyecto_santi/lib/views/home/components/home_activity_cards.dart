@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -85,15 +86,10 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                         ),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
+                          // Usar la navegación del shell para mantener el menú
+                          navigateToActivityDetailInShell(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => ActivityDetailView(
-                                actividad: widget.actividad,
-                                isDarkTheme: widget.isDarkTheme,
-                                onToggleTheme: () {},
-                              ),
-                            ),
+                            {'activity': widget.actividad},
                           );
                         },
                         child: ActivityInfo(

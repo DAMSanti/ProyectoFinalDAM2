@@ -11,7 +11,7 @@ class Profesor {
   final int activo;
   final String? urlFoto;
   final int esJefeDep;
-  final Departamento depart;
+  final Departamento? depart;
 
   Profesor({
     required this.uuid,
@@ -24,10 +24,30 @@ class Profesor {
     required this.activo,
     this.urlFoto,
     required this.esJefeDep,
-    required this.depart,
+    this.depart,
   });
 
   factory Profesor.fromJson(Map<String, dynamic> json) {
+    // Soportar tanto el formato antiguo como el nuevo (ProfesorSimpleDto de la API)
+    
+    // Si viene el formato simple de la API (ProfesorSimpleDto)
+    if (json.containsKey('email') && !json.containsKey('correo')) {
+      return Profesor(
+        uuid: json['id']?.toString() ?? '',
+        dni: '',
+        nombre: json['nombre'] ?? '',
+        apellidos: json['apellidos'] ?? '',
+        correo: json['email'] ?? '',
+        password: '',
+        rol: 'Profesor',
+        activo: 1,
+        urlFoto: json['fotoUrl'],
+        esJefeDep: 0,
+        depart: null,
+      );
+    }
+    
+    // Formato completo original
     return Profesor(
       uuid: json['uuid'],
       dni: json['dni'],
@@ -39,7 +59,7 @@ class Profesor {
       activo: json['activo'],
       urlFoto: json['urlFoto'],
       esJefeDep: json['esJefeDep'],
-      depart: Departamento.fromJson(json['depart']),
+      depart: json['depart'] != null ? Departamento.fromJson(json['depart']) : null,
     );
   }
 
@@ -55,7 +75,7 @@ class Profesor {
       'activo': activo,
       'urlFoto': urlFoto,
       'esJefeDep': esJefeDep,
-      'depart': depart.toJson(),
+      'depart': depart?.toJson(),
     };
   }
 }

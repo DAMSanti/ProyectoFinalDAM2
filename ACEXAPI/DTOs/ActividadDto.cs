@@ -17,6 +17,18 @@ public class ActividadDto
     public string? LocalizacionNombre { get; set; }
     public int? EmpTransporteId { get; set; }
     public string? EmpTransporteNombre { get; set; }
+    
+    // Información del profesor responsable/solicitante
+    public ProfesorSimpleDto? Solicitante { get; set; }
+}
+
+public class ProfesorSimpleDto
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellidos { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? FotoUrl { get; set; }
 }
 
 public class ActividadCreateDto
