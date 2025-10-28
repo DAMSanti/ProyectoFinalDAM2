@@ -24,7 +24,6 @@ public class AlojamientoController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AlojamientoDto>>> GetAlojamientos(
         [FromQuery] bool? soloActivos = true,
-        [FromQuery] string? tipo = null,
         [FromQuery] string? ciudad = null)
     {
         try
@@ -34,11 +33,6 @@ public class AlojamientoController : ControllerBase
             if (soloActivos == true)
             {
                 query = query.Where(a => a.Activo);
-            }
-
-            if (!string.IsNullOrEmpty(tipo))
-            {
-                query = query.Where(a => a.TipoAlojamiento == tipo);
             }
 
             if (!string.IsNullOrEmpty(ciudad))
@@ -59,16 +53,10 @@ public class AlojamientoController : ControllerBase
                     Telefono = a.Telefono,
                     Email = a.Email,
                     Web = a.Web,
-                    TipoAlojamiento = a.TipoAlojamiento,
-                    NumeroHabitaciones = a.NumeroHabitaciones,
                     CapacidadTotal = a.CapacidadTotal,
-                    PrecioPorNoche = a.PrecioPorNoche,
-                    Servicios = a.Servicios,
                     Observaciones = a.Observaciones,
                     Activo = a.Activo,
-                    FechaCreacion = a.FechaCreacion,
-                    Latitud = a.Latitud,
-                    Longitud = a.Longitud
+                    FechaCreacion = a.FechaCreacion
                 })
                 .ToListAsync();
 
@@ -100,16 +88,10 @@ public class AlojamientoController : ControllerBase
                     Telefono = a.Telefono,
                     Email = a.Email,
                     Web = a.Web,
-                    TipoAlojamiento = a.TipoAlojamiento,
-                    NumeroHabitaciones = a.NumeroHabitaciones,
                     CapacidadTotal = a.CapacidadTotal,
-                    PrecioPorNoche = a.PrecioPorNoche,
-                    Servicios = a.Servicios,
                     Observaciones = a.Observaciones,
                     Activo = a.Activo,
-                    FechaCreacion = a.FechaCreacion,
-                    Latitud = a.Latitud,
-                    Longitud = a.Longitud
+                    FechaCreacion = a.FechaCreacion
                 })
                 .FirstOrDefaultAsync();
 
@@ -144,14 +126,8 @@ public class AlojamientoController : ControllerBase
                 Telefono = dto.Telefono,
                 Email = dto.Email,
                 Web = dto.Web,
-                TipoAlojamiento = dto.TipoAlojamiento,
-                NumeroHabitaciones = dto.NumeroHabitaciones,
                 CapacidadTotal = dto.CapacidadTotal,
-                PrecioPorNoche = dto.PrecioPorNoche,
-                Servicios = dto.Servicios,
                 Observaciones = dto.Observaciones,
-                Latitud = dto.Latitud,
-                Longitud = dto.Longitud,
                 Activo = true,
                 FechaCreacion = DateTime.UtcNow
             };
@@ -170,16 +146,10 @@ public class AlojamientoController : ControllerBase
                 Telefono = alojamiento.Telefono,
                 Email = alojamiento.Email,
                 Web = alojamiento.Web,
-                TipoAlojamiento = alojamiento.TipoAlojamiento,
-                NumeroHabitaciones = alojamiento.NumeroHabitaciones,
                 CapacidadTotal = alojamiento.CapacidadTotal,
-                PrecioPorNoche = alojamiento.PrecioPorNoche,
-                Servicios = alojamiento.Servicios,
                 Observaciones = alojamiento.Observaciones,
                 Activo = alojamiento.Activo,
-                FechaCreacion = alojamiento.FechaCreacion,
-                Latitud = alojamiento.Latitud,
-                Longitud = alojamiento.Longitud
+                FechaCreacion = alojamiento.FechaCreacion
             };
 
             return CreatedAtAction(nameof(GetAlojamiento), new { id = alojamiento.Id }, alojamientoDto);
@@ -213,15 +183,9 @@ public class AlojamientoController : ControllerBase
             if (dto.Telefono != null) alojamiento.Telefono = dto.Telefono;
             if (dto.Email != null) alojamiento.Email = dto.Email;
             if (dto.Web != null) alojamiento.Web = dto.Web;
-            if (dto.TipoAlojamiento != null) alojamiento.TipoAlojamiento = dto.TipoAlojamiento;
-            if (dto.NumeroHabitaciones.HasValue) alojamiento.NumeroHabitaciones = dto.NumeroHabitaciones;
             if (dto.CapacidadTotal.HasValue) alojamiento.CapacidadTotal = dto.CapacidadTotal;
-            if (dto.PrecioPorNoche.HasValue) alojamiento.PrecioPorNoche = dto.PrecioPorNoche;
-            if (dto.Servicios != null) alojamiento.Servicios = dto.Servicios;
             if (dto.Observaciones != null) alojamiento.Observaciones = dto.Observaciones;
             if (dto.Activo.HasValue) alojamiento.Activo = dto.Activo.Value;
-            if (dto.Latitud.HasValue) alojamiento.Latitud = dto.Latitud;
-            if (dto.Longitud.HasValue) alojamiento.Longitud = dto.Longitud;
 
             await _context.SaveChangesAsync();
 
@@ -270,28 +234,6 @@ public class AlojamientoController : ControllerBase
         {
             _logger.LogError(ex, "Error al eliminar alojamiento {Id}", id);
             return StatusCode(500, "Error al eliminar alojamiento");
-        }
-    }
-
-    // GET: api/alojamiento/tipos
-    [HttpGet("tipos")]
-    public async Task<ActionResult<IEnumerable<string>>> GetTiposAlojamiento()
-    {
-        try
-        {
-            var tipos = await _context.Alojamientos
-                .Where(a => a.TipoAlojamiento != null)
-                .Select(a => a.TipoAlojamiento!)
-                .Distinct()
-                .OrderBy(t => t)
-                .ToListAsync();
-
-            return Ok(tipos);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al obtener tipos de alojamiento");
-            return StatusCode(500, "Error al obtener tipos de alojamiento");
         }
     }
 

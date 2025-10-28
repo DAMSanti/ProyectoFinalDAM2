@@ -2,11 +2,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/models/empresa_transporte.dart';
+import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/services/services.dart';
+import 'package:proyecto_santi/services/gasto_personalizado_service.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_large_landscape_layout.dart';
@@ -56,6 +60,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   Actividad? _actividadOriginal; // Copia de los datos originales de la BD
   Map<String, dynamic>? _datosEditados; // Datos modificados en el diálogo
   bool _isLoadingActivity = true;
+  int _widgetKey = 0; // Key para forzar reconstrucción del widget
 
   @override
   void initState() {
@@ -77,12 +82,17 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   
   Future<void> _loadActivityDetails() async {
     try {
-      print('[DEBUG] Recargando actividad desde la API...');
+
       final actividadCompleta = await _actividadService.fetchActivityById(widget.actividad.id);
-      print('[DEBUG] Actividad recargada - transporteReq: ${actividadCompleta?.transporteReq}, alojamientoReq: ${actividadCompleta?.alojamientoReq}');
+
+      
+      // Cargar fotos de la actividad
+      final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
+      
       setState(() {
         _actividadCompleta = actividadCompleta ?? widget.actividad;
         _actividadOriginal = actividadCompleta ?? widget.actividad; // Guardar copia original
+        imagesActividad = photos;
         _isLoadingActivity = false;
       });
     } catch (e) {
@@ -161,11 +171,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   
   
   bool _hasRealChanges() {
-    print('[DEBUG] ========== Verificando cambios reales ==========');
+
     
     // Verificar si hay imágenes nuevas o marcadas para eliminar
     if (selectedImages.isNotEmpty || imagesToDelete.isNotEmpty) {
-      print('[DEBUG] Hay cambios en imágenes: ${selectedImages.length} nuevas, ${imagesToDelete.length} a eliminar');
+
       return true;
     }
     
@@ -173,7 +183,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     if (_datosEditados != null) {
       if (_datosEditados!.containsKey('profesoresParticipantes') || 
           _datosEditados!.containsKey('gruposParticipantes')) {
-        print('[DEBUG] Hay cambios en participantes');
+
+        return true;
+      }
+    }
+
+    // Verificar si hay cambios en gastos personalizados (gastos varios)
+    if (_datosEditados != null) {
+      if (_datosEditados!.containsKey('gastosPersonalizados') ||
+          _datosEditados!.containsKey('budgetChanged')) {
+
         return true;
       }
     }
@@ -184,20 +203,20 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           _datosEditados!.containsKey('folletoBytes') ||
           _datosEditados!.containsKey('folletoFilePath') ||
           _datosEditados!.containsKey('deleteFolleto')) {
-        print('[DEBUG] Hay cambios en folleto (nuevo PDF seleccionado o marcado para eliminación)');
+
         return true;
       }
     }
     
     // Verificar si hay cambios en los datos editados
     if (_datosEditados == null || _actividadOriginal == null) {
-      print('[DEBUG] No hay datos editados o actividad original');
+
       return false;
     }
     
-    print('[DEBUG] Datos editados: $_datosEditados');
-    print('[DEBUG] Actividad original - Título: "${_actividadOriginal!.titulo}"');
-    print('[DEBUG] Actividad original - Descripción: "${_actividadOriginal!.descripcion}"');
+
+
+
     
     // Comparar cada campo editado con el original
     // Solo consideramos que hay cambio si el valor es diferente al original
@@ -206,9 +225,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     if (nombre != null) {
       final nombreTrimmed = nombre.trim();
       final originalTrimmed = _actividadOriginal!.titulo.trim();
-      print('[DEBUG] Comparando nombre: "$nombreTrimmed" vs "$originalTrimmed"');
+
       if (nombreTrimmed != originalTrimmed) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en nombre!');
+
         return true;
       }
     }
@@ -217,9 +236,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     if (descripcion != null) {
       final descripcionTrimmed = descripcion.trim();
       final originalDescripcionTrimmed = (_actividadOriginal!.descripcion?.trim() ?? '');
-      print('[DEBUG] Comparando descripción: "$descripcionTrimmed" vs "$originalDescripcionTrimmed"');
+
       if (descripcionTrimmed != originalDescripcionTrimmed) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en descripción!');
+
         return true;
       }
     }
@@ -235,13 +254,13 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                                              fechaEditada.hour, fechaEditada.minute, fechaEditada.second);
         final originalNormalizada = DateTime(fechaOriginal.year, fechaOriginal.month, fechaOriginal.day,
                                               fechaOriginal.hour, fechaOriginal.minute, fechaOriginal.second);
-        print('[DEBUG] Comparando fechaInicio: $editadaNormalizada vs $originalNormalizada');
+
         if (editadaNormalizada != originalNormalizada) {
-          print('[DEBUG] ¡CAMBIO DETECTADO en fechaInicio!');
+
           return true;
         }
       } catch (e) {
-        print('[DEBUG] Error parseando fechaInicio: $e');
+
         // Si hay error parseando, comparar como strings
         if (fechaInicio != _actividadOriginal!.fini) {
           return true;
@@ -260,13 +279,13 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                                              fechaEditada.hour, fechaEditada.minute, fechaEditada.second);
         final originalNormalizada = DateTime(fechaOriginal.year, fechaOriginal.month, fechaOriginal.day,
                                               fechaOriginal.hour, fechaOriginal.minute, fechaOriginal.second);
-        print('[DEBUG] Comparando fechaFin: $editadaNormalizada vs $originalNormalizada');
+
         if (editadaNormalizada != originalNormalizada) {
-          print('[DEBUG] ¡CAMBIO DETECTADO en fechaFin!');
+
           return true;
         }
       } catch (e) {
-        print('[DEBUG] Error parseando fechaFin: $e');
+
         // Si hay error parseando, comparar como strings
         if (fechaFin != _actividadOriginal!.ffin) {
           return true;
@@ -287,9 +306,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         hiniOriginal = hiniOriginal.substring(0, 5);
       }
       
-      print('[DEBUG] Comparando hini: "$hiniNueva" vs "$hiniOriginal"');
+
       if (hiniNueva != hiniOriginal) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en hini!');
+
         return true;
       }
     }
@@ -307,9 +326,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         hfinOriginal = hfinOriginal.substring(0, 5);
       }
       
-      print('[DEBUG] Comparando hfin: "$hfinNueva" vs "$hfinOriginal"');
+
       if (hfinNueva != hfinOriginal) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en hfin!');
+
         return true;
       }
     }
@@ -317,9 +336,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     final aprobada = _datosEditados!['aprobada'] as bool?;
     if (aprobada != null) {
       final estadoOriginal = _actividadOriginal!.estado == 'Aprobada';
-      print('[DEBUG] Comparando estado: $aprobada vs $estadoOriginal');
+
       if (aprobada != estadoOriginal) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en estado!');
+
         return true;
       }
     }
@@ -328,9 +347,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     final profesorId = _datosEditados!['profesorId'] as String?;
     if (profesorId != null) {
       final profesorOriginalId = _actividadOriginal!.solicitante?.uuid;
-      print('[DEBUG] Comparando profesorId: "$profesorId" vs "$profesorOriginalId"');
+
       if (profesorId != profesorOriginalId) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en profesorId!');
+
         return true;
       }
     }
@@ -339,9 +358,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     final departamentoId = _datosEditados!['departamentoId'] as int?;
     if (departamentoId != null) {
       final departamentoOriginalId = _actividadOriginal!.departamento?.id;
-      print('[DEBUG] Comparando departamentoId: "$departamentoId" vs "$departamentoOriginalId"');
+
       if (departamentoId != departamentoOriginalId) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en departamentoId!');
+
         return true;
       }
     }
@@ -349,9 +368,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Comparar transporteReq
     final transporteReq = _datosEditados!['transporteReq'] as int?;
     if (transporteReq != null) {
-      print('[DEBUG] Comparando transporteReq: "$transporteReq" vs "${_actividadOriginal!.transporteReq}"');
+
       if (transporteReq != _actividadOriginal!.transporteReq) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en transporteReq!');
+
         return true;
       }
     }
@@ -359,40 +378,99 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Comparar alojamientoReq
     final alojamientoReq = _datosEditados!['alojamientoReq'] as int?;
     if (alojamientoReq != null) {
-      print('[DEBUG] Comparando alojamientoReq: "$alojamientoReq" vs "${_actividadOriginal!.alojamientoReq}"');
+
       if (alojamientoReq != _actividadOriginal!.alojamientoReq) {
-        print('[DEBUG] ¡CAMBIO DETECTADO en alojamientoReq!');
+
         return true;
       }
     }
     
-    print('[DEBUG] No se detectaron cambios reales');
+    // Comparar presupuestoEstimado
+    final presupuestoEstimado = _datosEditados!['presupuestoEstimado'] as double?;
+    if (presupuestoEstimado != null) {
+      final presupuestoOriginal = _actividadOriginal!.presupuestoEstimado ?? 0.0;
+
+      if ((presupuestoEstimado - presupuestoOriginal).abs() > 0.01) { // Comparar con tolerancia para decimales
+
+        return true;
+      }
+    }
+    
+    // Comparar precioTransporte
+    final precioTransporte = _datosEditados!['precioTransporte'] as double?;
+    if (precioTransporte != null) {
+      final precioOriginal = _actividadOriginal!.precioTransporte ?? 0.0;
+
+      if ((precioTransporte - precioOriginal).abs() > 0.01) { // Comparar con tolerancia para decimales
+
+        return true;
+      }
+    }
+    
+    // Comparar empresaTransporteId
+    final empresaTransporteId = _datosEditados!['empresaTransporteId'] as int?;
+    if (empresaTransporteId != null) {
+      final empresaOriginalId = _actividadOriginal!.empresaTransporte?.id;
+
+      if (empresaTransporteId != empresaOriginalId) {
+
+        return true;
+      }
+    }
+    
+    // Comparar alojamientoId
+    final alojamientoId = _datosEditados!['alojamientoId'];
+    if (alojamientoId != null) {
+      final alojamientoOriginalId = _actividadOriginal!.alojamiento?.id;
+
+      if (alojamientoId != alojamientoOriginalId) {
+
+        return true;
+      }
+    }
+    
+    // Comparar precioAlojamiento
+    final precioAlojamiento = _datosEditados!['precioAlojamiento'] as double?;
+    if (precioAlojamiento != null) {
+      final precioOriginal = 0.0; // El precio no está en el alojamiento, se guarda en la actividad
+
+      if ((precioAlojamiento - precioOriginal).abs() > 0.01) { // Comparar con tolerancia para decimales
+
+        return true;
+      }
+    }
+    
+
     return false;
   }
   
-  void _revertChanges() {
+  Future<void> _revertChanges() async {
+    // Limpiar todos los cambios pendientes
     setState(() {
-      // Restaurar la actividad original
-      _actividadCompleta = _actividadOriginal;
       _datosEditados = null;
-      
-      // Limpiar imágenes seleccionadas y marcadas para eliminar
       selectedImages.clear();
       imagesToDelete.clear();
-      
-      // Recargar participantes desde la base de datos
-      // Esto lo haremos recargando el widget ActivityDetailInfo
-      
-      // Desactivar el botón guardar
       isDataChanged = false;
     });
     
-    // Forzar recarga de participantes
-    _loadActivityDetails();
+    // Recargar todo desde la base de datos (actividad, fotos, profesores, grupos)
+    // Esto restaurará folleto, profesores participantes, grupos participantes, etc.
+    await _loadActivityDetails();
+    
+    // Después de recargar, incrementar el widgetKey para forzar reconstrucción
+    setState(() {
+      _widgetKey++; // Incrementar para forzar reconstrucción del widget con datos actualizados
+    });
   }
   
   void _handleActivityDataChanged(Map<String, dynamic> updatedData) async {
-    print('[DEBUG] _handleActivityDataChanged llamado con: ${updatedData.keys}');
+
+
+    updatedData.forEach((key, value) {
+      if (key != 'folletoBytes' && key != 'selectedImages') {
+
+      }
+    });
     
     // Si _datosEditados es null, inicializarlo
     if (_datosEditados == null) {
@@ -402,14 +480,20 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Fusionar los datos actualizados con los existentes
     _datosEditados!.addAll(updatedData);
     
-    print('[DEBUG] _datosEditados después de actualizar: ${_datosEditados!.keys}');
+
+
+    _datosEditados!.forEach((key, value) {
+      if (key != 'folletoBytes' && key != 'selectedImages') {
+
+      }
+    });
     
     // Si hay cambios en localizaciones, marcar como cambio
     if (updatedData.containsKey('localizaciones_changed') && updatedData['localizaciones_changed'] == true) {
       setState(() {
         isDataChanged = true;
       });
-      print('[DEBUG] Cambios en localizaciones detectados - botón Guardar activado');
+
       return;
     }
     
@@ -459,10 +543,17 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           previstaIni: _actividadCompleta!.previstaIni,
           transporteReq: updatedData['transporteReq'] ?? _actividadCompleta!.transporteReq,
           comentTransporte: _actividadCompleta!.comentTransporte,
+          precioTransporte: updatedData['precioTransporte'] ?? _actividadCompleta!.precioTransporte,
+          // NO actualizar empresaTransporte aquí - se actualizará después de guardar con datos completos
+          empresaTransporte: _actividadCompleta!.empresaTransporte,
           alojamientoReq: updatedData['alojamientoReq'] ?? _actividadCompleta!.alojamientoReq,
           comentAlojamiento: _actividadCompleta!.comentAlojamiento,
+          precioAlojamiento: updatedData['precioAlojamiento'] ?? _actividadCompleta!.precioAlojamiento,
+          alojamiento: _actividadCompleta!.alojamiento,
           comentarios: _actividadCompleta!.comentarios,
-          estado: updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente',
+          estado: updatedData.containsKey('aprobada') 
+            ? (updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente')
+            : _actividadCompleta!.estado,
           comentEstado: _actividadCompleta!.comentEstado,
           incidencias: _actividadCompleta!.incidencias,
           urlFolleto: _actividadCompleta!.urlFolleto,
@@ -470,7 +561,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           departamento: nuevoDepartamento,
           localizacion: _actividadCompleta!.localizacion,
           importePorAlumno: _actividadCompleta!.importePorAlumno,
-          presupuestoEstimado: _actividadCompleta!.presupuestoEstimado,
+          presupuestoEstimado: updatedData['presupuestoEstimado'] ?? _actividadCompleta!.presupuestoEstimado,
           costoReal: _actividadCompleta!.costoReal,
         );
       }
@@ -490,11 +581,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         if (safeUpdated.containsKey('selectedImages')) {
           safeUpdated['selectedImages'] = '<images count: ${selectedImages.length}>';
         }
-        print('[DEBUG] Datos actualizados: $safeUpdated');
+
       } catch (e) {
-        print('[DEBUG] Datos actualizados (no se pudo serializar completamente)');
+
       }
-      print('[DEBUG] ¿Hay cambios reales?: $isDataChanged');
+
     });
   }
 
@@ -535,10 +626,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     try {
       bool success = true;
       
-      print('[DEBUG] ========== Iniciando guardado ==========');
-      print('[DEBUG] _datosEditados keys: ${_datosEditados?.keys}');
-      print('[DEBUG] selectedImages: ${selectedImages.length}');
-      print('[DEBUG] imagesToDelete: ${imagesToDelete.length}');
+
+
+
+
       
       // 1. Guardar cambios en los datos de la actividad (nombre, descripción, etc.)
       // Solo si hay cambios en campos de actividad (no participantes)
@@ -550,9 +641,68 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       
       if (hasActivityChanges) {
         try {
-          print('[DEBUG] Guardando cambios de actividad...');
-          print('[DEBUG] transporteReq: ${_datosEditados!['transporteReq']} (original: ${_actividadOriginal!.transporteReq})');
-          print('[DEBUG] alojamientoReq: ${_datosEditados!['alojamientoReq']} (original: ${_actividadOriginal!.alojamientoReq})');
+
+
+
+          _datosEditados!.forEach((key, value) {
+            if (key != 'folletoBytes' && key != 'selectedImages') {
+
+            }
+          });
+
+
+          
+          // Calcular el coste real sumando solo los servicios activados
+          final transporteReq = (_datosEditados!['transporteReq'] ?? _actividadOriginal!.transporteReq) ?? 0;
+          final alojamientoReq = (_datosEditados!['alojamientoReq'] ?? _actividadOriginal!.alojamientoReq) ?? 0;
+          
+          final precioTransporte = (_datosEditados!['precioTransporte'] ?? _actividadOriginal!.precioTransporte) ?? 0.0;
+          final precioAlojamiento = (_datosEditados!['precioAlojamiento'] ?? _actividadOriginal!.precioAlojamiento) ?? 0.0;
+          
+          // Obtener gastos personalizados de la actividad
+          final gastoService = GastoPersonalizadoService(ApiService());
+          List<GastoPersonalizado> gastosPersonalizados = [];
+          try {
+            gastosPersonalizados = await gastoService.fetchGastosByActividad(widget.actividad.id);
+          } catch (e) {
+            print('[ERROR] Error al cargar gastos personalizados: $e');
+          }
+          
+          // Calcular total de gastos personalizados
+          final totalGastosPersonalizados = gastosPersonalizados.fold<double>(
+            0.0,
+            (sum, gasto) => sum + gasto.cantidad,
+          );
+          
+          // Solo sumar al coste real si el switch está activado (req == 1) + gastos personalizados
+          final costoRealCalculado = (transporteReq == 1 ? precioTransporte : 0.0) + 
+                                     (alojamientoReq == 1 ? precioAlojamiento : 0.0) +
+                                     totalGastosPersonalizados;
+
+          
+          // Crear objeto de EmpresaTransporte si hay un ID
+          EmpresaTransporte? empresaTransporteParaGuardar;
+          if (_datosEditados!['empresaTransporteId'] != null) {
+            empresaTransporteParaGuardar = EmpresaTransporte(
+              id: _datosEditados!['empresaTransporteId'] as int,
+              nombre: '', // El backend no necesita el nombre, solo el ID
+              cif: '',
+            );
+
+          } else {
+            empresaTransporteParaGuardar = _actividadOriginal!.empresaTransporte;
+
+          }
+          
+          // Obtener el alojamiento desde _datosEditados o usar el original
+          Alojamiento? alojamientoParaGuardar;
+          if (_datosEditados!.containsKey('alojamiento') && _datosEditados!['alojamiento'] != null) {
+            alojamientoParaGuardar = _datosEditados!['alojamiento'] as Alojamiento;
+
+          } else {
+            alojamientoParaGuardar = _actividadOriginal!.alojamiento;
+
+          }
           
           // Crear un objeto Actividad completo con los datos actualizados
           final actividadParaGuardar = Actividad(
@@ -567,10 +717,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             previstaIni: _actividadOriginal!.previstaIni,
             transporteReq: _datosEditados!['transporteReq'] ?? _actividadOriginal!.transporteReq,
             comentTransporte: _actividadOriginal!.comentTransporte,
+            precioTransporte: _datosEditados!['precioTransporte'] ?? _actividadOriginal!.precioTransporte,
+            empresaTransporte: empresaTransporteParaGuardar,
             alojamientoReq: _datosEditados!['alojamientoReq'] ?? _actividadOriginal!.alojamientoReq,
             comentAlojamiento: _actividadOriginal!.comentAlojamiento,
+            precioAlojamiento: _datosEditados!['precioAlojamiento'] ?? _actividadOriginal!.precioAlojamiento,
+            alojamiento: alojamientoParaGuardar,
             comentarios: _actividadOriginal!.comentarios,
-            estado: _datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente',
+            estado: _datosEditados!.containsKey('aprobada')
+              ? (_datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente')
+              : _actividadOriginal!.estado,
             comentEstado: _actividadOriginal!.comentEstado,
             incidencias: _actividadOriginal!.incidencias,
             urlFolleto: _actividadOriginal!.urlFolleto,
@@ -578,15 +734,19 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             departamento: _actividadCompleta?.departamento,
             localizacion: _actividadOriginal!.localizacion,
             importePorAlumno: _actividadOriginal!.importePorAlumno,
-            presupuestoEstimado: _actividadOriginal!.presupuestoEstimado,
-            costoReal: _actividadOriginal!.costoReal,
+            presupuestoEstimado: _datosEditados!['presupuestoEstimado'] ?? _actividadOriginal!.presupuestoEstimado,
+            costoReal: costoRealCalculado,
           );
           
-          print('[DEBUG] Objeto actividadParaGuardar creado:');
-          print('[DEBUG]   - transporteReq: ${actividadParaGuardar.transporteReq}');
-          print('[DEBUG]   - alojamientoReq: ${actividadParaGuardar.alojamientoReq}');
+
+
+
+
+
+
+
           
-          print('[DEBUG] Guardando actividad completa');
+
           
           // Usar updateActivity en lugar de updateActivityFields
           final actividadActualizada = await _actividadService.updateActivity(
@@ -595,9 +755,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           );
           
           if (actividadActualizada != null) {
-            print('[DEBUG] Actividad actualizada recibida del API:');
-            print('[DEBUG]   - transporteReq: ${actividadActualizada.transporteReq}');
-            print('[DEBUG]   - alojamientoReq: ${actividadActualizada.alojamientoReq}');
+
+
+
+
+
             
             // La respuesta del API puede no incluir los objetos completos de Profesor y Departamento
             // Si se cambió el profesor o departamento, cargar los datos completos
@@ -612,7 +774,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                   (p) => p.uuid == _datosEditados!['profesorId'],
                   orElse: () => actividadActualizada.solicitante ?? _actividadOriginal!.solicitante!,
                 );
-                print('[DEBUG] Profesor completo cargado: ${profesorCompleto?.nombre}');
+
               } catch (e) {
                 print('[ERROR] Error cargando profesor completo: $e');
                 profesorCompleto = actividadActualizada.solicitante;
@@ -627,11 +789,87 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                   (d) => d.id == _datosEditados!['departamentoId'],
                   orElse: () => actividadActualizada.departamento ?? _actividadOriginal!.departamento!,
                 );
-                print('[DEBUG] Departamento completo cargado: ${departamentoCompleto?.nombre}');
+
               } catch (e) {
                 print('[ERROR] Error cargando departamento completo: $e');
                 departamentoCompleto = actividadActualizada.departamento;
               }
+            }
+            
+            // Si tenemos un ID de empresa de transporte pero no el objeto completo, cargarlo
+            EmpresaTransporte? empresaTransporteCompleta = actividadActualizada.empresaTransporte;
+            
+            // Verificar si necesitamos cargar la empresa:
+            // 1. Si viene null del backend pero tenemos un ID guardado
+            // 2. O si hay un cambio pendiente de empresaTransporteId
+            final needsEmpresaLoad = empresaTransporteCompleta == null || 
+                                     (_datosEditados!.containsKey('empresaTransporteId') && 
+                                      _datosEditados!['empresaTransporteId'] != null &&
+                                      _datosEditados!['empresaTransporteId'] != empresaTransporteCompleta?.id);
+            
+            if (needsEmpresaLoad) {
+              try {
+
+                final empresas = await _actividadService.fetchEmpresasTransporte();
+                
+                // Obtener el ID: de datosEditados o del objeto original
+                final empresaId = _datosEditados!['empresaTransporteId'] ?? 
+                                 actividadActualizada.empresaTransporte?.id ??
+                                 _actividadOriginal!.empresaTransporte?.id;
+                
+                if (empresaId != null) {
+                  empresaTransporteCompleta = empresas.firstWhere(
+                    (e) => e.id == empresaId,
+                    orElse: () => throw Exception('Empresa con ID $empresaId no encontrada'),
+                  );
+
+                } else {
+
+                }
+              } catch (e) {
+                print('[ERROR] Error cargando empresa de transporte completa: $e');
+                empresaTransporteCompleta = actividadActualizada.empresaTransporte ?? _actividadOriginal!.empresaTransporte;
+              }
+            } else {
+
+            }
+            
+            // Si tenemos un ID de alojamiento pero no el objeto completo, cargarlo
+            Alojamiento? alojamientoCompleto = actividadActualizada.alojamiento;
+            
+            // Verificar si necesitamos cargar el alojamiento:
+            // 1. Si viene null del backend pero tenemos un ID guardado
+            // 2. O si hay un cambio pendiente de alojamientoId
+            final needsAlojamientoLoad = alojamientoCompleto == null || 
+                                        (_datosEditados!.containsKey('alojamientoId') && 
+                                         _datosEditados!['alojamientoId'] != null &&
+                                         _datosEditados!['alojamientoId'] != alojamientoCompleto?.id);
+            
+            if (needsAlojamientoLoad) {
+              try {
+
+                final alojamientos = await _actividadService.fetchAlojamientos();
+                
+                // Obtener el ID: de datosEditados o del objeto original
+                final alojamientoId = _datosEditados!['alojamientoId'] ?? 
+                                     actividadActualizada.alojamiento?.id ??
+                                     _actividadOriginal!.alojamiento?.id;
+                
+                if (alojamientoId != null) {
+                  alojamientoCompleto = alojamientos.firstWhere(
+                    (a) => a.id == alojamientoId,
+                    orElse: () => throw Exception('Alojamiento con ID $alojamientoId no encontrado'),
+                  );
+
+                } else {
+
+                }
+              } catch (e) {
+                print('[ERROR] Error cargando alojamiento completo: $e');
+                alojamientoCompleto = actividadActualizada.alojamiento ?? _actividadOriginal!.alojamiento;
+              }
+            } else {
+
             }
             
             // Crear una copia completa con los objetos cargados
@@ -647,8 +885,12 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               previstaIni: actividadActualizada.previstaIni,
               transporteReq: actividadActualizada.transporteReq,
               comentTransporte: actividadActualizada.comentTransporte,
+              precioTransporte: actividadActualizada.precioTransporte,
+              empresaTransporte: empresaTransporteCompleta,
               alojamientoReq: actividadActualizada.alojamientoReq,
               comentAlojamiento: actividadActualizada.comentAlojamiento,
+              precioAlojamiento: actividadActualizada.precioAlojamiento,
+              alojamiento: alojamientoCompleto,
               comentarios: actividadActualizada.comentarios,
               estado: actividadActualizada.estado,
               comentEstado: actividadActualizada.comentEstado,
@@ -666,12 +908,14 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             _actividadOriginal = actividadCompletaConObjetos;
             _actividadCompleta = actividadCompletaConObjetos;
             
-            print('[DEBUG] Actividad actualizada en memoria:');
-            print('[DEBUG]   - _actividadCompleta.transporteReq: ${_actividadCompleta!.transporteReq}');
-            print('[DEBUG]   - _actividadCompleta.alojamientoReq: ${_actividadCompleta!.alojamientoReq}');
+
+
+
+
+
             
             // NO limpiar _datosEditados aquí, lo haremos al final después de guardar participantes
-            print('[DEBUG] Actividad actualizada correctamente en BD con objetos completos');
+
           } else {
             success = false;
           }
@@ -702,9 +946,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       // 4. Guardar profesores participantes
       if (_datosEditados != null && _datosEditados!.containsKey('profesoresParticipantes')) {
         try {
-          print('[DEBUG] Guardando profesores participantes...');
+
           final profesoresParticipantes = _datosEditados!['profesoresParticipantes'] as List<dynamic>;
-          print('[DEBUG] Profesores a guardar: ${profesoresParticipantes.length}');
+
           
           // Extraer los UUIDs de los objetos Profesor
           final profesoresIds = profesoresParticipantes.map((p) {
@@ -716,9 +960,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             }
           }).toList();
           
-          print('[DEBUG] UUIDs a guardar: $profesoresIds');
+
           await _profesorService.updateProfesoresParticipantes(widget.actividad.id, profesoresIds);
-          print('[DEBUG] Profesores participantes guardados correctamente');
+
         } catch (e) {
           print('[ERROR] Error guardando profesores participantes: $e');
           print('[ERROR] Stack trace: ${StackTrace.current}');
@@ -729,9 +973,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       // 5. Guardar grupos participantes
       if (_datosEditados != null && _datosEditados!.containsKey('gruposParticipantes')) {
         try {
-          print('[DEBUG] Guardando grupos participantes...');
+
           final gruposParticipantes = _datosEditados!['gruposParticipantes'] as List<dynamic>;
-          print('[DEBUG] Grupos a guardar: ${gruposParticipantes.length}');
+
           
           // Extraer los datos de los objetos GrupoParticipante
           final gruposData = gruposParticipantes.map((gp) {
@@ -751,9 +995,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             }
           }).toList();
           
-          print('[DEBUG] Datos de grupos a guardar: $gruposData');
+
           await _catalogoService.updateGruposParticipantes(widget.actividad.id, gruposData);
-          print('[DEBUG] Grupos participantes guardados correctamente');
+
         } catch (e) {
           print('[ERROR] Error guardando grupos participantes: $e');
           print('[ERROR] Stack trace: ${StackTrace.current}');
@@ -764,9 +1008,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       // 6. Eliminar folleto si se marcó para eliminación
       if (_datosEditados != null && _datosEditados!.containsKey('deleteFolleto') && _datosEditados!['deleteFolleto'] == true) {
         try {
-          print('[DEBUG] Eliminando folleto...');
+
           await _actividadService.deleteFolleto(widget.actividad.id);
-          print('[DEBUG] Folleto eliminado correctamente');
+
         } catch (e) {
           print('[ERROR] Error eliminando folleto: $e');
           success = false;
@@ -776,7 +1020,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       // 7. Subir folleto si cambió
       if (_datosEditados != null && _datosEditados!.containsKey('folletoFileName')) {
         try {
-          print('[DEBUG] Subiendo folleto...');
+
           final folletoName = _datosEditados!['folletoFileName'] as String;
           
           String folletoUrl;
@@ -800,7 +1044,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             throw Exception('No se encontró path ni bytes del folleto');
           }
           
-          print('[DEBUG] Folleto subido correctamente: $folletoUrl');
+
         } catch (e) {
           print('[ERROR] Error subiendo folleto: $e');
           print('[ERROR] Stack trace: ${StackTrace.current}');
@@ -808,10 +1052,50 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         }
       }
 
-      // 8. Guardar localizaciones si cambiaron
+      // 8. Guardar gastos personalizados si cambiaron
+      if (_datosEditados != null && _datosEditados!.containsKey('gastosPersonalizados')) {
+        try {
+          final gastosService = GastoPersonalizadoService(ApiService());
+          final gastosActuales = _datosEditados!['gastosPersonalizados'] as List<GastoPersonalizado>;
+          
+          // Obtener los gastos actuales de la BD
+          final gastosEnBD = await gastosService.fetchGastosByActividad(widget.actividad.id);
+          
+          // Identificar gastos a crear (tienen ID negativo o null)
+          final gastosACrear = gastosActuales.where((g) => g.id == null || g.id! < 0).toList();
+          
+          // Identificar gastos a eliminar (están en BD pero no en la lista actual)
+          final idsActuales = gastosActuales.where((g) => g.id != null && g.id! > 0).map((g) => g.id!).toSet();
+          final gastosAEliminar = gastosEnBD.where((g) => !idsActuales.contains(g.id)).toList();
+          
+          // Crear nuevos gastos
+          for (var gasto in gastosACrear) {
+            final nuevoGasto = GastoPersonalizado(
+              actividadId: widget.actividad.id,
+              concepto: gasto.concepto,
+              cantidad: gasto.cantidad,
+            );
+            await gastosService.createGasto(nuevoGasto);
+          }
+          
+          // Eliminar gastos que ya no están
+          for (var gasto in gastosAEliminar) {
+            if (gasto.id != null) {
+              await gastosService.deleteGasto(gasto.id!);
+            }
+          }
+          
+          print('[GASTOS] Gastos guardados: ${gastosACrear.length} creados, ${gastosAEliminar.length} eliminados');
+        } catch (e) {
+          print('[ERROR] Error guardando gastos personalizados: $e');
+          success = false;
+        }
+      }
+
+      // 9. Guardar localizaciones si cambiaron
       if (_datosEditados != null && _datosEditados!.containsKey('localizaciones_modificadas')) {
         try {
-          print('[DEBUG] Guardando localizaciones...');
+
           final localizacionesNuevas = _datosEditados!['localizaciones_modificadas'] as List<Localizacion>;
           final localizacionesOriginales = await _localizacionService.fetchLocalizaciones(widget.actividad.id);
           
@@ -824,7 +1108,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             final id = loc['id'] as int;
             if (!idsNuevos.contains(id)) {
               await _localizacionService.removeLocalizacion(widget.actividad.id, id);
-              print('[DEBUG] Localización eliminada: $id');
+
             }
           }
           
@@ -850,7 +1134,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                 esPrincipal: loc.esPrincipal,
                 icono: loc.icono,
               );
-              print('[DEBUG] Nueva localización creada y añadida: $localizacionId');
+
             }
           }
           
@@ -864,7 +1148,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             );
           }
           
-          print('[DEBUG] Localizaciones guardadas correctamente');
+
         } catch (e) {
           print('[ERROR] Error guardando localizaciones: $e');
           print('[ERROR] Stack trace: ${StackTrace.current}');
@@ -1051,12 +1335,14 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         saveChanges: _saveChanges,
         revertChanges: _revertChanges,
         onActivityDataChanged: _handleActivityDataChanged,
+        reloadTrigger: _widgetKey, // Pasar el contador de reload
       );
     } else {
       return OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {
             return ActivityDetailPortraitLayout(
+              key: ValueKey(_widgetKey), // Forzar reconstrucción al revertir
               actividad: actividadAMostrar,
               isDarkTheme: widget.isDarkTheme,
               onToggleTheme: widget.onToggleTheme,
@@ -1072,6 +1358,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             );
           } else {
             return ActivityDetailSmallLandscapeLayout(
+              key: ValueKey(_widgetKey), // Forzar reconstrucción al revertir
               actividad: actividadAMostrar,
               isDarkTheme: widget.isDarkTheme,
               onToggleTheme: widget.onToggleTheme,

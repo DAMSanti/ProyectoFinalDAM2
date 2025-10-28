@@ -92,6 +92,7 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
+            .Include(a => a.Alojamiento)
             .Include(a => a.ProfesoresResponsables)
                 .ThenInclude(pr => pr.Profesor)
             .Include(a => a.ActividadLocalizaciones)
@@ -165,10 +166,15 @@ public class ActividadService : IActividadService
         if (dto.FechaFin.HasValue) actividad.FechaFin = dto.FechaFin;
         if (dto.PresupuestoEstimado.HasValue) actividad.PresupuestoEstimado = dto.PresupuestoEstimado;
         if (dto.CostoReal.HasValue) actividad.CostoReal = dto.CostoReal;
+        if (dto.PrecioTransporte.HasValue) actividad.PrecioTransporte = dto.PrecioTransporte;
         if (dto.Aprobada.HasValue) actividad.Aprobada = dto.Aprobada.Value;
         if (dto.DepartamentoId.HasValue) actividad.DepartamentoId = dto.DepartamentoId;
         if (dto.LocalizacionId.HasValue) actividad.LocalizacionId = dto.LocalizacionId;
-        if (dto.EmpTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpTransporteId;
+        // Soportar tanto EmpTransporteId como EmpresaTransporteId (compatibilidad con Flutter)
+        if (dto.EmpresaTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpresaTransporteId;
+        else if (dto.EmpTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpTransporteId;
+        if (dto.AlojamientoId.HasValue) actividad.AlojamientoId = dto.AlojamientoId;
+        if (dto.PrecioAlojamiento.HasValue) actividad.PrecioAlojamiento = dto.PrecioAlojamiento.Value;
         if (dto.TransporteReq.HasValue) actividad.TransporteReq = dto.TransporteReq.Value;
         if (dto.AlojamientoReq.HasValue) actividad.AlojamientoReq = dto.AlojamientoReq.Value;
         
@@ -207,6 +213,7 @@ public class ActividadService : IActividadService
             .Include(a => a.Departamento)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
+            .Include(a => a.Alojamiento)
             .Include(a => a.ProfesoresResponsables)
                 .ThenInclude(pr => pr.Profesor)
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -259,6 +266,7 @@ public class ActividadService : IActividadService
             FechaFin = actividad.FechaFin,
             PresupuestoEstimado = actividad.PresupuestoEstimado,
             CostoReal = actividad.CostoReal,
+            PrecioTransporte = actividad.PrecioTransporte,
             FolletoUrl = actividad.FolletoUrl,
             Aprobada = actividad.Aprobada,
             DepartamentoId = actividad.DepartamentoId,
@@ -268,6 +276,24 @@ public class ActividadService : IActividadService
             EmpTransporteId = actividad.EmpTransporteId,
             EmpTransporteNombre = actividad.EmpTransporte?.Nombre,
             TransporteReq = actividad.TransporteReq,
+            PrecioAlojamiento = actividad.PrecioAlojamiento,
+            AlojamientoId = actividad.AlojamientoId,
+            Alojamiento = actividad.Alojamiento != null ? new AlojamientoDto
+            {
+                Id = actividad.Alojamiento.Id,
+                Nombre = actividad.Alojamiento.Nombre,
+                Direccion = actividad.Alojamiento.Direccion,
+                Ciudad = actividad.Alojamiento.Ciudad,
+                CodigoPostal = actividad.Alojamiento.CodigoPostal,
+                Provincia = actividad.Alojamiento.Provincia,
+                Telefono = actividad.Alojamiento.Telefono,
+                Email = actividad.Alojamiento.Email,
+                Web = actividad.Alojamiento.Web,
+                CapacidadTotal = actividad.Alojamiento.CapacidadTotal,
+                Observaciones = actividad.Alojamiento.Observaciones,
+                Activo = actividad.Alojamiento.Activo,
+                FechaCreacion = actividad.Alojamiento.FechaCreacion
+            } : null,
             AlojamientoReq = actividad.AlojamientoReq,
             Solicitante = solicitante
         };

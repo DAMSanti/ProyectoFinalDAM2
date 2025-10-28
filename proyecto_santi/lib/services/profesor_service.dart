@@ -11,22 +11,15 @@ class ProfesorService {
   /// Obtiene todos los profesores
   Future<List<Profesor>> fetchProfesores() async {
     try {
-      print('[ProfesorService] Fetching profesores from: ${AppConfig.profesorEndpoint}');
       final response = await _apiService.getData(AppConfig.profesorEndpoint);
-      
-      print('[ProfesorService] Response status: ${response.statusCode}');
-      print('[ProfesorService] Response data type: ${response.data.runtimeType}');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        print('[ProfesorService] Raw data: $data');
         
         final profesores = data.map((json) {
-          print('[ProfesorService] Parsing profesor: $json');
           return Profesor.fromJson(json);
         }).toList();
         
-        print('[ProfesorService] Parsed ${profesores.length} profesores');
         return profesores;
       }
       throw ApiException('Error al obtener profesores', statusCode: response.statusCode);
@@ -101,16 +94,11 @@ class ProfesorService {
   /// Obtiene los profesores participantes de una actividad
   Future<List<String>> fetchProfesoresParticipantes(int actividadId) async {
     try {
-      print('[ProfesorService] Fetching profesores participantes for actividad $actividadId');
       final response = await _apiService.getData('/Actividad/$actividadId/profesores-participantes');
-      
-      print('[ProfesorService] Response status: ${response.statusCode}');
-      print('[ProfesorService] Response data: ${response.data}');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         final result = data.map((e) => e.toString()).toList();
-        print('[ProfesorService] Profesores participantes IDs: $result');
         return result;
       }
       throw ApiException('Error al obtener profesores participantes', statusCode: response.statusCode);
@@ -123,7 +111,6 @@ class ProfesorService {
   /// Actualiza los profesores participantes de una actividad
   Future<bool> updateProfesoresParticipantes(int actividadId, List<String> profesoresIds) async {
     try {
-      print('[ProfesorService] Updating profesores participantes for actividad $actividadId');
       final response = await _apiService.putData(
         '/Actividad/$actividadId/profesores-participantes',
         {'profesoresIds': profesoresIds},

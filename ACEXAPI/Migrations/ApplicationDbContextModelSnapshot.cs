@@ -30,6 +30,13 @@ namespace ACEXAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AlojamientoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AlojamientoReq")
+                        .HasColumnType("int")
+                        .HasColumnName("alojamiento_req");
+
                     b.Property<bool>("Aprobada")
                         .HasColumnType("bit");
 
@@ -66,10 +73,20 @@ namespace ACEXAPI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<decimal?>("PrecioTransporte")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("precio_transporte");
+
                     b.Property<decimal?>("PresupuestoEstimado")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("TransporteReq")
+                        .HasColumnType("int")
+                        .HasColumnName("transporte_req");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AlojamientoId");
 
                     b.HasIndex("DepartamentoId");
 
@@ -77,7 +94,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("LocalizacionId");
 
-                    b.ToTable("Actividades");
+                    b.ToTable("Actividades", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ActividadLocalizacion", b =>
@@ -110,7 +127,85 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("ActividadId", "LocalizacionId")
                         .IsUnique();
 
-                    b.ToTable("ActividadLocalizaciones");
+                    b.ToTable("ActividadLocalizaciones", (string)null);
+                });
+
+            modelBuilder.Entity("ACEXAPI.Models.Alojamiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("CapacidadTotal")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Ciudad")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CodigoPostal")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Direccion")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Latitud")
+                        .HasColumnType("decimal(10,7)");
+
+                    b.Property<decimal?>("Longitud")
+                        .HasColumnType("decimal(10,7)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("NumeroHabitaciones")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal?>("PrecioPorNoche")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Provincia")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Servicios")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Telefono")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TipoAlojamiento")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Web")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Alojamientos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Contrato", b =>
@@ -152,7 +247,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ActividadId");
 
-                    b.ToTable("Contratos");
+                    b.ToTable("Contratos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Curso", b =>
@@ -177,7 +272,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cursos");
+                    b.ToTable("Cursos", (string)null);
 
                     b.HasData(
                         new
@@ -222,7 +317,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departamentos");
+                    b.ToTable("Departamentos", (string)null);
 
                     b.HasData(
                         new
@@ -276,7 +371,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmpTransportes");
+                    b.ToTable("EmpTransportes", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Foto", b =>
@@ -311,7 +406,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ActividadId");
 
-                    b.ToTable("Fotos");
+                    b.ToTable("Fotos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Grupo", b =>
@@ -337,7 +432,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("CursoId");
 
-                    b.ToTable("Grupos");
+                    b.ToTable("Grupos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.GrupoPartic", b =>
@@ -366,7 +461,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("GrupoId");
 
-                    b.ToTable("GrupoPartics");
+                    b.ToTable("GrupoPartics", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Localizacion", b =>
@@ -413,7 +508,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Localizaciones");
+                    b.ToTable("Localizaciones", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ProfParticipante", b =>
@@ -443,7 +538,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ProfesorUuid");
 
-                    b.ToTable("ProfParticipantes");
+                    b.ToTable("ProfParticipantes", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ProfResponsable", b =>
@@ -476,7 +571,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ProfesorUuid");
 
-                    b.ToTable("ProfResponsables");
+                    b.ToTable("ProfResponsables", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Profesor", b =>
@@ -528,7 +623,7 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("Dni")
                         .IsUnique();
 
-                    b.ToTable("Profesores");
+                    b.ToTable("Profesores", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Usuario", b =>
@@ -568,11 +663,16 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("Usuarios", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Actividad", b =>
                 {
+                    b.HasOne("ACEXAPI.Models.Alojamiento", "Alojamiento")
+                        .WithMany("Actividades")
+                        .HasForeignKey("AlojamientoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("ACEXAPI.Models.Departamento", "Departamento")
                         .WithMany("Actividades")
                         .HasForeignKey("DepartamentoId")
@@ -587,6 +687,8 @@ namespace ACEXAPI.Migrations
                         .WithMany("Actividades")
                         .HasForeignKey("LocalizacionId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Alojamiento");
 
                     b.Navigation("Departamento");
 
@@ -727,6 +829,11 @@ namespace ACEXAPI.Migrations
                     b.Navigation("ProfesoresParticipantes");
 
                     b.Navigation("ProfesoresResponsables");
+                });
+
+            modelBuilder.Entity("ACEXAPI.Models.Alojamiento", b =>
+                {
+                    b.Navigation("Actividades");
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Curso", b =>

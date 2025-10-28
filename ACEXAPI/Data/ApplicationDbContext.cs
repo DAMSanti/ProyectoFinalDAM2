@@ -25,12 +25,42 @@ public class ApplicationDbContext : DbContext
     public DbSet<Contrato> Contratos { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<ActividadLocalizacion> ActividadLocalizaciones { get; set; }
+    public DbSet<GastoPersonalizado> GastosPersonalizados { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurar �ndices �nicos
+        // Configurar precisión de decimales para Actividad
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PresupuestoEstimado)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.CostoReal)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PrecioTransporte)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PrecioAlojamiento)
+            .HasPrecision(18, 2);
+
+        // Configurar precisión de decimales para GastoPersonalizado
+        modelBuilder.Entity<GastoPersonalizado>()
+            .Property(g => g.Cantidad)
+            .HasPrecision(18, 2);
+
+        // Configurar relación de GastoPersonalizado con Actividad
+        modelBuilder.Entity<GastoPersonalizado>()
+            .HasOne(g => g.Actividad)
+            .WithMany()
+            .HasForeignKey(g => g.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configurar índices únicos
         modelBuilder.Entity<Profesor>()
             .HasIndex(p => p.Dni)
             .IsUnique();

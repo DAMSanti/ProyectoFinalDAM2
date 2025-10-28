@@ -15,22 +15,22 @@ class CatalogoService {
   /// Obtiene todos los departamentos
   Future<List<Departamento>> fetchDepartamentos() async {
     try {
-      print('[CatalogoService] Fetching departamentos from: ${AppConfig.departamentosEndpoint}');
+
       final response = await _apiService.getData(AppConfig.departamentosEndpoint);
       
-      print('[CatalogoService] Response status: ${response.statusCode}');
-      print('[CatalogoService] Response data type: ${response.data.runtimeType}');
+
+
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
-        print('[CatalogoService] Raw data: $data');
+
         
         final departamentos = data.map((json) {
-          print('[CatalogoService] Parsing departamento: $json');
+
           return Departamento.fromJson(json);
         }).toList();
         
-        print('[CatalogoService] Parsed ${departamentos.length} departamentos');
+
         return departamentos;
       }
       throw ApiException('Error al obtener departamentos', statusCode: response.statusCode);
@@ -45,13 +45,13 @@ class CatalogoService {
   /// Obtiene todos los cursos
   Future<List<Curso>> fetchCursos() async {
     try {
-      print('[CatalogoService] Fetching cursos from: /Curso');
+
       final response = await _apiService.getData('/Curso');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         final cursos = data.map((json) => Curso.fromJson(json)).toList();
-        print('[CatalogoService] Parsed ${cursos.length} cursos');
+
         return cursos;
       }
       throw ApiException('Error al obtener cursos', statusCode: response.statusCode);
@@ -66,13 +66,13 @@ class CatalogoService {
   /// Obtiene todos los grupos
   Future<List<Grupo>> fetchGrupos() async {
     try {
-      print('[CatalogoService] Fetching grupos from: /Grupo');
+
       final response = await _apiService.getData('/Grupo');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         final grupos = data.map((json) => Grupo.fromJson(json)).toList();
-        print('[CatalogoService] Parsed ${grupos.length} grupos');
+
         return grupos;
       }
       throw ApiException('Error al obtener grupos', statusCode: response.statusCode);
@@ -85,13 +85,13 @@ class CatalogoService {
   /// Obtiene los grupos de un curso específico
   Future<List<Grupo>> fetchGruposByCurso(int cursoId) async {
     try {
-      print('[CatalogoService] Fetching grupos for curso $cursoId');
+
       final response = await _apiService.getData('/Curso/$cursoId/grupos');
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         final grupos = data.map((json) => Grupo.fromJson(json)).toList();
-        print('[CatalogoService] Parsed ${grupos.length} grupos for curso $cursoId');
+
         return grupos;
       }
       throw ApiException('Error al obtener grupos del curso', statusCode: response.statusCode);
@@ -104,7 +104,7 @@ class CatalogoService {
   /// Obtiene los grupos participantes de una actividad
   Future<List<Map<String, dynamic>>> fetchGruposParticipantes(int actividadId) async {
     try {
-      print('[CatalogoService] Fetching grupos participantes for actividad $actividadId');
+
       final response = await _apiService.getData('/Actividad/$actividadId/grupos-participantes');
       
       if (response.statusCode == 200) {
@@ -121,7 +121,7 @@ class CatalogoService {
   /// Actualiza los grupos participantes de una actividad
   Future<bool> updateGruposParticipantes(int actividadId, List<Map<String, dynamic>> grupos) async {
     try {
-      print('[CatalogoService] Updating grupos participantes for actividad $actividadId');
+
       final response = await _apiService.putData(
         '/Actividad/$actividadId/grupos-participantes',
         {'grupos': grupos},

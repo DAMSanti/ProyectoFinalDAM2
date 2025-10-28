@@ -2,6 +2,7 @@ import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
+import 'package:proyecto_santi/models/empresa_transporte.dart';
 
 class Actividad {
   final int id;
@@ -16,8 +17,10 @@ class Actividad {
   final int transporteReq;
   final String? comentTransporte;
   final double? precioTransporte;
+  final EmpresaTransporte? empresaTransporte;
   final int alojamientoReq;
   final String? comentAlojamiento;
+  final double? precioAlojamiento;
   final Alojamiento? alojamiento;
   final String? comentarios;
   final String estado;
@@ -45,8 +48,10 @@ class Actividad {
     required this.transporteReq,
     this.comentTransporte,
     this.precioTransporte,
+    this.empresaTransporte,
     required this.alojamientoReq,
     this.comentAlojamiento,
+    this.precioAlojamiento,
     this.alojamiento,
     this.comentarios,
     required this.estado,
@@ -106,6 +111,19 @@ class Actividad {
           .toList();
     }
     
+    // Parsear la empresa de transporte si viene en el JSON
+    EmpresaTransporte? empresaTransporte;
+    if (json['empresaTransporte'] != null && json['empresaTransporte'] is Map) {
+      empresaTransporte = EmpresaTransporte.fromJson(json['empresaTransporte']);
+    } else if (json['empTransporteId'] != null && json['empTransporteNombre'] != null) {
+      // Si viene como campos planos desde el backend, construir el objeto
+      empresaTransporte = EmpresaTransporte(
+        id: json['empTransporteId'] as int,
+        nombre: json['empTransporteNombre'] as String,
+        cif: '', // No disponible en la respuesta plana
+      );
+    }
+    
     // Parsear fechas de inicio y fin
     final fechaInicioStr = json['fechaInicio']?.toString() ?? json['fini']?.toString() ?? now;
     final fechaFinStr = json['fechaFin']?.toString() ?? json['ffin']?.toString() ?? now;
@@ -146,8 +164,10 @@ class Actividad {
       transporteReq: json['transporteReq'] as int? ?? 0,
       comentTransporte: json['comentTransporte']?.toString(),
       precioTransporte: (json['precioTransporte'] as num?)?.toDouble(),
+      empresaTransporte: empresaTransporte,
       alojamientoReq: json['alojamientoReq'] as int? ?? 0,
       comentAlojamiento: json['comentAlojamiento']?.toString(),
+      precioAlojamiento: (json['precioAlojamiento'] as num?)?.toDouble(),
       alojamiento: alojamiento, // Cambio: ahora es un objeto Alojamiento
       comentarios: json['comentarios']?.toString(),
       estado: (json['aprobada'] == true) ? 'Aprobada' : (json['estado']?.toString() ?? 'Pendiente'),
@@ -178,8 +198,10 @@ class Actividad {
       'transporteReq': transporteReq,
       'comentTransporte': comentTransporte,
       'precioTransporte': precioTransporte,
+      'empresaTransporteId': empresaTransporte?.id, // Enviar solo el ID de la empresa
       'alojamientoReq': alojamientoReq,
       'comentAlojamiento': comentAlojamiento,
+      'precioAlojamiento': precioAlojamiento,
       'alojamientoId': alojamiento?.id, // Enviar solo el ID del alojamiento
       'comentarios': comentarios,
       'aprobada': estado == 'Aprobada', // La API espera 'aprobada' como bool

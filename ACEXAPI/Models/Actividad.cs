@@ -36,6 +36,9 @@ public class Actividad
     [Column("precio_transporte")]
     public decimal? PrecioTransporte { get; set; }
 
+    [Column("precio_alojamiento")]
+    public decimal? PrecioAlojamiento { get; set; }
+
     [Column("transporte_req")]
     public int TransporteReq { get; set; } = 0;
 
