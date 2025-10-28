@@ -3,7 +3,6 @@ import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/gestures.dart';
 
 class HomePortraitLayout extends StatelessWidget {
@@ -22,13 +21,15 @@ class HomePortraitLayout extends StatelessWidget {
               flex: 3,
               child: Column(
                 children: [
-                  UserInformation(),
+                  const UserInformation(),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
                       'Próximas Actividades',
                       style: TextStyle(
-                          fontSize: 16.dg, fontWeight: FontWeight.bold),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Padding(
@@ -37,7 +38,7 @@ class HomePortraitLayout extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(12.0),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             offset: Offset(-4, -4),
@@ -59,7 +60,7 @@ class HomePortraitLayout extends StatelessWidget {
                                   0.0,
                                   _scrollController.position.maxScrollExtent,
                                 ),
-                                duration: Duration(milliseconds: 100),
+                                duration: const Duration(milliseconds: 100),
                                 curve: Curves.ease,
                               );
                             }
@@ -67,11 +68,11 @@ class HomePortraitLayout extends StatelessWidget {
                           child: SingleChildScrollView(
                             controller: _scrollController,
                             scrollDirection: Axis.horizontal,
-                            physics: BouncingScrollPhysics(),
+                            physics: const BouncingScrollPhysics(),
                             child: Row(
                               children: activities.map((actividad) {
                                 return Padding(
-                                  padding: EdgeInsets.only(right: 16.0),
+                                  padding: const EdgeInsets.only(right: 16.0),
                                   child: SizedBox(
                                     width: constraints.maxHeight * 0.38,
                                     child: ActivityCardItem(

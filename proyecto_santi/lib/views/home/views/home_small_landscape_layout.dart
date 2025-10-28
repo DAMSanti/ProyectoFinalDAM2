@@ -19,36 +19,40 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
               flex: 1,
               child: Column(
                 children: [
-                  UserInformation(),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(12.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(-4, -4),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                                blurStyle: BlurStyle.inner,
-                              ),
-                            ],
-                          ),
-                          child: ListView.builder(
-                            itemCount: activities.length,
-                            itemBuilder: (context, index) {
-                              final actividad = activities[index];
-                              return ActivityCardItem(
-                                actividad: actividad,
-                                isDarkTheme: Theme.of(context).brightness == Brightness.dark,
-                              );
-                            },
-                          ),
+                  const UserInformation(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 6.0),
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 8.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              offset: Offset(-4, -4),
+                              blurRadius: 10.0,
+                              spreadRadius: 1.0,
+                              blurStyle: BlurStyle.inner,
+                            ),
+                          ],
                         ),
+                        child: ListView.builder(
+                          itemCount: activities.length,
+                          itemBuilder: (context, index) {
+                            final actividad = activities[index];
+                            return ActivityCardItem(
+                              actividad: actividad,
+                              isDarkTheme:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark,
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -60,7 +64,7 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: constraints.maxHeight, // Adjust the height of the calendar based on screen size
+                    height: constraints.maxHeight,
                     child: CalendarView(activities: activities),
                   ),
                 ],

@@ -35,86 +35,53 @@ class HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    // Si estamos en web o desktop, devolver el contenido con fondo degradado
-    // pero sin Scaffold porque el DesktopShell ya proporciona el marco
-    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      return Stack(
-        children: [
-          Theme.of(context).brightness == Brightness.dark
-              ? GradientBackgroundDark(child: Container())
-              : GradientBackgroundLight(child: Container()),
-          FutureBuilder<List<Actividad>>(
-            future: _futureActivities,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No hay actividades próximas.'));
-              } else {
-                // Usar HomeLargeLandscapeLayout que ya NO tiene MarcoDesktop
-                return HomeLargeLandscapeLayout(
-                  activities: snapshot.data!,
-                  onToggleTheme: widget.onToggleTheme,
-                );
-              }
-            },
-          ),
-        ],
-      );
-    }
-    
-    // Para móvil, mantener el Scaffold completo
-    return WillPopScope(
-      onWillPop: () => onWillPopSalir(context, isHome: true),
-      child: Stack(
-        children: [
-          Theme.of(context).brightness == Brightness.dark
-              ? GradientBackgroundDark(
-            child: Container(),
-          )
-              : GradientBackgroundLight(
-            child: Container(),
-          ),
-          Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: shouldShowAppBar()
-                ? AndroidAppBar(
-              onToggleTheme: widget.onToggleTheme,
-              title: 'Inicio',
-            )
-                : null,
-            drawer: Menu(),
-            body: FutureBuilder<List<Actividad>>(
-              future: _futureActivities,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No hay actividades próximas.'));
-                } else {
-                  return _buildMobileLayout(context, snapshot.data!);
-                }
-              },
-            ),
-          ),
-        ],
-      ),
+    // El contenido se muestra directamente sin Scaffold
+    // porque el DesktopShell ya proporciona el marco (tanto en desktop como en móvil)
+    return Stack(
+      children: [
+        Theme.of(context).brightness == Brightness.dark
+            ? GradientBackgroundDark(child: Container())
+            : GradientBackgroundLight(child: Container()),
+        FutureBuilder<List<Actividad>>(
+          future: _futureActivities,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('No hay actividades próximas.'));
+            } else {
+              return _buildResponsiveLayout(context, snapshot.data!);
+            }
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, List<Actividad> activities) {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        if (orientation == Orientation.portrait) {
-          return HomePortraitLayout(activities: activities);
-        } else {
-          return HomeSmallLandscapeLayout(activities: activities);
-        }
-      },
-    );
+  Widget _buildResponsiveLayout(BuildContext context, List<Actividad> activities) {
+    // Detectar si es desktop o móvil
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
+    if (isDesktop && width >= 800) {
+      // Vista de escritorio grande
+      return HomeLargeLandscapeLayout(
+        activities: activities,
+        onToggleTheme: widget.onToggleTheme,
+      );
+    } else {
+      // Vista móvil (portrait o landscape pequeño)
+      return OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return HomePortraitLayout(activities: activities);
+          } else {
+            return HomeSmallLandscapeLayout(activities: activities);
+          }
+        },
+      );
+    }
   }
 }

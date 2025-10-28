@@ -289,57 +289,82 @@ class DesktopShellFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final minMenuWidth = 200.0;
-        final menuWidth = constraints.maxWidth * 0.15;
-        final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
-
-        return Stack(
-          children: [
-            Row(
-              children: [
-                SizedBox(width: effectiveMenuWidth),
-                Expanded(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 92,
-                        child: DesktopBar(
-                          onToggleTheme: onToggleTheme,
-                          title: currentTitle,
-                        ),
-                      ),
-                      Expanded(
-                        child: child,
-                      ),
-                    ],
-                  ),
+        // Determinar si es móvil o desktop basándose en el ancho
+        final isMobile = constraints.maxWidth < 800;
+        
+        if (isMobile) {
+          // Versión móvil: Scaffold con Drawer oculto
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(currentTitle),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.brightness_6),
+                  onPressed: onToggleTheme,
+                  tooltip: 'Cambiar tema',
                 ),
               ],
             ),
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: effectiveMenuWidth,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      offset: Offset(3, 0),
+            drawer: MenuDesktopStatic(
+              currentRoute: currentRoute,
+              onNavigate: onNavigate,
+            ),
+            body: child,
+          );
+        } else {
+          // Versión desktop: menú fijo lateral
+          final minMenuWidth = 200.0;
+          final menuWidth = constraints.maxWidth * 0.15;
+          final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
+
+          return Stack(
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: effectiveMenuWidth),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 92,
+                          child: DesktopBar(
+                            onToggleTheme: onToggleTheme,
+                            title: currentTitle,
+                          ),
+                        ),
+                        Expanded(
+                          child: child,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: MenuDesktopStatic(
-                  currentRoute: currentRoute,
-                  onNavigate: onNavigate,
+                  ),
+                ],
+              ),
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: effectiveMenuWidth,
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: Offset(3, 0),
+                      ),
+                    ],
+                  ),
+                  child: MenuDesktopStatic(
+                    currentRoute: currentRoute,
+                    onNavigate: onNavigate,
+                  ),
                 ),
               ),
-            ),
-          ],
-        );
+            ],
+          );
+        }
       },
     );
   }
