@@ -50,8 +50,14 @@ final ThemeData lightTheme = ThemeData(
   // APPBAR
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.transparent,
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
-    iconTheme: IconThemeData(color: colorTextoLight),
+    titleTextStyle: TextStyle(
+      color: Color(0xFF1976d2), // Azul consistente
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 0.5,
+      inherit: true,
+    ),
+    iconTheme: IconThemeData(color: Color(0xFF1976d2)),
   ),
   // CARDS
   cardTheme: CardThemeData(
@@ -130,7 +136,13 @@ final ThemeData darkTheme = ThemeData(
   // APPBAR
   appBarTheme: AppBarTheme(
     backgroundColor: colorAccentDark,
-    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
+    titleTextStyle: TextStyle(
+      color: Color(0xFF1976d2), // Azul consistente también en tema oscuro
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 0.5,
+      inherit: true,
+    ),
     iconTheme: IconThemeData(color: colorTextoDark),
   ),
   // CARDS

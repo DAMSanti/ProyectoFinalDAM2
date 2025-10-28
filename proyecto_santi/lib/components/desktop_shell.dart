@@ -17,6 +17,7 @@ import 'package:proyecto_santi/views/estadisticas/estadisticas_view.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/components/user_avatar.dart';
 
 /// Shell que mantiene el menú fijo y solo cambia el contenido
 class DesktopShell extends StatefulWidget {
@@ -291,15 +292,74 @@ class DesktopShellFrame extends StatelessWidget {
       builder: (context, constraints) {
         // Determinar si es móvil o desktop basándose en el ancho
         final isMobile = constraints.maxWidth < 800;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         
         if (isMobile) {
+          // Obtener información del usuario para móvil
+          final auth = Provider.of<Auth>(context, listen: false);
+          final currentUser = auth.currentUser;
+          
           // Versión móvil: Scaffold con Drawer oculto
           return Scaffold(
             appBar: AppBar(
-              title: Text(currentTitle),
+              // Sin título, solo iconos y usuario
+              leading: Builder(
+                builder: (context) => IconButton(
+                  icon: Icon(
+                    Icons.menu,
+                    color: isDark ? Colors.white : Color(0xFF1976d2),
+                  ),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+              ),
               actions: [
+                // Mostrar avatar y info del usuario en móvil (compacta)
+                if (currentUser != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              currentUser.nombre,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Color(0xFF1976d2),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              currentUser.rol,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w500,
+                                color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 8),
+                        UserAvatar(
+                          user: currentUser,
+                          size: 36,
+                          fontSize: 14,
+                        ),
+                      ],
+                    ),
+                  ),
                 IconButton(
-                  icon: Icon(Icons.brightness_6),
+                  icon: Icon(
+                    isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                    color: isDark ? Colors.amber : Color(0xFF1976d2),
+                  ),
                   onPressed: onToggleTheme,
                   tooltip: 'Cambiar tema',
                 ),

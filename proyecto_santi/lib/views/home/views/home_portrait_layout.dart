@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -21,7 +20,7 @@ class HomePortraitLayout extends StatelessWidget {
               flex: 3,
               child: Column(
                 children: [
-                  const UserInformation(),
+                  // UserInformation quitado - ya está en el AppBar
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(

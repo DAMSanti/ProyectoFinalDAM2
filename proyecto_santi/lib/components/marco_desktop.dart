@@ -4,6 +4,7 @@ import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/components/user_avatar.dart';
 
 class MarcoDesktop extends StatelessWidget {
   final Widget content;
@@ -66,6 +67,10 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
+    // Obtener información del usuario
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    
     return OrientationBuilder(
       builder: (context, orientation) {
         return Container(
@@ -89,13 +94,53 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2), // Azul de los items del menú
+                  color: Color(0xFF1976d2), // Azul consistente
                   letterSpacing: 0.5,
+                  fontFamily: 'Roboto', // Fuente explícita
                 ),
               ),
               leading: Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Center(child: UserInformation()),
+                padding: const EdgeInsets.only(left: 16.0, top: 12.0),
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      UserAvatar(
+                        user: currentUser,
+                        size: 48,
+                        fontSize: 18,
+                      ),
+                      SizedBox(width: 12),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (currentUser?.nombre != null)
+                            Text(
+                              currentUser!.nombre,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : Color(0xFF1976d2),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          SizedBox(height: 4),
+                          if (currentUser?.rol != null)
+                            Text(
+                              currentUser!.rol,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
               leadingWidth: 250,
               actions: [

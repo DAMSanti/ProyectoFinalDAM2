@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -19,7 +18,7 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
               flex: 1,
               child: Column(
                 children: [
-                  const UserInformation(),
+                  // UserInformation quitado - ya está en el AppBar
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

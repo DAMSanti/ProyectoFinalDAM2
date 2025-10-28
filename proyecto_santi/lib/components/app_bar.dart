@@ -14,20 +14,28 @@ class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return OrientationBuilder(
       builder: (context, orientation) {
         return AppBar(
           centerTitle: true,
           title: Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Color(0xFF1976d2), // Azul consistente con desktop
+              letterSpacing: 0.5,
             ),
           ),
           leading: showMenuButton
               ? Builder(
             builder: (context) => IconButton(
-              icon: Icon(Icons.menu),
+              icon: Icon(
+                Icons.menu,
+                color: isDark ? Colors.white : Color(0xFF1976d2),
+              ),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
@@ -36,8 +44,12 @@ class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
               : null,
           actions: [
             IconButton(
-              icon: Icon(Icons.brightness_6),
+              icon: Icon(
+                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                color: isDark ? Colors.amber : Color(0xFF1976d2),
+              ),
               onPressed: onToggleTheme,
+              tooltip: 'Cambiar tema',
             ),
           ],
         );
