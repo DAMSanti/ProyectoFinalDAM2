@@ -94,7 +94,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("LocalizacionId");
 
-                    b.ToTable("Actividades");
+                    b.ToTable("Actividades", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ActividadLocalizacion", b =>
@@ -127,7 +127,7 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("ActividadId", "LocalizacionId")
                         .IsUnique();
 
-                    b.ToTable("ActividadLocalizaciones");
+                    b.ToTable("ActividadLocalizaciones", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Alojamiento", b =>
@@ -205,7 +205,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Alojamientos");
+                    b.ToTable("Alojamientos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Contrato", b =>
@@ -247,7 +247,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ActividadId");
 
-                    b.ToTable("Contratos");
+                    b.ToTable("Contratos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Curso", b =>
@@ -272,7 +272,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cursos");
+                    b.ToTable("Cursos", (string)null);
 
                     b.HasData(
                         new
@@ -317,7 +317,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departamentos");
+                    b.ToTable("Departamentos", (string)null);
 
                     b.HasData(
                         new
@@ -371,7 +371,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmpTransportes");
+                    b.ToTable("EmpTransportes", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Foto", b =>
@@ -406,7 +406,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ActividadId");
 
-                    b.ToTable("Fotos");
+                    b.ToTable("Fotos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Grupo", b =>
@@ -432,7 +432,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("CursoId");
 
-                    b.ToTable("Grupos");
+                    b.ToTable("Grupos", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.GrupoPartic", b =>
@@ -461,7 +461,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("GrupoId");
 
-                    b.ToTable("GrupoPartics");
+                    b.ToTable("GrupoPartics", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Localizacion", b =>
@@ -508,7 +508,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Localizaciones");
+                    b.ToTable("Localizaciones", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ProfParticipante", b =>
@@ -538,7 +538,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ProfesorUuid");
 
-                    b.ToTable("ProfParticipantes");
+                    b.ToTable("ProfParticipantes", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.ProfResponsable", b =>
@@ -571,7 +571,7 @@ namespace ACEXAPI.Migrations
 
                     b.HasIndex("ProfesorUuid");
 
-                    b.ToTable("ProfResponsables");
+                    b.ToTable("ProfResponsables", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Profesor", b =>
@@ -623,7 +623,7 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("Dni")
                         .IsUnique();
 
-                    b.ToTable("Profesores");
+                    b.ToTable("Profesores", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Usuario", b =>
@@ -663,7 +663,7 @@ namespace ACEXAPI.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("Usuarios", (string)null);
                 });
 
             modelBuilder.Entity("ACEXAPI.Models.Actividad", b =>

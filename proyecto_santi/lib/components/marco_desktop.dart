@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/tema/theme.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_santi/models/auth.dart';
 
 class MarcoDesktop extends StatelessWidget {
   final Widget content;
@@ -145,6 +147,12 @@ class MenuDesktop extends StatelessWidget {
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
+    // Obtener el usuario actual para verificar si es admin
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
+                    currentUser?.rol.toLowerCase() == 'administrador';
+    
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -246,6 +254,11 @@ class MenuDesktop extends StatelessWidget {
                   text: 'Mapa',
                   routeName: '/mapa',
                 ),
+                // Menú de Gestión solo para administradores
+                if (isAdmin) ...[
+                  SizedBox(height: 8),
+                  _buildGestionMenu(context, isDark),
+                ],
               ],
             ),
           ),
@@ -289,6 +302,80 @@ class MenuDesktop extends StatelessWidget {
           ),
           SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGestionMenu(BuildContext context, bool isDark) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        childrenPadding: EdgeInsets.only(left: 8),
+        leading: Icon(
+          Icons.admin_panel_settings_rounded,
+          color: isDark ? Colors.white70 : Color(0xFF1976d2),
+          size: 24,
+        ),
+        title: Text(
+          'Gestión',
+          style: TextStyle(
+            color: isDark ? Colors.white : Color(0xFF1976d2),
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        iconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
+        collapsedIconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
+        children: [
+          _buildSubMenuItem(context, isDark, Icons.event, 'Actividades', '/gestion/actividades'),
+          _buildSubMenuItem(context, isDark, Icons.person, 'Profesores', '/gestion/profesores'),
+          _buildSubMenuItem(context, isDark, Icons.business, 'Departamentos', '/gestion/departamentos'),
+          _buildSubMenuItem(context, isDark, Icons.group, 'Grupos', '/gestion/grupos'),
+          _buildSubMenuItem(context, isDark, Icons.school, 'Cursos', '/gestion/cursos'),
+          _buildSubMenuItem(context, isDark, Icons.hotel, 'Alojamientos', '/gestion/alojamientos'),
+          _buildSubMenuItem(context, isDark, Icons.directions_bus, 'Empresas de Transporte', '/gestion/empresas-transporte'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, routeName);
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isDark ? Colors.white60 : Color(0xFF1976d2).withOpacity(0.7),
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

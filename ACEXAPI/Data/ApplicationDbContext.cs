@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Contrato> Contratos { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<ActividadLocalizacion> ActividadLocalizaciones { get; set; }
+    public DbSet<GastoPersonalizado> GastosPersonalizados { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,22 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Actividad>()
             .Property(a => a.PrecioTransporte)
             .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PrecioAlojamiento)
+            .HasPrecision(18, 2);
+
+        // Configurar precisión de decimales para GastoPersonalizado
+        modelBuilder.Entity<GastoPersonalizado>()
+            .Property(g => g.Cantidad)
+            .HasPrecision(18, 2);
+
+        // Configurar relación de GastoPersonalizado con Actividad
+        modelBuilder.Entity<GastoPersonalizado>()
+            .HasOne(g => g.Actividad)
+            .WithMany()
+            .HasForeignKey(g => g.ActividadId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Configurar índices únicos
         modelBuilder.Entity<Profesor>()

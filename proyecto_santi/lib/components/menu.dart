@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_santi/models/auth.dart';
 
 class Menu extends StatelessWidget {
   @override
@@ -26,6 +28,12 @@ class Menu extends StatelessWidget {
   }
 
   Widget _buildMenuContent(BuildContext context) {
+    // Obtener el usuario actual para verificar si es admin
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
+                    currentUser?.rol.toLowerCase() == 'administrador';
+
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
       child: Column(
@@ -79,6 +87,9 @@ class Menu extends StatelessWidget {
             text: 'Mapa',
             routeName: '/mapa',
           ),
+          // Menú de Gestión solo para administradores
+          if (isAdmin)
+            _buildGestionMenu(context),
           Expanded(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -103,6 +114,78 @@ class Menu extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGestionMenu(BuildContext context) {
+    return ExpansionTile(
+      leading: FaIcon(Icons.admin_panel_settings, color: Theme.of(context).primaryColor),
+      title: Text('Gestión'),
+      children: [
+        ListTile(
+          leading: Icon(Icons.event, size: 20),
+          title: Text('Actividades', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/actividades');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.person, size: 20),
+          title: Text('Profesores', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/profesores');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.business, size: 20),
+          title: Text('Departamentos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/departamentos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.group, size: 20),
+          title: Text('Grupos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/grupos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.school, size: 20),
+          title: Text('Cursos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/cursos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.hotel, size: 20),
+          title: Text('Alojamientos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/alojamientos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.directions_bus, size: 20),
+          title: Text('Empresas de Transporte', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/gestion/empresas-transporte');
+          },
+        ),
+      ],
     );
   }
 
@@ -150,6 +233,12 @@ class MenuLandscape extends StatelessWidget {
   }
 
   Widget _buildMenuContent(BuildContext context) {
+    // Obtener el usuario actual para verificar si es admin
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
+                    currentUser?.rol.toLowerCase() == 'administrador';
+
     return Column(
       children: <Widget>[
         SizedBox(
@@ -201,6 +290,9 @@ class MenuLandscape extends StatelessWidget {
           text: 'Mapa',
           routeName: '/mapa',
         ),
+        // Menú de Gestión solo para administradores
+        if (isAdmin)
+          _buildGestionMenuLandscape(context),
         _buildDrawerItem(
           context,
           icon: Icons.settings,
@@ -212,6 +304,78 @@ class MenuLandscape extends StatelessWidget {
           icon: Icons.exit_to_app,
           text: 'Salir',
           routeName: '/',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGestionMenuLandscape(BuildContext context) {
+    return ExpansionTile(
+      leading: FaIcon(Icons.admin_panel_settings, color: Theme.of(context).primaryColor),
+      title: Text('Gestión'),
+      children: [
+        ListTile(
+          leading: Icon(Icons.event, size: 20),
+          title: Text('Actividades', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/actividades');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.person, size: 20),
+          title: Text('Profesores', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/profesores');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.business, size: 20),
+          title: Text('Departamentos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/departamentos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.group, size: 20),
+          title: Text('Grupos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/grupos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.school, size: 20),
+          title: Text('Cursos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/cursos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.hotel, size: 20),
+          title: Text('Alojamientos', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/alojamientos');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.directions_bus, size: 20),
+          title: Text('Empresas de Transporte', style: TextStyle(fontSize: 14)),
+          contentPadding: EdgeInsets.only(left: 72, right: 16),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/gestion/empresas-transporte');
+          },
         ),
       ],
     );

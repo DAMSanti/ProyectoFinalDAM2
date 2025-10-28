@@ -126,7 +126,7 @@ class ActividadService {
         'FechaInicio': actividad.fini,
         'FechaFin': actividad.ffin,
         'PresupuestoEstimado': actividad.presupuestoEstimado,
-        'CosteReal': actividad.costoReal,
+        'CostoReal': actividad.costoReal,
         'Aprobada': actividad.estado == 'Aprobada',
         'SolicitanteId': actividad.solicitante?.uuid,
         'DepartamentoId': actividad.departamento?.id,
@@ -143,7 +143,7 @@ class ActividadService {
       print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, PrecioTransporte: ${actividad.precioTransporte}, EmpresaTransporteId: ${actividad.empresaTransporte?.id}');
       print('[ActividadService] FormData - AlojamientoReq: ${actividad.alojamientoReq}, PrecioAlojamiento: ${actividad.precioAlojamiento}, AlojamientoId: ${actividad.alojamiento?.id}');
       print('[ActividadService] FormData - PresupuestoEstimado: ${actividad.presupuestoEstimado}');
-      print('[ActividadService] FormData - CosteReal: ${actividad.costoReal}');
+      print('[ActividadService] FormData - CostoReal: ${actividad.costoReal}');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
       
       // Imprimir todo el contenido del FormData

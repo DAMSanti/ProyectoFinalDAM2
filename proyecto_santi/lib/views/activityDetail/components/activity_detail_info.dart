@@ -101,9 +101,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   @override
   void didUpdateWidget(ActivityDetailInfo oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si el reloadTrigger cambi�, significa que el padre quiere que rec�rguemos
     if (widget.reloadTrigger != oldWidget.reloadTrigger) {
-      print('[ACTIVITY_DETAIL_INFO] reloadTrigger cambi�, recargando datos...');
       reloadData();
     }
   }
@@ -376,8 +374,10 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               child: Text(
                 widget.actividad.titulo,
                 style: TextStyle(
-                    fontSize: !isWeb ? 20.dg : 7.sp,
-                    fontWeight: FontWeight.bold),
+                  fontSize: !isWeb ? 20.dg : 7.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2),
+                ),
               ),
             ),
             IconButton(
@@ -560,29 +560,43 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildImages(BuildContext context, BoxConstraints constraints) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Fotos de la Actividad',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Fotos de la Actividad',
+              style: TextStyle(
+                fontSize: kIsWeb ? 5.sp : 14.dg,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1976d2),
+              ),
+            ),
+            SizedBox(height: 8),
+            _HorizontalImageScroller(
+              constraints: constraints,
+              isAdminOrSolicitante: widget.isAdminOrSolicitante,
+              showImagePicker: widget.showImagePicker,
+              imagesActividad: widget.imagesActividad,
+              selectedImages: widget.selectedImages,
+              onDeleteImage: (index) => widget.removeSelectedImage(index),
+              onDeleteApiImage: (index) async {
+                // Llamar a la función del padre que maneja la eliminación
+                if (widget.removeApiImage != null) {
+                  await widget.removeApiImage!(index);
+                }
+              },
+            ),
+          ],
         ),
-        SizedBox(height: 8),
-        _HorizontalImageScroller(
-          constraints: constraints,
-          isAdminOrSolicitante: widget.isAdminOrSolicitante,
-          showImagePicker: widget.showImagePicker,
-          imagesActividad: widget.imagesActividad,
-          selectedImages: widget.selectedImages,
-          onDeleteImage: (index) => widget.removeSelectedImage(index),
-          onDeleteApiImage: (index) async {
-            // Llamar a la funci�n del padre que maneja la eliminaci�n
-            if (widget.removeApiImage != null) {
-              await widget.removeApiImage!(index);
-            }
-          },
-        ),
-      ],
+      ),
     );
   }
 
@@ -590,12 +604,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Participantes',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 16),
-        // Layout responsivo: dos columnas en pantallas anchas, una columna en m�vil
+        // Layout responsivo: dos columnas en pantallas anchas, una columna en móvil
         constraints.maxWidth > 800
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -636,7 +645,11 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             children: [
               Text(
                 'Profesores Participantes',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: kIsWeb ? 5.sp : 14.dg,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2),
+                ),
               ),
               if (widget.isAdminOrSolicitante)
                 IconButton(
@@ -717,7 +730,11 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 children: [
                   Text(
                     'Grupos/Cursos Participantes',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: kIsWeb ? 5.sp : 14.dg,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1976d2),
+                    ),
                   ),
                   if (_gruposParticipantes.isNotEmpty)
                     Padding(
@@ -1158,7 +1175,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                     size: !isWeb ? 16.dg : 5.sp,
                   ),
                   label: Text(
-                    'A�adir',
+                    'Añadir',
                     style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -1202,7 +1219,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     );
   }
 
-  // M�todo para mostrar el di�logo de a�adir localizaci�n
+  // Método para mostrar el diálogo de añadir localización
   void _showAddLocalizacionDialog(BuildContext context) async {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     

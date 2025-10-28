@@ -8,7 +8,9 @@ import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
+import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/services/services.dart';
+import 'package:proyecto_santi/services/gasto_personalizado_service.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_large_landscape_layout.dart';
@@ -181,6 +183,15 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     if (_datosEditados != null) {
       if (_datosEditados!.containsKey('profesoresParticipantes') || 
           _datosEditados!.containsKey('gruposParticipantes')) {
+
+        return true;
+      }
+    }
+
+    // Verificar si hay cambios en gastos personalizados (gastos varios)
+    if (_datosEditados != null) {
+      if (_datosEditados!.containsKey('gastosPersonalizados') ||
+          _datosEditados!.containsKey('budgetChanged')) {
 
         return true;
       }
@@ -537,8 +548,12 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           empresaTransporte: _actividadCompleta!.empresaTransporte,
           alojamientoReq: updatedData['alojamientoReq'] ?? _actividadCompleta!.alojamientoReq,
           comentAlojamiento: _actividadCompleta!.comentAlojamiento,
+          precioAlojamiento: updatedData['precioAlojamiento'] ?? _actividadCompleta!.precioAlojamiento,
+          alojamiento: _actividadCompleta!.alojamiento,
           comentarios: _actividadCompleta!.comentarios,
-          estado: updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente',
+          estado: updatedData.containsKey('aprobada') 
+            ? (updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente')
+            : _actividadCompleta!.estado,
           comentEstado: _actividadCompleta!.comentEstado,
           incidencias: _actividadCompleta!.incidencias,
           urlFolleto: _actividadCompleta!.urlFolleto,
@@ -637,10 +652,32 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
 
           
-          // Calcular el coste real sumando transporte y alojamiento
+          // Calcular el coste real sumando solo los servicios activados
+          final transporteReq = (_datosEditados!['transporteReq'] ?? _actividadOriginal!.transporteReq) ?? 0;
+          final alojamientoReq = (_datosEditados!['alojamientoReq'] ?? _actividadOriginal!.alojamientoReq) ?? 0;
+          
           final precioTransporte = (_datosEditados!['precioTransporte'] ?? _actividadOriginal!.precioTransporte) ?? 0.0;
-          final precioAlojamiento = (_datosEditados!['precioAlojamiento']) ?? 0.0; // El precio no está en el alojamiento
-          final costoRealCalculado = precioTransporte + precioAlojamiento;
+          final precioAlojamiento = (_datosEditados!['precioAlojamiento'] ?? _actividadOriginal!.precioAlojamiento) ?? 0.0;
+          
+          // Obtener gastos personalizados de la actividad
+          final gastoService = GastoPersonalizadoService(ApiService());
+          List<GastoPersonalizado> gastosPersonalizados = [];
+          try {
+            gastosPersonalizados = await gastoService.fetchGastosByActividad(widget.actividad.id);
+          } catch (e) {
+            print('[ERROR] Error al cargar gastos personalizados: $e');
+          }
+          
+          // Calcular total de gastos personalizados
+          final totalGastosPersonalizados = gastosPersonalizados.fold<double>(
+            0.0,
+            (sum, gasto) => sum + gasto.cantidad,
+          );
+          
+          // Solo sumar al coste real si el switch está activado (req == 1) + gastos personalizados
+          final costoRealCalculado = (transporteReq == 1 ? precioTransporte : 0.0) + 
+                                     (alojamientoReq == 1 ? precioAlojamiento : 0.0) +
+                                     totalGastosPersonalizados;
 
           
           // Crear objeto de EmpresaTransporte si hay un ID
@@ -687,7 +724,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             precioAlojamiento: _datosEditados!['precioAlojamiento'] ?? _actividadOriginal!.precioAlojamiento,
             alojamiento: alojamientoParaGuardar,
             comentarios: _actividadOriginal!.comentarios,
-            estado: _datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente',
+            estado: _datosEditados!.containsKey('aprobada')
+              ? (_datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente')
+              : _actividadOriginal!.estado,
             comentEstado: _actividadOriginal!.comentEstado,
             incidencias: _actividadOriginal!.incidencias,
             urlFolleto: _actividadOriginal!.urlFolleto,
@@ -850,6 +889,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               empresaTransporte: empresaTransporteCompleta,
               alojamientoReq: actividadActualizada.alojamientoReq,
               comentAlojamiento: actividadActualizada.comentAlojamiento,
+              precioAlojamiento: actividadActualizada.precioAlojamiento,
               alojamiento: alojamientoCompleto,
               comentarios: actividadActualizada.comentarios,
               estado: actividadActualizada.estado,
@@ -1012,7 +1052,47 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         }
       }
 
-      // 8. Guardar localizaciones si cambiaron
+      // 8. Guardar gastos personalizados si cambiaron
+      if (_datosEditados != null && _datosEditados!.containsKey('gastosPersonalizados')) {
+        try {
+          final gastosService = GastoPersonalizadoService(ApiService());
+          final gastosActuales = _datosEditados!['gastosPersonalizados'] as List<GastoPersonalizado>;
+          
+          // Obtener los gastos actuales de la BD
+          final gastosEnBD = await gastosService.fetchGastosByActividad(widget.actividad.id);
+          
+          // Identificar gastos a crear (tienen ID negativo o null)
+          final gastosACrear = gastosActuales.where((g) => g.id == null || g.id! < 0).toList();
+          
+          // Identificar gastos a eliminar (están en BD pero no en la lista actual)
+          final idsActuales = gastosActuales.where((g) => g.id != null && g.id! > 0).map((g) => g.id!).toSet();
+          final gastosAEliminar = gastosEnBD.where((g) => !idsActuales.contains(g.id)).toList();
+          
+          // Crear nuevos gastos
+          for (var gasto in gastosACrear) {
+            final nuevoGasto = GastoPersonalizado(
+              actividadId: widget.actividad.id,
+              concepto: gasto.concepto,
+              cantidad: gasto.cantidad,
+            );
+            await gastosService.createGasto(nuevoGasto);
+          }
+          
+          // Eliminar gastos que ya no están
+          for (var gasto in gastosAEliminar) {
+            if (gasto.id != null) {
+              await gastosService.deleteGasto(gasto.id!);
+            }
+          }
+          
+          print('[GASTOS] Gastos guardados: ${gastosACrear.length} creados, ${gastosAEliminar.length} eliminados');
+        } catch (e) {
+          print('[ERROR] Error guardando gastos personalizados: $e');
+          success = false;
+        }
+      }
+
+      // 9. Guardar localizaciones si cambiaron
       if (_datosEditados != null && _datosEditados!.containsKey('localizaciones_modificadas')) {
         try {
 

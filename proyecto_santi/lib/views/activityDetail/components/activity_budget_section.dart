@@ -5,7 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../models/actividad.dart';
 import '../../../models/alojamiento.dart';
 import '../../../models/empresa_transporte.dart';
+import '../../../models/gasto_personalizado.dart';
 import '../../../services/actividad_service.dart';
+import '../../../services/gasto_personalizado_service.dart';
+import '../../../services/api_service.dart';
 
 /// Widget para mostrar y gestionar el presupuesto de una actividad.
 /// 
@@ -61,9 +64,18 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
   List<Alojamiento> _alojamientosDisponibles = [];
   bool _cargandoAlojamientos = false;
 
+  // Variables para gastos personalizados
+  List<GastoPersonalizado> _gastosPersonalizados = [];
+  final TextEditingController _conceptoController = TextEditingController();
+  final TextEditingController _cantidadController = TextEditingController();
+  bool _cargandoGastos = false;
+  late GastoPersonalizadoService _gastoService;
+
   @override
   void initState() {
     super.initState();
+    // Inicializar servicio de gastos
+    _gastoService = GastoPersonalizadoService(ApiService());
     // Inicializar switches desde la actividad (convertir int a bool)
     _transporteReq = widget.actividad.transporteReq == 1;
     _alojamientoReq = widget.actividad.alojamientoReq == 1;
@@ -75,6 +87,34 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     // Inicializar alojamiento local
     _precioAlojamientoLocal = widget.actividad.precioAlojamiento ?? 0.0;
     _alojamientoLocal = widget.actividad.alojamiento;
+    // Cargar gastos personalizados
+    _cargarGastos();
+  }
+
+  /// Carga los gastos personalizados de la actividad
+  Future<void> _cargarGastos() async {
+    if (widget.actividad.id == null) return;
+    
+    setState(() {
+      _cargandoGastos = true;
+    });
+    
+    try {
+      final gastos = await _gastoService.fetchGastosByActividad(widget.actividad.id!);
+      if (mounted) {
+        setState(() {
+          _gastosPersonalizados = gastos;
+          _cargandoGastos = false;
+        });
+      }
+    } catch (e) {
+      print('[GASTOS ERROR] Error al cargar gastos: $e');
+      if (mounted) {
+        setState(() {
+          _cargandoGastos = false;
+        });
+      }
+    }
   }
 
   @override
@@ -162,7 +202,17 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     final empresaTransporte = _empresaTransporteLocal ?? widget.actividad.empresaTransporte;
     
     final precioAlojamiento = _precioAlojamientoLocal ?? 0.0; // El precio se guarda localmente
-    final costoReal = precioTransporte + precioAlojamiento; // Coste real = suma de transporte + alojamiento
+    
+    // Calcular total de gastos personalizados
+    final totalGastosPersonalizados = _gastosPersonalizados.fold<double>(
+      0.0,
+      (sum, gasto) => sum + gasto.cantidad,
+    );
+    
+    // Coste real = suma solo de los servicios activados (switches en true) + gastos personalizados
+    final costoReal = (_transporteReq ? precioTransporte : 0.0) + 
+        (_alojamientoReq ? precioAlojamiento : 0.0) + 
+        totalGastosPersonalizados;
     final costoPorAlumno = widget.totalAlumnosParticipantes > 0 
         ? costoReal / widget.totalAlumnosParticipantes 
         : 0.0;
@@ -187,7 +237,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               color: Color(0xFF1976d2),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           
           // Switches para activar/desactivar Transporte y Alojamiento
           if (widget.isAdminOrSolicitante) ...[
@@ -236,7 +286,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
           ],
           
           // Fila superior: Presupuesto Estimado y Coste Real lado a lado
@@ -273,7 +323,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
           ),
           
           // Coste por Alumno justo debajo
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           _buildPresupuestoCard(
             context,
             'Coste por Alumno',
@@ -286,7 +336,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
           
           // Mostrar tarjetas de Transporte y Alojamiento si están activos
           if (_transporteReq || _alojamientoReq) ...[
-            SizedBox(height: 20),
+            SizedBox(height: 10),
             IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -325,24 +375,100 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
             ),
           ],
           
-          // Secciones expandibles de Transporte y Alojamiento (detalles completos)
-          if (_transporteReq || _alojamientoReq) ...[
-            SizedBox(height: 12),
+          // Botones de Solicitar Presupuestos (Transporte y Alojamiento)
+          if (widget.isAdminOrSolicitante && (_transporteReq || _alojamientoReq)) ...[
+            SizedBox(height: 6),
             Row(
               children: [
                 if (_transporteReq)
                   Expanded(
-                    child: _buildTransporteSection(context, isWeb, _transporteReq, precioTransporte),
+                    child: InkWell(
+                      onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.purple.withOpacity(0.1),
+                              Colors.purple.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.purple.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send, color: Colors.purple, size: !isWeb ? 12.dg : 4.sp),
+                            SizedBox(width: 6),
+                            Text(
+                              'Solicitar Presupuestos',
+                              style: TextStyle(
+                                fontSize: !isWeb ? 10.dg : 3.5.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.purple,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 if (_transporteReq && _alojamientoReq)
                   SizedBox(width: 16),
                 if (_alojamientoReq)
                   Expanded(
-                    child: _buildAlojamientoSection(context, isWeb, _alojamientoReq, precioAlojamiento),
+                    child: InkWell(
+                      onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.teal.withOpacity(0.1),
+                              Colors.teal.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.teal.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send, color: Colors.teal, size: !isWeb ? 12.dg : 4.sp),
+                            SizedBox(width: 6),
+                            Text(
+                              'Solicitar Presupuestos',
+                              style: TextStyle(
+                                fontSize: !isWeb ? 10.dg : 3.5.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
               ],
             ),
           ],
+          
+          // Card de Gastos Varios
+          SizedBox(height: 10),
+          _buildGastosVariosCard(context, isWeb),
         ],
       ),
     );
@@ -369,26 +495,28 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            icon,
-            color: value ? color : Colors.grey,
-            size: !isWeb ? 18.dg : 6.sp,
-          ),
-          SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: !isWeb ? 13.dg : 5.sp,
-                fontWeight: FontWeight.w600,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
                 color: value ? color : Colors.grey,
+                size: !isWeb ? 18.dg : 6.sp,
               ),
-              overflow: TextOverflow.ellipsis,
-            ),
+              SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: !isWeb ? 13.dg : 5.sp,
+                  fontWeight: FontWeight.w600,
+                  color: value ? color : Colors.grey,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          SizedBox(width: 4),
           Switch(
             value: value,
             onChanged: onChanged,
@@ -415,7 +543,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
   }) {
     return Container(
       width: width > 600 ? width : double.infinity,
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Reducido de 16 a 12
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey[800]
@@ -436,28 +564,30 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    icono,
-                    color: color,
-                    size: !isWeb ? 24.dg : 7.sp,
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    titulo,
-                    style: TextStyle(
-                      fontSize: !isWeb ? 13.dg : 4.5.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[600],
+          // Solo mostrar título con icono si NO es "Coste por Alumno"
+          if (titulo != 'Coste por Alumno')
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      icono,
+                      color: color,
+                      size: !isWeb ? 24.dg : 7.sp,
                     ),
-                  ),
-                ],
-              ),
-              if (showEdit && widget.isAdminOrSolicitante)
+                    SizedBox(width: 8),
+                    Text(
+                      titulo,
+                      style: TextStyle(
+                        fontSize: !isWeb ? 13.dg : 4.5.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                if (showEdit && widget.isAdminOrSolicitante)
                 IconButton(
                   icon: Icon(
                     (_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
@@ -703,7 +833,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               ),
             ),
           ],
-          SizedBox(height: 12),
+          // Solo agregar espacio vertical si NO es "Coste por Alumno"
+          if (titulo != 'Coste por Alumno')
+            SizedBox(height: 8), // Reducido de 12 a 8
           // Mostrar TextField si está en modo edición y es el presupuesto estimado
           if (_editandoPresupuesto && titulo == 'Presupuesto Estimado')
             TextField(
@@ -1056,14 +1188,51 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  '${valor.toStringAsFixed(2)} €',
-                  style: TextStyle(
-                    fontSize: !isWeb ? 16.dg : 5.5.sp,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                // Si es "Coste por Alumno", mostrar icono, título y valor en la misma línea
+                if (titulo == 'Coste por Alumno')
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              icono,
+                              color: color,
+                              size: !isWeb ? 20.dg : 6.sp,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              titulo,
+                              style: TextStyle(
+                                fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${valor.toStringAsFixed(2)} €',
+                          style: TextStyle(
+                            fontSize: !isWeb ? 16.dg : 5.5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Text(
+                    '${valor.toStringAsFixed(2)} €',
+                    style: TextStyle(
+                      fontSize: !isWeb ? 16.dg : 5.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
                   ),
-                ),
                 // Mostrar empresa de transporte si es la tarjeta de Transporte
                 if (titulo == 'Transporte')
                   Expanded(
@@ -1105,49 +1274,148 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     );
   }
 
-  /// Widget para mostrar la sección de transporte con detalles
-  Widget _buildTransporteSection(BuildContext context, bool isWeb, bool requiereTransporte, double precioTransporte) {
-    if (!requiereTransporte) return SizedBox.shrink();
+  /// Widget para la card de gastos varios
+  Widget _buildGastosVariosCard(BuildContext context, bool isWeb) {
+    // Calcular total de gastos personalizados
+    final totalGastos = _gastosPersonalizados.fold<double>(
+      0.0, 
+      (sum, gasto) => sum + gasto.cantidad
+    );
     
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.purple.withOpacity(0.1),
-            Colors.purple.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.purple.withOpacity(0.3),
+          color: Colors.amber.withOpacity(0.3),
           width: 2,
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.directions_bus,
-            color: Colors.purple,
-            size: !isWeb ? 24.dg : 7.sp,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
-          SizedBox(width: 12),
-          if (widget.isAdminOrSolicitante)
-            OutlinedButton.icon(
-              onPressed: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
-              icon: Icon(Icons.send, size: !isWeb ? 16.dg : 5.sp),
-              label: Text(
-                'Solicitar Presupuestos',
-                style: TextStyle(fontSize: !isWeb ? 11.dg : 4.sp),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Encabezado con título y botón agregar
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.receipt_long,
+                    color: Colors.amber,
+                    size: !isWeb ? 24.dg : 7.sp,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Gastos Varios',
+                    style: TextStyle(
+                      fontSize: !isWeb ? 13.dg : 4.5.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  if (totalGastos > 0) ...[
+                    SizedBox(width: 12),
+                    Text(
+                      '${totalGastos.toStringAsFixed(2)} €',
+                      style: TextStyle(
+                        fontSize: !isWeb ? 14.dg : 4.5.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber[700],
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.purple,
-                side: BorderSide(color: Colors.purple.withOpacity(0.5), width: 2),
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              if (widget.isAdminOrSolicitante)
+                IconButton(
+                  icon: Icon(Icons.add_circle, color: Colors.amber),
+                  onPressed: () => _mostrarDialogoAgregarGasto(context),
+                  tooltip: 'Agregar gasto',
+                ),
+            ],
+          ),
+          
+          if (_cargandoGastos)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(color: Colors.amber),
+              ),
+            )
+          else if (_gastosPersonalizados.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: Text(
+                  'No hay gastos personalizados',
+                  style: TextStyle(
+                    fontSize: !isWeb ? 12.dg : 4.sp,
+                    color: Colors.grey[500],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            )
+          else
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: _gastosPersonalizados.length > 5 ? 300 : double.infinity,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: _gastosPersonalizados.length > 5 
+                    ? AlwaysScrollableScrollPhysics() 
+                    : NeverScrollableScrollPhysics(),
+                itemCount: _gastosPersonalizados.length,
+                itemBuilder: (context, index) {
+                  final gasto = _gastosPersonalizados[index];
+                  return Card(
+                    margin: EdgeInsets.only(top: index == 0 ? 12 : 8),
+                    child: ListTile(
+                      leading: Icon(Icons.receipt, color: Colors.amber[700]),
+                      title: Text(
+                        gasto.concepto,
+                        style: TextStyle(
+                          fontSize: !isWeb ? 12.dg : 4.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${gasto.cantidad.toStringAsFixed(2)} €',
+                            style: TextStyle(
+                              fontSize: !isWeb ? 13.dg : 4.5.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber[700],
+                            ),
+                          ),
+                          if (widget.isAdminOrSolicitante) ...[
+                            SizedBox(width: 8),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red, size: !isWeb ? 18.dg : 5.sp),
+                              onPressed: () => _eliminarGasto(gasto),
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
         ],
@@ -1155,54 +1423,132 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     );
   }
 
-  /// Widget para mostrar la sección de alojamiento con detalles
-  Widget _buildAlojamientoSection(BuildContext context, bool isWeb, bool requiereAlojamiento, double precioAlojamiento) {
-    if (!requiereAlojamiento) return SizedBox.shrink();
+  /// Muestra diálogo para agregar un nuevo gasto
+  Future<void> _mostrarDialogoAgregarGasto(BuildContext context) async {
+    _conceptoController.clear();
+    _cantidadController.clear();
     
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.teal.withOpacity(0.1),
-            Colors.teal.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.teal.withOpacity(0.3),
-          width: 2,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.hotel,
-            color: Colors.teal,
-            size: !isWeb ? 24.dg : 7.sp,
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Agregar Gasto Personalizado'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _conceptoController,
+                decoration: InputDecoration(
+                  labelText: 'Concepto',
+                  hintText: 'Ej: Material didáctico, entradas...',
+                  border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _cantidadController,
+                decoration: InputDecoration(
+                  labelText: 'Cantidad (€)',
+                  hintText: '0.00',
+                  border: OutlineInputBorder(),
+                  prefixText: '€ ',
+                ),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+              ),
+            ],
           ),
-          SizedBox(width: 12),
-          if (widget.isAdminOrSolicitante)
-            OutlinedButton.icon(
-              onPressed: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
-              icon: Icon(Icons.send, size: !isWeb ? 16.dg : 5.sp),
-              label: Text(
-                'Solicitar Presupuestos',
-                style: TextStyle(fontSize: !isWeb ? 11.dg : 4.sp),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.teal,
-                side: BorderSide(color: Colors.teal.withOpacity(0.5), width: 2),
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancelar'),
             ),
-        ],
-      ),
+            ElevatedButton(
+              onPressed: () async {
+                final concepto = _conceptoController.text.trim();
+                final cantidadStr = _cantidadController.text.trim();
+                
+                if (concepto.isEmpty || cantidadStr.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Por favor completa todos los campos')),
+                  );
+                  return;
+                }
+                
+                final cantidad = double.tryParse(cantidadStr);
+                if (cantidad == null || cantidad <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Ingresa una cantidad válida')),
+                  );
+                  return;
+                }
+                
+                Navigator.of(context).pop();
+                _agregarGasto(concepto, cantidad);
+              },
+              child: Text('Agregar'),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  /// Agrega un nuevo gasto personalizado (solo localmente, se guarda al hacer click en Guardar)
+  void _agregarGasto(String concepto, double cantidad) {
+    final nuevoGasto = GastoPersonalizado(
+      id: -(DateTime.now().millisecondsSinceEpoch), // ID temporal negativo
+      actividadId: widget.actividad.id,
+      concepto: concepto,
+      cantidad: cantidad,
+      fechaCreacion: DateTime.now(),
+    );
+    
+    setState(() {
+      _gastosPersonalizados.add(nuevoGasto);
+    });
+    
+    // Notificar al padre que hubo cambios en el presupuesto
+    widget.onBudgetChanged?.call({
+      'budgetChanged': true,
+      'gastosPersonalizados': _gastosPersonalizados,
+    });
+  }
+
+  /// Elimina un gasto personalizado (solo localmente, se guarda al hacer click en Guardar)
+  Future<void> _eliminarGasto(GastoPersonalizado gasto) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Eliminar Gasto'),
+          content: Text('¿Estás seguro de que deseas eliminar "${gasto.concepto}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+    
+    if (confirmar == true) {
+      setState(() {
+        _gastosPersonalizados.remove(gasto);
+      });
+      
+      // Notificar al padre que hubo cambios en el presupuesto
+      widget.onBudgetChanged?.call({
+        'budgetChanged': true,
+        'gastosPersonalizados': _gastosPersonalizados,
+      });
+    }
   }
 
   // ============================================================================

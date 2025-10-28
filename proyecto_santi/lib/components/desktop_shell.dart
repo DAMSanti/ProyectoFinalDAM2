@@ -6,7 +6,17 @@ import 'package:proyecto_santi/views/chat/chat_list_view.dart';
 import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
 import 'package:proyecto_santi/views/map/map_view.dart';
 import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
+import 'package:proyecto_santi/views/gestion/actividades_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/profesores_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/departamentos_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/grupos_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/cursos_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/alojamientos_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/empresas_transporte_crud_view.dart';
+import 'package:proyecto_santi/views/estadisticas/estadisticas_view.dart';
 import 'package:proyecto_santi/func.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_santi/models/auth.dart';
 
 /// Shell que mantiene el menú fijo y solo cambia el contenido
 class DesktopShell extends StatefulWidget {
@@ -58,8 +68,24 @@ class _DesktopShellState extends State<DesktopShell> {
         return _chatViewArgs?['displayName'] ?? 'Chat';
       case '/mapa':
         return 'Mapa';
+      case '/estadisticas':
+        return 'Estadísticas';
       case '/activityDetail':
         return 'Detalle de Actividad';
+      case '/gestion/actividades':
+        return 'Gestión de Actividades';
+      case '/gestion/profesores':
+        return 'Gestión de Profesores';
+      case '/gestion/departamentos':
+        return 'Gestión de Departamentos';
+      case '/gestion/grupos':
+        return 'Gestión de Grupos';
+      case '/gestion/cursos':
+        return 'Gestión de Cursos';
+      case '/gestion/alojamientos':
+        return 'Gestión de Alojamientos';
+      case '/gestion/empresas-transporte':
+        return 'Gestión de Empresas de Transporte';
       default:
         return 'Próximas Actividades';
     }
@@ -122,6 +148,8 @@ class _DesktopShellState extends State<DesktopShell> {
           onToggleTheme: widget.onToggleTheme,
           isDarkTheme: Theme.of(context).brightness == Brightness.dark,
         );
+      case '/estadisticas':
+        return EstadisticasView();
       case '/activityDetail':
         if (_activityDetailArgs != null) {
           return ActivityDetailView(
@@ -131,6 +159,20 @@ class _DesktopShellState extends State<DesktopShell> {
           );
         }
         return HomeView(onToggleTheme: widget.onToggleTheme);
+      case '/gestion/actividades':
+        return ActividadesCrudView();
+      case '/gestion/profesores':
+        return ProfesoresCrudView();
+      case '/gestion/departamentos':
+        return DepartamentosCrudView();
+      case '/gestion/grupos':
+        return GruposCrudView();
+      case '/gestion/cursos':
+        return CursosCrudView();
+      case '/gestion/alojamientos':
+        return AlojamientosCrudView();
+      case '/gestion/empresas-transporte':
+        return EmpresasTransporteCrudView();
       default:
         return HomeView(onToggleTheme: widget.onToggleTheme);
     }
@@ -324,6 +366,12 @@ class MenuDesktopStatic extends StatelessWidget {
 
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Obtener el usuario actual para verificar si es admin
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
+                    currentUser?.rol.toLowerCase() == 'administrador';
 
     return Container(
       decoration: BoxDecoration(
@@ -430,6 +478,18 @@ class MenuDesktopStatic extends StatelessWidget {
                   text: 'Mapa',
                   routeName: '/mapa',
                 ),
+                SizedBox(height: 8),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.bar_chart_rounded,
+                  text: 'Estadísticas',
+                  routeName: '/estadisticas',
+                ),
+                // Menú de Gestión solo para administradores
+                if (isAdmin) ...[
+                  SizedBox(height: 8),
+                  _buildGestionMenu(context, isDark),
+                ],
               ],
             ),
           ),
@@ -474,6 +534,83 @@ class MenuDesktopStatic extends StatelessWidget {
           ),
           SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGestionMenu(BuildContext context, bool isDark) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        childrenPadding: EdgeInsets.zero,
+        leading: Icon(
+          Icons.admin_panel_settings_rounded,
+          color: isDark ? Colors.white70 : Color(0xFF1976d2),
+          size: 24,
+        ),
+        title: Text(
+          'Gestión',
+          style: TextStyle(
+            color: isDark ? Colors.white : Color(0xFF1976d2),
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        iconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
+        collapsedIconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
+        children: [
+          _buildSubMenuItem(context, isDark, Icons.event, 'Actividades', '/gestion/actividades'),
+          _buildSubMenuItem(context, isDark, Icons.person, 'Profesores', '/gestion/profesores'),
+          _buildSubMenuItem(context, isDark, Icons.business, 'Departamentos', '/gestion/departamentos'),
+          _buildSubMenuItem(context, isDark, Icons.group, 'Grupos', '/gestion/grupos'),
+          _buildSubMenuItem(context, isDark, Icons.school, 'Cursos', '/gestion/cursos'),
+          _buildSubMenuItem(context, isDark, Icons.hotel, 'Alojamientos', '/gestion/alojamientos'),
+          _buildSubMenuItem(context, isDark, Icons.directions_bus, 'Empresas de Transporte', '/gestion/empresas-transporte'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 4, left: 8, right: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            this.onNavigate(routeName);
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isDark ? Colors.white60 : Color(0xFF1976d2).withOpacity(0.7),
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
