@@ -16,6 +16,7 @@ class LoginButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return isColumn
         ? Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
@@ -23,21 +24,30 @@ class LoginButtons extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onLoginPressed,
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                child: Text('Login'),
+                child: const Text(
+                  'Login',
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
             ),
           ],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: ElevatedButton(
                 onPressed: onMicrosoftLoginPressed,
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -47,8 +57,14 @@ class LoginButtons extends StatelessWidget {
                       width: 24,
                       height: 24,
                     ),
-                    SizedBox(width: 8),
-                    Text('Iniciar sesión con Microsoft'),
+                    const SizedBox(width: 8),
+                    const Flexible(
+                      child: Text(
+                        'Iniciar sesión con Microsoft',
+                        style: TextStyle(fontSize: 15),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -63,17 +79,26 @@ class LoginButtons extends StatelessWidget {
           child: ElevatedButton(
             onPressed: onLoginPressed,
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text('Login'),
+            child: const Text(
+              'Login',
+              style: TextStyle(fontSize: 15),
+            ),
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: ElevatedButton(
             onPressed: onMicrosoftLoginPressed,
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -83,8 +108,14 @@ class LoginButtons extends StatelessWidget {
                   width: 24,
                   height: 24,
                 ),
-                SizedBox(width: 8),
-                Text('Microsoft'),
+                const SizedBox(width: 8),
+                const Flexible(
+                  child: Text(
+                    'Microsoft',
+                    style: TextStyle(fontSize: 15),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),

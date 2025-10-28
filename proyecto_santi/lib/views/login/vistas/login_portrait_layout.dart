@@ -5,48 +5,61 @@ import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 Widget loginPortraitLayout(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
   return LayoutBuilder(
     builder: (context, constraints) {
-      double imageSize = constraints.maxWidth * 0.5;
-      double padding = 16.0;
-
-      if (constraints.maxWidth < 600) {
-        imageSize = constraints.maxWidth * 0.6;
-        padding = 12.0;
-      } else if (constraints.maxWidth < 400) {
-        imageSize = constraints.maxWidth * 0.7;
-        padding = 8.0;
-      }
-
       return Stack(
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: padding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/logorecortado.png',
-                  width: imageSize,
-                  height: imageSize,
+          Center(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
                 ),
-                SizedBox(height: 32),
-                LoginForm(
-                  usernameController: usernameController,
-                  passwordController: passwordController,
-                  onSubmit: login,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth * 0.6,
+                        maxHeight: constraints.maxHeight * 0.3,
+                      ),
+                      child: Image.asset(
+                        'assets/logorecortado.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: LoginForm(
+                        usernameController: usernameController,
+                        passwordController: passwordController,
+                        onSubmit: login,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: LoginButtons(
+                        onLoginPressed: login,
+                        onMicrosoftLoginPressed: showLoginDialog,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
-                SizedBox(height: 16),
-                LoginButtons(
-                  onLoginPressed: login,
-                  onMicrosoftLoginPressed: showLoginDialog,
-                ),
-                SizedBox(height: 32),
-              ],
+              ),
             ),
           ),
           if (isLoading)
-            Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
             ),
         ],

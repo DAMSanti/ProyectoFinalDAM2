@@ -15,21 +15,38 @@ class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
           controller: usernameController,
+          style: const TextStyle(fontSize: 15),
           decoration: InputDecoration(
             labelText: 'Username',
-            border: OutlineInputBorder(),
+            labelStyle: const TextStyle(fontSize: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
           onSubmitted: (_) => onSubmit?.call(),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         TextField(
           controller: passwordController,
+          style: const TextStyle(fontSize: 15),
           decoration: InputDecoration(
             labelText: 'Password',
-            border: OutlineInputBorder(),
+            labelStyle: const TextStyle(fontSize: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
           obscureText: true,
           onSubmitted: (_) => onSubmit?.call(),

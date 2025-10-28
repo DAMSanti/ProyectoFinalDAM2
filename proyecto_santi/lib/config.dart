@@ -1,16 +1,30 @@
 ﻿import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
-/// ConfiguraciÃ³n de la aplicaciÃ³n
+/// Configuración de la aplicación
 class AppConfig {
   // URL base de la API (ACEXAPI C# .NET)
-  // En web usamos la IP local porque localhost no funciona en el navegador
+  // IMPORTANTE: Para Android físico, usar la IP local de tu PC en la misma red WiFi
   static String get apiBaseUrl {
     if (kIsWeb) {
       // Para web, usa localhost en desarrollo
       return 'http://localhost:5000/api';
     } else {
-      // Para desktop/mobile, localhost funciona bien
+      // Para mobile (Android/iOS)
+      try {
+        if (Platform.isAndroid) {
+          // Para Android físico: usa la IP de tu PC WiFi (192.168.1.42)
+          // IMPORTANTE: Cambia esta IP si tu red es diferente
+          return 'http://192.168.1.42:5000/api';
+        } else if (Platform.isIOS) {
+          // Para iOS, localhost funciona en simulador
+          return 'http://localhost:5000/api';
+        }
+      } catch (e) {
+        // Fallback para desktop
+      }
+      // Para desktop, localhost funciona bien
       return 'http://localhost:5000/api';
     }
   }
@@ -20,6 +34,16 @@ class AppConfig {
     if (kIsWeb) {
       return 'http://localhost:5000/uploads';
     } else {
+      try {
+        if (Platform.isAndroid) {
+          // Para Android físico: usa la IP de tu PC WiFi
+          return 'http://192.168.1.42:5000/uploads';
+        } else if (Platform.isIOS) {
+          return 'http://localhost:5000/uploads';
+        }
+      } catch (e) {
+        // Fallback
+      }
       return 'http://localhost:5000/uploads';
     }
   }

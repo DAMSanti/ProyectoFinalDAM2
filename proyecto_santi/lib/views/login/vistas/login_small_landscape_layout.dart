@@ -8,29 +8,46 @@ Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
     builder: (context, constraints) {
       return Stack(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: constraints.maxWidth * 0.5,
-                child: Center(
-                  child: Image.asset(
-                    'assets/logorecortado.png',
+          Center(
+            child: SingleChildScrollView(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * 0.35,
+                          maxHeight: constraints.maxHeight * 0.5,
+                        ),
+                        child: Image.asset(
+                          'assets/logorecortado.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      child: _buildRightSide(context, usernameController, passwordController, login, showLoginDialog),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                width: constraints.maxWidth * 0.5,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0), // Adjust margin here
-                  child: _buildRightSide(context, usernameController, passwordController, login, showLoginDialog),
-                ),
-              ),
-            ],
+            ),
           ),
           if (isLoading)
-            Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
             ),
         ],
@@ -42,7 +59,8 @@ Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
 Widget _buildRightSide(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, VoidCallback login, VoidCallback showLoginDialog) {
   return Center(
     child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 32),
+      constraints: const BoxConstraints(maxWidth: 400),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
             ? lightTheme.primaryColor.withAlpha(25)
@@ -50,14 +68,15 @@ Widget _buildRightSide(BuildContext context, TextEditingController usernameContr
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LoginForm(
             usernameController: usernameController,
             passwordController: passwordController,
             onSubmit: login,
           ),
-          SizedBox(height: 7),
+          const SizedBox(height: 20),
           LoginButtons(
             onLoginPressed: login,
             onMicrosoftLoginPressed: showLoginDialog,

@@ -4,60 +4,67 @@ import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
 
 Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      return Stack(
-        children: [
-          Center(
-            child: Container(
-              width: constraints.maxWidth * 0.35, // Fixed size
-              height: constraints.maxHeight * 0.6, // Fixed size
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? lightTheme.primaryColor.withAlpha(25)
-                    : darkTheme.primaryColor.withAlpha(25),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: constraints.maxHeight * 0.20, // Fixed width
-                    height: constraints.maxHeight * 0.20, // Fixed height
-                    child: Image.asset(
-                      'assets/logorecortado.png',
-                    ),
+  return Stack(
+    children: [
+      Center(
+        child: SingleChildScrollView(
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 450,
+              minWidth: 350,
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? lightTheme.primaryColor.withAlpha(25)
+                  : darkTheme.primaryColor.withAlpha(25),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo con tamaño fijo
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 180,
+                    maxHeight: 180,
                   ),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  SizedBox(
-                    width: constraints.maxWidth * 0.25, // Fixed width
-                    child: LoginForm(
-                      usernameController: usernameController,
-                      passwordController: passwordController,
-                      onSubmit: login,
-                    ),
+                  child: Image.asset(
+                    'assets/logorecortado.png',
+                    fit: BoxFit.contain,
                   ),
-                  SizedBox(height: constraints.maxHeight * 0.02),
-                  SizedBox(
-                    width: constraints.maxWidth * 0.25, // Fixed width
-                    child: LoginButtons(
-                      onLoginPressed: login,
-                      onMicrosoftLoginPressed: showLoginDialog,
-                    ),
-                  ),
-                  SizedBox(height: constraints.maxHeight * 0.05),
-                ],
-              ),
+                ),
+                const SizedBox(height: 32),
+                // Form
+                LoginForm(
+                  usernameController: usernameController,
+                  passwordController: passwordController,
+                  onSubmit: login,
+                ),
+                const SizedBox(height: 24),
+                // Botones
+                LoginButtons(
+                  onLoginPressed: login,
+                  onMicrosoftLoginPressed: showLoginDialog,
+                ),
+              ],
             ),
           ),
-          if (isLoading)
-            Center(
+        ),
+      ),
+      if (isLoading)
+        Positioned.fill(
+          child: Container(
+            color: Colors.black.withOpacity(0.3),
+            child: Center(
               child: CircularProgressIndicator(
                 color: Theme.of(context).primaryColor,
               ),
             ),
-        ],
-      );
-    },
+          ),
+        ),
+    ],
   );
 }
