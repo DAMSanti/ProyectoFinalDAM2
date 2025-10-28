@@ -11,16 +11,10 @@ public class AlojamientoDto
     public string? Telefono { get; set; }
     public string? Email { get; set; }
     public string? Web { get; set; }
-    public string? TipoAlojamiento { get; set; }
-    public int? NumeroHabitaciones { get; set; }
     public int? CapacidadTotal { get; set; }
-    public decimal? PrecioPorNoche { get; set; }
-    public string? Servicios { get; set; }
     public string? Observaciones { get; set; }
     public bool Activo { get; set; }
     public DateTime FechaCreacion { get; set; }
-    public decimal? Latitud { get; set; }
-    public decimal? Longitud { get; set; }
 }
 
 public class CreateAlojamientoDto
@@ -33,14 +27,8 @@ public class CreateAlojamientoDto
     public string? Telefono { get; set; }
     public string? Email { get; set; }
     public string? Web { get; set; }
-    public string? TipoAlojamiento { get; set; }
-    public int? NumeroHabitaciones { get; set; }
     public int? CapacidadTotal { get; set; }
-    public decimal? PrecioPorNoche { get; set; }
-    public string? Servicios { get; set; }
     public string? Observaciones { get; set; }
-    public decimal? Latitud { get; set; }
-    public decimal? Longitud { get; set; }
 }
 
 public class UpdateAlojamientoDto
@@ -53,13 +41,7 @@ public class UpdateAlojamientoDto
     public string? Telefono { get; set; }
     public string? Email { get; set; }
     public string? Web { get; set; }
-    public string? TipoAlojamiento { get; set; }
-    public int? NumeroHabitaciones { get; set; }
     public int? CapacidadTotal { get; set; }
-    public decimal? PrecioPorNoche { get; set; }
-    public string? Servicios { get; set; }
     public string? Observaciones { get; set; }
     public bool? Activo { get; set; }
-    public decimal? Latitud { get; set; }
-    public decimal? Longitud { get; set; }
 }

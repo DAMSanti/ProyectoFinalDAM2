@@ -1,26 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj": {}
+    "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj": {}
   },
   "projects": {
-    "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj": {
+    "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
+        "projectUniqueName": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
         "projectName": "ACEXAPI",
-        "projectPath": "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
-        "packagesPath": "C:\\Users\\rathm\\.nuget\\packages\\",
-        "outputPath": "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\ACEXAPI\\obj\\",
+        "projectPath": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\ACEXAPI.csproj",
+        "packagesPath": "C:\\Users\\santiagota\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\santiagota\\source\\repos\\ProyectoFinalDAM2\\ACEXAPI\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "G:\\Program Files\\DevExpress 24.2\\Components\\Offline Packages",
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\rathm\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 24.2.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\santiagota\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "G:\\Program Files\\DevExpress 24.2\\Components\\System\\Components\\Packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

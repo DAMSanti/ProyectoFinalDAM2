@@ -41,27 +41,27 @@ class ApiService {
       },
     ));
 
-    // Interceptor para logging (útil para debug)
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      error: true,
-      logPrint: (obj) => print('[API] $obj'),
-    ));
+    // Interceptor para logging (desactivado para producción)
+    // _dio.interceptors.add(LogInterceptor(
+    //   requestBody: true,
+    //   responseBody: true,
+    //   error: true,
+    //   logPrint: (obj) => print('[API] $obj'),
+    // ));
 
     // Interceptor para agregar JWT token automáticamente
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         if (_jwtToken != null) {
           options.headers['Authorization'] = 'Bearer $_jwtToken';
-          print('[API] Token agregado a la petición: ${options.uri.path}');
-        } else {
-          print('[API] ⚠️ No hay token disponible para: ${options.uri.path}');
         }
         return handler.next(options);
       },
       onError: (DioException error, ErrorInterceptorHandler handler) {
-        print('[API Error] ${error.message}');
+        // Log solo errores críticos
+        if (error.response?.statusCode == 401 || error.response?.statusCode == 500) {
+          print('[API Error] ${error.response?.statusCode}: ${error.message}');
+        }
         return handler.next(error);
       },
     ));
@@ -73,7 +73,6 @@ class ApiService {
   /// Establece el token JWT para las peticiones (compartido entre todas las instancias)
   void setToken(String? token) {
     _jwtToken = token;
-    print('[API] Token configurado globalmente: ${token?.substring(0, 20)}...');
   }
 
   /// Obtiene el token actual

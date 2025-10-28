@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/models/alojamiento.dart';
+import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/config.dart';
 
@@ -123,18 +125,33 @@ class ActividadService {
         'Descripcion': actividad.descripcion,
         'FechaInicio': actividad.fini,
         'FechaFin': actividad.ffin,
-        'PresupuestoEstimado': actividad.importePorAlumno,
+        'PresupuestoEstimado': actividad.presupuestoEstimado,
+        'CosteReal': actividad.costoReal,
         'Aprobada': actividad.estado == 'Aprobada',
         'SolicitanteId': actividad.solicitante?.uuid,
         'DepartamentoId': actividad.departamento?.id,
         'TransporteReq': actividad.transporteReq,
+        'PrecioTransporte': actividad.precioTransporte,
+        'EmpresaTransporteId': actividad.empresaTransporte?.id,
         'AlojamientoReq': actividad.alojamientoReq,
-        // LocalizacionId y EmpTransporteId son opcionales
+        'PrecioAlojamiento': actividad.precioAlojamiento,
+        'AlojamientoId': actividad.alojamiento?.id,
+        // LocalizacionId es opcional
       });
       
       print('[ActividadService] FormData preparado con SolicitanteId: ${actividad.solicitante?.uuid}');
-      print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, AlojamientoReq: ${actividad.alojamientoReq}');
+      print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, PrecioTransporte: ${actividad.precioTransporte}, EmpresaTransporteId: ${actividad.empresaTransporte?.id}');
+      print('[ActividadService] FormData - AlojamientoReq: ${actividad.alojamientoReq}, PrecioAlojamiento: ${actividad.precioAlojamiento}, AlojamientoId: ${actividad.alojamiento?.id}');
+      print('[ActividadService] FormData - PresupuestoEstimado: ${actividad.presupuestoEstimado}');
+      print('[ActividadService] FormData - CosteReal: ${actividad.costoReal}');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
+      
+      // Imprimir todo el contenido del FormData
+      print('[ActividadService] ========== FORMDATA COMPLETO ==========');
+      formData.fields.forEach((field) {
+        print('[ActividadService] ${field.key}: ${field.value}');
+      });
+      print('[ActividadService] ==========================================');
       
       final response = await _apiService.dio.put(
         '${AppConfig.actividadEndpoint}/$id',
@@ -250,6 +267,76 @@ class ActividadService {
       }
     } catch (e) {
       print('[ActividadService ERROR] deleteFolleto: $e');
+      rethrow;
+    }
+  }
+
+  /// Obtiene todas las empresas de transporte
+  Future<List<EmpresaTransporte>> fetchEmpresasTransporte() async {
+    try {
+      print('[ActividadService] Fetching empresas de transporte');
+      print('[ActividadService] URL: ${AppConfig.apiBaseUrl}/EmpTransporte');
+      
+      final response = await _apiService.getData('/EmpTransporte');
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      print('[ActividadService] Response data type: ${response.data.runtimeType}');
+      print('[ActividadService] Response data: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> list = response.data as List;
+        print('[ActividadService] Lista parseada - Cantidad: ${list.length}');
+        
+        final empresas = list.map((json) {
+          print('[ActividadService] Parseando: $json');
+          return EmpresaTransporte.fromJson(json);
+        }).toList();
+        
+        print('[ActividadService] Empresas cargadas exitosamente: ${empresas.length}');
+        return empresas;
+      }
+      throw ApiException('Error al obtener empresas de transporte', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] fetchEmpresasTransporte: $e');
+      if (e is DioException) {
+        print('[ActividadService ERROR] Response: ${e.response?.data}');
+        print('[ActividadService ERROR] Status: ${e.response?.statusCode}');
+      }
+      rethrow;
+    }
+  }
+
+  /// Obtiene todos los alojamientos activos
+  Future<List<Alojamiento>> fetchAlojamientos() async {
+    try {
+      print('[ActividadService] Fetching alojamientos');
+      print('[ActividadService] URL: ${AppConfig.apiBaseUrl}/Alojamiento?soloActivos=true');
+      
+      final response = await _apiService.getData('/Alojamiento?soloActivos=true');
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      print('[ActividadService] Response data type: ${response.data.runtimeType}');
+      print('[ActividadService] Response data count: ${(response.data as List).length}');
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> list = response.data as List;
+        print('[ActividadService] Lista parseada - Cantidad: ${list.length}');
+        
+        final alojamientos = list.map((json) {
+          print('[ActividadService] Parseando alojamiento: ${json['nombre']}');
+          return Alojamiento.fromJson(json);
+        }).toList();
+        
+        print('[ActividadService] Alojamientos cargados exitosamente: ${alojamientos.length}');
+        return alojamientos;
+      }
+      throw ApiException('Error al obtener alojamientos', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] fetchAlojamientos: $e');
+      if (e is DioException) {
+        print('[ActividadService ERROR] Response: ${e.response?.data}');
+        print('[ActividadService ERROR] Status: ${e.response?.statusCode}');
+      }
       rethrow;
     }
   }

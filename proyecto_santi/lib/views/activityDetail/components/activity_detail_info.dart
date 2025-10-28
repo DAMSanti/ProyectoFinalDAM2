@@ -36,8 +36,9 @@ class ActivityDetailInfo extends StatefulWidget {
   final List<XFile> selectedImages;
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
-  final Function(int)? removeApiImage; // Nueva función para eliminar fotos de la API
+  final Function(int)? removeApiImage; // Nueva funci�n para eliminar fotos de la API
   final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
+  final int reloadTrigger; // N�mero que cambia cuando se debe recargar
 
   const ActivityDetailInfo({
     super.key,
@@ -49,6 +50,7 @@ class ActivityDetailInfo extends StatefulWidget {
     required this.removeSelectedImage,
     this.removeApiImage, // Opcional
     this.onActivityDataChanged, // Opcional
+    this.reloadTrigger = 0, // Por defecto 0
   });
 
   @override
@@ -60,16 +62,17 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   late final ProfesorService _profesorService;
   late final CatalogoService _catalogoService;
   late final LocalizacionService _localizacionService;
+  late final ActividadService _actividadService;
   List<Profesor> _profesoresParticipantes = [];
   List<GrupoParticipante> _gruposParticipantes = [];
   List<Profesor> _profesoresParticipantesOriginales = [];
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
   List<Localizacion> _localizaciones = [];
-  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localización
+  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci�n
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   bool _loadingLocalizaciones = false;
-  int? _editingGrupoId; // ID del grupo que se está editando
+  int? _editingGrupoId; // ID del grupo que se est� editando
   
   // Variables para el folleto
   String? _folletoFileName;
@@ -88,10 +91,21 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     _profesorService = ProfesorService(_apiService);
     _catalogoService = CatalogoService(_apiService);
     _localizacionService = LocalizacionService(_apiService);
+    _actividadService = ActividadService(_apiService);
     // Cargar participantes desde la base de datos
     _loadParticipantes();
     // Cargar localizaciones
     _loadLocalizaciones();
+  }
+  
+  @override
+  void didUpdateWidget(ActivityDetailInfo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si el reloadTrigger cambi�, significa que el padre quiere que rec�rguemos
+    if (widget.reloadTrigger != oldWidget.reloadTrigger) {
+      print('[ACTIVITY_DETAIL_INFO] reloadTrigger cambi�, recargando datos...');
+      reloadData();
+    }
   }
   
   Future<void> _loadLocalizaciones() async {
@@ -100,14 +114,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     });
     
     try {
-      print('[LOCALIZACIONES] Cargando localizaciones para actividad ${widget.actividad.id}');
+
       final localizacionesData = await _localizacionService.fetchLocalizaciones(widget.actividad.id);
-      print('[LOCALIZACIONES] Localizaciones cargadas: ${localizacionesData.length}');
+
       
       // Debug: imprimir datos recibidos del API
-      print('[DEBUG ICONOS] Datos recibidos del API:');
+
       for (var data in localizacionesData) {
-        print('[DEBUG ICONOS] Loc ID: ${data['id']}, Nombre: ${data['nombre']}, Icono: ${data['icono']}, EsPrincipal: ${data['esPrincipal']}');
+
       }
       
       setState(() {
@@ -115,21 +129,21 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         
         // Inicializar iconos desde la base de datos o usar por defecto
         for (var loc in _localizaciones) {
-          print('[DEBUG ICONOS] Procesando Loc ID: ${loc.id}, Icono desde modelo: ${loc.icono}');
+
           
           if (!_iconosLocalizaciones.containsKey(loc.id)) {
-            // Si la localización tiene un icono guardado en la BD, usarlo
+            // Si la localizaci�n tiene un icono guardado en la BD, usarlo
             if (loc.icono != null && loc.icono!.isNotEmpty) {
               final iconData = IconHelper.getIcon(
                 loc.icono,
                 defaultIcon: loc.esPrincipal ? Icons.location_pin : Icons.location_on,
               );
               _iconosLocalizaciones[loc.id] = iconData;
-              print('[DEBUG ICONOS] Asignado icono desde BD: ${loc.icono} -> ${iconData.codePoint}');
+
             } else {
-              // Si no tiene icono guardado, usar el icono por defecto según si es principal
+              // Si no tiene icono guardado, usar el icono por defecto seg�n si es principal
               _iconosLocalizaciones[loc.id] = loc.esPrincipal ? Icons.location_pin : Icons.location_on;
-              print('[DEBUG ICONOS] Usando icono por defecto para loc ${loc.id}');
+
             }
           }
         }
@@ -146,29 +160,21 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   
   Future<void> _loadParticipantes() async {
     try {
-      print('[PARTICIPANTES] Cargando participantes para actividad ${widget.actividad.id}');
-      
       // Cargar profesores participantes
       final profesoresIds = await _profesorService.fetchProfesoresParticipantes(widget.actividad.id);
-      print('[PARTICIPANTES] IDs de profesores participantes: $profesoresIds');
       
       final todosLosProfesores = await _profesorService.fetchProfesores();
-      print('[PARTICIPANTES] Total profesores en sistema: ${todosLosProfesores.length}');
       
       // Cargar grupos participantes
       final gruposData = await _catalogoService.fetchGruposParticipantes(widget.actividad.id);
-      print('[PARTICIPANTES] Grupos participantes data: $gruposData');
       
       final todosLosGrupos = await _catalogoService.fetchGrupos();
-      print('[PARTICIPANTES] Total grupos en sistema: ${todosLosGrupos.length}');
       
       setState(() {
         // Filtrar profesores que participan - convertir UUIDs a lowercase para comparar
         _profesoresParticipantes = todosLosProfesores
             .where((p) => profesoresIds.any((id) => id.toLowerCase() == p.uuid.toLowerCase()))
             .toList();
-        
-        print('[PARTICIPANTES] Profesores participantes filtrados: ${_profesoresParticipantes.length}');
         
         // Construir lista de grupos participantes
         _gruposParticipantes = gruposData.map((data) {
@@ -182,8 +188,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           );
         }).toList();
         
-        print('[PARTICIPANTES] Grupos participantes construidos: ${_gruposParticipantes.length}');
-        
         // Guardar copias originales
         _profesoresParticipantesOriginales = List.from(_profesoresParticipantes);
         _gruposParticipantesOriginales = _gruposParticipantes.map((gp) => 
@@ -193,12 +197,10 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           )
         ).toList();
       });
-      
-      print('[PARTICIPANTES] Participantes cargados exitosamente');
     } catch (e) {
       print('[ERROR] Error cargando participantes: $e');
       print('[ERROR] Stack trace: ${StackTrace.current}');
-      // Inicializar listas vacías en caso de error
+      // Inicializar listas vac�as en caso de error
       setState(() {
         _profesoresParticipantesOriginales = [];
         _gruposParticipantesOriginales = [];
@@ -213,6 +215,21 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         'gruposParticipantes': _gruposParticipantes,
       });
     }
+  }
+  
+  // M�todo p�blico para recargar datos desde el padre (al revertir)
+  Future<void> reloadData() async {
+    print('[ACTIVITY_DETAIL_INFO] Recargando datos...');
+    setState(() {
+      // Limpiar estado del folleto
+      _folletoFileName = null;
+      _folletoFilePath = null;
+      _folletoChanged = false;
+      _folletoMarkedForDeletion = false;
+    });
+    // Solo recargar participantes, no localizaciones (no se modifican en esta vista)
+    await _loadParticipantes();
+    print('[ACTIVITY_DETAIL_INFO] Datos recargados correctamente');
   }
 
   Future<void> _selectFolleto() async {
@@ -230,7 +247,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           // En web, usar bytes en lugar de path
           if (kIsWeb) {
             _folletoFilePath = null; // No disponible en web
-            // Guardar bytes para subir después
+            // Guardar bytes para subir despu�s
             if (file.bytes != null) {
               // Notificar con los bytes directamente
               if (widget.onActivityDataChanged != null) {
@@ -263,7 +280,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       _folletoFileName = null;
       _folletoFilePath = null;
       
-      // Notificar el cambio para activar el botón guardar
+      // Notificar el cambio para activar el bot�n guardar
       if (widget.onActivityDataChanged != null) {
         widget.onActivityDataChanged!({
           'deleteFolleto': true,
@@ -344,7 +361,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       horaFin = horaFin.substring(0, 5);
     }
     
-    // Construir texto según si es el mismo día o días diferentes
+    // Construir texto seg�n si es el mismo d�a o d�as diferentes
     final String dateText = fechaInicioSolo == fechaFinSolo
         ? '$formattedStartDate $horaInicio'
         : '$formattedStartDate $horaInicio - $formattedEndDate $horaFin';
@@ -370,12 +387,12 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           ],
         ),
         SizedBox(height: 16),
-        // Descripción y Fecha en la misma línea
+        // Descripci�n y Fecha en la misma l�nea
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Descripción con icono (izquierda)
+            // Descripci�n con icono (izquierda)
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,7 +401,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.actividad.descripcion ?? 'Sin descripción',
+                      widget.actividad.descripcion ?? 'Sin descripci�n',
                       style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -465,7 +482,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                   SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      // Mostrar "Sin folleto" si está marcado para eliminación o no hay folleto
+                      // Mostrar "Sin folleto" si est� marcado para eliminaci�n o no hay folleto
                       _folletoMarkedForDeletion 
                           ? 'Sin folleto' 
                           : (_folletoFileName ?? 
@@ -486,7 +503,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       onPressed: _selectFolleto,
                       tooltip: 'Subir folleto PDF',
                     ),
-                    // Botón X para eliminar folleto (solo si hay folleto)
+                    // Bot�n X para eliminar folleto (solo si hay folleto)
                     if (!_folletoMarkedForDeletion && 
                         (_folletoFileName != null || widget.actividad.urlFolleto != null)) ...[
                       SizedBox(width: 8),
@@ -548,7 +565,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       children: [
         Text(
           'Fotos de la Actividad',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 8),
         _HorizontalImageScroller(
@@ -559,33 +576,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           selectedImages: widget.selectedImages,
           onDeleteImage: (index) => widget.removeSelectedImage(index),
           onDeleteApiImage: (index) async {
-            final confirmed = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Confirmar eliminación'),
-                  content: Text('¿Estás seguro de que deseas eliminar esta foto?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text('Cancelar'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: Text('Eliminar'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
-                    ),
-                  ],
-                );
-              },
-            );
-            
-            if (confirmed == true) {
-              // Aquí iría la lógica para eliminar de la API
-              // Por ahora solo mostramos un mensaje
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Foto marcada para eliminar')),
-              );
+            // Llamar a la funci�n del padre que maneja la eliminaci�n
+            if (widget.removeApiImage != null) {
+              await widget.removeApiImage!(index);
             }
           },
         ),
@@ -599,10 +592,10 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       children: [
         Text(
           'Participantes',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 16),
-        // Layout responsivo: dos columnas en pantallas anchas, una columna en móvil
+        // Layout responsivo: dos columnas en pantallas anchas, una columna en m�vil
         constraints.maxWidth > 800
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -643,11 +636,11 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             children: [
               Text(
                 'Profesores Participantes',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               if (widget.isAdminOrSolicitante)
                 IconButton(
-                  icon: Icon(Icons.add_circle_outline, size: 20, color: Color(0xFF1976d2)),
+                  icon: Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF1976d2)),
                   onPressed: _loadingProfesores ? null : () {
                     _showAddProfesorDialog(context);
                   },
@@ -724,7 +717,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 children: [
                   Text(
                     'Grupos/Cursos Participantes',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                   if (_gruposParticipantes.isNotEmpty)
                     Padding(
@@ -732,7 +725,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       child: Text(
                         'Total alumnos: $_totalAlumnosParticipantes',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Colors.blue,
                           fontWeight: FontWeight.w500,
                         ),
@@ -742,7 +735,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               ),
               if (widget.isAdminOrSolicitante)
                 IconButton(
-                  icon: Icon(Icons.add_circle_outline, size: 20, color: Color(0xFF1976d2)),
+                  icon: Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF1976d2)),
                   onPressed: _loadingGrupos ? null : () {
                     _showAddGrupoDialog(context);
                   },
@@ -844,7 +837,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (!mounted) return;
       
-      // Mostrar diálogo con selección múltiple
+      // Mostrar di�logo con selecci�n m�ltiple
       final selectedProfesores = await showDialog<List<Profesor>>(
         context: context,
         builder: (BuildContext context) {
@@ -857,7 +850,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (selectedProfesores != null && selectedProfesores.isNotEmpty) {
         setState(() {
-          // Agregar solo los profesores que no están ya en la lista
+          // Agregar solo los profesores que no est�n ya en la lista
           for (var profesor in selectedProfesores) {
             if (!_profesoresParticipantes.any((p) => p.uuid == profesor.uuid)) {
               _profesoresParticipantes.add(profesor);
@@ -896,7 +889,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (!mounted) return;
       
-      // Mostrar diálogo con selección de cursos/grupos
+      // Mostrar di�logo con selecci�n de cursos/grupos
       final gruposSeleccionados = await showDialog<List<Grupo>>(
         context: context,
         builder: (BuildContext context) {
@@ -910,7 +903,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (gruposSeleccionados != null && gruposSeleccionados.isNotEmpty) {
         setState(() {
-          // Agregar los grupos seleccionados con el número total de alumnos por defecto
+          // Agregar los grupos seleccionados con el n�mero total de alumnos por defecto
           for (var grupo in gruposSeleccionados) {
             if (!_gruposParticipantes.any((gp) => gp.grupo.id == grupo.id)) {
               _gruposParticipantes.add(GrupoParticipante(
@@ -1005,14 +998,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     
     if (nuevoNumero == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor ingrese un número válido')),
+        SnackBar(content: Text('Por favor ingrese un n�mero v�lido')),
       );
       return;
     }
     
     if (nuevoNumero <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El número debe ser mayor a 0')),
+        SnackBar(content: Text('El n�mero debe ser mayor a 0')),
       );
       return;
     }
@@ -1021,7 +1014,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'El número no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
+            'El n�mero no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
           ),
         ),
       );
@@ -1039,19 +1032,21 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   Widget _buildPresupuestoYLocalizacion(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
-    // En pantallas pequeñas (< 800px), mostrar en columna
+    // En pantallas peque�as (< 800px), mostrar en columna
     // En pantallas grandes, mostrar en fila (50/50)
     if (constraints.maxWidth < 800) {
       return Column(
         children: [
           ActivityBudgetSection(
+            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci�n al revertir
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
+            actividadService: _actividadService,
             onBudgetChanged: (budgetData) {
               // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el botón guardar
+              // Notificar al padre que hubo cambios para activar el bot�n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
@@ -1073,13 +1068,15 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         Expanded(
           flex: 1,
           child: ActivityBudgetSection(
+            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci�n al revertir
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
+            actividadService: _actividadService,
             onBudgetChanged: (budgetData) {
               // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el botón guardar
+              // Notificar al padre que hubo cambios para activar el bot�n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
@@ -1102,7 +1099,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Container(
-      constraints: BoxConstraints(minHeight: 500), // Altura mínima igual al contenedor de presupuesto
+      constraints: BoxConstraints(minHeight: 500), // Altura m�nima igual al contenedor de presupuesto
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
@@ -1121,13 +1118,13 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                   Icon(
                     Icons.location_on,
                     color: Color(0xFF1976d2),
-                    size: !isWeb ? 24.dg : 7.sp,
+                    size: !isWeb ? 18.dg : 6.sp,
                   ),
                   SizedBox(width: 8),
                   Text(
                     'Localizaciones',
                     style: TextStyle(
-                      fontSize: !isWeb ? 18.dg : 6.sp,
+                      fontSize: !isWeb ? 14.dg : 5.sp,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1976d2),
                     ),
@@ -1161,7 +1158,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                     size: !isWeb ? 16.dg : 5.sp,
                   ),
                   label: Text(
-                    'Añadir',
+                    'A�adir',
                     style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -1195,7 +1192,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 localizaciones: _localizaciones,
                 iconosLocalizaciones: _iconosLocalizaciones,
                 onLocalizacionTapped: (localizacion) {
-                  print('[MAP] Localización seleccionada: ${localizacion.nombre}');
+                  print('[MAP] Localizaci�n seleccionada: ${localizacion.nombre}');
                 },
               ),
             ),
@@ -1205,7 +1202,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     );
   }
 
-  // Método para mostrar el diálogo de añadir localización
+  // M�todo para mostrar el di�logo de a�adir localizaci�n
   void _showAddLocalizacionDialog(BuildContext context) async {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
@@ -1227,7 +1224,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     // Si hay cambios, actualizar el estado local
     if (result != null && result['hasChanges'] == true) {
       final localizacionesRecibidas = List<Localizacion>.from(result['localizaciones']);
-      print('[DEBUG SAVE ICONOS] Localizaciones recibidas del diálogo: ${localizacionesRecibidas.length}');
+      print('[DEBUG SAVE ICONOS] Localizaciones recibidas del di�logo: ${localizacionesRecibidas.length}');
       
       for (var loc in localizacionesRecibidas) {
         print('[DEBUG SAVE ICONOS] Loc ID: ${loc.id}, Nombre: ${loc.nombre}, Icono: ${loc.icono}');
@@ -1239,7 +1236,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         if (result.containsKey('iconos')) {
           final iconosDelDialogo = result['iconos'] as Map<int, IconData>;
           _iconosLocalizaciones = Map<int, IconData>.from(iconosDelDialogo);
-          print('[DEBUG SAVE ICONOS] Iconos recibidos del diálogo: ${_iconosLocalizaciones.length}');
+          print('[DEBUG SAVE ICONOS] Iconos recibidos del di�logo: ${_iconosLocalizaciones.length}');
           for (var entry in _iconosLocalizaciones.entries) {
             print('[DEBUG SAVE ICONOS] ID: ${entry.key}, IconData codePoint: ${entry.value.codePoint}');
           }
@@ -1255,14 +1252,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
   }
 
-  // Método para mostrar confirmación de eliminación de imagen
+  // M�todo para mostrar confirmaci�n de eliminaci�n de imagen
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int index) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('Eliminar foto'),
-          content: Text('¿Estás seguro de que deseas eliminar esta foto?'),
+          content: Text('�Est�s seguro de que deseas eliminar esta foto?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -1283,7 +1280,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
   }
 
-  // Método para construir sección de comentarios
+  // M�todo para construir secci�n de comentarios
   Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
@@ -1333,7 +1330,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 }
 
-// Widget para scroll horizontal de imágenes
+// Widget para scroll horizontal de im�genes
 class _HorizontalImageScroller extends StatefulWidget {
   final BoxConstraints constraints;
   final bool isAdminOrSolicitante;
@@ -1373,7 +1370,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
       height: 200.0,
       child: Row(
         children: [
-          // Botón de cámara fijo (no hace scroll)
+          // Bot�n de c�mara fijo (no hace scroll)
           if (widget.isAdminOrSolicitante)
             InkWell(
               onTap: widget.showImagePicker,
@@ -1392,7 +1389,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                 ),
               ),
             ),
-          // Área con scroll para las imágenes
+          // �rea con scroll para las im�genes
           Expanded(
             child: Listener(
               onPointerSignal: (pointerSignal) {

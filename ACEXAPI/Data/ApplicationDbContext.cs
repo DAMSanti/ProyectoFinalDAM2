@@ -30,7 +30,20 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurar �ndices �nicos
+        // Configurar precisión de decimales para Actividad
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PresupuestoEstimado)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.CostoReal)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Actividad>()
+            .Property(a => a.PrecioTransporte)
+            .HasPrecision(18, 2);
+
+        // Configurar índices únicos
         modelBuilder.Entity<Profesor>()
             .HasIndex(p => p.Dni)
             .IsUnique();

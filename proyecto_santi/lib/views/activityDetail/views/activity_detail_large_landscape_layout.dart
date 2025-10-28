@@ -19,6 +19,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   final VoidCallback _saveChanges;
   final VoidCallback? _revertChanges;
   final Function(Map<String, dynamic>)? onActivityDataChanged;
+  final int reloadTrigger;
 
   const ActivityDetailLargeLandscapeLayout({
     super.key,
@@ -35,6 +36,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
     required VoidCallback saveChanges,
     VoidCallback? revertChanges,
     this.onActivityDataChanged,
+    this.reloadTrigger = 0,
   })  : _showImagePicker = showImagePicker,
         _removeSelectedImage = removeSelectedImage,
         _removeApiImage = removeApiImage,
@@ -58,6 +60,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
                 removeSelectedImage: _removeSelectedImage,
                 removeApiImage: _removeApiImage,
                 onActivityDataChanged: onActivityDataChanged,
+                reloadTrigger: reloadTrigger,
               ),
             ),
             Positioned(

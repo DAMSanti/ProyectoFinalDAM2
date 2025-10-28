@@ -80,20 +80,20 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
 
   Future<void> _loadData() async {
     try {
-      print('[DEBUG] Iniciando carga de datos...');
+
       
       // Cargar profesores desde la API
       final profesores = await _profesorService.fetchProfesores();
-      print('[DEBUG] Profesores cargados: ${profesores.length}');
+
       for (var p in profesores) {
-        print('[DEBUG] - Profesor: ${p.nombre} ${p.apellidos} (${p.uuid}) - ${p.correo}');
+
       }
       
       // Cargar departamentos desde la API
       final departamentos = await _catalogoService.fetchDepartamentos();
-      print('[DEBUG] Departamentos cargados: ${departamentos.length}');
+
       for (var d in departamentos) {
-        print('[DEBUG] - Departamento: ${d.nombre} (${d.id})');
+
       }
       
       setState(() {
@@ -108,18 +108,18 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
             orElse: () => _profesores.first,
           );
           _selectedProfesorId = profesor.uuid;
-          print('[DEBUG] Solicitante email: ${widget.actividad.solicitante!.correo}');
-          print('[DEBUG] Profesor seleccionado: ${profesor.nombre} ${profesor.apellidos} (${profesor.uuid})');
+
+
         }
         if (widget.actividad.departamento != null) {
           _selectedDepartamentoId = widget.actividad.departamento!.id;
-          print('[DEBUG] Departamento seleccionado: $_selectedDepartamentoId');
+
         }
         
         _isLoading = false;
       });
       
-      print('[DEBUG] Estado actualizado, isLoading: $_isLoading');
+
     } catch (e, stackTrace) {
       print('[Error] Cargando datos: $e');
       print('[Error] StackTrace: $stackTrace');

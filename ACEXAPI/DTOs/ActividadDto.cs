@@ -9,6 +9,7 @@ public class ActividadDto
     public DateTime? FechaFin { get; set; }
     public decimal? PresupuestoEstimado { get; set; }
     public decimal? CostoReal { get; set; }
+    public decimal? PrecioTransporte { get; set; }
     public string? FolletoUrl { get; set; }
     public bool Aprobada { get; set; }
     public int? DepartamentoId { get; set; }
@@ -18,6 +19,9 @@ public class ActividadDto
     public int? EmpTransporteId { get; set; }
     public string? EmpTransporteNombre { get; set; }
     public int TransporteReq { get; set; }
+    public decimal? PrecioAlojamiento { get; set; }
+    public int? AlojamientoId { get; set; }
+    public AlojamientoDto? Alojamiento { get; set; }
     public int AlojamientoReq { get; set; }
     
     // Lista de localizaciones de la actividad
@@ -57,11 +61,15 @@ public class ActividadUpdateDto
     public DateTime? FechaFin { get; set; }
     public decimal? PresupuestoEstimado { get; set; }
     public decimal? CostoReal { get; set; }
+    public decimal? PrecioTransporte { get; set; }
     public bool? Aprobada { get; set; }
     public Guid? SolicitanteId { get; set; }
     public int? DepartamentoId { get; set; }
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
+    public int? EmpresaTransporteId { get; set; } // Alias para compatibilidad con Flutter
+    public int? AlojamientoId { get; set; }
+    public decimal? PrecioAlojamiento { get; set; }
     public int? TransporteReq { get; set; }
     public int? AlojamientoReq { get; set; }
 }

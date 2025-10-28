@@ -34,18 +34,7 @@ public class Alojamiento
 
     public string? Web { get; set; }
 
-    [MaxLength(50)]
-    public string? TipoAlojamiento { get; set; } // Hotel, Hostal, Albergue, Casa Rural, etc.
-
-    public int? NumeroHabitaciones { get; set; }
-
     public int? CapacidadTotal { get; set; }
-
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal? PrecioPorNoche { get; set; }
-
-    [MaxLength(1000)]
-    public string? Servicios { get; set; } // WiFi, Desayuno, Parking, etc.
 
     [MaxLength(1000)]
     public string? Observaciones { get; set; }
@@ -53,13 +42,6 @@ public class Alojamiento
     public bool Activo { get; set; } = true;
 
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
-
-    // Coordenadas para mapa
-    [Column(TypeName = "decimal(10,7)")]
-    public decimal? Latitud { get; set; }
-
-    [Column(TypeName = "decimal(10,7)")]
-    public decimal? Longitud { get; set; }
 
     // Relación inversa
     public ICollection<Actividad> Actividades { get; set; } = new List<Actividad>();
