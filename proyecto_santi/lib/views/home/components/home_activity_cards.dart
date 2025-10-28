@@ -33,72 +33,122 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
           child: AnimatedContainer(
-            duration: Duration(milliseconds: 200),
-            margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
             transform: _isHovered 
-                ? (Matrix4.identity()..translate(0.0, -8.0, 0.0))
+                ? (Matrix4.identity()
+                  ..translate(0.0, -8.0, 0.0)
+                  ..scale(1.02))
                 : Matrix4.identity(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? colorAccentDark : colorAccentLight,
-                  borderRadius: BorderRadius.circular(16.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _isHovered 
-                          ? (isDark ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2))
-                          : Colors.black26,
-                      offset: _isHovered ? Offset(0, 12) : Offset(4, 4),
-                      blurRadius: _isHovered ? 24.0 : 10.0,
-                      spreadRadius: _isHovered ? 2.0 : 1.0,
-                    ),
-                  ],
-                  border: Border.all(
-                    color: _isHovered
-                        ? (isDark ? Colors.blue.withOpacity(0.5) : Colors.blue.withOpacity(0.3))
-                        : Colors.transparent,
-                    width: 2,
-                  ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          Color(0xFF1976d2).withOpacity(0.25),
+                          Color(0xFF1565C0).withOpacity(0.20),
+                        ]
+                      : [
+                          Color(0xFFBBDEFB).withOpacity(0.85),
+                          Color(0xFF90CAF9).withOpacity(0.75),
+                        ],
                 ),
+                boxShadow: [
+                  // Sombra principal
+                  BoxShadow(
+                    color: _isHovered 
+                        ? Color(0xFF1976d2).withOpacity(0.35)
+                        : (isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.15)),
+                    offset: _isHovered ? Offset(0, 12) : Offset(0, 4),
+                    blurRadius: _isHovered ? 24.0 : 12.0,
+                    spreadRadius: _isHovered ? 0 : -1,
+                  ),
+                  // Sombra secundaria para más profundidad
+                  if (_isHovered)
+                    BoxShadow(
+                      color: Color(0xFF1976d2).withOpacity(0.2),
+                      offset: Offset(0, 6),
+                      blurRadius: 16.0,
+                    ),
+                ],
+                border: Border.all(
+                  color: _isHovered
+                      ? Color(0xFF1976d2).withOpacity(0.6)
+                      : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                  width: _isHovered ? 2 : 1,
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius: BorderRadius.circular(20.0),
                   child: Stack(
                     children: [
-                      // Efecto de brillo en hover
-                      if (_isHovered)
-                        Positioned(
-                          top: -50,
-                          right: -50,
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.blue.withOpacity(0.1),
-                                  Colors.transparent,
-                                ],
-                              ),
+                    // Gradiente superior decorativo
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF1976d2),
+                              Color(0xFF42A5F5),
+                              Color(0xFF64B5F6),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Efecto de brillo en hover
+                    if (_isHovered)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              center: Alignment.topRight,
+                              radius: 1.5,
+                              colors: [
+                                Color(0xFF1976d2).withOpacity(0.08),
+                                Colors.transparent,
+                              ],
                             ),
                           ),
                         ),
-                      InkWell(
-                        onTap: () {
-                          // Usar la navegación del shell para mantener el menú
-                          navigateToActivityDetailInShell(
-                            context,
-                            {'activity': widget.actividad},
-                          );
-                        },
-                        child: ActivityInfo(
-                          actividad: widget.actividad,
-                          isHovered: _isHovered,
+                      ),
+                    // Patrón de puntos decorativos
+                    Positioned(
+                      right: -20,
+                      bottom: -20,
+                      child: Opacity(
+                        opacity: isDark ? 0.03 : 0.02,
+                        child: Icon(
+                          Icons.calendar_month_rounded,
+                          size: 120,
+                          color: Color(0xFF1976d2),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        navigateToActivityDetailInShell(
+                          context,
+                          {'activity': widget.actividad},
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: ActivityInfo(
+                        actividad: widget.actividad,
+                        isHovered: _isHovered,
+                      ),
+                    ),
+                  ],
+                ),
                 ),
               ),
             ),
@@ -121,63 +171,187 @@ class ActivityInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     // Formatear la fecha a DD-MM-YYYY HH:MM
     String formatearFecha(String fechaStr) {
       try {
         final fecha = DateTime.parse(fechaStr);
         return DateFormat('dd-MM-yyyy HH:mm').format(fecha);
       } catch (e) {
-        return fechaStr; // Si no se puede parsear, devolver la cadena original
+        return fechaStr;
       }
     }
 
-    return Padding(
-      padding: EdgeInsets.all(16.0),
+    // Color según estado
+    Color getEstadoColor() {
+      switch (actividad.estado.toLowerCase()) {
+        case 'aprobada':
+          return Color(0xFF4CAF50);
+        case 'pendiente':
+          return Color(0xFFFFA726);
+        case 'rechazada':
+          return Color(0xFFEF5350);
+        default:
+          return Colors.grey;
+      }
+    }
+
+    // Icono según estado
+    IconData getEstadoIcon() {
+      switch (actividad.estado.toLowerCase()) {
+        case 'aprobada':
+          return Icons.check_circle_rounded;
+        case 'pendiente':
+          return Icons.schedule_rounded;
+        case 'rechazada':
+          return Icons.cancel_rounded;
+        default:
+          return Icons.info_rounded;
+      }
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        // Efecto glassmorphism sutil en hover
+        gradient: isHovered
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        Color(0xFF1976d2).withOpacity(0.05),
+                        Colors.transparent,
+                      ]
+                    : [
+                        Color(0xFF1976d2).withOpacity(0.02),
+                        Colors.transparent,
+                      ],
+              )
+            : null,
+      ),
+      padding: EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Título con icono
+          Row(
             children: [
-              Text(
-                actividad.titulo,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 13.dg : 3.5.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2), // Azul de los items del menú y "Próximas Actividades"
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Color(0xFF1976d2).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                child: Icon(
+                  Icons.event_note_rounded,
+                  color: Color(0xFF1976d2),
+                  size: 20,
+                ),
               ),
-              SizedBox(height: 6.0),
-              Text(
-                actividad.descripcion ?? 'Sin descripción',
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                  color: isHovered ? Colors.blue : Theme.of(context).brightness == Brightness.light ? lightTheme.textTheme.labelMedium?.color
-                      : darkTheme.textTheme.labelMedium?.color,
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  actividad.titulo,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Color(0xFF1A237E),
+                    letterSpacing: -0.5,
+                    height: 1.2,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: MediaQuery.of(context).size.height > 800 ? 2 : 1,
               ),
             ],
           ),
-          SizedBox(height: 10.0), // Add spacing between the columns
+          
+          SizedBox(height: 16),
+          
+          // Descripción
+          Text(
+            actividad.descripcion?.isNotEmpty == true 
+                ? actividad.descripcion! 
+                : 'Sin descripción',
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black87,
+              height: 1.5,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+          
+          SizedBox(height: 12),
+          
+          // Divider sutil
+          Container(
+            height: 1,
+            margin: EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          
+          // Fecha y estado
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                formatearFecha(actividad.fini),
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                ),
+              // Fecha con icono
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time_rounded,
+                    size: 16,
+                    color: isDark ? Colors.white60 : Colors.black45,
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    formatearFecha(actividad.fini),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                actividad.estado,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.shortestSide < 400 ? 10.dg : 3.sp,
-                  fontWeight: FontWeight.bold,
+              // Badge de estado
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: getEstadoColor().withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: getEstadoColor().withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      getEstadoIcon(),
+                      size: 14,
+                      color: getEstadoColor(),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      actividad.estado,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: getEstadoColor(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

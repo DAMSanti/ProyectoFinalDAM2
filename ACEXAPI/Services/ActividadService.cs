@@ -71,6 +71,7 @@ public class ActividadService : IActividadService
             {
                 Id = a.Id,
                 Nombre = a.Nombre,
+                Descripcion = a.Descripcion,
                 FechaInicio = a.FechaInicio,
                 Aprobada = a.Aprobada,
                 DepartamentoNombre = a.Departamento != null ? a.Departamento.Nombre : null

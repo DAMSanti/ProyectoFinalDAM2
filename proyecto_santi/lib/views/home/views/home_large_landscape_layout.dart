@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:proyecto_santi/components/marco_desktop.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -9,7 +8,11 @@ class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
   final VoidCallback onToggleTheme;
 
-  const HomeLargeLandscapeLayout({super.key, required this.activities, required this.onToggleTheme});
+  const HomeLargeLandscapeLayout({
+    super.key, 
+    required this.activities, 
+    required this.onToggleTheme
+  });
 
   @override
   State<HomeLargeLandscapeLayout> createState() =>
@@ -27,147 +30,190 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // Ya no usar MarcoDesktop porque el DesktopShell ya proporciona el marco
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Material(
       color: Colors.transparent,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-            // Tamaño mínimo donde deja de ser responsive
-            final minWidth = 900.0;
-            final minHeight = 600.0;
-            
-            // Si la ventana es más pequeña que el mínimo, usar el mínimo y agregar scroll
-            final effectiveWidth = constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
-            final effectiveHeight = constraints.maxHeight < minHeight ? minHeight : constraints.maxHeight;
-            
-            // Si necesitamos scroll, envolver en SingleChildScrollView
-            if (constraints.maxWidth < minWidth || constraints.maxHeight < minHeight) {
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: SizedBox(
-                    width: minWidth,
-                    height: minHeight,
-                    child: _buildContent(minWidth, minHeight),
+      child: Column(
+        children: [
+          // Header compacto
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.event_available_rounded,
+                  color: Color(0xFF1976d2),
+                  size: 28,
+                ),
+                SizedBox(width: 16),
+                Text(
+                  'Próximas Actividades',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Color(0xFF1976d2),
+                    letterSpacing: 0.5,
                   ),
                 ),
-              );
-            }
-            
-            // Si no necesitamos scroll, usar el tamaño disponible (responsive)
-            return _buildContent(effectiveWidth, effectiveHeight);
-        },
-      ),
-    );
-  }
-
-  Widget _buildContent(double width, double height) {
-    return Builder(
-      builder: (context) {
-        return SizedBox(
-          width: width,
-          height: height,
-          child: Column(
-            children: [
-              // Sección de actividades con scroll horizontal
-              SizedBox(
-                height: height * 0.25, // 25% de la altura
-                child: Column(
-                  children: [
-                    SizedBox(height: 12),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(12.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                offset: Offset(-4, -4),
-                                blurRadius: 10.0,
-                                spreadRadius: 1.0,
-                                blurStyle: BlurStyle.inner,
-                              ),
-                            ],
+                SizedBox(width: 12),
+                // Burbuja con número
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1976d2),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFF1976d2).withOpacity(0.3),
+                        offset: Offset(0, 2),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    '${widget.activities.length}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Carrusel de actividades con groove
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Container(
+              height: 232,
+              decoration: BoxDecoration(
+                color: isDark 
+                    ? Color(0xFF1A2332).withOpacity(0.4)
+                    : Color(0xFFE3F2FD).withOpacity(0.6),
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    offset: Offset(0, 2),
+                    blurRadius: 8,
+                    spreadRadius: -2,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.12),
+                    offset: Offset(0, -1),
+                    blurRadius: 6,
+                    spreadRadius: -3,
+                    blurStyle: BlurStyle.inner,
+                  ),
+                ],
+              ),
+              child: widget.activities.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.event_busy_rounded,
+                            size: 48,
+                            color: Colors.grey.withOpacity(0.5),
                           ),
-                          child: widget.activities.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'No hay actividades próximas',
-                                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                                  ),
-                                )
-                              : Listener(
-                                  onPointerSignal: (pointerSignal) {
-                                    if (pointerSignal is PointerScrollEvent) {
-                                      final offset = _scrollController.offset +
-                                          (pointerSignal.scrollDelta.dy);
-                                      _scrollController.jumpTo(
-                                        offset.clamp(
-                                          0.0,
-                                          _scrollController.position.maxScrollExtent,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: ListView.builder(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    physics: BouncingScrollPhysics(),
-                                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                                    itemCount: widget.activities.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(right: 16.0),
-                                        child: SizedBox(
-                                          width: width * 0.35,
-                                          child: ActivityCardItem(
-                                            actividad: widget.activities[index],
-                                            isDarkTheme: Theme.of(context).brightness == Brightness.dark,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          SizedBox(height: 12),
+                          Text(
+                            'No hay actividades próximas',
+                            style: TextStyle(
+                              fontSize: 18, 
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: Listener(
+                        onPointerSignal: (pointerSignal) {
+                          if (pointerSignal is PointerScrollEvent) {
+                            final offset = _scrollController.offset +
+                                (pointerSignal.scrollDelta.dy);
+                            _scrollController.jumpTo(
+                              offset.clamp(
+                                0.0,
+                                _scrollController.position.maxScrollExtent,
+                              ),
+                            );
+                          }
+                        },
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          padding: EdgeInsets.all(16.0),
+                          itemCount: widget.activities.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                right: index < widget.activities.length - 1 ? 16.0 : 0.0,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minWidth: 300,
+                                  maxWidth: 400,
                                 ),
+                                child: ActivityCardItem(
+                                  actividad: widget.activities[index],
+                                  isDarkTheme: isDark,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    SizedBox(height: 12),
-                  ],
+            ),
+          ),
+          
+          SizedBox(height: 24),
+          
+          // Título del calendario
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.calendar_month_rounded,
+                  color: Color(0xFF1976d2),
+                  size: 28,
                 ),
-              ),
-              
-              // Título del calendario centrado
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Text(
+                SizedBox(width: 12),
+                Text(
                   'Calendario de Actividades',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Color(0xFF1976d2),
+                    letterSpacing: 0.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
-              
-              // Calendario con ancho completo
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                  child: SizedBox(
-                    width: width - 32, // Ancho completo menos padding
-                    child: CalendarView(activities: widget.activities),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        );
-      },
+          
+          // Calendario
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
+              child: CalendarView(activities: widget.activities),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

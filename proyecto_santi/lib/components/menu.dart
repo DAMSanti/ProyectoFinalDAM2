@@ -241,31 +241,7 @@ class MenuLandscape extends StatelessWidget {
 
     return Column(
       children: <Widget>[
-        SizedBox(
-          height: 150.0,
-          // Set the desired height for the DrawerHeader
-          child: DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).primaryColor,
-                  Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Menú',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
+        // Header removido para landscape
         _buildDrawerItem(
           context,
           icon: Icons.home,
