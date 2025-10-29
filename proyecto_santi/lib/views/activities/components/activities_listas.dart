@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/services.dart';
@@ -7,9 +8,10 @@ import 'package:proyecto_santi/components/desktop_shell.dart';
 class AllActividades extends StatefulWidget {
   final String? selectedFilter;
   final String searchQuery;
-  final int? selectedDate;
+  final DateTime? selectedDate;
   final String? selectedCourse;
   final String? selectedState;
+  final Function(int)? onCountChanged;
 
   AllActividades({
     required this.selectedFilter,
@@ -17,6 +19,7 @@ class AllActividades extends StatefulWidget {
     required this.selectedDate,
     required this.selectedCourse,
     required this.selectedState,
+    this.onCountChanged,
   });
 
   @override
@@ -48,15 +51,54 @@ class AllActividadesState extends State<AllActividades> {
   void _filterActivities() {
     setState(() {
       _filteredActividades = _allActividades.where((actividad) {
-        return actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+        // Filtro por texto de búsqueda
+        final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+        
+        // Filtro por fecha (si está seleccionada)
+        bool matchesDate = true;
+        if (widget.selectedDate != null) {
+          try {
+            // Parsear la fecha de inicio (formato esperado: "yyyy-MM-dd")
+            final actividadFecha = DateTime.parse(actividad.fini);
+            matchesDate = actividadFecha.year == widget.selectedDate!.year &&
+                         actividadFecha.month == widget.selectedDate!.month &&
+                         actividadFecha.day == widget.selectedDate!.day;
+          } catch (e) {
+            matchesDate = false;
+          }
+        }
+        
+        // Filtro por estado (si está seleccionado)
+        bool matchesState = true;
+        if (widget.selectedState != null && widget.selectedState!.isNotEmpty) {
+          matchesState = actividad.estado.toLowerCase() == widget.selectedState!.toLowerCase();
+        }
+        
+        // Filtro por curso (si está seleccionado)
+        bool matchesCourse = true;
+        if (widget.selectedCourse != null && widget.selectedCourse!.isNotEmpty) {
+          // Aquí deberías implementar la lógica según cómo se relacionan las actividades con los cursos
+          // Por ahora, asumimos que se puede verificar en grupos participantes
+          matchesCourse = true; // Implementar según tu modelo de datos
+        }
+        
+        return matchesSearch && matchesDate && matchesState && matchesCourse;
       }).toList();
+    });
+    
+    // Notificar el cambio de contador después del build
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      widget.onCountChanged?.call(_filteredActividades.length);
     });
   }
 
   @override
   void didUpdateWidget(AllActividades oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.searchQuery != widget.searchQuery) {
+    if (oldWidget.searchQuery != widget.searchQuery ||
+        oldWidget.selectedDate != widget.selectedDate ||
+        oldWidget.selectedState != widget.selectedState ||
+        oldWidget.selectedCourse != widget.selectedCourse) {
       _filterActivities();
     }
   }
@@ -78,9 +120,10 @@ class AllActividadesState extends State<AllActividades> {
 class OtrasActividades extends StatefulWidget {
   final String? selectedFilter;
   final String searchQuery;
-  final int? selectedDate;
+  final DateTime? selectedDate;
   final String? selectedCourse;
   final String? selectedState;
+  final Function(int)? onCountChanged;
 
   OtrasActividades({
     required this.selectedFilter,
@@ -88,6 +131,7 @@ class OtrasActividades extends StatefulWidget {
     required this.selectedDate,
     required this.selectedCourse,
     required this.selectedState,
+    this.onCountChanged,
   });
 
   @override
@@ -119,15 +163,54 @@ class OtrasActividadesState extends State<OtrasActividades> {
   void _filterActivities() {
     setState(() {
       _filteredOtrasActividades = _otrasActividades.where((actividad) {
-        return actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+        // Filtro por texto de búsqueda
+        final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
+        
+        // Filtro por fecha (si está seleccionada)
+        bool matchesDate = true;
+        if (widget.selectedDate != null) {
+          try {
+            // Parsear la fecha de inicio (formato esperado: "yyyy-MM-dd")
+            final actividadFecha = DateTime.parse(actividad.fini);
+            matchesDate = actividadFecha.year == widget.selectedDate!.year &&
+                         actividadFecha.month == widget.selectedDate!.month &&
+                         actividadFecha.day == widget.selectedDate!.day;
+          } catch (e) {
+            matchesDate = false;
+          }
+        }
+        
+        // Filtro por estado (si está seleccionado)
+        bool matchesState = true;
+        if (widget.selectedState != null && widget.selectedState!.isNotEmpty) {
+          matchesState = actividad.estado.toLowerCase() == widget.selectedState!.toLowerCase();
+        }
+        
+        // Filtro por curso (si está seleccionado)
+        bool matchesCourse = true;
+        if (widget.selectedCourse != null && widget.selectedCourse!.isNotEmpty) {
+          // Aquí deberías implementar la lógica según cómo se relacionan las actividades con los cursos
+          // Por ahora, asumimos que se puede verificar en grupos participantes
+          matchesCourse = true; // Implementar según tu modelo de datos
+        }
+        
+        return matchesSearch && matchesDate && matchesState && matchesCourse;
       }).toList();
+    });
+    
+    // Notificar el cambio de contador después del build
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      widget.onCountChanged?.call(_filteredOtrasActividades.length);
     });
   }
 
   @override
   void didUpdateWidget(OtrasActividades oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.searchQuery != widget.searchQuery) {
+    if (oldWidget.searchQuery != widget.searchQuery ||
+        oldWidget.selectedDate != widget.selectedDate ||
+        oldWidget.selectedState != widget.selectedState ||
+        oldWidget.selectedCourse != widget.selectedCourse) {
       _filterActivities();
     }
   }

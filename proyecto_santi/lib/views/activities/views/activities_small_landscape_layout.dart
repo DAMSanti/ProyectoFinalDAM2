@@ -3,7 +3,9 @@ import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
-import 'package:proyecto_santi/views/activities/components/activities_busqueda.dart';
+import 'package:proyecto_santi/views/activities/components/activities_search_bar.dart';
+import 'package:proyecto_santi/views/activities/components/activities_section_header.dart';
+import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 
@@ -23,6 +25,13 @@ class ActivitiesSmallLandscapeLayout extends StatefulWidget {
 
 class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscapeLayout> {
   String searchQuery = '';
+  Map<String, dynamic> filters = {
+    'fecha': null,
+    'estado': null,
+    'curso': null,
+  };
+  int _allActivitiesCount = 0;
+  int _userActivitiesCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -45,97 +54,102 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
               },
             )
                 : null,
-            body: Column(
-              children: [
-                Busqueda(
-                  onSearchQueryChanged: (query) {
-                    setState(() {
-                      searchQuery = query;
-                    });
-                  },
-                  onFilterSelected: (filter, date, course, state) {
-                    // Handle filter selection
-                  },
-                ),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(height: 8),
+                  
+                  // Barra de búsqueda moderna
+                  ActivitiesSearchBar(
+                    onSearchQueryChanged: (query) {
+                      setState(() {
+                        searchQuery = query;
+                      });
+                    },
+                    filters: filters,
+                    onFiltersChanged: (newFilters) {
+                      setState(() {
+                        filters = newFilters;
+                      });
+                    },
+                  ),
+                  
+                  SizedBox(height: 8),
+                  
+                  // Layout horizontal para landscape
+                  Expanded(
+                    child: Row(
+                      children: [
+                        // Columna izquierda: Todas las actividades
+                        Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                              ActivitiesSectionHeader(
+                                title: 'Todas las Actividades',
+                                icon: Icons.grid_view_rounded,
+                                count: _allActivitiesCount,
+                              ),
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        offset: Offset(-4, -4),
-                                        blurRadius: 10.0,
-                                        spreadRadius: 1.0,
-                                        blurStyle: BlurStyle.inner,
-                                      ),
-                                    ],
-                                  ),
+                                child: ActivitiesListContainer(
                                   child: AllActividades(
                                     selectedFilter: null,
                                     searchQuery: searchQuery,
-                                    selectedDate: null,
-                                    selectedCourse: null,
-                                    selectedState: null,
+                                    selectedDate: filters['fecha'],
+                                    selectedCourse: filters['curso'],
+                                    selectedState: filters['estado'],
+                                    onCountChanged: (count) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _allActivitiesCount = count;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                        
+                        SizedBox(width: 8),
+                        
+                        // Columna derecha: Tus actividades
+                        Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                              ActivitiesSectionHeader(
+                                title: 'Tus Actividades',
+                                icon: Icons.person_rounded,
+                                count: _userActivitiesCount,
+                              ),
                               Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        offset: Offset(-4, -4),
-                                        blurRadius: 10.0,
-                                        spreadRadius: 1.0,
-                                        blurStyle: BlurStyle.inner,
-                                      ),
-                                    ],
-                                  ),
+                                child: ActivitiesListContainer(
                                   child: OtrasActividades(
                                     selectedFilter: null,
                                     searchQuery: searchQuery,
-                                    selectedDate: null,
-                                    selectedCourse: null,
-                                    selectedState: null,
+                                    selectedDate: filters['fecha'],
+                                    selectedCourse: filters['curso'],
+                                    selectedState: filters['estado'],
+                                    onCountChanged: (count) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _userActivitiesCount = count;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  
+                  SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ],
