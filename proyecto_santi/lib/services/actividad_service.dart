@@ -164,9 +164,9 @@ class ActividadService {
         'FechaFin': fechaFinConHora,
         'PresupuestoEstimado': actividad.presupuestoEstimado,
         'CostoReal': actividad.costoReal,
-        'Aprobada': actividad.estado == 'Aprobada',
-        'SolicitanteId': actividad.solicitante?.uuid,
-        'DepartamentoId': actividad.departamento?.id,
+        'Estado': actividad.estado,
+        'Tipo': actividad.tipo,
+        'ResponsableId': actividad.responsable?.uuid,
         'TransporteReq': actividad.transporteReq,
         'PrecioTransporte': actividad.precioTransporte,
         'EmpresaTransporteId': actividad.empresaTransporte?.id,
@@ -176,7 +176,7 @@ class ActividadService {
         // LocalizacionId es opcional
       });
       
-      print('[ActividadService] FormData preparado con SolicitanteId: ${actividad.solicitante?.uuid}');
+      print('[ActividadService] FormData preparado con ResponsableId: ${actividad.responsable?.uuid}');
       print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, PrecioTransporte: ${actividad.precioTransporte}, EmpresaTransporteId: ${actividad.empresaTransporte?.id}');
       print('[ActividadService] FormData - AlojamientoReq: ${actividad.alojamientoReq}, PrecioAlojamiento: ${actividad.precioAlojamiento}, AlojamientoId: ${actividad.alojamiento?.id}');
       print('[ActividadService] FormData - PresupuestoEstimado: ${actividad.presupuestoEstimado}');

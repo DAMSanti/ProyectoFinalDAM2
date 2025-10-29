@@ -30,26 +30,38 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<object>> Login([FromBody] LoginRequest request)
     {
-        _logger.LogInformation($"[LOGIN] Intento de login para: {request.Email}");
+        _logger.LogInformation($"[LOGIN] Intento de login para: {request.NombreUsuario}");
         
-        // Validar que se proporcionen email y contraseña
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        // Validar que se proporcionen nombre de usuario y contraseña
+        if (string.IsNullOrWhiteSpace(request.NombreUsuario) || string.IsNullOrWhiteSpace(request.Password))
         {
-            _logger.LogWarning("[LOGIN] Email o contraseña vacíos");
-            return BadRequest(new { message = "Email y contraseña son requeridos" });
+            _logger.LogWarning("[LOGIN] Nombre de usuario o contraseña vacíos");
+            return BadRequest(new { message = "Nombre de usuario y contraseña son requeridos" });
         }
 
-        // Buscar usuario por email
+        // Buscar usuario por nombre de usuario O por correo del profesor asociado
         var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Email == request.Email && u.Activo);
+            .Include(u => u.Profesor)
+            .Where(u => u.Activo && (
+                u.NombreUsuario == request.NombreUsuario ||
+                (u.Profesor != null && u.Profesor.Correo == request.NombreUsuario)
+            ))
+            .FirstOrDefaultAsync();
 
         if (usuario == null)
         {
-            _logger.LogWarning($"[LOGIN] Usuario no encontrado: {request.Email}");
+            _logger.LogWarning($"[LOGIN] Usuario no encontrado: {request.NombreUsuario}");
             return Unauthorized(new { message = "Credenciales inválidas" });
         }
 
-        _logger.LogInformation($"[LOGIN] Usuario encontrado: {usuario.Email}, Password hash length: {usuario.Password?.Length ?? 0}");
+        _logger.LogInformation($"[LOGIN] Usuario encontrado: {usuario.NombreUsuario}, Password hash length: {usuario.Password?.Length ?? 0}");
+
+        // Verificar que el password no sea null
+        if (string.IsNullOrEmpty(usuario.Password))
+        {
+            _logger.LogError($"[LOGIN] Password hash es null para usuario: {usuario.NombreUsuario}");
+            return Unauthorized(new { message = "Error en la configuración del usuario" });
+        }
 
         // Verificar contraseña
         try
@@ -59,7 +71,7 @@ public class AuthController : ControllerBase
             
             if (!passwordValid)
             {
-                _logger.LogWarning($"[LOGIN] Contraseña incorrecta para: {request.Email}");
+                _logger.LogWarning($"[LOGIN] Contraseña incorrecta para: {request.NombreUsuario}");
                 return Unauthorized(new { message = "Credenciales inválidas" });
             }
         }
@@ -70,9 +82,9 @@ public class AuthController : ControllerBase
         }
 
         // Generar token JWT
-        var token = _jwtService.GenerateToken(usuario.Email, usuario.Rol, usuario.Id);
+        var token = _jwtService.GenerateToken(usuario.NombreUsuario, usuario.Rol, usuario.Id);
         
-        _logger.LogInformation($"[LOGIN] Login exitoso para: {usuario.Email}");
+        _logger.LogInformation($"[LOGIN] Login exitoso para: {usuario.NombreUsuario}");
 
         return Ok(new
         {
@@ -80,8 +92,7 @@ public class AuthController : ControllerBase
             usuario = new
             {
                 usuario.Id,
-                usuario.Email,
-                usuario.NombreCompleto,
+                NombreUsuario = usuario.NombreUsuario,
                 usuario.Rol
             }
         });
@@ -91,24 +102,28 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<object>> Register([FromBody] RegisterRequest request)
     {
         // Validar que se proporcionen todos los campos requeridos
-        if (string.IsNullOrWhiteSpace(request.Email) || 
-            string.IsNullOrWhiteSpace(request.Password) || 
-            string.IsNullOrWhiteSpace(request.NombreCompleto))
+        if (string.IsNullOrWhiteSpace(request.NombreUsuario) || 
+            string.IsNullOrWhiteSpace(request.Password))
         {
-            return BadRequest(new { message = "Email, contraseña y nombre completo son requeridos" });
+            return BadRequest(new { message = "Nombre de usuario y contraseña son requeridos" });
+        }
+
+        // Validar formato del nombre de usuario (solo letras, números, guiones y guiones bajos)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(request.NombreUsuario, @"^[a-zA-Z0-9_-]+$"))
+        {
+            return BadRequest(new { message = "El nombre de usuario solo puede contener letras, números, guiones (-) y guiones bajos (_)" });
         }
 
         // Verificar si el usuario ya existe
-        if (await _context.Usuarios.AnyAsync(u => u.Email == request.Email))
+        if (await _context.Usuarios.AnyAsync(u => u.NombreUsuario == request.NombreUsuario))
         {
-            return BadRequest(new { message = "Ya existe un usuario con ese email" });
+            return BadRequest(new { message = "Ya existe un usuario con ese nombre de usuario" });
         }
 
         // Crear nuevo usuario con contraseña hasheada
         var usuario = new Usuario
         {
-            Email = request.Email,
-            NombreCompleto = request.NombreCompleto,
+            NombreUsuario = request.NombreUsuario,
             Password = _passwordService.HashPassword(request.Password),
             Rol = "Usuario"
         };
@@ -117,7 +132,7 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         // Generar token JWT
-        var token = _jwtService.GenerateToken(usuario.Email, usuario.Rol, usuario.Id);
+        var token = _jwtService.GenerateToken(usuario.NombreUsuario, usuario.Rol, usuario.Id);
 
         return Ok(new
         {
@@ -125,8 +140,7 @@ public class AuthController : ControllerBase
             usuario = new
             {
                 usuario.Id,
-                usuario.Email,
-                usuario.NombreCompleto,
+                NombreUsuario = usuario.NombreUsuario,
                 usuario.Rol
             }
         });
@@ -135,13 +149,12 @@ public class AuthController : ControllerBase
 
 public class LoginRequest
 {
-    public string Email { get; set; } = string.Empty;
+    public string NombreUsuario { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }
 
 public class RegisterRequest
 {
-    public string Email { get; set; } = string.Empty;
-    public string NombreCompleto { get; set; } = string.Empty;
+    public string NombreUsuario { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }

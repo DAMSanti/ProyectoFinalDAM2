@@ -111,10 +111,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
 
 
         }
-        if (widget.actividad.departamento != null) {
-          _selectedDepartamentoId = widget.actividad.departamento!.id;
-
-        }
+        // Ya no usamos departamento, ahora es responsable
         
         _isLoading = false;
       });
@@ -280,11 +277,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       hasChanges = true;
     }
     
-    print('[DIALOG] Comparando departamentoId: "$_selectedDepartamentoId" vs "${widget.actividad.departamento?.id}"');
-    if (_selectedDepartamentoId != widget.actividad.departamento?.id) {
-      print('[DIALOG] CAMBIO en departamentoId detectado');
-      hasChanges = true;
-    }
+    // Ya no comparamos departamento, ahora usamos responsable
     
     // Comparar estado (aprobada se mapea a estado "Aprobada" o "Pendiente")
     final estadoOriginal = (widget.actividad.estado == 'Aprobada');

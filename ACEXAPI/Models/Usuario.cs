@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ACEXAPI.Models;
 
@@ -8,13 +9,9 @@ public class Usuario
     public Guid Id { get; set; } = Guid.NewGuid();
     
     [Required]
-    [EmailAddress]
-    [MaxLength(256)]
-    public string Email { get; set; } = string.Empty;
-    
-    [Required]
     [MaxLength(200)]
-    public string NombreCompleto { get; set; } = string.Empty;
+    [RegularExpression(@"^[a-zA-Z0-9_-]+$", ErrorMessage = "El nombre de usuario solo puede contener letras, números, guiones y guiones bajos")]
+    public string NombreUsuario { get; set; } = string.Empty;
     
     [Required]
     [MaxLength(256)]
@@ -27,4 +24,9 @@ public class Usuario
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
     
     public bool Activo { get; set; } = true;
+    
+    // Relación con Profesor
+    public Guid? ProfesorUuid { get; set; }
+    [ForeignKey("ProfesorUuid")]
+    public Profesor? Profesor { get; set; }
 }

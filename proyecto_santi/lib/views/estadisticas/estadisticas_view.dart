@@ -61,7 +61,9 @@ class _EstadisticasViewState extends State<EstadisticasView> {
   Map<String, int> _getActividadesPorDepartamento() {
     final Map<String, int> deptoCounts = {};
     for (var actividad in _actividades) {
-      final deptoNombre = actividad.departamento?.nombre ?? 'Sin Departamento';
+      final deptoNombre = actividad.responsable != null 
+          ? '${actividad.responsable!.nombre} ${actividad.responsable!.apellidos}'
+          : 'Sin Responsable';
       deptoCounts[deptoNombre] = (deptoCounts[deptoNombre] ?? 0) + 1;
     }
     return deptoCounts;

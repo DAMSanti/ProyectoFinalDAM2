@@ -354,16 +354,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       }
     }
     
-    // Comparar departamento
-    final departamentoId = _datosEditados!['departamentoId'] as int?;
-    if (departamentoId != null) {
-      final departamentoOriginalId = _actividadOriginal!.departamento?.id;
-
-      if (departamentoId != departamentoOriginalId) {
-
-        return true;
-      }
-    }
+    // Ya no comparamos departamento, ahora usamos responsable
     
     // Comparar transporteReq
     final transporteReq = _datosEditados!['transporteReq'] as int?;
@@ -497,9 +488,8 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       return;
     }
     
-    // Buscar el profesor y departamento actualizados si cambiaron
-    dynamic nuevoProfesor = _actividadCompleta?.solicitante;
-    dynamic nuevoDepartamento = _actividadCompleta?.departamento;
+    // Buscar el profesor (responsable) actualizado si cambió
+    dynamic nuevoProfesor = _actividadCompleta?.responsable;
     
     // Si cambió el profesor, buscar el nuevo
     if (updatedData['profesorId'] != null) {
@@ -514,18 +504,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       }
     }
     
-    // Si cambió el departamento, buscar el nuevo
-    if (updatedData['departamentoId'] != null) {
-      try {
-        final departamentos = await _catalogoService.fetchDepartamentos();
-        final departamentoEncontrado = departamentos.where((d) => d.id == updatedData['departamentoId']).toList();
-        if (departamentoEncontrado.isNotEmpty) {
-          nuevoDepartamento = departamentoEncontrado.first;
-        }
-      } catch (e) {
-        print('[Error] Buscando departamento: $e');
-      }
-    }
+    // Ya no usamos departamento, eliminamos este código
     
     setState(() {
       // Actualizar la actividad completa con los nuevos datos
@@ -557,8 +536,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           comentEstado: _actividadCompleta!.comentEstado,
           incidencias: _actividadCompleta!.incidencias,
           urlFolleto: _actividadCompleta!.urlFolleto,
-          solicitante: nuevoProfesor,
-          departamento: nuevoDepartamento,
+          responsable: nuevoProfesor,
           localizacion: _actividadCompleta!.localizacion,
           importePorAlumno: _actividadCompleta!.importePorAlumno,
           presupuestoEstimado: updatedData['presupuestoEstimado'] ?? _actividadCompleta!.presupuestoEstimado,
@@ -730,8 +708,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             comentEstado: _actividadOriginal!.comentEstado,
             incidencias: _actividadOriginal!.incidencias,
             urlFolleto: _actividadOriginal!.urlFolleto,
-            solicitante: _actividadCompleta?.solicitante,
-            departamento: _actividadCompleta?.departamento,
+            responsable: _actividadCompleta?.responsable,
             localizacion: _actividadOriginal!.localizacion,
             importePorAlumno: _actividadOriginal!.importePorAlumno,
             presupuestoEstimado: _datosEditados!['presupuestoEstimado'] ?? _actividadOriginal!.presupuestoEstimado,
@@ -761,10 +738,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
 
             
-            // La respuesta del API puede no incluir los objetos completos de Profesor y Departamento
-            // Si se cambió el profesor o departamento, cargar los datos completos
-            Profesor? profesorCompleto = actividadActualizada.solicitante;
-            Departamento? departamentoCompleto = actividadActualizada.departamento;
+            // La respuesta del API puede no incluir el objeto completo de Profesor (responsable)
+            // Si se cambió el profesor, cargar los datos completos
+            Profesor? profesorCompleto = actividadActualizada.responsable;
             
             // Si tenemos un UUID de profesor pero no el objeto completo, cargarlo
             if (_datosEditados!.containsKey('profesorId') && _datosEditados!['profesorId'] != null) {
@@ -781,20 +757,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               }
             }
             
-            // Si tenemos un ID de departamento pero no el objeto completo, cargarlo
-            if (_datosEditados!.containsKey('departamentoId') && _datosEditados!['departamentoId'] != null) {
-              try {
-                final departamentos = await _catalogoService.fetchDepartamentos();
-                departamentoCompleto = departamentos.firstWhere(
-                  (d) => d.id == _datosEditados!['departamentoId'],
-                  orElse: () => actividadActualizada.departamento ?? _actividadOriginal!.departamento!,
-                );
-
-              } catch (e) {
-                print('[ERROR] Error cargando departamento completo: $e');
-                departamentoCompleto = actividadActualizada.departamento;
-              }
-            }
+            // Ya no cargamos departamento
             
             // Si tenemos un ID de empresa de transporte pero no el objeto completo, cargarlo
             EmpresaTransporte? empresaTransporteCompleta = actividadActualizada.empresaTransporte;
@@ -805,7 +768,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             final needsEmpresaLoad = empresaTransporteCompleta == null || 
                                      (_datosEditados!.containsKey('empresaTransporteId') && 
                                       _datosEditados!['empresaTransporteId'] != null &&
-                                      _datosEditados!['empresaTransporteId'] != empresaTransporteCompleta?.id);
+                                      _datosEditados!['empresaTransporteId'] != empresaTransporteCompleta.id);
             
             if (needsEmpresaLoad) {
               try {
@@ -896,8 +859,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               comentEstado: actividadActualizada.comentEstado,
               incidencias: actividadActualizada.incidencias,
               urlFolleto: actividadActualizada.urlFolleto,
-              solicitante: profesorCompleto,
-              departamento: departamentoCompleto,
+              responsable: profesorCompleto,
               localizacion: actividadActualizada.localizacion,
               importePorAlumno: actividadActualizada.importePorAlumno,
               presupuestoEstimado: actividadActualizada.presupuestoEstimado,

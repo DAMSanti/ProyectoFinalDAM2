@@ -11,12 +11,13 @@ class AuthService {
   AuthService(this._apiService) : _profesorService = ProfesorService(_apiService);
 
   /// Autentica un usuario y obtiene el token JWT
+  /// Puede usar nombreUsuario o correo del profesor asociado
   Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
       final response = await _apiService.postData(
         '${AppConfig.authEndpoint}/login',
         {
-          'email': email,
+          'nombreUsuario': email, // Puede ser NombreUsuario o Correo del profesor
           'password': password,
         },
       );

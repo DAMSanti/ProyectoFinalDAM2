@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ACEXAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2799d1563dc53e7d9d03d3ca2f0dd89c7de654c4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37b03c232be372766c7e8b8aa85a078b111c95d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("ACEXAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ACEXAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

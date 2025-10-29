@@ -11,7 +11,8 @@ public class ActividadDto
     public decimal? CostoReal { get; set; }
     public decimal? PrecioTransporte { get; set; }
     public string? FolletoUrl { get; set; }
-    public bool Aprobada { get; set; }
+    public string Estado { get; set; } = "Pendiente";
+    public string Tipo { get; set; } = "Complementaria";
     public int? DepartamentoId { get; set; }
     public string? DepartamentoNombre { get; set; }
     public int? LocalizacionId { get; set; }
@@ -27,7 +28,11 @@ public class ActividadDto
     // Lista de localizaciones de la actividad
     public List<LocalizacionDto>? Localizaciones { get; set; }
     
-    // Información del profesor responsable/solicitante
+    // Información del profesor responsable
+    public Guid? ResponsableId { get; set; }
+    public ProfesorSimpleDto? Responsable { get; set; }
+    
+    // Información del profesor solicitante (mantener por compatibilidad)
     public ProfesorSimpleDto? Solicitante { get; set; }
 }
 
@@ -48,9 +53,10 @@ public class ActividadCreateDto
     public DateTime FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }
     public decimal? PresupuestoEstimado { get; set; }
-    public int? DepartamentoId { get; set; }
+    public Guid? ResponsableId { get; set; }
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
+    public string Tipo { get; set; } = "Complementaria";
 }
 
 public class ActividadUpdateDto
@@ -62,9 +68,10 @@ public class ActividadUpdateDto
     public decimal? PresupuestoEstimado { get; set; }
     public decimal? CostoReal { get; set; }
     public decimal? PrecioTransporte { get; set; }
-    public bool? Aprobada { get; set; }
-    public Guid? SolicitanteId { get; set; }
-    public int? DepartamentoId { get; set; }
+    public string? Estado { get; set; }
+    public string? Tipo { get; set; }
+    public Guid? ResponsableId { get; set; }
+    public Guid? SolicitanteId { get; set; } // Mantener por compatibilidad
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
     public int? EmpresaTransporteId { get; set; } // Alias para compatibilidad con Flutter
@@ -81,7 +88,8 @@ public class ActividadListDto
     public string? Descripcion { get; set; }
     public DateTime FechaInicio { get; set; }
     public DateTime? FechaFin { get; set; }
-    public bool Aprobada { get; set; }
+    public string Estado { get; set; } = "Pendiente";
+    public string Tipo { get; set; } = "Complementaria";
     public string? DepartamentoNombre { get; set; }
 }
 
