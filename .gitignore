@@ -1,0 +1,193 @@
+# ============================================
+# .NET / C# / ASP.NET Core
+# ============================================
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio cache/options
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+## Publish folders
+publish/
+*.publish.xml
+*.azurePubxml
+
+## Others
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ============================================
+# Flutter / Dart
+# ============================================
+
+## Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+## IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+## The .vscode folder contains launch configuration and tasks
+## you might want to share with your team, so keep it if needed
+# .vscode/
+
+## Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+proyecto_santi/build/
+proyecto_santi/.dart_tool/
+proyecto_santi/.flutter-plugins
+proyecto_santi/.flutter-plugins-dependencies
+proyecto_santi/.packages
+proyecto_santi/pubspec.lock
+
+## Symbolication related
+app.*.symbols
+
+## Obfuscation related
+app.*.map.json
+
+## Android Studio will place build artifacts here
+proyecto_santi/android/app/debug
+proyecto_santi/android/app/profile
+proyecto_santi/android/app/release
+
+## Coverage
+coverage/
+proyecto_santi/coverage/
+
+# ============================================
+# SQL Server / Database
+# ============================================
+
+## Database backup files
+*.bak
+*.log
+*.mdf
+*.ldf
+*.ndf
+
+## PERO mantener el backup principal del proyecto
+!DB/ACEXAPI_backup.bak
+
+## SQL Server temporary files
+*.sqlproj.user
+
+# ============================================
+# Deployment / DevOps
+# ============================================
+
+## Deployment packages
+*.zip
+acexapi-deploy.zip
+
+## SSH Keys (¡IMPORTANTE! Nunca subir claves privadas)
+*.pem
+*.key
+digitalocean_key
+digitalocean_key.pub
+.ssh/
+
+## Scripts sensibles con contraseñas
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.Casa.json
+**/appsettings.Trabajo.json
+
+## PERO mantener el template de producción
+!ACEXAPI/appsettings.Production.json.template
+
+# ============================================
+# Sistema Operativo
+# ============================================
+
+## Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Linux
+*~
+
+# ============================================
+# Otros
+# ============================================
+
+## Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+## Node modules (si usas alguna herramienta Node)
+node_modules/
+
+## Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+## Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+## VS Code settings (opcional, puedes quitarlo si quieres compartir settings)
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+## JetBrains Rider
+.idea/
+*.sln.iml

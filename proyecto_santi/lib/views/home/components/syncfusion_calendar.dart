@@ -324,8 +324,6 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   });
                 },
                 monthViewSettings: MonthViewSettings(
-                  // En pantallas pequeñas: indicators (puntos)
-                  // En pantallas grandes: appointments (líneas horizontales)
                   appointmentDisplayMode: MonthAppointmentDisplayMode.indicator,
                   showAgenda: false,
                   dayFormat: 'EEE',
