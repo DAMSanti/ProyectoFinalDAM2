@@ -93,6 +93,20 @@ public class FotoController : ControllerBase
         return Ok(fotosCreadas.Select(f => FotoDto.FromEntity(f)).ToList());
     }
 
+    [HttpPatch("{id}/descripcion")]
+    [Authorize(Roles = "Administrador,Coordinador,Profesor")]
+    public async Task<IActionResult> UpdateDescripcion(int id, [FromBody] UpdateDescripcionDto dto)
+    {
+        var foto = await _context.Fotos.FindAsync(id);
+        if (foto == null)
+            return NotFound(new { message = "Foto no encontrada" });
+
+        foto.Descripcion = dto.Descripcion;
+        await _context.SaveChangesAsync();
+
+        return Ok(FotoDto.FromEntity(foto));
+    }
+
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador,Coordinador")]
     public async Task<IActionResult> Delete(int id)

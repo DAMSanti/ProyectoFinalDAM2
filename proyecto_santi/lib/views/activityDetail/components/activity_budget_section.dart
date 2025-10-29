@@ -111,6 +111,8 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
       print('[GASTOS ERROR] Error al cargar gastos: $e');
       if (mounted) {
         setState(() {
+          // Inicializar con lista vacía si hay error (tabla puede no existir aún)
+          _gastosPersonalizados = [];
           _cargandoGastos = false;
         });
       }
@@ -195,6 +197,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Calcular valores - usar los valores locales si están disponibles
     final presupuesto = _presupuestoEstimadoLocal ?? widget.actividad.presupuestoEstimado ?? 0.0;
@@ -219,25 +222,83 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     
     return Container(
       constraints: BoxConstraints(minHeight: 500),
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+            ? const [
+                Color.fromRGBO(25, 118, 210, 0.25),
+                Color.fromRGBO(21, 101, 192, 0.20),
+              ]
+            : const [
+                Color.fromRGBO(187, 222, 251, 0.85),
+                Color.fromRGBO(144, 202, 249, 0.75),
+              ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark 
+            ? const Color.fromRGBO(255, 255, 255, 0.1) 
+            : const Color.fromRGBO(0, 0, 0, 0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+              ? const Color.fromRGBO(0, 0, 0, 0.4) 
+              : const Color.fromRGBO(0, 0, 0, 0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12.0,
+            spreadRadius: -1,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          Text(
-            'Presupuesto y Gastos',
-            style: TextStyle(
-              fontSize: !isWeb ? 14.dg : 5.sp,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1976d2),
-            ),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF1976d2).withOpacity(0.8),
+                      Color(0xFF1565c0).withOpacity(0.9),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFF1976d2).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: Colors.white,
+                  size: !isWeb ? 24.dg : 7.sp,
+                ),
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Presupuesto y Gastos',
+                style: TextStyle(
+                  fontSize: !isWeb ? 16.dg : 5.5.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976d2),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 16),
           
           // Switches para activar/desactivar Transporte y Alojamiento
           if (widget.isAdminOrSolicitante) ...[
@@ -377,7 +438,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
           
           // Botones de Solicitar Presupuestos (Transporte y Alojamiento)
           if (widget.isAdminOrSolicitante && (_transporteReq || _alojamientoReq)) ...[
-            SizedBox(height: 6),
+            SizedBox(height: 10),
             Row(
               children: [
                 if (_transporteReq)
@@ -386,33 +447,36 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Colors.purple.withOpacity(0.1),
-                              Colors.purple.withOpacity(0.05),
-                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
+                            colors: [
+                              Colors.purple.withOpacity(0.85),
+                              Colors.purple.withOpacity(0.65),
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.purple.withOpacity(0.3),
-                            width: 2,
-                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purple.withOpacity(0.4),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.send, color: Colors.purple, size: !isWeb ? 12.dg : 4.sp),
-                            SizedBox(width: 6),
+                            Icon(Icons.send_rounded, color: Colors.white, size: !isWeb ? 16.dg : 5.sp),
+                            SizedBox(width: 8),
                             Text(
                               'Solicitar Presupuestos',
                               style: TextStyle(
-                                fontSize: !isWeb ? 10.dg : 3.5.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.purple,
+                                fontSize: !isWeb ? 12.dg : 4.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -428,33 +492,36 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Colors.teal.withOpacity(0.1),
-                              Colors.teal.withOpacity(0.05),
-                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
+                            colors: [
+                              Colors.teal.withOpacity(0.85),
+                              Colors.teal.withOpacity(0.65),
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.teal.withOpacity(0.3),
-                            width: 2,
-                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.teal.withOpacity(0.4),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.send, color: Colors.teal, size: !isWeb ? 12.dg : 4.sp),
-                            SizedBox(width: 6),
+                            Icon(Icons.send_rounded, color: Colors.white, size: !isWeb ? 16.dg : 5.sp),
+                            SizedBox(width: 8),
                             Text(
                               'Solicitar Presupuestos',
                               style: TextStyle(
-                                fontSize: !isWeb ? 10.dg : 3.5.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.teal,
+                                fontSize: !isWeb ? 12.dg : 4.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -485,14 +552,33 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     required Function(bool) onChanged,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: value ? color.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: value 
+            ? [
+                color.withOpacity(0.25),
+                color.withOpacity(0.15),
+              ]
+            : [
+                Colors.white.withOpacity(0.3),
+                Colors.white.withOpacity(0.1),
+              ],
+        ),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: value ? color.withOpacity(0.5) : Colors.grey.withOpacity(0.3),
+          color: value ? color.withOpacity(0.5) : Colors.white.withOpacity(0.3),
           width: 2,
         ),
+        boxShadow: value ? [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ] : [],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -500,28 +586,53 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: value ? color : Colors.grey,
-                size: !isWeb ? 18.dg : 6.sp,
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: value
+                    ? LinearGradient(
+                        colors: [
+                          color.withOpacity(0.8),
+                          color.withOpacity(0.6),
+                        ],
+                      )
+                    : LinearGradient(
+                        colors: [
+                          Colors.grey.withOpacity(0.3),
+                          Colors.grey.withOpacity(0.2),
+                        ],
+                      ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: value ? Colors.white : Colors.grey[600],
+                  size: !isWeb ? 20.dg : 6.sp,
+                ),
               ),
-              SizedBox(width: 8),
+              SizedBox(width: 12),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: !isWeb ? 13.dg : 5.sp,
-                  fontWeight: FontWeight.w600,
-                  color: value ? color : Colors.grey,
+                  fontSize: !isWeb ? 14.dg : 5.sp,
+                  fontWeight: FontWeight.bold,
+                  color: value ? color : Colors.grey[600],
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: color,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          Transform.scale(
+            scale: 0.9,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: color,
+              activeTrackColor: color.withOpacity(0.5),
+              inactiveThumbColor: Colors.grey[400],
+              inactiveTrackColor: Colors.grey[300],
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
         ],
       ),
@@ -543,21 +654,26 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
   }) {
     return Container(
       width: width > 600 ? width : double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Reducido de 16 a 12
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[800]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.9),
+            Colors.white.withOpacity(0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withOpacity(0.4),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            color: color.withOpacity(0.2),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -569,40 +685,77 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      icono,
-                      color: color,
-                      size: !isWeb ? 24.dg : 7.sp,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      titulo,
-                      style: TextStyle(
-                        fontSize: !isWeb ? 13.dg : 4.5.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              color.withOpacity(0.8),
+                              color.withOpacity(0.6),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          icono,
+                          color: Colors.white,
+                          size: !isWeb ? 22.dg : 7.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          titulo,
+                          style: TextStyle(
+                            fontSize: !isWeb ? 14.dg : 4.5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (showEdit && widget.isAdminOrSolicitante)
-                IconButton(
-                  icon: Icon(
-                    (_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
-                    (_editandoTransporte && titulo == 'Transporte') ||
-                    (_editandoAlojamiento && titulo == 'Alojamiento')
-                      ? Icons.check 
-                      : Icons.edit, 
-                    size: !isWeb ? 16.dg : 5.sp
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: ((_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
+                              (_editandoTransporte && titulo == 'Transporte') ||
+                              (_editandoAlojamiento && titulo == 'Alojamiento'))
+                        ? [Colors.green.withOpacity(0.2), Colors.green.withOpacity(0.1)]
+                        : [Colors.grey.withOpacity(0.2), Colors.grey.withOpacity(0.1)],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  color: ((_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
-                          (_editandoTransporte && titulo == 'Transporte') ||
-                          (_editandoAlojamiento && titulo == 'Alojamiento'))
-                    ? Colors.green 
-                    : Colors.grey[600],
-                  onPressed: () async {
+                  child: IconButton(
+                    icon: Icon(
+                      (_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
+                      (_editandoTransporte && titulo == 'Transporte') ||
+                      (_editandoAlojamiento && titulo == 'Alojamiento')
+                        ? Icons.check_circle 
+                        : Icons.edit_rounded, 
+                      size: !isWeb ? 20.dg : 6.sp
+                    ),
+                    color: ((_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
+                            (_editandoTransporte && titulo == 'Transporte') ||
+                            (_editandoAlojamiento && titulo == 'Alojamiento'))
+                      ? Colors.green[700]
+                      : color,
+                    onPressed: () async {
                     if (titulo == 'Presupuesto Estimado') {
                       if (_editandoPresupuesto) {
                         // Guardar cambios
@@ -821,6 +974,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                 ),
+              ),
             ],
           ),
           if (subtitle != null) ...[
@@ -1283,21 +1437,26 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
     );
     
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[800]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.9),
+            Colors.white.withOpacity(0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.amber.withOpacity(0.3),
+          color: Colors.amber.withOpacity(0.4),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.amber.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            color: Colors.amber.withOpacity(0.2),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -1310,38 +1469,80 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.receipt_long,
-                    color: Colors.amber,
-                    size: !isWeb ? 24.dg : 7.sp,
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Gastos Varios',
-                    style: TextStyle(
-                      fontSize: !isWeb ? 13.dg : 4.5.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  if (totalGastos > 0) ...[
-                    SizedBox(width: 12),
-                    Text(
-                      '${totalGastos.toStringAsFixed(2)} €',
-                      style: TextStyle(
-                        fontSize: !isWeb ? 14.dg : 4.5.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber[700],
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.amber.withOpacity(0.8),
+                          Colors.amber.withOpacity(0.6),
+                        ],
                       ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Icon(
+                      Icons.receipt_long_rounded,
+                      color: Colors.white,
+                      size: !isWeb ? 22.dg : 7.sp,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Gastos Varios',
+                        style: TextStyle(
+                          fontSize: !isWeb ? 14.dg : 4.5.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber[700],
+                        ),
+                      ),
+                      if (totalGastos > 0)
+                        Text(
+                          '${totalGastos.toStringAsFixed(2)} €',
+                          style: TextStyle(
+                            fontSize: !isWeb ? 16.dg : 5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[800],
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
               if (widget.isAdminOrSolicitante)
-                IconButton(
-                  icon: Icon(Icons.add_circle, color: Colors.amber),
-                  onPressed: () => _mostrarDialogoAgregarGasto(context),
-                  tooltip: 'Agregar gasto',
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.amber.withOpacity(0.8),
+                        Colors.amber.withOpacity(0.6),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.add_circle_rounded, color: Colors.white),
+                    onPressed: () => _mostrarDialogoAgregarGasto(context),
+                    tooltip: 'Agregar gasto',
+                  ),
                 ),
             ],
           ),
@@ -1354,21 +1555,41 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               ),
             )
           else if (_gastosPersonalizados.isEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
+            Container(
+              margin: EdgeInsets.only(top: 16),
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.amber.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
               child: Center(
-                child: Text(
-                  'No hay gastos personalizados',
-                  style: TextStyle(
-                    fontSize: !isWeb ? 12.dg : 4.sp,
-                    color: Colors.grey[500],
-                    fontStyle: FontStyle.italic,
-                  ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.receipt_long_outlined,
+                      color: Colors.amber.withOpacity(0.5),
+                      size: !isWeb ? 40.dg : 12.sp,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'No hay gastos personalizados',
+                      style: TextStyle(
+                        fontSize: !isWeb ? 12.dg : 4.sp,
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
           else
             Container(
+              margin: EdgeInsets.only(top: 12),
               constraints: BoxConstraints(
                 maxHeight: _gastosPersonalizados.length > 5 ? 300 : double.infinity,
               ),
@@ -1380,39 +1601,78 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 itemCount: _gastosPersonalizados.length,
                 itemBuilder: (context, index) {
                   final gasto = _gastosPersonalizados[index];
-                  return Card(
-                    margin: EdgeInsets.only(top: index == 0 ? 12 : 8),
-                    child: ListTile(
-                      leading: Icon(Icons.receipt, color: Colors.amber[700]),
-                      title: Text(
-                        gasto.concepto,
-                        style: TextStyle(
-                          fontSize: !isWeb ? 12.dg : 4.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${gasto.cantidad.toStringAsFixed(2)} €',
-                            style: TextStyle(
-                              fontSize: !isWeb ? 13.dg : 4.5.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.amber[700],
-                            ),
-                          ),
-                          if (widget.isAdminOrSolicitante) ...[
-                            SizedBox(width: 8),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red, size: !isWeb ? 18.dg : 5.sp),
-                              onPressed: () => _eliminarGasto(gasto),
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                            ),
-                          ],
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.amber.withOpacity(0.15),
+                          Colors.amber.withOpacity(0.05),
                         ],
                       ),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.amber.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.amber.withOpacity(0.6),
+                                Colors.amber.withOpacity(0.4),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.receipt_rounded, 
+                            color: Colors.white, 
+                            size: !isWeb ? 18.dg : 5.sp
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            gasto.concepto,
+                            style: TextStyle(
+                              fontSize: !isWeb ? 13.dg : 4.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${gasto.cantidad.toStringAsFixed(2)} €',
+                          style: TextStyle(
+                            fontSize: !isWeb ? 14.dg : 4.5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber[800],
+                          ),
+                        ),
+                        if (widget.isAdminOrSolicitante) ...[
+                          SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.delete_rounded, color: Colors.red[700], size: !isWeb ? 18.dg : 5.sp),
+                              onPressed: () => _eliminarGasto(gasto),
+                              padding: EdgeInsets.all(6),
+                              constraints: BoxConstraints(),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   );
                 },

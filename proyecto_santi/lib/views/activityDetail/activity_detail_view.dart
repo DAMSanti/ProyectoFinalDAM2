@@ -16,6 +16,7 @@ import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_large_landscape_layout.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/activityDetail/views/activity_detail_portrait_layout.dart';
+import 'package:proyecto_santi/views/activityDetail/components/images/image_preview_dialog.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -50,6 +51,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   bool isAdminOrSolicitante = true;
   List<Photo> imagesActividad = [];
   List<XFile> selectedImages = [];
+  Map<String, String> selectedImagesDescriptions = {}; // Mapa: path -> descripción
   List<int> imagesToDelete = []; // IDs de imágenes marcadas para eliminar
   bool isDialogVisible = false;
   bool isPopupVisible = false;
@@ -119,17 +121,40 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   void _showImagePicker() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        selectedImages.add(image);
-        isDataChanged = true;
-      });
+    
+    if (image != null && mounted) {
+      // Mostrar diálogo de preview con descripción
+      await showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return ImagePreviewDialog(
+            imageFile: image,
+            onConfirm: (description) {
+              // Cerrar el diálogo
+              Navigator.of(dialogContext).pop();
+              
+              // Añadir la imagen con su descripción
+              setState(() {
+                selectedImages.add(image);
+                // Guardar la descripción asociada a esta imagen
+                if (description.isNotEmpty) {
+                  selectedImagesDescriptions[image.path] = description;
+                }
+                isDataChanged = true;
+              });
+            },
+          );
+        },
+      );
     }
   }
 
   void _removeSelectedImage(int index) {
     setState(() {
+      final imagePath = selectedImages[index].path;
       selectedImages.removeAt(index);
+      // Eliminar también la descripción asociada
+      selectedImagesDescriptions.remove(imagePath);
       isDataChanged = true;
     });
   }
@@ -167,6 +192,35 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         isDataChanged = true;
       });
     }
+  }
+  
+  // Método para editar la descripción de una imagen local
+  void _editLocalImage(int index) async {
+    if (index >= selectedImages.length) return;
+    
+    final image = selectedImages[index];
+    final currentDescription = selectedImagesDescriptions[image.path];
+    
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ImagePreviewDialog(
+          imageFile: image,
+          initialDescription: currentDescription,
+          isEditing: true,
+          onConfirm: (description) {
+            setState(() {
+              // Actualizar o eliminar la descripción
+              if (description.isNotEmpty) {
+                selectedImagesDescriptions[image.path] = description;
+              } else {
+                selectedImagesDescriptions.remove(image.path);
+              }
+            });
+          },
+        );
+      },
+    );
   }
   
   
@@ -440,6 +494,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     setState(() {
       _datosEditados = null;
       selectedImages.clear();
+      selectedImagesDescriptions.clear();
       imagesToDelete.clear();
       isDataChanged = false;
     });
@@ -485,6 +540,14 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         isDataChanged = true;
       });
 
+      return;
+    }
+    
+    // Si hay cambios en descripciones de fotos, marcar como cambio
+    if (updatedData.containsKey('photoDescriptionChanges')) {
+      setState(() {
+        isDataChanged = true;
+      });
       return;
     }
     
@@ -1118,6 +1181,35 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         }
       }
 
+      // 10. Guardar descripciones de fotos si cambiaron
+      if (_datosEditados != null && _datosEditados!.containsKey('photoDescriptionChanges')) {
+        try {
+          final photoChanges = _datosEditados!['photoDescriptionChanges'] as Map<int, String>;
+          
+          if (photoChanges.isNotEmpty) {
+            print('[ACTIVITY_DETAIL] Guardando ${photoChanges.length} descripciones de fotos...');
+            
+            for (var entry in photoChanges.entries) {
+              try {
+                final photoId = entry.key;
+                final newDescription = entry.value;
+                
+                await _photoService.updatePhotoDescription(photoId, newDescription);
+                print('[ACTIVITY_DETAIL] Descripción de foto $photoId actualizada correctamente');
+              } catch (e) {
+                print('[ERROR] Error actualizando descripción de foto ${entry.key}: $e');
+                success = false;
+              }
+            }
+            
+            print('[ACTIVITY_DETAIL] Descripciones de fotos guardadas correctamente');
+          }
+        } catch (e) {
+          print('[ERROR] Error guardando descripciones de fotos: $e');
+          success = false;
+        }
+      }
+
       // Cerrar diálogo de carga
       if (mounted) {
         Navigator.of(context).pop();
@@ -1139,6 +1231,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           setState(() {
             imagesActividad = photos;
             selectedImages.clear();
+            selectedImagesDescriptions.clear();
             imagesToDelete.clear();
             isDataChanged = false;
             _datosEditados = null; // Limpiar datos editados después de guardar exitosamente
@@ -1195,13 +1288,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       for (var xFile in selectedImages) {
         final bytes = await xFile.readAsBytes();
         final fileName = xFile.name;
+        
+        // Obtener la descripción asociada a esta imagen (si existe)
+        final description = selectedImagesDescriptions[xFile.path] ?? '';
 
         // Subir la imagen usando el método del ApiService
         bool success = await _photoService.uploadPhotosFromBytes(
           activityId: widget.actividad.id,
           bytes: bytes,
           filename: fileName,
-          descripcion: '',
+          descripcion: description,
         );
 
         if (!success) {
@@ -1291,9 +1387,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         isAdminOrSolicitante: isAdminOrSolicitante,
         imagesActividad: imagesActividad,
         selectedImages: selectedImages,
+        selectedImagesDescriptions: selectedImagesDescriptions,
         showImagePicker: _showImagePicker,
         removeSelectedImage: _removeSelectedImage,
         removeApiImage: _removeApiImage,
+        editLocalImage: _editLocalImage,
         saveChanges: _saveChanges,
         revertChanges: _revertChanges,
         onActivityDataChanged: _handleActivityDataChanged,
@@ -1312,8 +1410,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               isAdminOrSolicitante: isAdminOrSolicitante,
               imagesActividad: imagesActividad,
               selectedImages: selectedImages,
+              selectedImagesDescriptions: selectedImagesDescriptions,
               showImagePicker: _showImagePicker,
               removeSelectedImage: _removeSelectedImage,
+              editLocalImage: _editLocalImage,
               saveChanges: _saveChanges,
               revertChanges: _revertChanges,
               onActivityDataChanged: _handleActivityDataChanged,
@@ -1328,8 +1428,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               isAdminOrSolicitante: isAdminOrSolicitante,
               imagesActividad: imagesActividad,
               selectedImages: selectedImages,
+              selectedImagesDescriptions: selectedImagesDescriptions,
               showImagePicker: _showImagePicker,
               removeSelectedImage: _removeSelectedImage,
+              editLocalImage: _editLocalImage,
               saveChanges: _saveChanges,
               revertChanges: _revertChanges,
               onActivityDataChanged: _handleActivityDataChanged,

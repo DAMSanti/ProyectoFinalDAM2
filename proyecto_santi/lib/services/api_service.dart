@@ -144,6 +144,15 @@ class ApiService {
     }
   }
 
+  /// PUT genérico con cualquier tipo de dato (usado para enviar listas directamente)
+  Future<Response> put(String endpoint, dynamic data) async {
+    try {
+      return await _dio.put(endpoint, data: data);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   /// DELETE genérico
   Future<Response> deleteData(String endpoint) async {
     try {

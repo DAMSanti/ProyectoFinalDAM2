@@ -13,8 +13,10 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
   final bool isAdminOrSolicitante;
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
+  final Map<String, String> selectedImagesDescriptions;
   final VoidCallback _showImagePicker;
   final Function(int) _removeSelectedImage;
+  final Function(int)? _editLocalImage;
   final VoidCallback _saveChanges;
   final VoidCallback? _revertChanges;
   final Function(Map<String, dynamic>)? onActivityDataChanged;
@@ -28,14 +30,17 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
     required this.isAdminOrSolicitante,
     required this.imagesActividad,
     required this.selectedImages,
+    required this.selectedImagesDescriptions,
     required VoidCallback showImagePicker,
     required Function(int) removeSelectedImage,
+    Function(int)? editLocalImage,
     required VoidCallback saveChanges,
     VoidCallback? revertChanges,
     this.onActivityDataChanged,
   })
       : _showImagePicker = showImagePicker,
         _removeSelectedImage = removeSelectedImage,
+        _editLocalImage = editLocalImage,
         _saveChanges = saveChanges,
         _revertChanges = revertChanges;
 
@@ -52,8 +57,10 @@ class ActivityDetailSmallLandscapeLayout extends StatelessWidget {
                 isAdminOrSolicitante: isAdminOrSolicitante,
                 imagesActividad: imagesActividad,
                 selectedImages: selectedImages,
+                selectedImagesDescriptions: selectedImagesDescriptions,
                 showImagePicker: _showImagePicker,
                 removeSelectedImage: _removeSelectedImage,
+                editLocalImage: _editLocalImage,
                 onActivityDataChanged: onActivityDataChanged,
               ),
             ),

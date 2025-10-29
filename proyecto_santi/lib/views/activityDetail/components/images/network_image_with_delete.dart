@@ -6,6 +6,7 @@ class NetworkImageWithDelete extends StatefulWidget {
   final double maxHeight;
   final bool showDeleteButton;
   final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   const NetworkImageWithDelete({
     Key? key,
@@ -13,6 +14,7 @@ class NetworkImageWithDelete extends StatefulWidget {
     required this.maxHeight,
     required this.showDeleteButton,
     this.onDelete,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: Container(
@@ -32,48 +35,51 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
         height: widget.maxHeight,
         child: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                widget.imageUrl,
-                key: ValueKey(widget.imageUrl),
-                fit: BoxFit.contain,
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Container(
-                    width: widget.maxHeight,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: widget.maxHeight,
-                    color: Colors.grey[300],
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error, color: Colors.red),
-                        SizedBox(height: 8),
-                        Text(
-                          'Error al cargar',
-                          style: TextStyle(fontSize: 12),
+            GestureDetector(
+              onTap: widget.onTap,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  widget.imageUrl,
+                  key: ValueKey(widget.imageUrl),
+                  fit: BoxFit.contain,
+                  headers: {
+                    'Access-Control-Allow-Origin': '*',
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return Container(
+                      width: widget.maxHeight,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
                         ),
-                      ],
-                    ),
-                  );
-                },
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: widget.maxHeight,
+                      color: Colors.grey[300],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error, color: Colors.red),
+                          SizedBox(height: 8),
+                          Text(
+                            'Error al cargar',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             // Botón de eliminar (solo visible en hover y si está habilitado)

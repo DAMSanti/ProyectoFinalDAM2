@@ -32,3 +32,8 @@ public class FotoUploadDto
     public int ActividadId { get; set; }
     public string? Descripcion { get; set; }
 }
+
+public class UpdateDescripcionDto
+{
+    public string? Descripcion { get; set; }
+}

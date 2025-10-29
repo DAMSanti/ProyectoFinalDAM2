@@ -109,4 +109,20 @@ class PhotoService {
       rethrow;
     }
   }
+
+  /// Actualiza la descripción de una foto
+  Future<bool> updatePhotoDescription(int photoId, String? descripcion) async {
+    try {
+      final response = await _apiService.dio.patch(
+        '${AppConfig.fotoEndpoint}/$photoId/descripcion',
+        data: {
+          'descripcion': descripcion ?? '',
+        },
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('[PhotoService ERROR] updatePhotoDescription: $e');
+      rethrow;
+    }
+  }
 }

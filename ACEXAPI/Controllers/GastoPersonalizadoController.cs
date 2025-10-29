@@ -21,20 +21,29 @@ namespace ACEXAPI.Controllers
         [HttpGet("actividad/{actividadId}")]
         public async Task<ActionResult<IEnumerable<GastoPersonalizadoDto>>> GetGastosByActividad(int actividadId)
         {
-            var gastos = await _context.Set<GastoPersonalizado>()
-                .Where(g => g.ActividadId == actividadId)
-                .OrderBy(g => g.FechaCreacion)
-                .Select(g => new GastoPersonalizadoDto
-                {
-                    Id = g.Id,
-                    ActividadId = g.ActividadId,
-                    Concepto = g.Concepto,
-                    Cantidad = g.Cantidad,
-                    FechaCreacion = g.FechaCreacion
-                })
-                .ToListAsync();
+            try
+            {
+                var gastos = await _context.Set<GastoPersonalizado>()
+                    .Where(g => g.ActividadId == actividadId)
+                    .OrderBy(g => g.FechaCreacion)
+                    .Select(g => new GastoPersonalizadoDto
+                    {
+                        Id = g.Id,
+                        ActividadId = g.ActividadId,
+                        Concepto = g.Concepto,
+                        Cantidad = g.Cantidad,
+                        FechaCreacion = g.FechaCreacion
+                    })
+                    .ToListAsync();
 
-            return Ok(gastos);
+                return Ok(gastos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] GetGastosByActividad: {ex.Message}");
+                Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { message = "Error al cargar gastos", detail = ex.Message });
+            }
         }
 
         // POST: api/GastoPersonalizado

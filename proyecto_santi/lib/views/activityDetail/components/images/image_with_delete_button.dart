@@ -9,12 +9,14 @@ class ImageWithDeleteButton extends StatefulWidget {
   final XFile image;
   final double maxHeight;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const ImageWithDeleteButton({
     Key? key,
     required this.image,
     required this.maxHeight,
     required this.onDelete,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -71,6 +73,7 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
     final width = widget.maxHeight * _aspectRatio!;
 
     return MouseRegion(
+      cursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: Container(
@@ -79,17 +82,20 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
         height: widget.maxHeight,
         child: Stack(
           children: [
-            // Imagen
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: FutureBuilder<Widget>(
-                future: _buildImageWidget(widget.image),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return snapshot.data!;
-                  }
-                  return Center(child: CircularProgressIndicator());
-                },
+            // Imagen con GestureDetector para el tap
+            GestureDetector(
+              onTap: widget.onTap,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: FutureBuilder<Widget>(
+                  future: _buildImageWidget(widget.image),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return snapshot.data!;
+                    }
+                    return Center(child: CircularProgressIndicator());
+                  },
+                ),
               ),
             ),
             // Botón de eliminar (solo visible en hover)

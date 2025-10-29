@@ -121,10 +121,10 @@ class CatalogoService {
   /// Actualiza los grupos participantes de una actividad
   Future<bool> updateGruposParticipantes(int actividadId, List<Map<String, dynamic>> grupos) async {
     try {
-
-      final response = await _apiService.putData(
+      // El backend espera List<GrupoParticipanteUpdateDto> directamente, no un objeto con 'grupos'
+      final response = await _apiService.put(
         '/Actividad/$actividadId/grupos-participantes',
-        {'grupos': grupos},
+        grupos,
       );
       
       return response.statusCode == 200;

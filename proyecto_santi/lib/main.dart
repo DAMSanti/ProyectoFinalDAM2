@@ -74,6 +74,7 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   void _toggleTheme() {
     setState(() {
@@ -89,6 +90,7 @@ class MyAppState extends State<MyApp> {
       designSize: Size(360, 690),
       builder: (context, child) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'ACEX',
           theme: lightTheme,
           darkTheme: darkTheme,

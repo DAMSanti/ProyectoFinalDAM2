@@ -14,6 +14,14 @@ export 'activity_detail_view.dart';
 export 'components/activity_detail_info.dart';
 export 'components/detail_bar.dart';
 
+// Header components
+export 'components/header/activity_detail_header.dart';
+
+// Card widgets
+export 'components/cards/info_card_widget.dart';
+export 'components/cards/folleto_card_widget.dart';
+export 'components/cards/estado_card_widget.dart';
+
 // Localizaciones
 export 'components/localizaciones/add_localizacion_dialog.dart';
 export 'components/localizaciones/edit_localizacion_dialog.dart';

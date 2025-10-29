@@ -27,16 +27,20 @@ import 'dialogs/multi_select_profesor_dialog.dart';
 import 'dialogs/multi_select_grupo_dialog.dart';
 import 'images/network_image_with_delete.dart';
 import 'images/image_with_delete_button.dart';
+import 'images/image_preview_dialog.dart';
 import 'activity_budget_section.dart';
+import 'header/activity_detail_header.dart';
 
 class ActivityDetailInfo extends StatefulWidget {
   final Actividad actividad;
   final bool isAdminOrSolicitante;
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
+  final Map<String, String> selectedImagesDescriptions;
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
   final Function(int)? removeApiImage; // Nueva funci�n para eliminar fotos de la API
+  final Function(int)? editLocalImage; // Nueva función para editar imágenes locales
   final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
   final int reloadTrigger; // N�mero que cambia cuando se debe recargar
 
@@ -46,9 +50,11 @@ class ActivityDetailInfo extends StatefulWidget {
     required this.isAdminOrSolicitante,
     required this.imagesActividad,
     required this.selectedImages,
+    required this.selectedImagesDescriptions,
     required this.showImagePicker,
     required this.removeSelectedImage,
     this.removeApiImage, // Opcional
+    this.editLocalImage, // Opcional
     this.onActivityDataChanged, // Opcional
     this.reloadTrigger = 0, // Por defecto 0
   });
@@ -63,12 +69,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   late final CatalogoService _catalogoService;
   late final LocalizacionService _localizacionService;
   late final ActividadService _actividadService;
+  late final PhotoService _photoService;
   List<Profesor> _profesoresParticipantes = [];
   List<GrupoParticipante> _gruposParticipantes = [];
   List<Profesor> _profesoresParticipantesOriginales = [];
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
   List<Localizacion> _localizaciones = [];
   Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci�n
+  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripción
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   bool _loadingLocalizaciones = false;
@@ -92,6 +100,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     _catalogoService = CatalogoService(_apiService);
     _localizacionService = LocalizacionService(_apiService);
     _actividadService = ActividadService(_apiService);
+    _photoService = PhotoService(_apiService);
     // Cargar participantes desde la base de datos
     _loadParticipantes();
     // Cargar localizaciones
@@ -224,10 +233,45 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       _folletoFilePath = null;
       _folletoChanged = false;
       _folletoMarkedForDeletion = false;
+      // Limpiar cambios pendientes de descripciones de fotos
+      _photoDescriptionChanges.clear();
     });
     // Solo recargar participantes, no localizaciones (no se modifican en esta vista)
     await _loadParticipantes();
     print('[ACTIVITY_DETAIL_INFO] Datos recargados correctamente');
+  }
+
+  // Método público para guardar las descripciones de fotos pendientes
+  Future<bool> savePhotoDescriptions() async {
+    if (_photoDescriptionChanges.isEmpty) {
+      print('[ACTIVITY_DETAIL_INFO] No hay cambios de descripciones de fotos para guardar');
+      return true;
+    }
+
+    print('[ACTIVITY_DETAIL_INFO] Guardando ${_photoDescriptionChanges.length} descripciones de fotos...');
+    bool allSuccess = true;
+
+    for (var entry in _photoDescriptionChanges.entries) {
+      try {
+        final photoId = entry.key;
+        final newDescription = entry.value;
+        
+        await _photoService.updatePhotoDescription(photoId, newDescription);
+        print('[ACTIVITY_DETAIL_INFO] Descripción de foto $photoId actualizada correctamente');
+      } catch (e) {
+        print('[ERROR] Error actualizando descripción de foto ${entry.key}: $e');
+        allSuccess = false;
+      }
+    }
+
+    if (allSuccess) {
+      setState(() {
+        _photoDescriptionChanges.clear();
+      });
+      print('[ACTIVITY_DETAIL_INFO] Todas las descripciones de fotos guardadas correctamente');
+    }
+
+    return allSuccess;
   }
 
   Future<void> _selectFolleto() async {
@@ -314,7 +358,15 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 8),
-              _buildHeader(context, constraints),
+              ActivityDetailHeader(
+                actividad: widget.actividad,
+                isAdminOrSolicitante: widget.isAdminOrSolicitante,
+                folletoFileName: _folletoFileName,
+                folletoMarkedForDeletion: _folletoMarkedForDeletion,
+                onEditPressed: () => _showEditDialog(context),
+                onSelectFolleto: _selectFolleto,
+                onDeleteFolleto: _deleteFolleto,
+              ),
               SizedBox(height: 16),
               _buildImages(context, constraints),
               SizedBox(height: 16),
@@ -327,218 +379,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, BoxConstraints constraints) {
-    final isWeb =
-        kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
-    // Parsear fechas y horas
-    final DateTime fechaInicio = DateTime.parse(widget.actividad.fini);
-    final DateTime fechaFin = DateTime.parse(widget.actividad.ffin);
-    
-    // Extraer solo la parte de fecha (sin hora) para comparar
-    final fechaInicioSolo = DateTime(fechaInicio.year, fechaInicio.month, fechaInicio.day);
-    final fechaFinSolo = DateTime(fechaFin.year, fechaFin.month, fechaFin.day);
-    
-    // Formatear fechas
-    final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
-    final String formattedStartDate = dateFormat.format(fechaInicio);
-    final String formattedEndDate = dateFormat.format(fechaFin);
-    
-    // Formatear horas (hini y hfin vienen como "HH:mm" o "HH:mm:ss")
-    String horaInicio = widget.actividad.hini;
-    String horaFin = widget.actividad.hfin;
-    
-    // Si las horas tienen formato HH:mm:ss, quitar los segundos
-    if (horaInicio.length > 5 && horaInicio.substring(5, 6) == ':') {
-      horaInicio = horaInicio.substring(0, 5);
-    }
-    if (horaFin.length > 5 && horaFin.substring(5, 6) == ':') {
-      horaFin = horaFin.substring(0, 5);
-    }
-    
-    // Construir texto seg�n si es el mismo d�a o d�as diferentes
-    final String dateText = fechaInicioSolo == fechaFinSolo
-        ? '$formattedStartDate $horaInicio'
-        : '$formattedStartDate $horaInicio - $formattedEndDate $horaFin';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                widget.actividad.titulo,
-                style: TextStyle(
-                  fontSize: !isWeb ? 20.dg : 7.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
-                ),
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.edit, color: Color(0xFF1976d2)),
-              onPressed: () => _showEditDialog(context),
-            ),
-          ],
-        ),
-        SizedBox(height: 16),
-        // Descripci�n y Fecha en la misma l�nea
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Descripci�n con icono (izquierda)
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.description, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.actividad.descripcion ?? 'Sin descripci�n',
-                      style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 16),
-            // Fecha con icono (derecha)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.calendar_today, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                SizedBox(width: 8),
-                Text(
-                  dateText,
-                  style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        // Solicitante y Departamento
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Solicitante con icono (izquierda)
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.person, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.actividad.solicitante != null 
-                          ? '${widget.actividad.solicitante!.nombre} ${widget.actividad.solicitante!.apellidos}'
-                          : 'Sin solicitante',
-                      style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 16),
-            // Departamento con icono (derecha)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.person, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                SizedBox(width: 8),
-                Text(
-                  widget.actividad.responsable != null 
-                      ? '${widget.actividad.responsable!.nombre} ${widget.actividad.responsable!.apellidos}'
-                      : 'Sin responsable',
-                  style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(height: 12),
-        // Folleto (izquierda) y Estado (derecha)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Folleto con icono (izquierda)
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.picture_as_pdf, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                  SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      // Mostrar "Sin folleto" si est� marcado para eliminaci�n o no hay folleto
-                      _folletoMarkedForDeletion 
-                          ? 'Sin folleto' 
-                          : (_folletoFileName ?? 
-                              (widget.actividad.urlFolleto != null 
-                                  ? _extractFileName(widget.actividad.urlFolleto!)
-                                  : 'Sin folleto')),
-                      style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (widget.isAdminOrSolicitante) ...[
-                    SizedBox(width: 8),
-                    IconButton(
-                      icon: Icon(Icons.upload_file, color: Color(0xFF1976d2)),
-                      iconSize: !isWeb ? 16.dg : 5.sp,
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
-                      onPressed: _selectFolleto,
-                      tooltip: 'Subir folleto PDF',
-                    ),
-                    // Bot�n X para eliminar folleto (solo si hay folleto)
-                    if (!_folletoMarkedForDeletion && 
-                        (_folletoFileName != null || widget.actividad.urlFolleto != null)) ...[
-                      SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.close, color: Colors.red),
-                        iconSize: !isWeb ? 16.dg : 5.sp,
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                        onPressed: _deleteFolleto,
-                        tooltip: 'Eliminar folleto',
-                      ),
-                    ],
-                  ],
-                ],
-              ),
-            ),
-            SizedBox(width: 16),
-            // Estado con icono (derecha)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.check_circle, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
-                SizedBox(width: 8),
-                Text(
-                  widget.actividad.estado,
-                  style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -562,42 +402,115 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildImages(BuildContext context, BoxConstraints constraints) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.25),
+                  Color.fromRGBO(21, 101, 192, 0.20),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.85),
+                  Color.fromRGBO(144, 202, 249, 0.75),
+                ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.4) 
+                : const Color.fromRGBO(0, 0, 0, 0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12.0,
+            spreadRadius: -1,
+          ),
+        ],
+        border: Border.all(
+          color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.1) 
+              : const Color.fromRGBO(0, 0, 0, 0.05),
+          width: 1,
+        ),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Fotos de la Actividad',
-              style: TextStyle(
-                fontSize: kIsWeb ? 5.sp : 14.dg,
-                fontWeight: FontWeight.bold,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Patrón decorativo de fondo
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Opacity(
+              opacity: isDark ? 0.03 : 0.02,
+              child: Icon(
+                Icons.photo_library_rounded,
+                size: 120,
                 color: Color(0xFF1976d2),
               ),
             ),
-            SizedBox(height: 8),
-            _HorizontalImageScroller(
-              constraints: constraints,
-              isAdminOrSolicitante: widget.isAdminOrSolicitante,
-              showImagePicker: widget.showImagePicker,
-              imagesActividad: widget.imagesActividad,
-              selectedImages: widget.selectedImages,
-              onDeleteImage: (index) => widget.removeSelectedImage(index),
-              onDeleteApiImage: (index) async {
-                // Llamar a la función del padre que maneja la eliminación
-                if (widget.removeApiImage != null) {
-                  await widget.removeApiImage!(index);
-                }
-              },
+          ),
+          // Contenido
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título con icono
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(25, 118, 210, 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.photo_library_rounded,
+                        color: Color(0xFF1976d2),
+                        size: !isWeb ? 18.dg : 6.sp,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Fotos de la Actividad',
+                      style: TextStyle(
+                        fontSize: !isWeb ? 14.dg : 5.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Color(0xFF1976d2),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                _HorizontalImageScroller(
+                  constraints: constraints,
+                  isAdminOrSolicitante: widget.isAdminOrSolicitante,
+                  showImagePicker: widget.showImagePicker,
+                  imagesActividad: widget.imagesActividad,
+                  selectedImages: widget.selectedImages,
+                  selectedImagesDescriptions: widget.selectedImagesDescriptions,
+                  onDeleteImage: (index) => widget.removeSelectedImage(index),
+                  onDeleteApiImage: (index) async {
+                    if (widget.removeApiImage != null) {
+                      await widget.removeApiImage!(index);
+                    }
+                  },
+                  onImageTap: (photo) => _showImageEditDialog(context, photo),
+                  onLocalImageTap: (index) {
+                    if (widget.editLocalImage != null) {
+                      widget.editLocalImage!(index);
+                    }
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -632,223 +545,659 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildProfesoresParticipantes(BuildContext context) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Profesores Participantes',
-                style: TextStyle(
-                  fontSize: kIsWeb ? 5.sp : 14.dg,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
-                ),
-              ),
-              if (widget.isAdminOrSolicitante)
-                IconButton(
-                  icon: Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF1976d2)),
-                  onPressed: _loadingProfesores ? null : () {
-                    _showAddProfesorDialog(context);
-                  },
-                  tooltip: 'Agregar profesor',
-                ),
-            ],
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.25),
+                  Color.fromRGBO(21, 101, 192, 0.20),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.85),
+                  Color.fromRGBO(144, 202, 249, 0.75),
+                ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.4) 
+                : const Color.fromRGBO(0, 0, 0, 0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12.0,
+            spreadRadius: -1,
           ),
-          SizedBox(height: 12),
-          // Lista de profesores participantes
-          _profesoresParticipantes.isEmpty
-              ? Text(
-                  'Sin profesores participantes',
-                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-                )
-              : ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 300),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: _profesoresParticipantes.map((profesor) {
-                    return Card(
-                      margin: EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Color(0xFF1976d2),
-                          child: Text(
-                            profesor.nombre.substring(0, 1).toUpperCase(),
-                            style: TextStyle(color: Colors.white),
+        ],
+        border: Border.all(
+          color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.1) 
+              : const Color.fromRGBO(0, 0, 0, 0.05),
+          width: 1,
+        ),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Patrón decorativo de fondo
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Opacity(
+              opacity: isDark ? 0.03 : 0.02,
+              child: Icon(
+                Icons.people_rounded,
+                size: 120,
+                color: Color(0xFF1976d2),
+              ),
+            ),
+          ),
+          // Contenido
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título con icono y botón agregar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(25, 118, 210, 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.people_rounded,
+                            color: Color(0xFF1976d2),
+                            size: !isWeb ? 18.dg : 6.sp,
                           ),
                         ),
-                        title: Text('${profesor.nombre} ${profesor.apellidos}'),
-                        subtitle: Text(profesor.correo, style: TextStyle(fontSize: 12)),
-                        trailing: widget.isAdminOrSolicitante
-                            ? IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    _profesoresParticipantes.removeWhere((p) => p.uuid == profesor.uuid);
-                                  });
-                                  _notifyChanges();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Profesor eliminado')),
-                                  );
-                                },
-                                tooltip: 'Eliminar profesor',
-                              )
-                            : null,
-                      ),
-                    );
-                  }).toList(),
+                        SizedBox(width: 10),
+                        Text(
+                          'Profesores Participantes',
+                          style: TextStyle(
+                            fontSize: !isWeb ? 14.dg : 5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Color(0xFF1976d2),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    if (widget.isAdminOrSolicitante)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1976d2).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add_circle_outline_rounded,
+                            color: Color(0xFF1976d2),
+                            size: !isWeb ? 20.dg : 6.sp,
+                          ),
+                          onPressed: _loadingProfesores ? null : () {
+                            _showAddProfesorDialog(context);
+                          },
+                          tooltip: 'Agregar profesor',
+                        ),
+                      ),
+                  ],
                 ),
+                SizedBox(height: 16),
+                // Lista de profesores participantes
+                _profesoresParticipantes.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.people_outline_rounded,
+                                size: 48,
+                                color: Colors.grey.withOpacity(0.5),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Sin profesores participantes',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: 300),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: _profesoresParticipantes.map((profesor) {
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.05)
+                                      : Colors.white.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.1)
+                                        : Colors.white.withOpacity(0.5),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  leading: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFF1976d2),
+                                          Color(0xFF42A5F5),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xFF1976d2).withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        profesor.nombre.substring(0, 1).toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: !isWeb ? 16.dg : 5.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    '${profesor.nombre} ${profesor.apellidos}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                      color: isDark ? Colors.white : Colors.black87,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: EdgeInsets.only(top: 4),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.email_outlined,
+                                          size: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                        SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            profesor.correo,
+                                            style: TextStyle(
+                                              fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                              color: Colors.grey[600],
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  trailing: widget.isAdminOrSolicitante
+                                      ? Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: Colors.red,
+                                              size: !isWeb ? 18.dg : 5.5.sp,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _profesoresParticipantes.removeWhere((p) => p.uuid == profesor.uuid);
+                                              });
+                                              _notifyChanges();
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Row(
+                                                    children: [
+                                                      Icon(Icons.check_circle, color: Colors.white),
+                                                      SizedBox(width: 8),
+                                                      Text('Profesor eliminado'),
+                                                    ],
+                                                  ),
+                                                  backgroundColor: Colors.green,
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            },
+                                            tooltip: 'Eliminar profesor',
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildGruposParticipantes(BuildContext context) {
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
-      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Grupos/Cursos Participantes',
-                    style: TextStyle(
-                      fontSize: kIsWeb ? 5.sp : 14.dg,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1976d2),
-                    ),
-                  ),
-                  if (_gruposParticipantes.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Total alumnos: $_totalAlumnosParticipantes',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.25),
+                  Color.fromRGBO(21, 101, 192, 0.20),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.85),
+                  Color.fromRGBO(144, 202, 249, 0.75),
                 ],
-              ),
-              if (widget.isAdminOrSolicitante)
-                IconButton(
-                  icon: Icon(Icons.add_circle_outline, size: 18, color: Color(0xFF1976d2)),
-                  onPressed: _loadingGrupos ? null : () {
-                    _showAddGrupoDialog(context);
-                  },
-                  tooltip: 'Agregar grupo',
-                ),
-            ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.4) 
+                : const Color.fromRGBO(0, 0, 0, 0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12.0,
+            spreadRadius: -1,
           ),
-          SizedBox(height: 12),
-          // Lista de grupos participantes
-          _gruposParticipantes.isEmpty
-              ? Text(
-                  'Sin grupos participantes',
-                  style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-                )
-              : ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 300),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: _gruposParticipantes.map((grupoParticipante) {
-                    final isEditing = _editingGrupoId == grupoParticipante.grupo.id;
-                    
-                    return Card(
-                      margin: EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Color(0xFF1976d2),
-                          child: Text(
-                            grupoParticipante.grupo.nombre.substring(0, 1).toUpperCase(),
-                            style: TextStyle(color: Colors.white),
+        ],
+        border: Border.all(
+          color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.1) 
+              : const Color.fromRGBO(0, 0, 0, 0.05),
+          width: 1,
+        ),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Patrón decorativo de fondo
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Opacity(
+              opacity: isDark ? 0.03 : 0.02,
+              child: Icon(
+                Icons.school_rounded,
+                size: 120,
+                color: Color(0xFF1976d2),
+              ),
+            ),
+          ),
+          // Contenido
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título con icono y botón agregar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(25, 118, 210, 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.school_rounded,
+                              color: Color(0xFF1976d2),
+                              size: !isWeb ? 18.dg : 6.sp,
+                            ),
                           ),
-                        ),
-                        title: Text(grupoParticipante.grupo.nombre),
-                        subtitle: isEditing
-                            ? _buildEditableParticipantes(grupoParticipante)
-                            : InkWell(
-                                onTap: widget.isAdminOrSolicitante 
-                                  ? () {
-                                      setState(() {
-                                        _editingGrupoId = grupoParticipante.grupo.id;
-                                      });
-                                    }
-                                  : null,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      '${grupoParticipante.numeroParticipantes}/${grupoParticipante.grupo.numeroAlumnos} alumnos',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: widget.isAdminOrSolicitante 
-                                          ? Colors.blue 
-                                          : null,
-                                        decoration: widget.isAdminOrSolicitante 
-                                          ? TextDecoration.underline 
-                                          : null,
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Grupos/Cursos Participantes',
+                                  style: TextStyle(
+                                    fontSize: !isWeb ? 14.dg : 5.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Color(0xFF1976d2),
+                                  ),
+                                ),
+                                if (_gruposParticipantes.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF1976d2).withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        'Total alumnos: $_totalAlumnosParticipantes',
+                                        style: TextStyle(
+                                          fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                          color: Color(0xFF1976d2),
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
-                                    if (widget.isAdminOrSolicitante)
-                                      Padding(
-                                        padding: EdgeInsets.only(left: 4),
-                                        child: Icon(Icons.edit, size: 14, color: Colors.blue),
-                                      ),
-                                  ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (widget.isAdminOrSolicitante)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1976d2).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add_circle_outline_rounded,
+                            color: Color(0xFF1976d2),
+                            size: !isWeb ? 20.dg : 6.sp,
+                          ),
+                          onPressed: _loadingGrupos ? null : () {
+                            _showAddGrupoDialog(context);
+                          },
+                          tooltip: 'Agregar grupo',
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                // Lista de grupos participantes
+                _gruposParticipantes.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.school_outlined,
+                                size: 48,
+                                color: Colors.grey.withOpacity(0.5),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Sin grupos participantes',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: !isWeb ? 12.dg : 4.sp,
                                 ),
                               ),
-                        trailing: widget.isAdminOrSolicitante
-                            ? IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    _gruposParticipantes.removeWhere(
-                                      (gp) => gp.grupo.id == grupoParticipante.grupo.id
-                                    );
-                                  });
-                                  _notifyChanges();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Grupo eliminado')),
-                                  );
-                                },
-                                tooltip: 'Eliminar grupo',
-                              )
-                            : null,
+                            ],
+                          ),
+                        ),
+                      )
+                    : ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: 300),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: _gruposParticipantes.map((grupoParticipante) {
+                              final isEditing = _editingGrupoId == grupoParticipante.grupo.id;
+                              
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.05)
+                                      : Colors.white.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.1)
+                                        : Colors.white.withOpacity(0.5),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  leading: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFF1976d2),
+                                          Color(0xFF42A5F5),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xFF1976d2).withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        grupoParticipante.grupo.nombre.substring(0, 1).toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: !isWeb ? 16.dg : 5.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(
+                                    grupoParticipante.grupo.nombre,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                      color: isDark ? Colors.white : Colors.black87,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: EdgeInsets.only(top: 4),
+                                    child: isEditing
+                                        ? _buildEditableParticipantes(grupoParticipante)
+                                        : InkWell(
+                                            onTap: widget.isAdminOrSolicitante 
+                                              ? () {
+                                                  setState(() {
+                                                    _editingGrupoId = grupoParticipante.grupo.id;
+                                                  });
+                                                }
+                                              : null,
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: widget.isAdminOrSolicitante
+                                                    ? Color(0xFF1976d2).withOpacity(0.1)
+                                                    : Colors.transparent,
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.people_alt_rounded,
+                                                    size: 14,
+                                                    color: Color(0xFF1976d2),
+                                                  ),
+                                                  SizedBox(width: 4),
+                                                  Text(
+                                                    '${grupoParticipante.numeroParticipantes}/${grupoParticipante.grupo.numeroAlumnos} alumnos',
+                                                    style: TextStyle(
+                                                      fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                                      color: Color(0xFF1976d2),
+                                                      fontWeight: FontWeight.w500,
+                                                      decoration: widget.isAdminOrSolicitante 
+                                                        ? TextDecoration.underline 
+                                                        : null,
+                                                    ),
+                                                  ),
+                                                  if (widget.isAdminOrSolicitante)
+                                                    Padding(
+                                                      padding: EdgeInsets.only(left: 4),
+                                                      child: Icon(
+                                                        Icons.edit_rounded,
+                                                        size: 14,
+                                                        color: Color(0xFF1976d2),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                  trailing: widget.isAdminOrSolicitante
+                                      ? Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: Colors.red,
+                                              size: !isWeb ? 18.dg : 5.5.sp,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _gruposParticipantes.removeWhere(
+                                                  (gp) => gp.grupo.id == grupoParticipante.grupo.id
+                                                );
+                                              });
+                                              _notifyChanges();
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Row(
+                                                    children: [
+                                                      Icon(Icons.check_circle, color: Colors.white),
+                                                      SizedBox(width: 8),
+                                                      Text('Grupo eliminado'),
+                                                    ],
+                                                  ),
+                                                  backgroundColor: Colors.green,
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            },
+                                            tooltip: 'Eliminar grupo',
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ),
-                    );
-                  }).toList(),
-                    ),
-                  ),
-                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
+  /// Muestra el diálogo para editar la descripción de una foto existente
+  void _showImageEditDialog(BuildContext context, Photo photo) async {
+    // Obtener la descripción actual (puede haber cambios pendientes)
+    final currentDescription = _photoDescriptionChanges.containsKey(photo.id)
+        ? _photoDescriptionChanges[photo.id]
+        : photo.descripcion;
+    
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return ImagePreviewDialog(
+          imageUrl: photo.urlFoto ?? '',
+          initialDescription: currentDescription?.isNotEmpty == true ? currentDescription : null,
+          isEditing: true,
+          onConfirm: (description) {
+            // Solo retornar el valor, no guardar aún
+            Navigator.of(dialogContext).pop(description);
+          },
+        );
+      },
+    );
+    
+    // Si se confirmó (result no es null), guardar cambio localmente
+    if (result != null && mounted) {
+      setState(() {
+        // Guardar el cambio en el mapa temporal
+        _photoDescriptionChanges[photo.id] = result;
+        
+        // Actualizar visualmente
+        photo.descripcion = result;
+      });
+      
+      // Notificar que hay cambios pendientes, pasar el mapa completo
+      if (widget.onActivityDataChanged != null) {
+        widget.onActivityDataChanged!({
+          'photoDescriptionChanges': Map<int, String>.from(_photoDescriptionChanges),
+        });
+      }
+      
+      // Mostrar feedback al usuario usando el contexto del widget montado
+      try {
+        if (mounted) {
+          ScaffoldMessenger.of(this.context).showSnackBar(
+            SnackBar(
+              content: Text('Descripción actualizada (pendiente de guardar)'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } catch (e) {
+        // Si falla el SnackBar, al menos registramos el cambio
+        print('[INFO] Descripción actualizada para foto ${photo.id} (SnackBar no disponible)');
+      }
+    }
+  }
+
   void _showAddProfesorDialog(BuildContext context) async {
     setState(() => _loadingProfesores = true);
+    
+    // Capturar el ScaffoldMessenger antes del diálogo async
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
       // Cargar todos los profesores desde la API
@@ -880,16 +1229,24 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         _notifyChanges();
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${selectedProfesores.length} profesor(es) agregado(s)')),
-          );
+          try {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(content: Text('${selectedProfesores.length} profesor(es) agregado(s)')),
+            );
+          } catch (e) {
+            print('[INFO] ${selectedProfesores.length} profesor(es) agregado(s) (SnackBar no disponible)');
+          }
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar profesores: $e')),
-        );
+        try {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('Error al cargar profesores: $e')),
+          );
+        } catch (snackbarError) {
+          print('[ERROR] Error al cargar profesores: $e (SnackBar no disponible)');
+        }
       }
     } finally {
       if (mounted) {
@@ -900,6 +1257,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
 
   void _showAddGrupoDialog(BuildContext context) async {
     setState(() => _loadingGrupos = true);
+    
+    // Capturar el ScaffoldMessenger antes del diálogo async
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
       // Cargar todos los cursos y grupos desde la API
@@ -936,16 +1296,24 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         _notifyChanges();
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${gruposSeleccionados.length} grupo(s) agregado(s)')),
-          );
+          try {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(content: Text('${gruposSeleccionados.length} grupo(s) agregado(s)')),
+            );
+          } catch (e) {
+            print('[INFO] ${gruposSeleccionados.length} grupo(s) agregado(s) (SnackBar no disponible)');
+          }
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar grupos: $e')),
-        );
+        try {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text('Error al cargar grupos: $e')),
+          );
+        } catch (snackbarError) {
+          print('[ERROR] Error al cargar grupos: $e (SnackBar no disponible)');
+        }
       }
     } finally {
       if (mounted) {
@@ -1116,14 +1484,42 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
 
   Widget _buildLocalizacion(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Container(
-      constraints: BoxConstraints(minHeight: 500), // Altura m�nima igual al contenedor de presupuesto
-      padding: EdgeInsets.all(16),
+      constraints: BoxConstraints(minHeight: 500),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+            ? const [
+                Color.fromRGBO(25, 118, 210, 0.25),
+                Color.fromRGBO(21, 101, 192, 0.20),
+              ]
+            : const [
+                Color.fromRGBO(187, 222, 251, 0.85),
+                Color.fromRGBO(144, 202, 249, 0.75),
+              ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark 
+            ? const Color.fromRGBO(255, 255, 255, 0.1) 
+            : const Color.fromRGBO(0, 0, 0, 0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+              ? const Color.fromRGBO(0, 0, 0, 0.4) 
+              : const Color.fromRGBO(0, 0, 0, 0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12.0,
+            spreadRadius: -1,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1134,55 +1530,120 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    color: Color(0xFF1976d2),
-                    size: !isWeb ? 18.dg : 6.sp,
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF1976d2).withOpacity(0.8),
+                          Color(0xFF1565c0).withOpacity(0.9),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF1976d2).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.location_on_rounded,
+                      color: Colors.white,
+                      size: !isWeb ? 24.dg : 7.sp,
+                    ),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 12),
                   Text(
                     'Localizaciones',
                     style: TextStyle(
-                      fontSize: !isWeb ? 14.dg : 5.sp,
+                      fontSize: !isWeb ? 16.dg : 5.5.sp,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1976d2),
                     ),
                   ),
                   if (_localizaciones.isNotEmpty)
                     Container(
-                      margin: EdgeInsets.only(left: 8),
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      margin: EdgeInsets.only(left: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Color(0xFF1976d2).withOpacity(0.2),
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF1976d2).withOpacity(0.8),
+                            Color(0xFF1565c0).withOpacity(0.9),
+                          ],
+                        ),
                         borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
                         '${_localizaciones.length}',
                         style: TextStyle(
                           fontSize: !isWeb ? 12.dg : 4.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1976d2),
+                          color: Colors.white,
                         ),
                       ),
                     ),
                 ],
               ),
               if (widget.isAdminOrSolicitante)
-                ElevatedButton.icon(
-                  onPressed: _loadingLocalizaciones ? null : () {
-                    _showAddLocalizacionDialog(context);
-                  },
-                  icon: Icon(
-                    Icons.add_location,
-                    size: !isWeb ? 16.dg : 5.sp,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF1976d2).withOpacity(0.8),
+                        Color(0xFF1565c0).withOpacity(0.9),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFF1976d2).withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  label: Text(
-                    'Añadir',
-                    style: TextStyle(fontSize: !isWeb ? 12.dg : 4.sp),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1976d2),
-                    foregroundColor: Colors.white,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: _loadingLocalizaciones ? null : () {
+                        _showAddLocalizacionDialog(context);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.add_location_rounded,
+                              color: Colors.white,
+                              size: !isWeb ? 18.dg : 5.sp,
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Añadir',
+                              style: TextStyle(
+                                fontSize: !isWeb ? 13.dg : 4.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -1322,13 +1783,13 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               Icon(
                 Icons.comment,
                 color: Color(0xFF1976d2),
-                size: !isWeb ? 24.dg : 7.sp,
+                size: !isWeb ? 16.dg : 5.sp,
               ),
               SizedBox(width: 8),
               Text(
                 'Comentarios',
                 style: TextStyle(
-                  fontSize: !isWeb ? 18.dg : 6.sp,
+                  fontSize: !isWeb ? 14.dg : 5.sp,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1976d2),
                 ),
@@ -1356,8 +1817,11 @@ class _HorizontalImageScroller extends StatefulWidget {
   final VoidCallback showImagePicker;
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
+  final Map<String, String> selectedImagesDescriptions;
   final Function(int) onDeleteImage;
   final Function(int)? onDeleteApiImage;
+  final Function(Photo)? onImageTap;
+  final Function(int)? onLocalImageTap;
 
   const _HorizontalImageScroller({
     required this.constraints,
@@ -1365,8 +1829,11 @@ class _HorizontalImageScroller extends StatefulWidget {
     required this.showImagePicker,
     required this.imagesActividad,
     required this.selectedImages,
+    required this.selectedImagesDescriptions,
     required this.onDeleteImage,
     this.onDeleteApiImage,
+    this.onImageTap,
+    this.onLocalImageTap,
   });
 
   @override
@@ -1384,27 +1851,78 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return SizedBox(
       width: widget.constraints.maxWidth,
       height: 200.0,
       child: Row(
         children: [
-          // Bot�n de c�mara fijo (no hace scroll)
+          // Botón de cámara fijo (no hace scroll) - Modernizado
           if (widget.isAdminOrSolicitante)
-            InkWell(
-              onTap: widget.showImagePicker,
-              child: Container(
-                width: 80.0,
-                height: 200.0,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8.0),
+            Container(
+              width: 160.0,
+              height: 200.0,
+              margin: EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          Color.fromRGBO(25, 118, 210, 0.2),
+                          Color.fromRGBO(21, 101, 192, 0.15),
+                        ]
+                      : [
+                          Color.fromRGBO(187, 222, 251, 0.6),
+                          Color.fromRGBO(144, 202, 249, 0.5),
+                        ],
                 ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.add_a_photo,
-                  color: Color(0xFF1976d2),
-                  size: 48,
+                borderRadius: BorderRadius.circular(16.0),
+                border: Border.all(
+                  color: Color(0xFF1976d2).withOpacity(0.3),
+                  width: 2,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFF1976d2).withOpacity(0.2),
+                    offset: Offset(0, 4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: widget.showImagePicker,
+                  borderRadius: BorderRadius.circular(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1976d2).withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.add_photo_alternate_rounded,
+                          color: Color(0xFF1976d2),
+                          size: 48,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'Añadir Foto',
+                        style: TextStyle(
+                          color: Color(0xFF1976d2),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1439,6 +1957,9 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                           onDelete: widget.onDeleteApiImage != null 
                               ? () => widget.onDeleteApiImage!(index)
                               : null,
+                          onTap: widget.onImageTap != null
+                              ? () => widget.onImageTap!(photo)
+                              : null,
                         );
                       }),
                       ...widget.selectedImages.asMap().entries.map((entry) {
@@ -1448,6 +1969,9 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                           image: image,
                           maxHeight: 200.0,
                           onDelete: () => widget.onDeleteImage(index),
+                          onTap: widget.onLocalImageTap != null
+                              ? () => widget.onLocalImageTap!(index)
+                              : null,
                         );
                       }),
                     ],

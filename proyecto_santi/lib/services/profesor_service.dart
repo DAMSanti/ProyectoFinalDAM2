@@ -111,9 +111,10 @@ class ProfesorService {
   /// Actualiza los profesores participantes de una actividad
   Future<bool> updateProfesoresParticipantes(int actividadId, List<String> profesoresIds) async {
     try {
-      final response = await _apiService.putData(
+      // El backend espera List<string> directamente, no un objeto con 'profesoresIds'
+      final response = await _apiService.put(
         '/Actividad/$actividadId/profesores-participantes',
-        {'profesoresIds': profesoresIds},
+        profesoresIds,
       );
       
       return response.statusCode == 200;
