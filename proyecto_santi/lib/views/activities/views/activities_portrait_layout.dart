@@ -27,6 +27,7 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
     'fecha': null,
     'estado': null,
     'curso': null,
+    'profesorId': null,
   };
   int _allActivitiesCount = 0;
   int _userActivitiesCount = 0;
@@ -89,6 +90,7 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                         selectedDate: filters['fecha'],
                         selectedCourse: filters['curso'],
                         selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
                         onCountChanged: (count) {
                           if (mounted) {
                             setState(() {
@@ -117,6 +119,7 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                         selectedDate: filters['fecha'],
                         selectedCourse: filters['curso'],
                         selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
                         onCountChanged: (count) {
                           if (mounted) {
                             setState(() {

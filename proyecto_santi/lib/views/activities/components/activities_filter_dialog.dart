@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/services/services.dart';
 
 /// Diálogo de filtros para la vista de actividades
 class ActivitiesFilterDialog extends StatefulWidget {
@@ -17,15 +19,39 @@ class ActivitiesFilterDialog extends StatefulWidget {
 
 class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
   late Map<String, dynamic> _tempFilters;
+  late final ApiService _apiService;
+  late final ProfesorService _profesorService;
   
   // Opciones de filtros
-  final List<String> _estados = ['Pendiente', 'En Curso', 'Finalizada', 'Cancelada'];
+  final List<String> _estados = ['Borrador', 'Tramite', 'Aprobada', 'Concluida', 'Cancelada'];
   final List<String> _cursos = ['1º ESO', '2º ESO', '3º ESO', '4º ESO', '1º Bach', '2º Bach'];
+  
+  // Profesores cargados dinámicamente
+  List<Profesor> _profesores = [];
+  bool _isLoadingProfesores = true;
 
   @override
   void initState() {
     super.initState();
     _tempFilters = Map<String, dynamic>.from(widget.currentFilters);
+    _apiService = ApiService();
+    _profesorService = ProfesorService(_apiService);
+    _loadProfesores();
+  }
+
+  Future<void> _loadProfesores() async {
+    try {
+      final profesores = await _profesorService.fetchProfesores();
+      setState(() {
+        _profesores = profesores;
+        _isLoadingProfesores = false;
+      });
+    } catch (e) {
+      print('[ERROR] Error cargando profesores: $e');
+      setState(() {
+        _isLoadingProfesores = false;
+      });
+    }
   }
 
   @override
@@ -38,7 +64,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
       ),
       child: Container(
         width: 500,
-        constraints: BoxConstraints(maxHeight: 600),
+        constraints: BoxConstraints(maxHeight: 700),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
@@ -220,6 +246,84 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                         }).toList(),
                       ),
                     ),
+
+                    SizedBox(height: 20),
+
+                    // Filtro por profesor
+                    _buildFilterSection(
+                      context,
+                      icon: Icons.person_rounded,
+                      title: 'Profesor (Responsable o Participante)',
+                      isDark: isDark,
+                      child: _isLoadingProfesores
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976d2)),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isDark 
+                                    ? Colors.white.withOpacity(0.05)
+                                    : Colors.grey.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isDark 
+                                      ? Colors.white.withOpacity(0.1)
+                                      : Colors.grey.withOpacity(0.3),
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  isExpanded: true,
+                                  value: _tempFilters['profesorId'],
+                                  hint: Text(
+                                    'Seleccionar profesor',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : Colors.black54,
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                                  ),
+                                  dropdownColor: isDark ? Color(0xFF1a1a2e) : Colors.white,
+                                  items: [
+                                    DropdownMenuItem<String>(
+                                      value: null,
+                                      child: Text(
+                                        'Todos los profesores',
+                                        style: TextStyle(
+                                          color: isDark ? Colors.white70 : Colors.black87,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ),
+                                    ..._profesores.map((profesor) {
+                                      return DropdownMenuItem<String>(
+                                        value: profesor.uuid,
+                                        child: Text(
+                                          '${profesor.nombre} ${profesor.apellidos}',
+                                          style: TextStyle(
+                                            color: isDark ? Colors.white : Colors.black87,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _tempFilters['profesorId'] = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                    ),
                   ],
                 ),
               ),
@@ -248,6 +352,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                             'fecha': null,
                             'estado': null,
                             'curso': null,
+                            'profesorId': null,
                           };
                         });
                       },

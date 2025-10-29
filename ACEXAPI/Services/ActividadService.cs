@@ -346,13 +346,16 @@ public class ActividadService : IActividadService
     {
         var grupos = await _context.Set<GrupoPartic>()
             .Include(gp => gp.Grupo)
+                .ThenInclude(g => g.Curso)
             .Where(gp => gp.ActividadId == actividadId)
             .Select(gp => new GrupoParticipanteDto
             {
                 GrupoId = gp.GrupoId,
                 GrupoNombre = gp.Grupo.Nombre,
                 NumeroAlumnos = gp.Grupo.NumeroAlumnos,
-                NumeroParticipantes = gp.NumeroParticipantes
+                NumeroParticipantes = gp.NumeroParticipantes,
+                CursoId = gp.Grupo.CursoId,
+                CursoNombre = gp.Grupo.Curso != null ? gp.Grupo.Curso.Nombre : null
             })
             .ToListAsync();
 

@@ -29,6 +29,7 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
     'fecha': null,
     'estado': null,
     'curso': null,
+    'profesorId': null,
   };
   int _allActivitiesCount = 0;
   int _userActivitiesCount = 0;
@@ -97,6 +98,7 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
                                     selectedDate: filters['fecha'],
                                     selectedCourse: filters['curso'],
                                     selectedState: filters['estado'],
+                                    selectedProfesorId: filters['profesorId'],
                                     onCountChanged: (count) {
                                       if (mounted) {
                                         setState(() {
@@ -130,6 +132,7 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
                                     selectedDate: filters['fecha'],
                                     selectedCourse: filters['curso'],
                                     selectedState: filters['estado'],
+                                    selectedProfesorId: filters['profesorId'],
                                     onCountChanged: (count) {
                                       if (mounted) {
                                         setState(() {

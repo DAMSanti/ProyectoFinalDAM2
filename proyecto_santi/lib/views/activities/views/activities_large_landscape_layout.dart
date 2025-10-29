@@ -22,6 +22,7 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
     'fecha': null,
     'estado': null,
     'curso': null,
+    'profesorId': null,
   };
   final ValueNotifier<List<Actividad>> _filteredActivitiesNotifier = ValueNotifier([]);
   int _allActivitiesCount = 0;
@@ -99,6 +100,7 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                         selectedDate: filters['fecha'],
                         selectedCourse: filters['curso'],
                         selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
                         onCountChanged: (count) {
                           if (mounted) {
                             setState(() {
@@ -128,6 +130,7 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                         selectedDate: filters['fecha'],
                         selectedCourse: filters['curso'],
                         selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
                         onCountChanged: (count) {
                           if (mounted) {
                             setState(() {
