@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/home_calendario.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -29,6 +30,24 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Actualizar el contador de actividades en el shell
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updateActivitiesCountInShell(context, widget.activities.length);
+    });
+  }
+
+  @override
+  void didUpdateWidget(HomeLargeLandscapeLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Actualizar si cambia el número de actividades
+    if (oldWidget.activities.length != widget.activities.length) {
+      updateActivitiesCountInShell(context, widget.activities.length);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
@@ -36,56 +55,8 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
       color: Colors.transparent,
       child: Column(
         children: [
-          // Header compacto
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.event_available_rounded,
-                  color: Color(0xFF1976d2),
-                  size: 28,
-                ),
-                SizedBox(width: 16),
-                Text(
-                  'Próximas Actividades',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Color(0xFF1976d2),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                SizedBox(width: 12),
-                // Burbuja con número
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF1976d2),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFF1976d2).withOpacity(0.3),
-                        offset: Offset(0, 2),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    '${widget.activities.length}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Carrusel de actividades con groove
+          SizedBox(height: 16), // Espaciado superior
+          // Carrusel de actividades con groove (sin header, ahora está en el top bar)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Container(

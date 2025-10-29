@@ -56,11 +56,13 @@ class MarcoDesktop extends StatelessWidget {
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
   final String? title;
+  final int? activitiesCount; // Contador de actividades (opcional)
 
   const DesktopBar({
     super.key, 
     required this.onToggleTheme,
     this.title,
+    this.activitiesCount, // Nuevo parámetro opcional
   });
 
   @override
@@ -89,16 +91,134 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               elevation: 0,
               centerTitle: true,
               automaticallyImplyLeading: false,
-              title: Text(
-                title ?? 'Próximas Actividades',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2), // Azul consistente
-                  letterSpacing: 0.5,
-                  fontFamily: 'Roboto', // Fuente explícita
-                ),
-              ),
+              title: activitiesCount != null
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Si el ancho es muy pequeño, mostrar versión compacta
+                        if (constraints.maxWidth < 400) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.event_available_rounded,
+                                color: Color(0xFF1976d2),
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  'Actividades',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1976d2),
+                                    letterSpacing: 0.5,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF1976d2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$activitiesCount',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        
+                        // Versión completa
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.event_available_rounded,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Flexible(
+                              child: Text(
+                                title ?? 'Próximas Actividades',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1976d2),
+                                  letterSpacing: 0.5,
+                                  fontFamily: 'Roboto',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    offset: Offset(0, 2),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                '$activitiesCount',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  : Text(
+                      title ?? 'Próximas Actividades',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1976d2),
+                        letterSpacing: 0.5,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
               leading: Padding(
                 padding: const EdgeInsets.only(left: 16.0, top: 12.0),
                 child: Center(

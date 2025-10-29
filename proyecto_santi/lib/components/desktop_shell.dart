@@ -37,6 +37,7 @@ class _DesktopShellState extends State<DesktopShell> {
   String _previousRoute = '/home'; // Ruta anterior para volver atrás
   Map<String, dynamic>? _activityDetailArgs;
   Map<String, dynamic>? _chatViewArgs;
+  int _activitiesCount = 0; // Contador de actividades
 
   @override
   void initState() {
@@ -46,6 +47,15 @@ class _DesktopShellState extends State<DesktopShell> {
   }
 
   // Método público para navegar entre rutas
+  // Método para actualizar el contador de actividades
+  void updateActivitiesCount(int count) {
+    if (mounted) {
+      setState(() {
+        _activitiesCount = count;
+      });
+    }
+  }
+
   void navigateTo(String route) {
     if (route != _currentRoute) {
       setState(() {
@@ -186,6 +196,7 @@ class _DesktopShellState extends State<DesktopShell> {
       child: DesktopShellFrame(
         currentRoute: _currentRoute,
         currentTitle: _getTitleForRoute(),
+        activitiesCount: _activitiesCount, // Pasar el contador
         onNavigate: navigateTo,
         onToggleTheme: widget.onToggleTheme,
         child: _buildCurrentView(),
@@ -209,6 +220,14 @@ class _DesktopShellScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_DesktopShellScope oldWidget) => false;
+}
+
+// Función helper para actualizar el contador de actividades
+void updateActivitiesCountInShell(BuildContext context, int count) {
+  final shellState = _DesktopShellScope.of(context);
+  if (shellState != null) {
+    shellState.updateActivitiesCount(count);
+  }
 }
 
 // Función helper para verificar si estamos dentro del shell
@@ -273,6 +292,7 @@ void navigateToChatInShell(BuildContext context, Map<String, dynamic> args) {
 class DesktopShellFrame extends StatelessWidget {
   final String currentRoute;
   final String currentTitle;
+  final int activitiesCount; // Número de actividades
   final Function(String) onNavigate;
   final VoidCallback onToggleTheme;
   final Widget child;
@@ -281,6 +301,7 @@ class DesktopShellFrame extends StatelessWidget {
     super.key,
     required this.currentRoute,
     required this.currentTitle,
+    required this.activitiesCount, // Nuevo parámetro
     required this.onNavigate,
     required this.onToggleTheme,
     required this.child,
@@ -390,6 +411,7 @@ class DesktopShellFrame extends StatelessWidget {
                           child: DesktopBar(
                             onToggleTheme: onToggleTheme,
                             title: currentTitle,
+                            activitiesCount: currentRoute == '/home' ? activitiesCount : null, // Solo mostrar en home
                           ),
                         ),
                         Expanded(
