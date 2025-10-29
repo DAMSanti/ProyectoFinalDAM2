@@ -619,8 +619,8 @@ class _ModernCalendarState extends State<ModernCalendar> with AutomaticKeepAlive
                     ),
                   ),
 
-                  // Indicador de festivo
-                  if (isHoliday && cellSize > 40)
+                  // Indicador de festivo (solo si hay suficiente espacio)
+                  if (isHoliday && cellSize > 45)
                     Positioned(
                       top: 4,
                       right: 4,

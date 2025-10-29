@@ -60,7 +60,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Container(
-              height: 232,
+              height: 190, // Reducido de 232 a 190
               decoration: BoxDecoration(
                 color: isDark 
                     ? Color(0xFF1A2332).withOpacity(0.4)
@@ -130,11 +130,9 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                               padding: EdgeInsets.only(
                                 right: index < widget.activities.length - 1 ? 16.0 : 0.0,
                               ),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minWidth: 300,
-                                  maxWidth: 400,
-                                ),
+                              child: SizedBox(
+                                width: 350, // Ancho fijo
+                                height: 158, // Altura reducida para caber en el contenedor (190 - 32 padding)
                                 child: ActivityCardItem(
                                   actividad: widget.activities[index],
                                   isDarkTheme: isDark,

@@ -97,9 +97,12 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                             final actividad = activities[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12.0),
-                              child: ActivityCardItem(
-                                actividad: actividad,
-                                isDarkTheme: isDark,
+                              child: SizedBox(
+                                height: 170, // Altura fija para cada card
+                                child: ActivityCardItem(
+                                  actividad: actividad,
+                                  isDarkTheme: isDark,
+                                ),
                               ),
                             );
                           },

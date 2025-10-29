@@ -251,44 +251,45 @@ class ActivityInfo extends StatelessWidget {
               )
             : null,
       ),
-      padding: EdgeInsets.all(20.0),
+      padding: EdgeInsets.fromLTRB(14.0, 12.0, 14.0, 12.0), // Padding reducido vertical
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Ocupar solo el espacio necesario
         children: [
           // Título con icono
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: Color(0xFF1976d2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.event_note_rounded,
                   color: Color(0xFF1976d2),
-                  size: 20,
+                  size: 18,
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   actividad.titulo,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : Color(0xFF1A237E),
                     letterSpacing: -0.5,
                     height: 1.2,
                   ),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                 ),
               ),
             ],
           ),
           
-          SizedBox(height: 16),
+          SizedBox(height: 10),
           
           // Descripción
           Text(
@@ -296,20 +297,20 @@ class ActivityInfo extends StatelessWidget {
                 ? actividad.descripcion! 
                 : 'Sin descripción',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: isDark ? Colors.white70 : Colors.black87,
-              height: 1.5,
+              height: 1.4,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
           
-          SizedBox(height: 12),
+          SizedBox(height: 10),
           
           // Divider sutil
           Container(
             height: 1,
-            margin: EdgeInsets.symmetric(vertical: 8),
+            margin: EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -330,14 +331,14 @@ class ActivityInfo extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.access_time_rounded,
-                    size: 16,
+                    size: 15,
                     color: isDark ? Colors.white60 : Colors.black45,
                   ),
-                  SizedBox(width: 6),
+                  SizedBox(width: 5),
                   Text(
                     formatearFechaHora(),
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: isDark ? Colors.white70 : Colors.black54,
                       fontWeight: FontWeight.w500,
                     ),
@@ -346,7 +347,7 @@ class ActivityInfo extends StatelessWidget {
               ),
               // Badge de estado
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: getEstadoColor().withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),

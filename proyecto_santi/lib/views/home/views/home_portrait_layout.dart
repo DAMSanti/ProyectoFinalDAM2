@@ -18,61 +18,58 @@ class HomePortraitLayout extends StatelessWidget {
       builder: (context, constraints) {
         return Column(
           children: [
-            Expanded(
-              flex: 3,
-              child: Column(
+            // Header compacto
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Header compacto
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.event_available_rounded,
-                          color: Color(0xFF1976d2),
-                          size: 24,
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Próximas Actividades',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Color(0xFF1976d2),
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        // Burbuja con número
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF1976d2),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF1976d2).withOpacity(0.3),
-                                offset: Offset(0, 2),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            '${activities.length}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                  Icon(
+                    Icons.event_available_rounded,
+                    color: Color(0xFF1976d2),
+                    size: 24,
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    'Próximas Actividades',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  // Burbuja con número
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1976d2),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF1976d2).withOpacity(0.3),
+                          offset: Offset(0, 2),
+                          blurRadius: 6,
                         ),
                       ],
                     ),
+                    child: Text(
+                      '${activities.length}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  // Carrusel con efecto de surco
-                  Expanded(
-                    child: Container(
+                ],
+              ),
+            ),
+            // Carrusel con efecto de surco
+            SizedBox(
+              height: 180, // Altura fija para las cards
+              child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
                         color: isDark 
@@ -137,12 +134,32 @@ class HomePortraitLayout extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8),
+            SizedBox(height: 8),
+            // Título del calendario
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    color: Color(0xFF1976d2),
+                    size: 22,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Calendario de Actividades',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                      letterSpacing: 0.3,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
-              flex: 4,
               child: CalendarView(activities: activities),
             ),
           ],
