@@ -23,7 +23,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
   late final ProfesorService _profesorService;
   
   // Opciones de filtros
-  final List<String> _estados = ['Borrador', 'Tramite', 'Aprobada', 'Concluida', 'Cancelada'];
+  final List<String> _estados = ['Pendiente', 'Aprobada', 'Cancelada'];
   final List<String> _cursos = ['1º ESO', '2º ESO', '3º ESO', '4º ESO', '1º Bach', '2º Bach'];
   
   // Profesores cargados dinámicamente

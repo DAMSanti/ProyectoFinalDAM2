@@ -44,6 +44,7 @@ class ActivityFormatters {
       case 'pendiente':
         return const Color(0xFFFFA726); // Naranja
       case 'rechazada':
+      case 'cancelada':
         return const Color(0xFFEF5350); // Rojo
       default:
         return Colors.grey;
@@ -58,6 +59,7 @@ class ActivityFormatters {
       case 'pendiente':
         return Icons.schedule_rounded;
       case 'rechazada':
+      case 'cancelada':
         return Icons.cancel_rounded;
       default:
         return Icons.info_rounded;

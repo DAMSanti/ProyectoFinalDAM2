@@ -407,11 +407,17 @@ class HoverableListItemState extends State<HoverableListItem> {
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF1976d2),
-                              Color(0xFF42A5F5),
-                              Color(0xFF64B5F6),
-                            ],
+                            colors: widget.actividad.tipo == 'Complementaria'
+                              ? [
+                                  Color(0xFF1976d2), // Azul oscuro
+                                  Color(0xFF42A5F5), // Azul medio
+                                  Color(0xFF64B5F6), // Azul claro
+                                ]
+                              : [
+                                  Color(0xFFE65100), // Naranja oscuro
+                                  Color(0xFFFF6F00), // Naranja medio
+                                  Color(0xFFFF9800), // Naranja claro
+                                ],
                           ),
                         ),
                       ),
