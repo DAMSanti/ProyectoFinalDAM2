@@ -31,7 +31,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     setState(() => _isLoading = true);
     
     try {
-      final actividades = await _actividadService.fetchActivities();
+      final actividades = await _actividadService.fetchActivities(pageSize: 100);
       setState(() {
         _actividades = actividades;
         _isLoading = false;

@@ -47,7 +47,7 @@ class AllActividadesState extends State<AllActividades> {
   }
 
   void _fetchActivities() async {
-    List<Actividad> actividades = await _actividadService.fetchActivities();
+    List<Actividad> actividades = await _actividadService.fetchActivities(pageSize: 100);
     setState(() {
       _allActividades = actividades;
     });
@@ -125,6 +125,17 @@ class AllActividadesState extends State<AllActividades> {
       
       filtered.add(actividad);
     }
+    
+    // Ordenar por fecha (más próximas primero)
+    filtered.sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.fini);
+        final dateB = DateTime.parse(b.fini);
+        return dateA.compareTo(dateB);
+      } catch (e) {
+        return 0; // Si hay error en el parsing, mantener orden original
+      }
+    });
     
     setState(() {
       _filteredActividades = filtered;
@@ -204,7 +215,7 @@ class OtrasActividadesState extends State<OtrasActividades> {
   }
 
   void _fetchActivities() async {
-    List<Actividad> actividades = await _actividadService.fetchActivities();
+    List<Actividad> actividades = await _actividadService.fetchActivities(pageSize: 100);
     setState(() {
       _otrasActividades = actividades;
     });
@@ -276,6 +287,17 @@ class OtrasActividadesState extends State<OtrasActividades> {
       
       filtered.add(actividad);
     }
+    
+    // Ordenar por fecha (más próximas primero)
+    filtered.sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.fini);
+        final dateB = DateTime.parse(b.fini);
+        return dateA.compareTo(dateB);
+      } catch (e) {
+        return 0; // Si hay error en el parsing, mantener orden original
+      }
+    });
     
     setState(() {
       _filteredOtrasActividades = filtered;

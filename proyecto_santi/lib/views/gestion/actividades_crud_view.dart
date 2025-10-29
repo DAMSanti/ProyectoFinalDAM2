@@ -33,7 +33,7 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
   Future<void> _loadActividades() async {
     setState(() => _isLoading = true);
     try {
-      final actividades = await _actividadService.fetchActivities();
+      final actividades = await _actividadService.fetchActivities(pageSize: 100);
       setState(() {
         _actividades = actividades;
         _filteredActividades = actividades;

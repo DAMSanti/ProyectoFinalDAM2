@@ -56,11 +56,12 @@ class ActividadService {
   /// Obtiene actividades futuras (hoy o posteriores)
   Future<List<Actividad>> fetchFutureActivities() async {
     try {
-      final allActivities = await fetchActivities();
+      // Solicitar todas las actividades sin paginación (pageSize = 100 es el máximo)
+      final allActivities = await fetchActivities(pageSize: 100);
       final currentDate = DateTime.now();
       final today = DateTime(currentDate.year, currentDate.month, currentDate.day);
       
-      return allActivities.where((actividad) {
+      final futureActivities = allActivities.where((actividad) {
         try {
           final activityDate = DateTime.parse(actividad.fini);
           final activityDay = DateTime(
@@ -74,6 +75,19 @@ class ActividadService {
           return false;
         }
       }).toList();
+      
+      // Ordenar por fecha (más próximas primero)
+      futureActivities.sort((a, b) {
+        try {
+          final dateA = DateTime.parse(a.fini);
+          final dateB = DateTime.parse(b.fini);
+          return dateA.compareTo(dateB);
+        } catch (e) {
+          return 0;
+        }
+      });
+      
+      return futureActivities;
     } catch (e) {
       print('[ActividadService ERROR] fetchFutureActivities: $e');
       rethrow;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
+import 'package:proyecto_santi/views/home/components/calendar/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:flutter/gestures.dart';
 import 'package:proyecto_santi/views/home/widgets/activities_header.dart';
