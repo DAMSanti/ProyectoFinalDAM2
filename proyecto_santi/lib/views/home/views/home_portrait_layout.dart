@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:flutter/gestures.dart';
+import 'package:proyecto_santi/views/home/widgets/activities_header.dart';
+import 'package:proyecto_santi/views/home/widgets/calendar_title.dart';
 
 class HomePortraitLayout extends StatelessWidget {
   final List<Actividad> activities;
@@ -19,53 +21,7 @@ class HomePortraitLayout extends StatelessWidget {
         return Column(
           children: [
             // Header compacto
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.event_available_rounded,
-                    color: Color(0xFF1976d2),
-                    size: 24,
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    'Próximas Actividades',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Color(0xFF1976d2),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  // Burbuja con número
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF1976d2),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF1976d2).withOpacity(0.3),
-                          offset: Offset(0, 2),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      '${activities.length}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ActivitiesHeader(activityCount: activities.length),
             // Carrusel con efecto de surco
             SizedBox(
               height: 180, // Altura fija para las cards
@@ -136,31 +92,15 @@ class HomePortraitLayout extends StatelessWidget {
                   ),
             SizedBox(height: 8),
             // Título del calendario
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.calendar_month_rounded,
-                    color: Color(0xFF1976d2),
-                    size: 22,
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    'Calendario de Actividades',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Color(0xFF1976d2),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            CalendarTitle(),
             Expanded(
-              child: CalendarView(activities: activities),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ModernSyncfusionCalendar(
+                  activities: activities,
+                  countryCode: 'ES',
+                ),
+              ),
             ),
           ],
         );

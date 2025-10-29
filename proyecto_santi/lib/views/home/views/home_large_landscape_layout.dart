@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:proyecto_santi/views/home/widgets/calendar_title.dart';
+import 'package:proyecto_santi/shared/widgets/state_widgets.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -83,26 +85,9 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                 ],
               ),
               child: widget.activities.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.event_busy_rounded,
-                            size: 48,
-                            color: Colors.grey.withOpacity(0.5),
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            'No hay actividades próximas',
-                            style: TextStyle(
-                              fontSize: 18, 
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                  ? EmptyState(
+                      message: 'No hay actividades próximas',
+                      icon: Icons.event_busy_rounded,
                     )
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
@@ -149,36 +134,16 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
           SizedBox(height: 24),
           
           // Título del calendario
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.calendar_month_rounded,
-                  color: Color(0xFF1976d2),
-                  size: 28,
-                ),
-                SizedBox(width: 12),
-                Text(
-                  'Calendario de Actividades',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Color(0xFF1976d2),
-                    letterSpacing: 0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+          CalendarTitle(),
           
           // Calendario
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
-              child: CalendarView(activities: widget.activities),
+              child: ModernSyncfusionCalendar(
+                activities: widget.activities,
+                countryCode: 'ES',
+              ),
             ),
           ),
         ],

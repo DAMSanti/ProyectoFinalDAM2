@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-import 'package:proyecto_santi/views/activityDetail/activity_detail_view.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
-import 'package:proyecto_santi/tema/theme.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
+import 'package:proyecto_santi/shared/helpers/activity_formatters.dart';
 
 class ActivityCardItem extends StatefulWidget {
   final Actividad actividad;
@@ -173,64 +170,10 @@ class ActivityInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // Formatear la fecha y hora desde campos separados
-    String formatearFechaHora() {
-      try {
-        // Parsear la fecha (fini está en formato YYYY-MM-DDT00:00:00)
-        final fecha = DateTime.parse(actividad.fini);
-        
-        // Combinar fecha con hora (hini está en formato HH:mm)
-        final partsHora = actividad.hini.split(':');
-        final hora = int.tryParse(partsHora[0]) ?? 0;
-        final minuto = int.tryParse(partsHora.length > 1 ? partsHora[1] : '0') ?? 0;
-        
-        final fechaHoraCompleta = DateTime(
-          fecha.year,
-          fecha.month,
-          fecha.day,
-          hora,
-          minuto,
-        );
-        
-        return DateFormat('dd-MM-yyyy HH:mm').format(fechaHoraCompleta);
-      } catch (e) {
-        // Fallback: mostrar fecha y hora como vienen
-        try {
-          final fecha = DateTime.parse(actividad.fini);
-          return '${DateFormat('dd-MM-yyyy').format(fecha)} ${actividad.hini}';
-        } catch (e2) {
-          return '${actividad.fini} ${actividad.hini}';
-        }
-      }
-    }
-
-    // Color según estado
-    Color getEstadoColor() {
-      switch (actividad.estado.toLowerCase()) {
-        case 'aprobada':
-          return Color(0xFF4CAF50);
-        case 'pendiente':
-          return Color(0xFFFFA726);
-        case 'rechazada':
-          return Color(0xFFEF5350);
-        default:
-          return Colors.grey;
-      }
-    }
-
-    // Icono según estado
-    IconData getEstadoIcon() {
-      switch (actividad.estado.toLowerCase()) {
-        case 'aprobada':
-          return Icons.check_circle_rounded;
-        case 'pendiente':
-          return Icons.schedule_rounded;
-        case 'rechazada':
-          return Icons.cancel_rounded;
-        default:
-          return Icons.info_rounded;
-      }
-    }
+    // Usar helpers centralizados
+    final fechaHora = ActivityFormatters.formatearFechaHora(actividad);
+    final estadoColor = ActivityFormatters.getEstadoColor(actividad.estado);
+    final estadoIcon = ActivityFormatters.getEstadoIcon(actividad.estado);
 
     return Container(
       decoration: BoxDecoration(
@@ -336,7 +279,7 @@ class ActivityInfo extends StatelessWidget {
                   ),
                   SizedBox(width: 5),
                   Text(
-                    formatearFechaHora(),
+                    fechaHora,
                     style: TextStyle(
                       fontSize: 12,
                       color: isDark ? Colors.white70 : Colors.black54,
@@ -349,10 +292,10 @@ class ActivityInfo extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: getEstadoColor().withOpacity(0.15),
+                  color: estadoColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: getEstadoColor().withOpacity(0.3),
+                    color: estadoColor.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -360,9 +303,9 @@ class ActivityInfo extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      getEstadoIcon(),
+                      estadoIcon,
                       size: 14,
-                      color: getEstadoColor(),
+                      color: estadoColor,
                     ),
                     SizedBox(width: 4),
                     Text(
@@ -370,7 +313,7 @@ class ActivityInfo extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: getEstadoColor(),
+                        color: estadoColor,
                       ),
                     ),
                   ],

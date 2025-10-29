@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/views/home/widgets/activities_header.dart';
 
 class HomeSmallLandscapeLayout extends StatelessWidget {
   final List<Actividad> activities;
@@ -22,45 +23,10 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
               child: Column(
                 children: [
                   // Header compacto
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.event_available_rounded,
-                          color: Color(0xFF1976d2),
-                          size: 20,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Actividades',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Color(0xFF1976d2),
-                            decoration: TextDecoration.none,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        // Burbuja con número
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF1976d2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${activities.length}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  ActivitiesHeader(
+                    activityCount: activities.length,
+                    isCompact: true,
+                    title: 'Actividades',
                   ),
                   // Lista vertical con surco
                   Expanded(
@@ -116,7 +82,13 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
             // Columna derecha: Calendario
             Expanded(
               flex: 1,
-              child: CalendarView(activities: activities),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ModernSyncfusionCalendar(
+                  activities: activities,
+                  countryCode: 'ES',
+                ),
+              ),
             ),
           ],
         );

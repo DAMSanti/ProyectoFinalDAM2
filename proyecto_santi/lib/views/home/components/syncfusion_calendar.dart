@@ -3,7 +3,9 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/services/holidays_service.dart';
-import 'package:intl/intl.dart';
+import 'package:proyecto_santi/views/home/helpers/calendar_helpers.dart';
+import 'package:proyecto_santi/views/home/widgets/calendar_appointment_widget.dart';
+import 'package:proyecto_santi/shared/constants/app_theme_constants.dart';
 
 class ModernSyncfusionCalendar extends StatefulWidget {
   final List<Actividad> activities;
@@ -61,8 +63,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
     super.dispose();
   }
 
-  String _getCacheKey(int year) => '${widget.countryCode}_$year';
-
+  /// Carga festivos para 3 años (anterior, actual, siguiente)
   Future<void> _loadHolidays() async {
     if (_isLoadingHolidays) return;
     
@@ -74,7 +75,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       bool holidaysUpdated = false;
       
       for (int y = year - 1; y <= year + 1; y++) {
-        final key = _getCacheKey(y);
+        final key = CalendarHelpers.getCacheKey(widget.countryCode, y);
         if (!_holidays.containsKey(key)) {
           final holidays = await HolidaysService.getHolidays(y, countryCode: widget.countryCode);
           if (mounted) {
@@ -99,8 +100,9 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
     }
   }
 
+  /// Obtiene el festivo para una fecha específica
   Holiday? _getHoliday(DateTime day) {
-    final key = _getCacheKey(day.year);
+    final key = CalendarHelpers.getCacheKey(widget.countryCode, day.year);
     final yearHolidays = _holidays[key];
     if (yearHolidays == null) return null;
 
@@ -114,87 +116,15 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
     }
   }
 
-  Color _getColorByEstado(String estado) {
-    switch (estado.toLowerCase()) {
-      case 'planificada':
-        return Color(0xFF2196F3); // Azul
-      case 'en curso':
-        return Color(0xFF4CAF50); // Verde
-      case 'completada':
-        return Color(0xFF9E9E9E); // Gris
-      case 'cancelada':
-        return Color(0xFFF44336); // Rojo
-      default:
-        return Color(0xFF1976d2); // Azul por defecto
-    }
-  }
-
+  /// Genera lista de appointments (actividades + festivos)
   List<Appointment> _getAppointments() {
     List<Appointment> appointments = [];
 
-    // Agregar actividades
+    // Agregar actividades usando CalendarHelpers
     for (var actividad in widget.activities) {
-      try {
-        // Parsear fechas
-        final startDate = DateTime.parse(actividad.fini);
-        final endDate = DateTime.parse(actividad.ffin);
-
-        // Parsear horas (formato "HH:mm:ss")
-        DateTime startTime = startDate;
-        DateTime endTime = endDate;
-
-        if (actividad.hini.isNotEmpty && actividad.hini != '00:00:00') {
-          final horaIniParts = actividad.hini.split(':');
-          if (horaIniParts.length >= 2) {
-            startTime = DateTime(
-              startDate.year,
-              startDate.month,
-              startDate.day,
-              int.parse(horaIniParts[0]),
-              int.parse(horaIniParts[1]),
-              horaIniParts.length > 2 ? int.parse(horaIniParts[2]) : 0,
-            );
-          }
-        }
-
-        if (actividad.hfin.isNotEmpty && actividad.hfin != '00:00:00') {
-          final horaFinParts = actividad.hfin.split(':');
-          if (horaFinParts.length >= 2) {
-            endTime = DateTime(
-              endDate.year,
-              endDate.month,
-              endDate.day,
-              int.parse(horaFinParts[0]),
-              int.parse(horaFinParts[1]),
-              horaFinParts.length > 2 ? int.parse(horaFinParts[2]) : 0,
-            );
-          }
-        }
-
-        // Si la hora de inicio y fin son iguales en el mismo día, agregar 1 hora
-        if (startTime.isAtSameMomentAs(endTime) && 
-            startDate.year == endDate.year && 
-            startDate.month == endDate.month && 
-            startDate.day == endDate.day) {
-          endTime = endTime.add(Duration(hours: 1));
-        }
-
-        // Determinar si es un evento de todo el día
-        // Si ambas horas son 00:00:00 o si dura más de un día, es isAllDay
-        final isMultiDay = endDate.difference(startDate).inDays > 0;
-        final hasSpecificHours = actividad.hini != '00:00:00' || actividad.hfin != '00:00:00';
-        final isAllDay = isMultiDay || !hasSpecificHours;
-
-        appointments.add(Appointment(
-          startTime: startTime,
-          endTime: endTime,
-          subject: actividad.titulo,
-          color: _getColorByEstado(actividad.estado),
-          isAllDay: isAllDay,
-          id: actividad.id,
-        ));
-      } catch (e) {
-        debugPrint('Error al parsear fecha de actividad ${actividad.id}: $e');
+      final appointment = CalendarHelpers.actividadToAppointment(actividad);
+      if (appointment != null) {
+        appointments.add(appointment);
       }
     }
 
@@ -203,7 +133,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       final displayDate = _calendarController.displayDate ?? DateTime.now();
       for (int yearOffset = -1; yearOffset <= 1; yearOffset++) {
         final year = displayDate.year + yearOffset;
-        final key = _getCacheKey(year);
+        final key = CalendarHelpers.getCacheKey(widget.countryCode, year);
         final yearHolidays = _holidays[key];
         
         if (yearHolidays != null) {
@@ -232,31 +162,31 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       children: [
         // Botones de selector de vista
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      Color(0xFF1a237e).withOpacity(0.08),
-                      Color(0xFF0d47a1).withOpacity(0.05),
+                      const Color(0xFF1a237e).withOpacity(0.08),
+                      const Color(0xFF0d47a1).withOpacity(0.05),
                     ]
                   : [
-                      Color(0xFFe3f2fd),
-                      Color(0xFFbbdefb).withOpacity(0.3),
+                      const Color(0xFFe3f2fd),
+                      const Color(0xFFbbdefb).withOpacity(0.3),
                     ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.15),
+              color: AppThemeConstants.primaryBlue.withOpacity(0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.08),
+                color: AppThemeConstants.primaryBlue.withOpacity(0.08),
                 blurRadius: 20,
-                offset: Offset(0, 5),
+                offset: const Offset(0, 5),
                 spreadRadius: -3,
               ),
             ],
@@ -313,24 +243,24 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 end: Alignment.bottomRight,
                 colors: isDark
                     ? [
-                        Color(0xFF1a237e).withOpacity(0.08),
-                        Color(0xFF0d47a1).withOpacity(0.05),
+                        const Color(0xFF1a237e).withOpacity(0.08),
+                        const Color(0xFF0d47a1).withOpacity(0.05),
                       ]
                     : [
-                        Color(0xFFe3f2fd),
-                        Color(0xFFbbdefb).withOpacity(0.3),
+                        const Color(0xFFe3f2fd),
+                        const Color(0xFFbbdefb).withOpacity(0.3),
                       ],
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Color(0xFF1976d2).withOpacity(0.15),
+                color: AppThemeConstants.primaryBlue.withOpacity(0.15),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.08),
+                  color: AppThemeConstants.primaryBlue.withOpacity(0.08),
                   blurRadius: 30,
-                  offset: Offset(0, 10),
+                  offset: const Offset(0, 10),
                   spreadRadius: -5,
                 ),
               ],
@@ -422,7 +352,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   textStyle: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1976d2),
+                    color: AppThemeConstants.primaryBlue,
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -430,17 +360,17 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 viewHeaderHeight: 45,
                 viewHeaderStyle: ViewHeaderStyle(
                   backgroundColor: isDark 
-                      ? Color(0xFF1976d2).withOpacity(0.1)
-                      : Color(0xFF1976d2).withOpacity(0.05),
+                      ? AppThemeConstants.primaryBlue.withOpacity(0.1)
+                      : AppThemeConstants.primaryBlue.withOpacity(0.05),
                   dayTextStyle: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1976d2),
+                    color: AppThemeConstants.primaryBlue,
                     letterSpacing: 1.2,
                   ),
                 ),
-                todayHighlightColor: Color(0xFF1976d2),
-                todayTextStyle: TextStyle(
+                todayHighlightColor: AppThemeConstants.primaryBlue,
+                todayTextStyle: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -448,7 +378,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 selectionDecoration: BoxDecoration(
                   color: Colors.transparent,
                   border: Border.all(
-                    color: Color(0xFF1976d2),
+                    color: AppThemeConstants.primaryBlue,
                     width: 2.5,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -472,7 +402,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     decoration: BoxDecoration(
                       // Prioridad: Hoy > Festivo > Transparente
                       color: isToday
-                          ? Color(0xFF1976d2).withOpacity(isDark ? 0.25 : 0.15)
+                          ? AppThemeConstants.primaryBlue.withOpacity(isDark ? 0.25 : 0.15)
                           : isHoliday
                               ? Colors.red.withOpacity(isDark ? 0.15 : 0.08)
                               : Colors.transparent,
@@ -480,7 +410,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                       // Borde extra para el día de hoy
                       border: isToday
                           ? Border.all(
-                              color: Color(0xFF1976d2).withOpacity(0.5),
+                              color: AppThemeConstants.primaryBlue.withOpacity(0.5),
                               width: 2,
                             )
                           : null,
@@ -540,187 +470,11 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   }
                 },
                 appointmentBuilder: (context, calendarAppointmentDetails) {
-                  final Appointment appointment = calendarAppointmentDetails.appointments.first;
-                  
-                  // En pantallas pequeñas, usar un Container super simple sin decoración compleja
-                  // Esto evita problemas de layout y errores de borderRadius
-                  if (isSmallScreen) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.5),
-                      decoration: BoxDecoration(
-                        color: appointment.color,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: Center(
-                        child: Text(
-                          appointment.subject,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ),
-                    );
-                  }
-                  
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      // Protección: Si el tamaño es muy pequeño, usar widget super simple
-                      if (constraints.maxHeight < 8 || constraints.maxWidth < 10) {
-                        return Container(
-                          color: appointment.color,
-                        );
-                      }
-                      
-                      // En vista día/semana/agenda
-                      if (_currentView != CalendarView.month) {
-                        final showFullText = constraints.maxHeight > 50;
-                        final showTime = !appointment.isAllDay && constraints.maxHeight > 35;
-                        
-                        // Calcular borderRadius seguro
-                        final maxRadius = constraints.maxHeight / 2;
-                        final borderRadius = maxRadius > 6 ? 6.0 : (maxRadius > 1 ? maxRadius - 1 : 0.0);
-                        
-                        return Container(
-                          constraints: BoxConstraints(minHeight: 16),
-                          margin: EdgeInsets.symmetric(vertical: 1, horizontal: 2),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                appointment.color,
-                                appointment.color.withOpacity(0.85),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(borderRadius),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: appointment.color.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Center(
-                            child: Text(
-                              showTime 
-                                  ? '${DateFormat('HH:mm').format(appointment.startTime)} ${appointment.subject}'
-                                  : appointment.subject,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: showFullText ? 11 : 9,
-                                fontWeight: FontWeight.bold,
-                                height: 1.1,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.5),
-                                    offset: Offset(0, 1),
-                                    blurRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: showFullText ? 2 : 1,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      }
-                      
-                      // Vista mes: diseño compacto con protecciones EXTREMAS
-                      final showText = constraints.maxHeight > 12;
-                      final showDot = constraints.maxHeight > 8;
-                      
-                      // Calcular borderRadius ULTRA seguro para vista mes
-                      // Tomar altura y ancho, usar el mínimo, restar márgenes y padding
-                      final availableHeight = constraints.maxHeight - 1; // margen vertical 0.5 * 2
-                      final availableWidth = constraints.maxWidth - 1; // margen horizontal 0.5 * 2
-                      final minDimension = availableHeight < availableWidth ? availableHeight : availableWidth;
-                      // El radio máximo es la mitad de la dimensión más pequeña, con margen extra
-                      final maxSafeRadius = (minDimension / 2) - 1; // Restar 1px extra de seguridad
-                      // Limitar a máximo 2px para ser ultra conservador
-                      final borderRadius = maxSafeRadius > 2 ? 2.0 : (maxSafeRadius > 0.5 ? maxSafeRadius : 0.0);
-                      
-                      return Container(
-                        constraints: BoxConstraints(minHeight: 6, minWidth: 10),
-                        margin: EdgeInsets.symmetric(vertical: 0.5, horizontal: 0.5),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              appointment.color,
-                              appointment.color.withOpacity(0.85),
-                              appointment.color.withOpacity(0.7),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            stops: [0.0, 0.5, 1.0],
-                          ),
-                          borderRadius: borderRadius > 0.5 ? BorderRadius.circular(borderRadius) : null,
-                          boxShadow: borderRadius > 1 ? [
-                            BoxShadow(
-                              color: appointment.color.withOpacity(0.25),
-                              blurRadius: 2,
-                              offset: Offset(0, 0.5),
-                              spreadRadius: 0,
-                            ),
-                          ] : null,
-                          border: borderRadius > 0.5 ? Border.all(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 0.5,
-                          ) : null,
-                        ),
-                        child: showText
-                            ? Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1.5),
-                                child: Row(
-                                  children: [
-                                    if (showDot) ...[
-                                      Container(
-                                        width: 2.5,
-                                        height: 2.5,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      SizedBox(width: 2.5),
-                                    ],
-                                    Expanded(
-                                      child: Text(
-                                        appointment.subject,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8.5,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: 0.1,
-                                          height: 1.0,
-                                          shadows: [
-                                            Shadow(
-                                              color: Colors.black.withOpacity(0.4),
-                                              offset: Offset(0, 0.5),
-                                              blurRadius: 1,
-                                            ),
-                                          ],
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                      );
-                    },
+                  final appointment = calendarAppointmentDetails.appointments.first as Appointment;
+                  return CalendarAppointmentWidget(
+                    appointment: appointment,
+                    currentView: _currentView,
+                    isSmallScreen: isSmallScreen,
                   );
                 },
               ),
