@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/func.dart';
-import 'package:proyecto_santi/views/home/components/home_user.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
@@ -56,11 +55,13 @@ class MarcoDesktop extends StatelessWidget {
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
   final String? title;
+  final int? activitiesCount; // Contador de actividades (opcional)
 
   const DesktopBar({
     super.key, 
     required this.onToggleTheme,
     this.title,
+    this.activitiesCount, // Nuevo parámetro opcional
   });
 
   @override
@@ -89,56 +90,196 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               elevation: 0,
               centerTitle: true,
               automaticallyImplyLeading: false,
-              title: Text(
-                title ?? 'Próximas Actividades',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2), // Azul consistente
-                  letterSpacing: 0.5,
-                  fontFamily: 'Roboto', // Fuente explícita
-                ),
-              ),
+              title: activitiesCount != null
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Si el ancho es muy pequeño, mostrar versión compacta
+                        if (constraints.maxWidth < 400) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.event_available_rounded,
+                                color: Color(0xFF1976d2),
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  'Actividades',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1976d2),
+                                    letterSpacing: 0.5,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF1976d2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '$activitiesCount',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        
+                        // Versión completa
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.event_available_rounded,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Flexible(
+                              child: Text(
+                                title ?? 'Próximas Actividades',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1976d2),
+                                  letterSpacing: 0.5,
+                                  fontFamily: 'Roboto',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    offset: Offset(0, 2),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                '$activitiesCount',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  : Text(
+                      title ?? 'Próximas Actividades',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1976d2),
+                        letterSpacing: 0.5,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
               leading: Padding(
                 padding: const EdgeInsets.only(left: 16.0, top: 12.0),
                 child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      UserAvatar(
-                        user: currentUser,
-                        size: 48,
-                        fontSize: 18,
-                      ),
-                      SizedBox(width: 12),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (currentUser?.nombre != null)
-                            Text(
-                              currentUser!.nombre,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : Color(0xFF1976d2),
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => _showAccountSettingsDialog(context, currentUser, isDark),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            UserAvatar(
+                              user: currentUser,
+                              size: 48,
+                              fontSize: 18,
                             ),
-                          SizedBox(height: 4),
-                          if (currentUser?.rol != null)
-                            Text(
-                              currentUser!.rol,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                            SizedBox(width: 12),
+                            Flexible(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (currentUser?.nombre != null)
+                                    Text(
+                                      currentUser!.nombre,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark ? Colors.white : Color(0xFF1976d2),
+                                        height: 1.2,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  if (currentUser?.rol != null)
+                                    Text(
+                                      currentUser!.rol,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                                        height: 1.2,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                ],
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                        ],
+                            SizedBox(width: 8),
+                            Icon(
+                              Icons.settings,
+                              size: 18,
+                              color: isDark ? Colors.white70 : Color(0xFF1976d2).withOpacity(0.7),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -169,6 +310,208 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize {
     return Size.fromHeight(92);
+  }
+
+  void _showAccountSettingsDialog(BuildContext context, dynamic currentUser, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.account_circle,
+                color: isDark ? Colors.amber : Color(0xFF1976d2),
+                size: 28,
+              ),
+              SizedBox(width: 12),
+              Text('Configuración de Cuenta'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Container(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Avatar y nombre del usuario
+                  Center(
+                    child: Column(
+                      children: [
+                        UserAvatar(
+                          user: currentUser,
+                          size: 80,
+                          fontSize: 32,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          currentUser?.nombre ?? 'Usuario',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Color(0xFF1976d2),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.amber.withOpacity(0.2) : Color(0xFF1976d2).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            currentUser?.rol ?? 'Rol',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? Colors.amber : Color(0xFF1976d2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  
+                  Divider(),
+                  SizedBox(height: 16),
+                  
+                  // Información del usuario
+                  Text(
+                    'Información Personal',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  
+                  _buildInfoTile(
+                    icon: Icons.email,
+                    label: 'Correo',
+                    value: currentUser?.correo ?? 'No disponible',
+                    isDark: isDark,
+                  ),
+                  SizedBox(height: 8),
+                  
+                  _buildInfoTile(
+                    icon: Icons.badge,
+                    label: 'DNI',
+                    value: currentUser?.dni?.isNotEmpty == true ? currentUser!.dni : 'No disponible',
+                    isDark: isDark,
+                  ),
+                  
+                  SizedBox(height: 24),
+                  Divider(),
+                  SizedBox(height: 16),
+                  
+                  // Opciones de configuración (placeholder)
+                  Text(
+                    'Opciones',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.lock,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Cambiar Contraseña'),
+                    subtitle: Text('Próximamente disponible'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Notificaciones'),
+                    subtitle: Text('Próximamente disponible'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.language,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Idioma'),
+                    subtitle: Text('Español (predeterminado)'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: isDark ? Colors.white70 : Color(0xFF1976d2),
+            size: 20,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white60 : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

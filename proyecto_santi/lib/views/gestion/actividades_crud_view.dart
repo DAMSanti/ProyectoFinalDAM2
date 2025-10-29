@@ -263,9 +263,8 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       case 'pendiente':
         return Colors.orange;
       case 'rechazada':
-        return Colors.red;
       case 'cancelada':
-        return Colors.grey;
+        return Colors.red;
       default:
         return Colors.blue;
     }

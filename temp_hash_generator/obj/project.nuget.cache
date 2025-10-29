@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "gZ4H7qwB3ho=",
+  "success": true,
+  "projectFilePath": "G:\\ProyectoFinalCSharp\\ProyectoFinalDAM2\\temp_hash_generator\\BCryptHashGenerator.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rathm\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

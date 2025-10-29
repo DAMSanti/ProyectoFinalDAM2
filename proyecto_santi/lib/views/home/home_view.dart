@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/app_bar.dart';
-import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/views/home/views/home_portrait_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/home/views/home_large_landscape_layout.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
-import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
+import 'package:proyecto_santi/shared/widgets/state_widgets.dart';
 
 class HomeView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -46,11 +44,14 @@ class HomeViewState extends State<HomeView> {
           future: _futureActivities,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return LoadingState();
             } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+              return ErrorState(error: snapshot.error.toString());
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No hay actividades próximas.'));
+              return EmptyState(
+                message: 'No hay actividades próximas',
+                icon: Icons.event_busy_rounded,
+              );
             } else {
               return _buildResponsiveLayout(context, snapshot.data!);
             }

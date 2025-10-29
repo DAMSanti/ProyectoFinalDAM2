@@ -43,7 +43,7 @@ public class ActividadService : IActividadService
     public async Task<PaginatedResult<ActividadListDto>> GetAllAsync(QueryParameters queryParams)
     {
         var query = _context.Actividades
-            .Include(a => a.Departamento)
+            .Include(a => a.Responsable)
             .AsQueryable();
 
         // B�squeda
@@ -73,8 +73,9 @@ public class ActividadService : IActividadService
                 Nombre = a.Nombre,
                 Descripcion = a.Descripcion,
                 FechaInicio = a.FechaInicio,
-                Aprobada = a.Aprobada,
-                DepartamentoNombre = a.Departamento != null ? a.Departamento.Nombre : null
+                FechaFin = a.FechaFin,
+                Estado = a.Estado,
+                Tipo = a.Tipo,
             })
             .ToListAsync();
 
@@ -90,7 +91,7 @@ public class ActividadService : IActividadService
     public async Task<ActividadDto?> GetByIdAsync(int id)
     {
         var actividad = await _context.Actividades
-            .Include(a => a.Departamento)
+            .Include(a => a.Responsable)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
             .Include(a => a.Alojamiento)
@@ -136,9 +137,10 @@ public class ActividadService : IActividadService
             FechaInicio = dto.FechaInicio,
             FechaFin = dto.FechaFin,
             PresupuestoEstimado = dto.PresupuestoEstimado,
-            DepartamentoId = dto.DepartamentoId,
+            ResponsableId = dto.ResponsableId,
             LocalizacionId = dto.LocalizacionId,
-            EmpTransporteId = dto.EmpTransporteId
+            EmpTransporteId = dto.EmpTransporteId,
+            Tipo = dto.Tipo
         };
 
         if (folleto != null)
@@ -168,8 +170,9 @@ public class ActividadService : IActividadService
         if (dto.PresupuestoEstimado.HasValue) actividad.PresupuestoEstimado = dto.PresupuestoEstimado;
         if (dto.CostoReal.HasValue) actividad.CostoReal = dto.CostoReal;
         if (dto.PrecioTransporte.HasValue) actividad.PrecioTransporte = dto.PrecioTransporte;
-        if (dto.Aprobada.HasValue) actividad.Aprobada = dto.Aprobada.Value;
-        if (dto.DepartamentoId.HasValue) actividad.DepartamentoId = dto.DepartamentoId;
+        if (dto.Estado != null) actividad.Estado = dto.Estado;
+        if (dto.Tipo != null) actividad.Tipo = dto.Tipo;
+        if (dto.ResponsableId != null) actividad.ResponsableId = dto.ResponsableId;
         if (dto.LocalizacionId.HasValue) actividad.LocalizacionId = dto.LocalizacionId;
         // Soportar tanto EmpTransporteId como EmpresaTransporteId (compatibilidad con Flutter)
         if (dto.EmpresaTransporteId.HasValue) actividad.EmpTransporteId = dto.EmpresaTransporteId;
@@ -211,7 +214,7 @@ public class ActividadService : IActividadService
 
         // Recargar la actividad con todas las relaciones para MapToDto
         var actividadActualizada = await _context.Actividades
-            .Include(a => a.Departamento)
+            .Include(a => a.Responsable)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
             .Include(a => a.Alojamiento)
@@ -269,9 +272,18 @@ public class ActividadService : IActividadService
             CostoReal = actividad.CostoReal,
             PrecioTransporte = actividad.PrecioTransporte,
             FolletoUrl = actividad.FolletoUrl,
-            Aprobada = actividad.Aprobada,
-            DepartamentoId = actividad.DepartamentoId,
-            DepartamentoNombre = actividad.Departamento?.Nombre,
+            Estado = actividad.Estado,
+            Tipo = actividad.Tipo,
+            ResponsableId = actividad.ResponsableId,
+            Responsable = actividad.Responsable != null ? new ProfesorSimpleDto
+            {
+                Id = actividad.Responsable.Uuid.GetHashCode(), // Convertir Guid a int
+                Uuid = actividad.Responsable.Uuid,
+                Nombre = actividad.Responsable.Nombre,
+                Apellidos = actividad.Responsable.Apellidos,
+                Email = actividad.Responsable.Correo,
+                FotoUrl = actividad.Responsable.FotoUrl
+            } : null,
             LocalizacionId = actividad.LocalizacionId,
             LocalizacionNombre = actividad.Localizacion?.Nombre,
             EmpTransporteId = actividad.EmpTransporteId,
@@ -345,13 +357,16 @@ public class ActividadService : IActividadService
     {
         var grupos = await _context.Set<GrupoPartic>()
             .Include(gp => gp.Grupo)
+                .ThenInclude(g => g.Curso)
             .Where(gp => gp.ActividadId == actividadId)
             .Select(gp => new GrupoParticipanteDto
             {
                 GrupoId = gp.GrupoId,
                 GrupoNombre = gp.Grupo.Nombre,
                 NumeroAlumnos = gp.Grupo.NumeroAlumnos,
-                NumeroParticipantes = gp.NumeroParticipantes
+                NumeroParticipantes = gp.NumeroParticipantes,
+                CursoId = gp.Grupo.CursoId,
+                CursoNombre = gp.Grupo.Curso != null ? gp.Grupo.Curso.Nombre : null
             })
             .ToListAsync();
 

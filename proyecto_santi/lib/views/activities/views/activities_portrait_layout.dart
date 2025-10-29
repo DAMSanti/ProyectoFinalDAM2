@@ -3,7 +3,9 @@ import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
-import 'package:proyecto_santi/views/activities/components/activities_busqueda.dart';
+import 'package:proyecto_santi/views/activities/components/activities_search_bar.dart';
+import 'package:proyecto_santi/views/activities/components/activities_section_header.dart';
+import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
 
 class ActivitiesPortraitLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -21,6 +23,14 @@ class ActivitiesPortraitLayout extends StatefulWidget {
 
 class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
   String searchQuery = '';
+  Map<String, dynamic> filters = {
+    'fecha': null,
+    'estado': null,
+    'curso': null,
+    'profesorId': null,
+  };
+  int _allActivitiesCount = 0;
+  int _userActivitiesCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -43,80 +53,87 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                     : MenuLandscape();
               },
             ),
-            body: Column(
-              children: [
-                Busqueda(
-                  onSearchQueryChanged: (query) {
-                    setState(() {
-                      searchQuery = query;
-                    });
-                  },
-                  onFilterSelected: (filter, date, course, state) {
-                    // Handle filter selection
-                  },
-                ),
-                Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(12.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            offset: Offset(-4, -4),
-                            blurRadius: 10.0,
-                            spreadRadius: 1.0,
-                            blurStyle: BlurStyle.inner,
-                          ),
-                        ],
-                      ),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(height: 8),
+                  
+                  // Barra de búsqueda moderna
+                  ActivitiesSearchBar(
+                    onSearchQueryChanged: (query) {
+                      setState(() {
+                        searchQuery = query;
+                      });
+                    },
+                    filters: filters,
+                    onFiltersChanged: (newFilters) {
+                      setState(() {
+                        filters = newFilters;
+                      });
+                    },
+                  ),
+                  
+                  SizedBox(height: 8),
+                  
+                  // Sección: Todas las actividades
+                  ActivitiesSectionHeader(
+                    title: 'Todas las Actividades',
+                    icon: Icons.grid_view_rounded,
+                    count: _allActivitiesCount,
+                  ),
+                  
+                  Expanded(
+                    child: ActivitiesListContainer(
                       child: AllActividades(
                         selectedFilter: null,
                         searchQuery: searchQuery,
-                        selectedDate: null,
-                        selectedCourse: null,
-                        selectedState: null,
+                        selectedDate: filters['fecha'],
+                        selectedCourse: filters['curso'],
+                        selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
+                        onCountChanged: (count) {
+                          if (mounted) {
+                            setState(() {
+                              _allActivitiesCount = count;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 24.0,
-                  child: Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(12.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            offset: Offset(-4, -4),
-                            blurRadius: 10.0,
-                            spreadRadius: 1.0,
-                            blurStyle: BlurStyle.inner,
-                          ),
-                        ],
-                      ),
+                  
+                  SizedBox(height: 8),
+                  
+                  // Sección: Tus actividades
+                  ActivitiesSectionHeader(
+                    title: 'Tus Actividades',
+                    icon: Icons.person_rounded,
+                    count: _userActivitiesCount,
+                  ),
+                  
+                  Expanded(
+                    child: ActivitiesListContainer(
                       child: OtrasActividades(
                         selectedFilter: null,
                         searchQuery: searchQuery,
-                        selectedDate: null,
-                        selectedCourse: null,
-                        selectedState: null,
+                        selectedDate: filters['fecha'],
+                        selectedCourse: filters['curso'],
+                        selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
+                        onCountChanged: (count) {
+                          if (mounted) {
+                            setState(() {
+                              _userActivitiesCount = count;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
-                ),
-              ],
+                  
+                  SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ],

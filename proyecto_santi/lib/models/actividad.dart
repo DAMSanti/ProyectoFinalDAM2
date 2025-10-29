@@ -1,5 +1,4 @@
 import 'package:proyecto_santi/models/profesor.dart';
-import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
@@ -28,7 +27,7 @@ class Actividad {
   final String? incidencias;
   final String? urlFolleto;
   final Profesor? solicitante;
-  final Departamento? departamento;
+  final Profesor? responsable;
   final Localizacion? localizacion;
   final List<Localizacion> localizaciones;
   final double? importePorAlumno;
@@ -59,7 +58,7 @@ class Actividad {
     this.incidencias,
     this.urlFolleto,
     this.solicitante,
-    this.departamento,
+    this.responsable,
     this.localizacion,
     this.localizaciones = const [],
     this.importePorAlumno,
@@ -69,7 +68,6 @@ class Actividad {
 
   factory Actividad.fromJson(Map<String, dynamic> json) {
     // Mapear desde la API de C# ACEXAPI
-    final now = DateTime.now().toIso8601String();
     
     // Parsear el solicitante si viene en el JSON
     Profesor? solicitante;
@@ -77,18 +75,10 @@ class Actividad {
       solicitante = Profesor.fromJson(json['solicitante']);
     }
     
-    // Parsear el departamento - la API puede devolver el objeto completo o solo el nombre
-    Departamento? departamento;
-    if (json['departamento'] != null && json['departamento'] is Map) {
-      // Viene el objeto completo desde la API antigua
-      departamento = Departamento.fromJson(json['departamento']);
-    } else if (json['departamentoId'] != null && json['departamentoNombre'] != null) {
-      // Desde ACEXAPI - viene separado
-      departamento = Departamento(
-        id: json['departamentoId'],
-        codigo: '', // No tenemos el código en el DTO
-        nombre: json['departamentoNombre'],
-      );
+    // Parsear el responsable si viene en el JSON
+    Profesor? responsable;
+    if (json['responsable'] != null) {
+      responsable = Profesor.fromJson(json['responsable']);
     }
     
     // Parsear el alojamiento si viene en el JSON
@@ -124,37 +114,60 @@ class Actividad {
       );
     }
     
-    // Parsear fechas de inicio y fin
-    final fechaInicioStr = json['fechaInicio']?.toString() ?? json['fini']?.toString() ?? now;
-    final fechaFinStr = json['fechaFin']?.toString() ?? json['ffin']?.toString() ?? now;
+    // Parsear fechas de inicio y fin desde DateTime completos
+    DateTime? fechaInicio;
+    DateTime? fechaFin;
     
-    // Extraer horas de las fechas si no vienen por separado
-    String horaInicio = json['hini']?.toString() ?? '00:00';
-    String horaFin = json['hfin']?.toString() ?? '00:00';
+    // Intentar parsear fechaInicio desde varios campos posibles
+    if (json['fechaInicio'] != null) {
+      fechaInicio = DateTime.parse(json['fechaInicio'].toString());
+    } else if (json['fini'] != null) {
+      fechaInicio = DateTime.parse(json['fini'].toString());
+    }
     
-    // Si hini/hfin son "00:00", intentar extraer de fechaInicio/fechaFin
-    if (horaInicio == '00:00' && fechaInicioStr != now) {
+    // Intentar parsear fechaFin desde varios campos posibles
+    if (json['fechaFin'] != null) {
       try {
-        final dt = DateTime.parse(fechaInicioStr);
-        horaInicio = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+        fechaFin = DateTime.parse(json['fechaFin'].toString());
       } catch (e) {
-        // Si falla el parseo, mantener 00:00
+        // Error silencioso, se maneja más abajo
+      }
+    } else if (json['ffin'] != null) {
+      try {
+        fechaFin = DateTime.parse(json['ffin'].toString());
+      } catch (e) {
+        // Error silencioso, se maneja más abajo
       }
     }
     
-    if (horaFin == '00:00' && fechaFinStr != now) {
-      try {
-        final dt = DateTime.parse(fechaFinStr);
-        horaFin = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-      } catch (e) {
-        // Si falla el parseo, mantener 00:00
-      }
+    // Si no se pudo parsear, usar fecha actual
+    if (fechaInicio == null) {
+      fechaInicio = DateTime.now();
     }
+    if (fechaFin == null) {
+      fechaFin = fechaInicio; // Si no hay fecha fin, usar la de inicio (actividad de un día)
+    }
+    
+    // Extraer solo la parte de fecha (sin hora) en formato ISO
+    final fechaInicioStr = '${fechaInicio.year.toString().padLeft(4, '0')}-'
+        '${fechaInicio.month.toString().padLeft(2, '0')}-'
+        '${fechaInicio.day.toString().padLeft(2, '0')}T00:00:00';
+    
+    final fechaFinStr = '${fechaFin.year.toString().padLeft(4, '0')}-'
+        '${fechaFin.month.toString().padLeft(2, '0')}-'
+        '${fechaFin.day.toString().padLeft(2, '0')}T00:00:00';
+    
+    // Extraer horas desde los DateTime o desde campos separados
+    String horaInicio = json['hini']?.toString() ?? 
+        '${fechaInicio.hour.toString().padLeft(2, '0')}:${fechaInicio.minute.toString().padLeft(2, '0')}';
+    
+    String horaFin = json['hfin']?.toString() ?? 
+        '${fechaFin.hour.toString().padLeft(2, '0')}:${fechaFin.minute.toString().padLeft(2, '0')}';
     
     return Actividad(
       id: json['id'] ?? 0,
       titulo: json['nombre']?.toString() ?? json['titulo']?.toString() ?? 'Sin título',
-      tipo: json['tipo']?.toString() ?? 'Actividad',
+      tipo: json['tipo']?.toString() ?? 'Complementaria',
       descripcion: json['descripcion']?.toString(),
       fini: fechaInicioStr,
       ffin: fechaFinStr,
@@ -170,12 +183,12 @@ class Actividad {
       precioAlojamiento: (json['precioAlojamiento'] as num?)?.toDouble(),
       alojamiento: alojamiento, // Cambio: ahora es un objeto Alojamiento
       comentarios: json['comentarios']?.toString(),
-      estado: (json['aprobada'] == true) ? 'Aprobada' : (json['estado']?.toString() ?? 'Pendiente'),
+      estado: json['estado']?.toString() ?? 'Pendiente',
       comentEstado: json['comentEstado']?.toString(),
       incidencias: json['incidencias']?.toString(),
       urlFolleto: json['folletoUrl']?.toString() ?? json['urlFolleto']?.toString(),
       solicitante: solicitante,
-      departamento: departamento,
+      responsable: responsable,
       localizacion: localizacion,
       localizaciones: localizaciones,
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
@@ -204,12 +217,12 @@ class Actividad {
       'precioAlojamiento': precioAlojamiento,
       'alojamientoId': alojamiento?.id, // Enviar solo el ID del alojamiento
       'comentarios': comentarios,
-      'aprobada': estado == 'Aprobada', // La API espera 'aprobada' como bool
+      'estado': estado, // Enviar el estado como string
       'comentEstado': comentEstado,
       'incidencias': incidencias,
       'folletoUrl': urlFolleto, // La API espera 'folletoUrl'
-      'solicitanteId': solicitante?.uuid, // Enviar solo el ID
-      'departamentoId': departamento?.id, // Enviar solo el ID
+      'responsableId': responsable?.uuid, // Enviar el ID del responsable
+      'solicitanteId': solicitante?.uuid, // Mantener por compatibilidad
       'localizacionId': localizacion?.id, // Enviar solo el ID
       'presupuestoEstimado': presupuestoEstimado ?? importePorAlumno,
       'costoReal': costoReal,

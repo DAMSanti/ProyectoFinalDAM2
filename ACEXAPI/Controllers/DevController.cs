@@ -36,7 +36,7 @@ public class DevController : ControllerBase
     {
         // Eliminar usuarios existentes de prueba
         var existingUsers = await _context.Usuarios
-            .Where(u => u.Email.EndsWith("@acexapi.com"))
+            .Where(u => u.NombreUsuario.Contains("demo") || u.NombreUsuario == "admin")
             .ToListAsync();
         
         _context.Usuarios.RemoveRange(existingUsers);
@@ -47,32 +47,28 @@ public class DevController : ControllerBase
         {
             new Usuario
             {
-                Email = "admin@acexapi.com",
-                NombreCompleto = "Administrador ACEX",
+                NombreUsuario = "admin",
                 Password = _passwordService.HashPassword("admin123"),
                 Rol = "Administrador",
                 Activo = true
             },
             new Usuario
             {
-                Email = "profesor@acexapi.com",
-                NombreCompleto = "Profesor Demo",
+                NombreUsuario = "profesor_demo",
                 Password = _passwordService.HashPassword("profesor123"),
                 Rol = "Profesor",
                 Activo = true
             },
             new Usuario
             {
-                Email = "coordinador@acexapi.com",
-                NombreCompleto = "Coordinador Demo",
+                NombreUsuario = "coordinador_demo",
                 Password = _passwordService.HashPassword("coord123"),
                 Rol = "Coordinador",
                 Activo = true
             },
             new Usuario
             {
-                Email = "usuario@acexapi.com",
-                NombreCompleto = "Usuario Demo",
+                NombreUsuario = "usuario_demo",
                 Password = _passwordService.HashPassword("usuario123"),
                 Rol = "Usuario",
                 Activo = true
@@ -89,11 +85,10 @@ public class DevController : ControllerBase
             message = "Usuarios de prueba creados exitosamente",
             usuarios = usuarios.Select(u => new
             {
-                email = u.Email,
-                nombreCompleto = u.NombreCompleto,
+                nombreUsuario = u.NombreUsuario,
                 rol = u.Rol,
                 // NO devolver contraseñas en producción
-                passwordHint = u.Email.Replace("@acexapi.com", "123")
+                passwordHint = u.NombreUsuario + "123"
             })
         });
     }
@@ -118,8 +113,7 @@ public class DevController : ControllerBase
             .Select(u => new
             {
                 u.Id,
-                u.Email,
-                u.NombreCompleto,
+                NombreUsuario = u.NombreUsuario,
                 u.Rol,
                 u.Activo,
                 u.FechaCreacion
@@ -155,7 +149,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(7),
                 FechaFin = now.AddDays(7),
                 PresupuestoEstimado = 500.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             },
             new Actividad
@@ -165,7 +159,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(14),
                 FechaFin = now.AddDays(16),
                 PresupuestoEstimado = 800.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             },
             new Actividad
@@ -175,7 +169,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(30),
                 FechaFin = now.AddDays(37),
                 PresupuestoEstimado = 3500.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             },
             new Actividad
@@ -185,7 +179,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(21),
                 FechaFin = now.AddDays(21),
                 PresupuestoEstimado = 1200.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             },
             new Actividad
@@ -195,7 +189,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(10),
                 FechaFin = now.AddDays(10),
                 PresupuestoEstimado = 600.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             },
             new Actividad
@@ -205,7 +199,7 @@ public class DevController : ControllerBase
                 FechaInicio = now.AddDays(45),
                 FechaFin = now.AddDays(47),
                 PresupuestoEstimado = 2000.00m,
-                Aprobada = true,
+                Estado = EstadoActividad.Aprobada.ToString(),
                 FechaCreacion = DateTime.UtcNow
             }
         };

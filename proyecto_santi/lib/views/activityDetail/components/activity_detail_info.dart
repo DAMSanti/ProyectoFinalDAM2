@@ -457,10 +457,12 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.business, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
+                Icon(Icons.person, color: Color(0xFF1976d2), size: !isWeb ? 16.dg : 5.sp),
                 SizedBox(width: 8),
                 Text(
-                  widget.actividad.departamento?.nombre ?? 'Sin departamento',
+                  widget.actividad.responsable != null 
+                      ? '${widget.actividad.responsable!.nombre} ${widget.actividad.responsable!.apellidos}'
+                      : 'Sin responsable',
                   style: TextStyle(fontSize: !isWeb ? 13.dg : 4.sp),
                 ),
               ],

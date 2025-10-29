@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:flutter/gestures.dart';
+import 'package:proyecto_santi/views/home/widgets/activities_header.dart';
+import 'package:proyecto_santi/views/home/widgets/calendar_title.dart';
 
 class HomePortraitLayout extends StatelessWidget {
   final List<Actividad> activities;
@@ -18,77 +20,28 @@ class HomePortraitLayout extends StatelessWidget {
       builder: (context, constraints) {
         return Column(
           children: [
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  // Header compacto
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.event_available_rounded,
-                          color: Color(0xFF1976d2),
-                          size: 24,
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Próximas Actividades',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Color(0xFF1976d2),
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        // Burbuja con número
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF1976d2),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF1976d2).withOpacity(0.3),
-                                offset: Offset(0, 2),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            '${activities.length}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Carrusel con efecto de surco
-                  Expanded(
-                    child: Container(
+            // Header compacto
+            ActivitiesHeader(activityCount: activities.length),
+            // Carrusel con efecto de surco
+            SizedBox(
+              height: 180, // Altura fija para las cards
+              child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
                         color: isDark 
-                            ? Color(0xFF1A2332).withOpacity(0.4)
-                            : Color(0xFFE3F2FD).withOpacity(0.6),
+                            ? const Color.fromRGBO(26, 35, 50, 0.4)
+                            : const Color.fromRGBO(227, 242, 253, 0.6),
                         borderRadius: BorderRadius.circular(16.0),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Color.fromRGBO(0, 0, 0, 0.08),
                             offset: Offset(0, 2),
                             blurRadius: 8,
                             spreadRadius: -2,
                           ),
                           // Sombra interna para efecto de surco
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
+                            color: Color.fromRGBO(0, 0, 0, 0.12),
                             offset: Offset(0, -1),
                             blurRadius: 6,
                             spreadRadius: -3,
@@ -137,13 +90,17 @@ class HomePortraitLayout extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8),
-                ],
-              ),
-            ),
+            SizedBox(height: 8),
+            // Título del calendario
+            CalendarTitle(),
             Expanded(
-              flex: 4,
-              child: CalendarView(activities: activities),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ModernSyncfusionCalendar(
+                  activities: activities,
+                  countryCode: 'ES',
+                ),
+              ),
             ),
           ],
         );

@@ -1,0 +1,20 @@
+TABLE_NAME
+----------
+__EFMigrationsHistory
+Actividades
+ActividadLocalizaciones
+Alojamientos
+Contratos
+Cursos
+Departamentos
+EmpTransportes
+Fotos
+GrupoPartics
+Grupos
+Localizaciones
+Profesores
+ProfParticipantes
+ProfResponsables
+Usuarios
+
+(16 filas afectadas)

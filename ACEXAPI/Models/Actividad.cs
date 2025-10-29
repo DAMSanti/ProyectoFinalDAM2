@@ -28,7 +28,13 @@ public class Actividad
 
     public string? FolletoUrl { get; set; }
 
-    public bool Aprobada { get; set; } = false;
+    [Required]
+    [MaxLength(20)]
+    public string Estado { get; set; } = EstadoActividad.Pendiente.ToString();
+
+    [Required]
+    [MaxLength(20)]
+    public string Tipo { get; set; } = "Complementaria";
 
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
@@ -49,14 +55,16 @@ public class Actividad
     public int? AlojamientoId { get; set; }
     public Alojamiento? Alojamiento { get; set; }
 
-    public int? DepartamentoId { get; set; }
-    public Departamento? Departamento { get; set; }
-
     public int? LocalizacionId { get; set; }
     public Localizacion? Localizacion { get; set; }
 
     public int? EmpTransporteId { get; set; }
     public EmpTransporte? EmpTransporte { get; set; }
+
+    // Profesor Responsable de la actividad
+    public Guid? ResponsableId { get; set; }
+    [ForeignKey("ResponsableId")]
+    public Profesor? Responsable { get; set; }
 
     public ICollection<GrupoPartic> GruposParticipantes { get; set; } = new List<GrupoPartic>();
     public ICollection<ProfParticipante> ProfesoresParticipantes { get; set; } = new List<ProfParticipante>();

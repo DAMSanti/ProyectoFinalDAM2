@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/marco_desktop.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
-import 'package:proyecto_santi/views/activities/components/activities_busqueda.dart';
+import 'package:proyecto_santi/views/activities/components/activities_search_bar.dart';
+import 'package:proyecto_santi/views/activities/components/activities_section_header.dart';
+import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
 
 class ActivitiesLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -17,7 +18,15 @@ class ActivitiesLargeLandscapeLayout extends StatefulWidget {
 
 class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscapeLayout> {
   String searchQuery = '';
+  Map<String, dynamic> filters = {
+    'fecha': null,
+    'estado': null,
+    'curso': null,
+    'profesorId': null,
+  };
   final ValueNotifier<List<Actividad>> _filteredActivitiesNotifier = ValueNotifier([]);
+  int _allActivitiesCount = 0;
+  int _userActivitiesCount = 0;
 
   @override
   void initState() {
@@ -27,7 +36,13 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
 
   void _filterActivities() {
     _filteredActivitiesNotifier.value = widget.activities.where((actividad) {
-      return actividad.titulo.toLowerCase().contains(searchQuery.toLowerCase());
+      // Filtro por búsqueda de texto
+      final matchesSearch = actividad.titulo.toLowerCase().contains(searchQuery.toLowerCase());
+      
+      // Aquí puedes agregar más lógica de filtrado basada en filters
+      // Por ahora solo filtramos por texto
+      
+      return matchesSearch;
     }).toList();
   }
 
@@ -50,90 +65,84 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  Busqueda(
+                  // Barra de búsqueda moderna
+                  ActivitiesSearchBar(
                     onSearchQueryChanged: (query) {
                       setState(() {
                         searchQuery = query;
                         _filterActivities();
                       });
                     },
-                    onFilterSelected: (filter, date, course, state) {
-                      // Handle filter selection
+                    filters: filters,
+                    onFiltersChanged: (newFilters) {
+                      setState(() {
+                        filters = newFilters;
+                        _filterActivities();
+                      });
                     },
                   ),
-                  Text("TODAS LAS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                  
+                  SizedBox(height: 16),
+                  
+                  // Sección: Todas las actividades
+                  ActivitiesSectionHeader(
+                    title: 'Todas las Actividades',
+                    icon: Icons.grid_view_rounded,
+                    count: _allActivitiesCount,
+                  ),
+                  
                   Flexible(
                     flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(-4, -4),
-                              blurRadius: 10.0,
-                              spreadRadius: 1.0,
-                              blurStyle: BlurStyle.inner,
-                            ),
-                          ],
-                        ),
-                        child: ValueListenableBuilder<List<Actividad>>(
-                          valueListenable: _filteredActivitiesNotifier,
-                          builder: (context, filteredActivities, child) {
-                            return AllActividades(
-                              selectedFilter: null,
-                              searchQuery: searchQuery,
-                              selectedDate: null,
-                              selectedCourse: null,
-                              selectedState: null,
-                            );
-                          },
-                        ),
+                    child: ActivitiesListContainer(
+                      child: AllActividades(
+                        selectedFilter: null,
+                        searchQuery: searchQuery,
+                        selectedDate: filters['fecha'],
+                        selectedCourse: filters['curso'],
+                        selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
+                        onCountChanged: (count) {
+                          if (mounted) {
+                            setState(() {
+                              _allActivitiesCount = count;
+                            });
+                          }
+                        },
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 60.0,
-                    child: Text("TUS ACTIVIDADES", style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                  
+                  SizedBox(height: 16),
+                  
+                  // Sección: Tus actividades
+                  ActivitiesSectionHeader(
+                    title: 'Tus Actividades',
+                    icon: Icons.person_rounded,
+                    count: _userActivitiesCount,
                   ),
+                  
                   Flexible(
                     flex: 1,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(-4, -4),
-                              blurRadius: 10.0,
-                              spreadRadius: 1.0,
-                              blurStyle: BlurStyle.inner,
-                            ),
-                          ],
-                        ),
-                        child: ValueListenableBuilder<List<Actividad>>(
-                          valueListenable: _filteredActivitiesNotifier,
-                          builder: (context, filteredActivities, child) {
-                            return OtrasActividades(
-                              selectedFilter: null,
-                              searchQuery: searchQuery,
-                              selectedDate: null,
-                              selectedCourse: null,
-                              selectedState: null,
-                            );
+                    child: ActivitiesListContainer(
+                      child: OtrasActividades(
+                        selectedFilter: null,
+                        searchQuery: searchQuery,
+                        selectedDate: filters['fecha'],
+                        selectedCourse: filters['curso'],
+                        selectedState: filters['estado'],
+                        selectedProfesorId: filters['profesorId'],
+                        onCountChanged: (count) {
+                          if (mounted) {
+                            setState(() {
+                              _userActivitiesCount = count;
+                            });
                           }
-                        ),
+                        },
                       ),
                     ),
                   ),
+                  
+                  SizedBox(height: 16),
                 ],
               ),
             ),

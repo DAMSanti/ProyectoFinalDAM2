@@ -68,6 +68,8 @@ public class GrupoParticipanteDto
     public string GrupoNombre { get; set; } = string.Empty;
     public int NumeroAlumnos { get; set; }
     public int NumeroParticipantes { get; set; }
+    public int CursoId { get; set; }
+    public string? CursoNombre { get; set; }
 }
 
 public class GrupoParticipanteUpdateDto

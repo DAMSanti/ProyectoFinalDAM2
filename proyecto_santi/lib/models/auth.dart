@@ -45,8 +45,8 @@ class Auth extends ChangeNotifier {
         _currentUser = Profesor(
           uuid: usuario?['id']?.toString() ?? '',
           dni: '',
-          nombre: usuario?['nombreCompleto']?.toString().split(' ').first ?? 'Usuario',
-          apellidos: usuario?['nombreCompleto']?.toString().split(' ').skip(1).join(' ') ?? '',
+          nombre: usuario?['nombreUsuario']?.toString() ?? 'Usuario',
+          apellidos: '',
           correo: usuario?['email']?.toString() ?? email,
           password: '',
           rol: usuario?['rol']?.toString() ?? 'Usuario',

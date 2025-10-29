@@ -70,7 +70,7 @@ public class ApplicationDbContext : DbContext
             .IsUnique();
 
         modelBuilder.Entity<Usuario>()
-            .HasIndex(u => u.Email)
+            .HasIndex(u => u.NombreUsuario)
             .IsUnique();
 
         // Configurar relaciones
@@ -80,11 +80,8 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(a => a.AlojamientoId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        modelBuilder.Entity<Actividad>()
-            .HasOne(a => a.Departamento)
-            .WithMany(d => d.Actividades)
-            .HasForeignKey(a => a.DepartamentoId)
-            .OnDelete(DeleteBehavior.SetNull);
+        // Relación Actividad -> Responsable (Profesor) eliminada de aquí
+        // ya que se maneja en el modelo Actividad
 
         modelBuilder.Entity<Actividad>()
             .HasOne(a => a.Localizacion)

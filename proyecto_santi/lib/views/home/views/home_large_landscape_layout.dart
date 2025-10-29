@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
-import 'package:proyecto_santi/views/home/components/home_calendario.dart';
+import 'package:proyecto_santi/views/home/components/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
+import 'package:proyecto_santi/views/home/widgets/calendar_title.dart';
+import 'package:proyecto_santi/shared/widgets/state_widgets.dart';
 
 class HomeLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
@@ -29,6 +32,24 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Actualizar el contador de actividades en el shell
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updateActivitiesCountInShell(context, widget.activities.length);
+    });
+  }
+
+  @override
+  void didUpdateWidget(HomeLargeLandscapeLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Actualizar si cambia el número de actividades
+    if (oldWidget.activities.length != widget.activities.length) {
+      updateActivitiesCountInShell(context, widget.activities.length);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
@@ -36,74 +57,26 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
       color: Colors.transparent,
       child: Column(
         children: [
-          // Header compacto
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.event_available_rounded,
-                  color: Color(0xFF1976d2),
-                  size: 28,
-                ),
-                SizedBox(width: 16),
-                Text(
-                  'Próximas Actividades',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Color(0xFF1976d2),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                SizedBox(width: 12),
-                // Burbuja con número
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF1976d2),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xFF1976d2).withOpacity(0.3),
-                        offset: Offset(0, 2),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    '${widget.activities.length}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Carrusel de actividades con groove
+          const SizedBox(height: 16), // Espaciado superior
+          // Carrusel de actividades con groove (sin header, ahora está en el top bar)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Container(
-              height: 232,
+              height: 190, // Reducido de 232 a 190
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Color(0xFF1A2332).withOpacity(0.4)
-                    : Color(0xFFE3F2FD).withOpacity(0.6),
+                    ? const Color.fromRGBO(26, 35, 50, 0.4)
+                    : const Color.fromRGBO(227, 242, 253, 0.6),
                 borderRadius: BorderRadius.circular(20.0),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Color.fromRGBO(0, 0, 0, 0.08),
                     offset: Offset(0, 2),
                     blurRadius: 8,
                     spreadRadius: -2,
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Color.fromRGBO(0, 0, 0, 0.12),
                     offset: Offset(0, -1),
                     blurRadius: 6,
                     spreadRadius: -3,
@@ -112,26 +85,9 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                 ],
               ),
               child: widget.activities.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.event_busy_rounded,
-                            size: 48,
-                            color: Colors.grey.withOpacity(0.5),
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            'No hay actividades próximas',
-                            style: TextStyle(
-                              fontSize: 18, 
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                  ? const EmptyState(
+                      message: 'No hay actividades próximas',
+                      icon: Icons.event_busy_rounded,
                     )
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
@@ -151,19 +107,17 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                         child: ListView.builder(
                           controller: _scrollController,
                           scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          padding: EdgeInsets.all(16.0),
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.all(16.0),
                           itemCount: widget.activities.length,
                           itemBuilder: (context, index) {
                             return Padding(
                               padding: EdgeInsets.only(
                                 right: index < widget.activities.length - 1 ? 16.0 : 0.0,
                               ),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minWidth: 300,
-                                  maxWidth: 400,
-                                ),
+                              child: SizedBox(
+                                width: 350, // Ancho fijo
+                                height: 158, // Altura reducida para caber en el contenedor (190 - 32 padding)
                                 child: ActivityCardItem(
                                   actividad: widget.activities[index],
                                   isDarkTheme: isDark,
@@ -177,39 +131,19 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
             ),
           ),
           
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           
           // Título del calendario
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.calendar_month_rounded,
-                  color: Color(0xFF1976d2),
-                  size: 28,
-                ),
-                SizedBox(width: 12),
-                Text(
-                  'Calendario de Actividades',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Color(0xFF1976d2),
-                    letterSpacing: 0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+          const CalendarTitle(),
           
           // Calendario
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 16.0),
-              child: CalendarView(activities: widget.activities),
+              child: ModernSyncfusionCalendar(
+                activities: widget.activities,
+                countryCode: 'ES',
+              ),
             ),
           ),
         ],
