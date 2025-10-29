@@ -119,12 +119,49 @@ class ActividadService {
       print('[ActividadService] ========== UPDATE ACTIVITY ==========');
       print('[ActividadService] ID: $id');
       
+      // Combinar fecha y hora para FechaInicio y FechaFin
+      String fechaInicioConHora = actividad.fini;
+      String fechaFinConHora = actividad.ffin;
+      
+      // Si hay hora de inicio, combinarla con la fecha
+      if (actividad.hini.isNotEmpty && actividad.hini != '00:00:00') {
+        final fechaInicio = DateTime.parse(actividad.fini);
+        final horaPartes = actividad.hini.split(':');
+        final fechaConHora = DateTime(
+          fechaInicio.year,
+          fechaInicio.month,
+          fechaInicio.day,
+          int.parse(horaPartes[0]),
+          int.parse(horaPartes[1]),
+          horaPartes.length > 2 ? int.parse(horaPartes[2]) : 0,
+        );
+        fechaInicioConHora = fechaConHora.toIso8601String();
+      }
+      
+      // Si hay hora de fin, combinarla con la fecha
+      if (actividad.hfin.isNotEmpty && actividad.hfin != '00:00:00') {
+        final fechaFin = DateTime.parse(actividad.ffin);
+        final horaPartes = actividad.hfin.split(':');
+        final fechaConHora = DateTime(
+          fechaFin.year,
+          fechaFin.month,
+          fechaFin.day,
+          int.parse(horaPartes[0]),
+          int.parse(horaPartes[1]),
+          horaPartes.length > 2 ? int.parse(horaPartes[2]) : 0,
+        );
+        fechaFinConHora = fechaConHora.toIso8601String();
+      }
+      
+      print('[ActividadService] FechaInicio con hora: $fechaInicioConHora');
+      print('[ActividadService] FechaFin con hora: $fechaFinConHora');
+      
       // Preparar FormData en lugar de JSON
       final formData = FormData.fromMap({
         'Nombre': actividad.titulo,
         'Descripcion': actividad.descripcion,
-        'FechaInicio': actividad.fini,
-        'FechaFin': actividad.ffin,
+        'FechaInicio': fechaInicioConHora,
+        'FechaFin': fechaFinConHora,
         'PresupuestoEstimado': actividad.presupuestoEstimado,
         'CostoReal': actividad.costoReal,
         'Aprobada': actividad.estado == 'Aprobada',

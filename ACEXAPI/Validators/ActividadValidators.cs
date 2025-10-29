@@ -12,12 +12,12 @@ public class ActividadCreateDtoValidator : AbstractValidator<ActividadCreateDto>
             .MaximumLength(200).WithMessage("El nombre no puede exceder 200 caracteres");
 
         RuleFor(x => x.Descripcion)
-            .MaximumLength(1000).WithMessage("La descripción no puede exceder 1000 caracteres");
+            .MaximumLength(1000).WithMessage("La descripciï¿½n no puede exceder 1000 caracteres");
 
         RuleFor(x => x.FechaInicio)
             .NotEmpty().WithMessage("La fecha de inicio es requerida")
             .GreaterThanOrEqualTo(DateTime.Today.AddDays(-30))
-            .WithMessage("La fecha de inicio no puede ser anterior a 30 días");
+            .WithMessage("La fecha de inicio no puede ser anterior a 30 dï¿½as");
 
         RuleFor(x => x.FechaFin)
             .GreaterThanOrEqualTo(x => x.FechaInicio)
@@ -40,14 +40,14 @@ public class ActividadUpdateDtoValidator : AbstractValidator<ActividadUpdateDto>
 
         RuleFor(x => x.Descripcion)
             .MaximumLength(1000).When(x => !string.IsNullOrEmpty(x.Descripcion))
-            .WithMessage("La descripción no puede exceder 1000 caracteres");
+            .WithMessage("La descripciï¿½n no puede exceder 1000 caracteres");
 
         RuleFor(x => x.PresupuestoEstimado)
             .GreaterThan(0).When(x => x.PresupuestoEstimado.HasValue)
             .WithMessage("El presupuesto debe ser mayor a 0");
 
         RuleFor(x => x.CostoReal)
-            .GreaterThan(0).When(x => x.CostoReal.HasValue)
-            .WithMessage("El costo real debe ser mayor a 0");
+            .GreaterThanOrEqualTo(0).When(x => x.CostoReal.HasValue)
+            .WithMessage("El costo real no puede ser negativo");
     }
 }
