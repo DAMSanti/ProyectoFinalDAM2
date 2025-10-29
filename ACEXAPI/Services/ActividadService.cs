@@ -76,7 +76,6 @@ public class ActividadService : IActividadService
                 FechaFin = a.FechaFin,
                 Estado = a.Estado,
                 Tipo = a.Tipo,
-                DepartamentoNombre = null // Ya no usamos departamento en actividades
             })
             .ToListAsync();
 
@@ -278,6 +277,7 @@ public class ActividadService : IActividadService
             ResponsableId = actividad.ResponsableId,
             Responsable = actividad.Responsable != null ? new ProfesorSimpleDto
             {
+                Id = actividad.Responsable.Uuid.GetHashCode(), // Convertir Guid a int
                 Uuid = actividad.Responsable.Uuid,
                 Nombre = actividad.Responsable.Nombre,
                 Apellidos = actividad.Responsable.Apellidos,

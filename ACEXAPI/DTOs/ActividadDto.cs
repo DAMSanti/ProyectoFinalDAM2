@@ -13,8 +13,6 @@ public class ActividadDto
     public string? FolletoUrl { get; set; }
     public string Estado { get; set; } = "Pendiente";
     public string Tipo { get; set; } = "Complementaria";
-    public int? DepartamentoId { get; set; }
-    public string? DepartamentoNombre { get; set; }
     public int? LocalizacionId { get; set; }
     public string? LocalizacionNombre { get; set; }
     public int? EmpTransporteId { get; set; }
@@ -90,7 +88,6 @@ public class ActividadListDto
     public DateTime? FechaFin { get; set; }
     public string Estado { get; set; } = "Pendiente";
     public string Tipo { get; set; } = "Complementaria";
-    public string? DepartamentoNombre { get; set; }
 }
 
 public class LocalizacionDto

@@ -4,6 +4,7 @@ using ACEXAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ACEXAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029152635_SyncModelWithDatabase")]
+    partial class SyncModelWithDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,6 +43,9 @@ namespace ACEXAPI.Migrations
                     b.Property<decimal?>("CostoReal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("DepartamentoId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(1000)
@@ -102,6 +108,8 @@ namespace ACEXAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlojamientoId");
+
+                    b.HasIndex("DepartamentoId");
 
                     b.HasIndex("EmpTransporteId");
 
@@ -697,6 +705,10 @@ namespace ACEXAPI.Migrations
                         .WithMany("Actividades")
                         .HasForeignKey("AlojamientoId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ACEXAPI.Models.Departamento", null)
+                        .WithMany("Actividades")
+                        .HasForeignKey("DepartamentoId");
 
                     b.HasOne("ACEXAPI.Models.EmpTransporte", "EmpTransporte")
                         .WithMany("Actividades")
