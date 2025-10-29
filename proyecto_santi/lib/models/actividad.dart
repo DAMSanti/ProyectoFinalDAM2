@@ -69,7 +69,6 @@ class Actividad {
 
   factory Actividad.fromJson(Map<String, dynamic> json) {
     // Mapear desde la API de C# ACEXAPI
-    final now = DateTime.now().toIso8601String();
     
     // Parsear el solicitante si viene en el JSON
     Profesor? solicitante;
@@ -124,32 +123,55 @@ class Actividad {
       );
     }
     
-    // Parsear fechas de inicio y fin
-    final fechaInicioStr = json['fechaInicio']?.toString() ?? json['fini']?.toString() ?? now;
-    final fechaFinStr = json['fechaFin']?.toString() ?? json['ffin']?.toString() ?? now;
+    // Parsear fechas de inicio y fin desde DateTime completos
+    DateTime? fechaInicio;
+    DateTime? fechaFin;
     
-    // Extraer horas de las fechas si no vienen por separado
-    String horaInicio = json['hini']?.toString() ?? '00:00';
-    String horaFin = json['hfin']?.toString() ?? '00:00';
+    // Intentar parsear fechaInicio desde varios campos posibles
+    if (json['fechaInicio'] != null) {
+      fechaInicio = DateTime.parse(json['fechaInicio'].toString());
+    } else if (json['fini'] != null) {
+      fechaInicio = DateTime.parse(json['fini'].toString());
+    }
     
-    // Si hini/hfin son "00:00", intentar extraer de fechaInicio/fechaFin
-    if (horaInicio == '00:00' && fechaInicioStr != now) {
+    // Intentar parsear fechaFin desde varios campos posibles
+    if (json['fechaFin'] != null) {
       try {
-        final dt = DateTime.parse(fechaInicioStr);
-        horaInicio = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+        fechaFin = DateTime.parse(json['fechaFin'].toString());
       } catch (e) {
-        // Si falla el parseo, mantener 00:00
+        // Error silencioso, se maneja más abajo
+      }
+    } else if (json['ffin'] != null) {
+      try {
+        fechaFin = DateTime.parse(json['ffin'].toString());
+      } catch (e) {
+        // Error silencioso, se maneja más abajo
       }
     }
     
-    if (horaFin == '00:00' && fechaFinStr != now) {
-      try {
-        final dt = DateTime.parse(fechaFinStr);
-        horaFin = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-      } catch (e) {
-        // Si falla el parseo, mantener 00:00
-      }
+    // Si no se pudo parsear, usar fecha actual
+    if (fechaInicio == null) {
+      fechaInicio = DateTime.now();
     }
+    if (fechaFin == null) {
+      fechaFin = fechaInicio; // Si no hay fecha fin, usar la de inicio (actividad de un día)
+    }
+    
+    // Extraer solo la parte de fecha (sin hora) en formato ISO
+    final fechaInicioStr = '${fechaInicio.year.toString().padLeft(4, '0')}-'
+        '${fechaInicio.month.toString().padLeft(2, '0')}-'
+        '${fechaInicio.day.toString().padLeft(2, '0')}T00:00:00';
+    
+    final fechaFinStr = '${fechaFin.year.toString().padLeft(4, '0')}-'
+        '${fechaFin.month.toString().padLeft(2, '0')}-'
+        '${fechaFin.day.toString().padLeft(2, '0')}T00:00:00';
+    
+    // Extraer horas desde los DateTime o desde campos separados
+    String horaInicio = json['hini']?.toString() ?? 
+        '${fechaInicio.hour.toString().padLeft(2, '0')}:${fechaInicio.minute.toString().padLeft(2, '0')}';
+    
+    String horaFin = json['hfin']?.toString() ?? 
+        '${fechaFin.hour.toString().padLeft(2, '0')}:${fechaFin.minute.toString().padLeft(2, '0')}';
     
     return Actividad(
       id: json['id'] ?? 0,

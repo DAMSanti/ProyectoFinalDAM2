@@ -73,6 +73,7 @@ public class ActividadService : IActividadService
                 Nombre = a.Nombre,
                 Descripcion = a.Descripcion,
                 FechaInicio = a.FechaInicio,
+                FechaFin = a.FechaFin,
                 Aprobada = a.Aprobada,
                 DepartamentoNombre = a.Departamento != null ? a.Departamento.Nombre : null
             })

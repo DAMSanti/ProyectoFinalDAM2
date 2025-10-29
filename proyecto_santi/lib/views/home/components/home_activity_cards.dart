@@ -173,13 +173,34 @@ class ActivityInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // Formatear la fecha a DD-MM-YYYY HH:MM
-    String formatearFecha(String fechaStr) {
+    // Formatear la fecha y hora desde campos separados
+    String formatearFechaHora() {
       try {
-        final fecha = DateTime.parse(fechaStr);
-        return DateFormat('dd-MM-yyyy HH:mm').format(fecha);
+        // Parsear la fecha (fini está en formato YYYY-MM-DDT00:00:00)
+        final fecha = DateTime.parse(actividad.fini);
+        
+        // Combinar fecha con hora (hini está en formato HH:mm)
+        final partsHora = actividad.hini.split(':');
+        final hora = int.tryParse(partsHora[0]) ?? 0;
+        final minuto = int.tryParse(partsHora.length > 1 ? partsHora[1] : '0') ?? 0;
+        
+        final fechaHoraCompleta = DateTime(
+          fecha.year,
+          fecha.month,
+          fecha.day,
+          hora,
+          minuto,
+        );
+        
+        return DateFormat('dd-MM-yyyy HH:mm').format(fechaHoraCompleta);
       } catch (e) {
-        return fechaStr;
+        // Fallback: mostrar fecha y hora como vienen
+        try {
+          final fecha = DateTime.parse(actividad.fini);
+          return '${DateFormat('dd-MM-yyyy').format(fecha)} ${actividad.hini}';
+        } catch (e2) {
+          return '${actividad.fini} ${actividad.hini}';
+        }
       }
     }
 
@@ -314,7 +335,7 @@ class ActivityInfo extends StatelessWidget {
                   ),
                   SizedBox(width: 6),
                   Text(
-                    formatearFecha(actividad.fini),
+                    formatearFechaHora(),
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? Colors.white70 : Colors.black54,
