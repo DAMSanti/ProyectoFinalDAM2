@@ -14,7 +14,7 @@ class ActivityCardItem extends StatefulWidget {
   });
 
   @override
-  _ActivityCardItemState createState() => _ActivityCardItemState();
+  State<ActivityCardItem> createState() => _ActivityCardItemState();
 }
 
 class _ActivityCardItemState extends State<ActivityCardItem> {
@@ -30,12 +30,14 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
           child: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
             transform: _isHovered 
                 ? (Matrix4.identity()
-                  ..translate(0.0, -8.0, 0.0)
-                  ..scale(1.02))
+                  ..setEntry(3, 2, 0.001)
+                  ..rotateX(0.0)
+                  ..setTranslationRaw(0.0, -8.0, 0.0)
+                  ..multiply(Matrix4.diagonal3Values(1.02, 1.02, 1.0)))
                 : Matrix4.identity(),
             child: Container(
               decoration: BoxDecoration(
@@ -44,37 +46,37 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isDark
-                      ? [
-                          Color(0xFF1976d2).withOpacity(0.25),
-                          Color(0xFF1565C0).withOpacity(0.20),
+                      ? const [
+                          Color.fromRGBO(25, 118, 210, 0.25),
+                          Color.fromRGBO(21, 101, 192, 0.20),
                         ]
-                      : [
-                          Color(0xFFBBDEFB).withOpacity(0.85),
-                          Color(0xFF90CAF9).withOpacity(0.75),
+                      : const [
+                          Color.fromRGBO(187, 222, 251, 0.85),
+                          Color.fromRGBO(144, 202, 249, 0.75),
                         ],
                 ),
                 boxShadow: [
                   // Sombra principal
                   BoxShadow(
                     color: _isHovered 
-                        ? Color(0xFF1976d2).withOpacity(0.35)
-                        : (isDark ? Colors.black.withOpacity(0.4) : Colors.black.withOpacity(0.15)),
-                    offset: _isHovered ? Offset(0, 12) : Offset(0, 4),
+                        ? const Color.fromRGBO(25, 118, 210, 0.35)
+                        : (isDark ? const Color.fromRGBO(0, 0, 0, 0.4) : const Color.fromRGBO(0, 0, 0, 0.15)),
+                    offset: _isHovered ? const Offset(0, 12) : const Offset(0, 4),
                     blurRadius: _isHovered ? 24.0 : 12.0,
                     spreadRadius: _isHovered ? 0 : -1,
                   ),
                   // Sombra secundaria para más profundidad
                   if (_isHovered)
-                    BoxShadow(
-                      color: Color(0xFF1976d2).withOpacity(0.2),
+                    const BoxShadow(
+                      color: Color.fromRGBO(25, 118, 210, 0.2),
                       offset: Offset(0, 6),
                       blurRadius: 16.0,
                     ),
                 ],
                 border: Border.all(
                   color: _isHovered
-                      ? Color(0xFF1976d2).withOpacity(0.6)
-                      : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                      ? const Color.fromRGBO(25, 118, 210, 0.6)
+                      : (isDark ? const Color.fromRGBO(255, 255, 255, 0.1) : const Color.fromRGBO(0, 0, 0, 0.05)),
                   width: _isHovered ? 2 : 1,
                 ),
               ),
@@ -106,12 +108,12 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                     if (_isHovered)
                       Positioned.fill(
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             gradient: RadialGradient(
                               center: Alignment.topRight,
                               radius: 1.5,
                               colors: [
-                                Color(0xFF1976d2).withOpacity(0.08),
+                                Color.fromRGBO(25, 118, 210, 0.08),
                                 Colors.transparent,
                               ],
                             ),
@@ -183,18 +185,18 @@ class ActivityInfo extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [
-                        Color(0xFF1976d2).withOpacity(0.05),
+                    ? const [
+                        Color.fromRGBO(25, 118, 210, 0.05),
                         Colors.transparent,
                       ]
-                    : [
-                        Color(0xFF1976d2).withOpacity(0.02),
+                    : const [
+                        Color.fromRGBO(25, 118, 210, 0.02),
                         Colors.transparent,
                       ],
               )
             : null,
       ),
-      padding: EdgeInsets.fromLTRB(14.0, 12.0, 14.0, 12.0), // Padding reducido vertical
+      padding: const EdgeInsets.fromLTRB(14.0, 12.0, 14.0, 12.0), // Padding reducido vertical
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min, // Ocupar solo el espacio necesario
@@ -203,12 +205,12 @@ class ActivityInfo extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1976d2).withOpacity(0.1),
+                  color: const Color.fromRGBO(25, 118, 210, 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.event_note_rounded,
                   color: Color(0xFF1976d2),
                   size: 18,
@@ -248,17 +250,17 @@ class ActivityInfo extends StatelessWidget {
             maxLines: 2,
           ),
           
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           
           // Divider sutil
           Container(
             height: 1,
-            margin: EdgeInsets.symmetric(vertical: 6),
+            margin: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                  isDark ? const Color.fromRGBO(255, 255, 255, 0.1) : const Color.fromRGBO(0, 0, 0, 0.1),
                   Colors.transparent,
                 ],
               ),
@@ -277,7 +279,7 @@ class ActivityInfo extends StatelessWidget {
                     size: 15,
                     color: isDark ? Colors.white60 : Colors.black45,
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   Text(
                     fechaHora,
                     style: TextStyle(
@@ -290,12 +292,22 @@ class ActivityInfo extends StatelessWidget {
               ),
               // Badge de estado
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: estadoColor.withOpacity(0.15),
+                  color: Color.fromRGBO(
+                    (estadoColor.r * 255.0).round(),
+                    (estadoColor.g * 255.0).round(),
+                    (estadoColor.b * 255.0).round(),
+                    0.15,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: estadoColor.withOpacity(0.3),
+                    color: Color.fromRGBO(
+                      (estadoColor.r * 255.0).round(),
+                      (estadoColor.g * 255.0).round(),
+                      (estadoColor.b * 255.0).round(),
+                      0.3,
+                    ),
                     width: 1,
                   ),
                 ),

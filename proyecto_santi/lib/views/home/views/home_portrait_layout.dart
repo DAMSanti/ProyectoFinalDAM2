@@ -29,19 +29,19 @@ class HomePortraitLayout extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
                         color: isDark 
-                            ? Color(0xFF1A2332).withOpacity(0.4)
-                            : Color(0xFFE3F2FD).withOpacity(0.6),
+                            ? const Color.fromRGBO(26, 35, 50, 0.4)
+                            : const Color.fromRGBO(227, 242, 253, 0.6),
                         borderRadius: BorderRadius.circular(16.0),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Color.fromRGBO(0, 0, 0, 0.08),
                             offset: Offset(0, 2),
                             blurRadius: 8,
                             spreadRadius: -2,
                           ),
                           // Sombra interna para efecto de surco
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
+                            color: Color.fromRGBO(0, 0, 0, 0.12),
                             offset: Offset(0, -1),
                             blurRadius: 6,
                             spreadRadius: -3,

@@ -77,19 +77,29 @@ class CalendarAppointmentWidget extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             appointment.color,
-            appointment.color.withOpacity(0.85),
+            Color.fromRGBO(
+              (appointment.color.r * 255.0).round(),
+              (appointment.color.g * 255.0).round(),
+              (appointment.color.b * 255.0).round(),
+              0.85,
+            ),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: const Color.fromRGBO(255, 255, 255, 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: appointment.color.withOpacity(0.3),
+            color: Color.fromRGBO(
+              (appointment.color.r * 255.0).round(),
+              (appointment.color.g * 255.0).round(),
+              (appointment.color.b * 255.0).round(),
+              0.3,
+            ),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -99,15 +109,15 @@ class CalendarAppointmentWidget extends StatelessWidget {
       child: Center(
         child: Text(
           _getAppointmentText(showTime),
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
-            fontSize: showFullText ? 11 : 9,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
             height: 1.1,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.5),
-                offset: const Offset(0, 1),
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+                offset: Offset(0, 1),
                 blurRadius: 2,
               ),
             ],
@@ -132,7 +142,7 @@ class CalendarAppointmentWidget extends StatelessWidget {
         color: appointment.color,
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: const Color.fromRGBO(255, 255, 255, 0.2),
           width: 0.5,
         ),
       ),

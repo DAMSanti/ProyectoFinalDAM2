@@ -57,7 +57,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
       color: Colors.transparent,
       child: Column(
         children: [
-          SizedBox(height: 16), // Espaciado superior
+          const SizedBox(height: 16), // Espaciado superior
           // Carrusel de actividades con groove (sin header, ahora está en el top bar)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -65,18 +65,18 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
               height: 190, // Reducido de 232 a 190
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Color(0xFF1A2332).withOpacity(0.4)
-                    : Color(0xFFE3F2FD).withOpacity(0.6),
+                    ? const Color.fromRGBO(26, 35, 50, 0.4)
+                    : const Color.fromRGBO(227, 242, 253, 0.6),
                 borderRadius: BorderRadius.circular(20.0),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Color.fromRGBO(0, 0, 0, 0.08),
                     offset: Offset(0, 2),
                     blurRadius: 8,
                     spreadRadius: -2,
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Color.fromRGBO(0, 0, 0, 0.12),
                     offset: Offset(0, -1),
                     blurRadius: 6,
                     spreadRadius: -3,
@@ -85,7 +85,7 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                 ],
               ),
               child: widget.activities.isEmpty
-                  ? EmptyState(
+                  ? const EmptyState(
                       message: 'No hay actividades próximas',
                       icon: Icons.event_busy_rounded,
                     )
@@ -107,8 +107,8 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
                         child: ListView.builder(
                           controller: _scrollController,
                           scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          padding: EdgeInsets.all(16.0),
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.all(16.0),
                           itemCount: widget.activities.length,
                           itemBuilder: (context, index) {
                             return Padding(
@@ -131,10 +131,10 @@ class _HomeLargeLandscapeLayoutState extends State<HomeLargeLandscapeLayout> {
             ),
           ),
           
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           
           // Título del calendario
-          CalendarTitle(),
+          const CalendarTitle(),
           
           // Calendario
           Expanded(

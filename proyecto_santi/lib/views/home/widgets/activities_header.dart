@@ -63,7 +63,12 @@ class ActivitiesHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(isCompact ? 10.0 : 12.0),
               boxShadow: [
                 BoxShadow(
-                  color: AppThemeConstants.primaryBlue.withOpacity(0.3),
+                  color: Color.fromRGBO(
+                    (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                    (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                    (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                    0.3,
+                  ),
                   offset: const Offset(0, 2),
                   blurRadius: 6,
                 ),

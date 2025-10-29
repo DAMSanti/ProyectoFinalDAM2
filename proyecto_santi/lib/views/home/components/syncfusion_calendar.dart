@@ -168,23 +168,33 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [
-                      const Color(0xFF1a237e).withOpacity(0.08),
-                      const Color(0xFF0d47a1).withOpacity(0.05),
+                  ? const [
+                      Color.fromRGBO(26, 35, 126, 0.08),
+                      Color.fromRGBO(13, 71, 161, 0.05),
                     ]
-                  : [
-                      const Color(0xFFe3f2fd),
-                      const Color(0xFFbbdefb).withOpacity(0.3),
+                  : const [
+                      Color(0xFFe3f2fd),
+                      Color.fromRGBO(187, 222, 251, 0.3),
                     ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppThemeConstants.primaryBlue.withOpacity(0.15),
+              color: Color.fromRGBO(
+                (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                0.15,
+              ),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppThemeConstants.primaryBlue.withOpacity(0.08),
+                color: Color.fromRGBO(
+                  (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                  0.08,
+                ),
                 blurRadius: 20,
                 offset: const Offset(0, 5),
                 spreadRadius: -3,
@@ -242,23 +252,33 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [
-                        const Color(0xFF1a237e).withOpacity(0.08),
-                        const Color(0xFF0d47a1).withOpacity(0.05),
+                    ? const [
+                        Color.fromRGBO(26, 35, 126, 0.08),
+                        Color.fromRGBO(13, 71, 161, 0.05),
                       ]
-                    : [
-                        const Color(0xFFe3f2fd),
-                        const Color(0xFFbbdefb).withOpacity(0.3),
+                    : const [
+                        Color(0xFFe3f2fd),
+                        Color.fromRGBO(187, 222, 251, 0.3),
                       ],
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: AppThemeConstants.primaryBlue.withOpacity(0.15),
+                color: Color.fromRGBO(
+                  (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                  0.15,
+                ),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppThemeConstants.primaryBlue.withOpacity(0.08),
+                  color: Color.fromRGBO(
+                    (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                    (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                    (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                    0.08,
+                  ),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                   spreadRadius: -5,
@@ -360,8 +380,18 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 viewHeaderHeight: 45,
                 viewHeaderStyle: ViewHeaderStyle(
                   backgroundColor: isDark 
-                      ? AppThemeConstants.primaryBlue.withOpacity(0.1)
-                      : AppThemeConstants.primaryBlue.withOpacity(0.05),
+                      ? Color.fromRGBO(
+                          (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                          (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                          (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                          0.1,
+                        )
+                      : Color.fromRGBO(
+                          (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                          (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                          (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                          0.05,
+                        ),
                   dayTextStyle: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -384,8 +414,8 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 cellBorderColor: isDark 
-                    ? Colors.white.withOpacity(0.03)
-                    : Colors.grey.withOpacity(0.08),
+                    ? const Color.fromRGBO(255, 255, 255, 0.03)
+                    : const Color.fromRGBO(158, 158, 158, 0.08),
                 backgroundColor: Colors.transparent,
                 monthCellBuilder: (BuildContext context, MonthCellDetails details) {
                   final date = details.date;
@@ -402,15 +432,34 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     decoration: BoxDecoration(
                       // Prioridad: Hoy > Festivo > Transparente
                       color: isToday
-                          ? AppThemeConstants.primaryBlue.withOpacity(isDark ? 0.25 : 0.15)
+                          ? (isDark 
+                              ? Color.fromRGBO(
+                                  (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                                  (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                                  (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                                  0.25,
+                                )
+                              : Color.fromRGBO(
+                                  (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                                  (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                                  (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                                  0.15,
+                                ))
                           : isHoliday
-                              ? Colors.red.withOpacity(isDark ? 0.15 : 0.08)
+                              ? (isDark 
+                                  ? const Color.fromRGBO(244, 67, 54, 0.15)
+                                  : const Color.fromRGBO(244, 67, 54, 0.08))
                               : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                       // Borde extra para el día de hoy
                       border: isToday
                           ? Border.all(
-                              color: AppThemeConstants.primaryBlue.withOpacity(0.5),
+                              color: Color.fromRGBO(
+                                (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                                (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                                (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                                0.5,
+                              ),
                               width: 2,
                             )
                           : null,
@@ -491,18 +540,18 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                         },
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: isDark 
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.white.withOpacity(0.5),
+                                ? const Color.fromRGBO(255, 255, 255, 0.1)
+                                : const Color.fromRGBO(255, 255, 255, 0.5),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Color(0xFF1976d2).withOpacity(0.3),
+                              color: const Color.fromRGBO(25, 118, 210, 0.3),
                               width: 1,
                             ),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.chevron_left,
                             color: Color(0xFF1976d2),
                             size: 24,
@@ -523,18 +572,18 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                         },
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: isDark 
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.white.withOpacity(0.5),
+                                ? const Color.fromRGBO(255, 255, 255, 0.1)
+                                : const Color.fromRGBO(255, 255, 255, 0.5),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Color(0xFF1976d2).withOpacity(0.3),
+                              color: const Color.fromRGBO(25, 118, 210, 0.3),
                               width: 1,
                             ),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.chevron_right,
                             color: Color(0xFF1976d2),
                             size: 24,
@@ -599,21 +648,21 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   color: isSelected
                       ? null
                       : (isDark
-                          ? Colors.white.withOpacity(0.03)
-                          : Colors.white.withOpacity(0.5)),
+                          ? const Color.fromRGBO(255, 255, 255, 0.03)
+                          : const Color.fromRGBO(255, 255, 255, 0.5)),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
-                        ? Color(0xFF1976d2).withOpacity(0.5)
+                        ? const Color.fromRGBO(25, 118, 210, 0.5)
                         : (isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.grey.withOpacity(0.2)),
+                            ? const Color.fromRGBO(255, 255, 255, 0.1)
+                            : const Color.fromRGBO(158, 158, 158, 0.2)),
                     width: 1.5,
                   ),
                   boxShadow: isSelected
-                      ? [
+                      ? const [
                           BoxShadow(
-                            color: Color(0xFF1976d2).withOpacity(0.3),
+                            color: Color.fromRGBO(25, 118, 210, 0.3),
                             blurRadius: 8,
                             offset: Offset(0, 4),
                           ),

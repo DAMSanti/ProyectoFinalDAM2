@@ -34,19 +34,19 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                       margin: const EdgeInsets.fromLTRB(0.5, 6.0, 0.5, 6.0),
                       decoration: BoxDecoration(
                         color: isDark 
-                            ? Colors.black.withOpacity(0.2)
-                            : Colors.white.withOpacity(0.3),
+                            ? const Color.fromRGBO(0, 0, 0, 0.2)
+                            : const Color.fromRGBO(255, 255, 255, 0.3),
                         borderRadius: BorderRadius.circular(16.0),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Color.fromRGBO(0, 0, 0, 0.1),
                             offset: Offset(0, 2),
                             blurRadius: 8,
                             spreadRadius: -2,
                           ),
                           // Sombra interna para efecto de surco
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
+                            color: Color.fromRGBO(0, 0, 0, 0.15),
                             offset: Offset(0, -2),
                             blurRadius: 6,
                             spreadRadius: -4,
@@ -57,7 +57,7 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16.0),
                         child: ListView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
                           itemCount: activities.length,
                           itemBuilder: (context, index) {
                             final actividad = activities[index];
