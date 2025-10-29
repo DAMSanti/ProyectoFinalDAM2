@@ -209,7 +209,8 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
   Widget _buildCalendarContainer(BuildContext context, bool isDark, bool isNarrowScreen) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isSmallScreen = constraints.maxWidth < 600;
+        // Usar isNarrowScreen para determinar si ocultar iconos
+        final isSmallScreen = isNarrowScreen || constraints.maxWidth < 600;
         
         return Container(
           decoration: BoxDecoration(
@@ -317,7 +318,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     context,
                     details,
                     isDark,
-                    isSmallScreen,
+                    isNarrowScreen,  // Usar isNarrowScreen en lugar de isSmallScreen
                     _getHoliday,
                     _calendarController,
                   );
