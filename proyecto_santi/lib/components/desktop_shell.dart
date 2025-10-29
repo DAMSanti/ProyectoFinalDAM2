@@ -338,42 +338,46 @@ class DesktopShellFrame extends StatelessWidget {
               actions: [
                 // Mostrar avatar y info del usuario en móvil (compacta)
                 if (currentUser != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              currentUser.nombre,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white : Color(0xFF1976d2),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => _showAccountSettingsDialog(context, currentUser, isDark),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                currentUser.nombre,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white : Color(0xFF1976d2),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              currentUser.rol,
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w500,
-                                color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                              Text(
+                                currentUser.rol,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                        SizedBox(width: 8),
-                        UserAvatar(
-                          user: currentUser,
-                          size: 36,
-                          fontSize: 14,
-                        ),
-                      ],
+                            ],
+                          ),
+                          SizedBox(width: 8),
+                          UserAvatar(
+                            user: currentUser,
+                            size: 36,
+                            fontSize: 14,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 IconButton(
@@ -448,6 +452,208 @@ class DesktopShellFrame extends StatelessWidget {
           );
         }
       },
+    );
+  }
+
+  void _showAccountSettingsDialog(BuildContext context, dynamic currentUser, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.account_circle,
+                color: isDark ? Colors.amber : Color(0xFF1976d2),
+                size: 28,
+              ),
+              SizedBox(width: 12),
+              Text('Configuración de Cuenta'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Container(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Avatar y nombre del usuario
+                  Center(
+                    child: Column(
+                      children: [
+                        UserAvatar(
+                          user: currentUser,
+                          size: 80,
+                          fontSize: 32,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          currentUser?.nombre ?? 'Usuario',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Color(0xFF1976d2),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.amber.withOpacity(0.2) : Color(0xFF1976d2).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            currentUser?.rol ?? 'Rol',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? Colors.amber : Color(0xFF1976d2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  
+                  Divider(),
+                  SizedBox(height: 16),
+                  
+                  // Información del usuario
+                  Text(
+                    'Información Personal',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  
+                  _buildInfoTile(
+                    icon: Icons.email,
+                    label: 'Correo',
+                    value: currentUser?.correo ?? 'No disponible',
+                    isDark: isDark,
+                  ),
+                  SizedBox(height: 8),
+                  
+                  _buildInfoTile(
+                    icon: Icons.badge,
+                    label: 'DNI',
+                    value: currentUser?.dni?.isNotEmpty == true ? currentUser!.dni : 'No disponible',
+                    isDark: isDark,
+                  ),
+                  
+                  SizedBox(height: 24),
+                  Divider(),
+                  SizedBox(height: 16),
+                  
+                  // Opciones de configuración (placeholder)
+                  Text(
+                    'Opciones',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.lock,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Cambiar Contraseña'),
+                    subtitle: Text('Próximamente disponible'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Notificaciones'),
+                    subtitle: Text('Próximamente disponible'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                  
+                  ListTile(
+                    leading: Icon(
+                      Icons.language,
+                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
+                    ),
+                    title: Text('Idioma'),
+                    subtitle: Text('Español (predeterminado)'),
+                    contentPadding: EdgeInsets.zero,
+                    enabled: false,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: isDark ? Colors.white70 : Color(0xFF1976d2),
+            size: 20,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white60 : Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
