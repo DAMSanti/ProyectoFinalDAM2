@@ -42,6 +42,8 @@ public class ProfesorSimpleDto
     public string Apellidos { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? FotoUrl { get; set; }
+    public int? DepartamentoId { get; set; }
+    public string? DepartamentoNombre { get; set; }
 }
 
 public class ActividadCreateDto

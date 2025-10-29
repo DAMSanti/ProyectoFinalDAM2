@@ -1531,32 +1531,18 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF1976d2).withOpacity(0.8),
-                          Color(0xFF1565c0).withOpacity(0.9),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF1976d2).withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                      color: Color.fromRGBO(25, 118, 210, 0.15),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       Icons.location_on_rounded,
-                      color: Colors.white,
-                      size: !isWeb ? 24.dg : 7.sp,
+                      color: Color(0xFF1976d2),
+                      size: !isWeb ? 18.dg : 6.sp,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: 10),
                   Text(
                     'Localizaciones',
                     style: TextStyle(

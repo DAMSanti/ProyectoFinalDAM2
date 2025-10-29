@@ -43,7 +43,13 @@ class Profesor {
         activo: 1,
         urlFoto: json['fotoUrl'],
         esJefeDep: 0,
-        depart: null,
+        depart: json['departamentoId'] != null 
+          ? Departamento(
+              id: json['departamentoId'],
+              nombre: json['departamentoNombre']?.toString() ?? '',
+              codigo: null,
+            )
+          : null,
       );
     }
     

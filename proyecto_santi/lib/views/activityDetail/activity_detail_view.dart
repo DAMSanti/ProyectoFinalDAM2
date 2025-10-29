@@ -576,7 +576,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         _actividadCompleta = Actividad(
           id: _actividadCompleta!.id,
           titulo: updatedData['nombre'] ?? _actividadCompleta!.titulo,
-          tipo: _actividadCompleta!.tipo,
+          tipo: updatedData['tipoActividad'] ?? _actividadCompleta!.tipo,
           descripcion: updatedData['descripcion'] ?? _actividadCompleta!.descripcion,
           fini: updatedData['fechaInicio'] ?? _actividadCompleta!.fini,
           ffin: updatedData['fechaFin'] ?? _actividadCompleta!.ffin,
@@ -593,9 +593,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           precioAlojamiento: updatedData['precioAlojamiento'] ?? _actividadCompleta!.precioAlojamiento,
           alojamiento: _actividadCompleta!.alojamiento,
           comentarios: _actividadCompleta!.comentarios,
-          estado: updatedData.containsKey('aprobada') 
-            ? (updatedData['aprobada'] == true ? 'Aprobada' : 'Pendiente')
-            : _actividadCompleta!.estado,
+          estado: updatedData['estado'] ?? _actividadCompleta!.estado,
           comentEstado: _actividadCompleta!.comentEstado,
           incidencias: _actividadCompleta!.incidencias,
           urlFolleto: _actividadCompleta!.urlFolleto,

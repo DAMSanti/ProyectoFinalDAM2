@@ -7,6 +7,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 import '../cards/info_card_widget.dart';
 import '../cards/folleto_card_widget.dart';
 import '../cards/estado_card_widget.dart';
+import '../cards/departamento_card_widget.dart';
 
 class ActivityDetailHeader extends StatelessWidget {
   final Actividad actividad;
@@ -276,12 +277,12 @@ class ActivityDetailHeader extends StatelessWidget {
                     
                     SizedBox(height: 12),
                     
-                    // Primera fila: Fecha y Hora (izq) y Estado (der)
+                    // Primera fila: Fecha/Hora (izq), Departamento (centro), Estado (der)
                     Row(
                       children: [
                         // Fecha y hora
                         Expanded(
-                          flex: 6,
+                          flex: 4,
                           child: InfoCardWidget(
                             icon: Icons.access_time_rounded,
                             label: 'Fecha y Hora',
@@ -291,9 +292,19 @@ class ActivityDetailHeader extends StatelessWidget {
                         
                         SizedBox(width: 12),
                         
+                        // Departamento
+                        Expanded(
+                          flex: 3,
+                          child: DepartamentoCardWidget(
+                            responsable: actividad.responsable,
+                          ),
+                        ),
+                        
+                        SizedBox(width: 12),
+                        
                         // Estado
                         Expanded(
-                          flex: 4,
+                          flex: 3,
                           child: EstadoCardWidget(estado: actividad.estado),
                         ),
                       ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
-import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/services/services.dart';
 
 /// Diálogo para editar los datos básicos de una actividad
@@ -27,8 +26,8 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
   late TimeOfDay _horaInicio;
   late TimeOfDay _horaFin;
   String? _selectedProfesorId;
-  int? _selectedDepartamentoId;
-  bool _aprobada = false;
+  String _estadoActividad = 'Pendiente'; // Puede ser: Pendiente, Aprobada, Cancelada
+  String _tipoActividad = 'Complementaria'; // Puede ser: Complementaria, Extraescolar
   
   // Variables para el folleto
   String? _folletoFileName;
@@ -36,11 +35,9 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
   bool _folletoChanged = false;
   
   List<Profesor> _profesores = [];
-  List<Departamento> _departamentos = [];
   bool _isLoading = true;
   late final ApiService _apiService;
   late final ProfesorService _profesorService;
-  late final CatalogoService _catalogoService;
 
   @override
   void initState() {
@@ -48,7 +45,6 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     
     _apiService = ApiService();
     _profesorService = ProfesorService(_apiService);
-    _catalogoService = CatalogoService(_apiService);
     
     // Inicializar controladores
     _nombreController = TextEditingController(text: widget.actividad.titulo);
@@ -71,8 +67,36 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       minute: int.parse(horaFinParts[1]),
     );
     
-    // Estado
-    _aprobada = widget.actividad.estado.toLowerCase() == 'aprobada';
+    // Estado - Normalizar a uno de los tres valores permitidos
+    final estadoActual = widget.actividad.estado.toLowerCase();
+    if (estadoActual == 'aprobada') {
+      _estadoActividad = 'Aprobada';
+    } else if (estadoActual == 'cancelada') {
+      _estadoActividad = 'Cancelada';
+    } else {
+      _estadoActividad = 'Pendiente';
+    }
+    
+    // Tipo de actividad - Leer desde el modelo (normalizar)
+    final tipoActual = widget.actividad.tipo.trim();
+    if (tipoActual.toLowerCase() == 'extraescolar') {
+      _tipoActividad = 'Extraescolar';
+    } else if (tipoActual.toLowerCase() == 'complementaria') {
+      _tipoActividad = 'Complementaria';
+    } else {
+      // Si no coincide con ninguno, usar Complementaria por defecto
+      _tipoActividad = 'Complementaria';
+    }
+    
+    print('[DEBUG] Tipo actividad cargado: "${widget.actividad.tipo}" -> $_tipoActividad');
+    
+    // Inicializar profesor responsable
+    if (widget.actividad.responsable != null) {
+      _selectedProfesorId = widget.actividad.responsable!.uuid;
+      print('[DEBUG] Profesor seleccionado: ${widget.actividad.responsable!.nombre} (${_selectedProfesorId})');
+    } else {
+      print('[DEBUG] No hay profesor responsable en la actividad');
+    }
     
     // Cargar datos
     _loadData();
@@ -80,43 +104,24 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
 
   Future<void> _loadData() async {
     try {
-
-      
       // Cargar profesores desde la API
       final profesores = await _profesorService.fetchProfesores();
-
-      for (var p in profesores) {
-
-      }
-      
-      // Cargar departamentos desde la API
-      final departamentos = await _catalogoService.fetchDepartamentos();
-
-      for (var d in departamentos) {
-
-      }
       
       setState(() {
         _profesores = profesores;
-        _departamentos = departamentos;
         
-        // Seleccionar valores actuales
-        if (widget.actividad.solicitante != null) {
-          // Buscar el profesor por correo electrónico ya que el UUID puede no coincidir
-          final profesor = _profesores.firstWhere(
-            (p) => p.correo.toLowerCase() == widget.actividad.solicitante!.correo.toLowerCase(),
-            orElse: () => _profesores.first,
-          );
-          _selectedProfesorId = profesor.uuid;
-
-
+        // Validar que el profesor seleccionado existe en la lista
+        if (_selectedProfesorId != null) {
+          final profesorExists = _profesores.any((p) => p.uuid == _selectedProfesorId);
+          if (!profesorExists) {
+            print('[Warning] Profesor con UUID $_selectedProfesorId no encontrado en la lista');
+            _selectedProfesorId = null;
+          }
         }
-        // Ya no usamos departamento, ahora es responsable
         
         _isLoading = false;
       });
       
-
     } catch (e, stackTrace) {
       print('[Error] Cargando datos: $e');
       print('[Error] StackTrace: $stackTrace');
@@ -126,12 +131,16 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       
       // Mostrar error al usuario
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cargar datos: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        try {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al cargar datos: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } catch (e) {
+          print('[Error] No se pudo mostrar SnackBar: $e');
+        }
       }
     }
   }
@@ -279,13 +288,17 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     
     // Ya no comparamos departamento, ahora usamos responsable
     
-    // Comparar estado (aprobada se mapea a estado "Aprobada" o "Pendiente")
-    final estadoOriginal = (widget.actividad.estado == 'Aprobada');
-    print('[DIALOG] Comparando aprobada: "$_aprobada" vs "$estadoOriginal" (estado: "${widget.actividad.estado}")');
-    if (_aprobada != estadoOriginal) {
-      print('[DIALOG] CAMBIO en aprobada detectado');
+    // Comparar estado
+    print('[DIALOG] Comparando estado: "$_estadoActividad" vs "${widget.actividad.estado}"');
+    if (_estadoActividad != widget.actividad.estado) {
+      print('[DIALOG] CAMBIO en estado detectado');
       hasChanges = true;
     }
+    
+    // Comparar tipo de actividad
+    // TODO: Cuando se agregue el campo al modelo, comparar aquí
+    print('[DIALOG] Tipo de actividad: "$_tipoActividad" (nuevo campo, siempre se considera cambio)');
+    hasChanges = true; // Por ahora siempre marcamos cambio hasta que el backend soporte este campo
     
     // Comparar folleto
     if (_folletoChanged) {
@@ -306,8 +319,8 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
         'hini': '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}:00',
         'hfin': '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}:00',
         'profesorId': _selectedProfesorId,
-        'departamentoId': _selectedDepartamentoId,
-        'aprobada': _aprobada,
+        'estado': _estadoActividad, // Aprobada, Pendiente o Cancelada
+        'tipoActividad': _tipoActividad, // Complementaria o Extraescolar
       };
       
       // Añadir folleto si cambió
@@ -326,37 +339,108 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Dialog(
+      backgroundColor: Colors.transparent,
       child: Container(
-        width: 600,
+        width: 650,
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.25),
+                  Color.fromRGBO(21, 101, 192, 0.20),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.95),
+                  Color.fromRGBO(144, 202, 249, 0.85),
+                ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.1) 
+              : const Color.fromRGBO(0, 0, 0, 0.05),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.5) 
+                : const Color.fromRGBO(0, 0, 0, 0.2),
+              offset: const Offset(0, 8),
+              blurRadius: 24.0,
+              spreadRadius: -2,
+            ),
+          ],
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
+            // Header moderno
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               decoration: BoxDecoration(
-                color: Color(0xFF1976d2),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF1976d2).withOpacity(0.9),
+                    Color(0xFF1565c0).withOpacity(0.95),
+                  ],
                 ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFF1976d2).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Editar Actividad',
-                    style: TextStyle(
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.edit_rounded,
                       color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      size: 24,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      'Editar Actividad',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close_rounded, color: Colors.white),
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: 'Cerrar',
+                    ),
                   ),
                 ],
               ),
@@ -365,115 +449,112 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
             // Content
             Expanded(
               child: _isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976d2)),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Cargando datos...',
+                            style: TextStyle(
+                              color: Color(0xFF1976d2),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : SingleChildScrollView(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.all(24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Nombre
-                          TextField(
+                          _buildSectionTitle('Información Básica', Icons.info_rounded),
+                          SizedBox(height: 12),
+                          _buildTextField(
                             controller: _nombreController,
-                            decoration: InputDecoration(
-                              labelText: 'Nombre *',
-                              border: OutlineInputBorder(),
-                            ),
+                            label: 'Nombre de la actividad',
+                            hint: 'Ej: Visita al Museo del Prado',
+                            icon: Icons.title_rounded,
+                            isRequired: true,
                           ),
                           SizedBox(height: 16),
                           
                           // Descripción
-                          TextField(
+                          _buildTextField(
                             controller: _descripcionController,
-                            decoration: InputDecoration(
-                              labelText: 'Descripción',
-                              border: OutlineInputBorder(),
-                            ),
+                            label: 'Descripción',
+                            hint: 'Describe brevemente la actividad...',
+                            icon: Icons.description_rounded,
                             maxLines: 3,
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 24),
                           
-                          // Fecha Inicio
+                          // Fechas y Horas
+                          _buildSectionTitle('Fechas y Horarios', Icons.event_rounded),
+                          SizedBox(height: 12),
                           Row(
                             children: [
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectDate(context, true),
-                                  icon: Icon(Icons.calendar_today),
-                                  label: Text(
-                                    'Fecha Inicio: ${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
+                                child: _buildDateTimeButton(
+                                  label: 'Fecha Inicio',
+                                  icon: Icons.calendar_today_rounded,
+                                  value: '${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
+                                  onTap: () => _selectDate(context, true),
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 12),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectTime(context, true),
-                                  icon: Icon(Icons.access_time),
-                                  label: Text(
-                                    'Hora: ${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
+                                child: _buildDateTimeButton(
+                                  label: 'Hora Inicio',
+                                  icon: Icons.access_time_rounded,
+                                  value: '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
+                                  onTap: () => _selectTime(context, true),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 16),
-                          
-                          // Fecha Fin
+                          SizedBox(height: 12),
                           Row(
                             children: [
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectDate(context, false),
-                                  icon: Icon(Icons.calendar_today),
-                                  label: Text(
-                                    'Fecha Fin: ${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
+                                child: _buildDateTimeButton(
+                                  label: 'Fecha Fin',
+                                  icon: Icons.calendar_today_rounded,
+                                  value: '${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
+                                  onTap: () => _selectDate(context, false),
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 12),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () => _selectTime(context, false),
-                                  icon: Icon(Icons.access_time),
-                                  label: Text(
-                                    'Hora: ${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.all(12),
-                                    alignment: Alignment.centerLeft,
-                                  ),
+                                child: _buildDateTimeButton(
+                                  label: 'Hora Fin',
+                                  icon: Icons.access_time_rounded,
+                                  value: '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
+                                  onTap: () => _selectTime(context, false),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 24),
                           
-                          // Profesor Responsable
-                          DropdownButtonFormField<String>(
+                          // Responsables
+                          _buildSectionTitle('Responsables', Icons.people_rounded),
+                          SizedBox(height: 12),
+                          _buildDropdown<String>(
                             value: _profesores.any((p) => p.uuid == _selectedProfesorId) 
                                 ? _selectedProfesorId 
                                 : null,
-                            decoration: InputDecoration(
-                              labelText: 'Profesor Responsable',
-                              border: OutlineInputBorder(),
-                            ),
-                            isExpanded: true,
+                            label: 'Profesor Responsable',
+                            icon: Icons.person_rounded,
                             items: [
                               DropdownMenuItem<String>(
                                 value: null,
-                                child: Text('Seleccionar profesor...'),
+                                child: Text('Seleccionar profesor...', style: TextStyle(color: Colors.grey[600])),
                               ),
                               ..._profesores.map((profesor) {
                                 return DropdownMenuItem<String>(
@@ -488,76 +569,144 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                               });
                             },
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 24),
                           
-                          // Departamento
-                          DropdownButtonFormField<int>(
-                            value: _departamentos.any((d) => d.id == _selectedDepartamentoId) 
-                                ? _selectedDepartamentoId 
-                                : null,
-                            decoration: InputDecoration(
-                              labelText: 'Departamento',
-                              border: OutlineInputBorder(),
-                            ),
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem<int>(
-                                value: null,
-                                child: Text('Seleccionar departamento...'),
+                          // Estado de la Actividad
+                          _buildSectionTitle('Estado y Tipo', Icons.check_circle_rounded),
+                          SizedBox(height: 12),
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Color(0xFF1976d2).withOpacity(0.3),
+                                width: 1,
                               ),
-                              ..._departamentos.map((departamento) {
-                                return DropdownMenuItem<int>(
-                                  value: departamento.id,
-                                  child: Text(departamento.nombre),
-                                );
-                              }).toList(),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDepartamentoId = value;
-                              });
-                            },
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Estado de la Actividad',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1976d2),
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildRadioOption(
+                                        value: 'Pendiente',
+                                        groupValue: _estadoActividad,
+                                        label: 'Pendiente',
+                                        icon: Icons.schedule_rounded,
+                                        color: Colors.orange,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _estadoActividad = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: _buildRadioOption(
+                                        value: 'Aprobada',
+                                        groupValue: _estadoActividad,
+                                        label: 'Aprobada',
+                                        icon: Icons.check_circle_rounded,
+                                        color: Colors.green,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _estadoActividad = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: _buildRadioOption(
+                                        value: 'Cancelada',
+                                        groupValue: _estadoActividad,
+                                        label: 'Cancelada',
+                                        icon: Icons.cancel_rounded,
+                                        color: Colors.red,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _estadoActividad = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                           SizedBox(height: 16),
                           
-                          // Estado (Radio Buttons)
-                          Text(
-                            'Estado',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                          // Tipo de Actividad
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Color(0xFF1976d2).withOpacity(0.3),
+                                width: 1,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text('Pendiente'),
-                                  value: false,
-                                  groupValue: _aprobada,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _aprobada = value!;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.zero,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Tipo de Actividad',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1976d2),
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<bool>(
-                                  title: Text('Aprobada'),
-                                  value: true,
-                                  groupValue: _aprobada,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _aprobada = value!;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.zero,
+                                SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildRadioOption(
+                                        value: 'Complementaria',
+                                        groupValue: _tipoActividad,
+                                        label: 'Complementaria',
+                                        icon: Icons.school_rounded,
+                                        color: Color(0xFF1976d2),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _tipoActividad = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildRadioOption(
+                                        value: 'Extraescolar',
+                                        groupValue: _tipoActividad,
+                                        label: 'Extraescolar',
+                                        icon: Icons.sports_soccer_rounded,
+                                        color: Colors.purple,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _tipoActividad = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -566,28 +715,331 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
             
             // Actions
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey.shade300)),
+                color: isDark 
+                    ? Colors.grey[850]!.withOpacity(0.9)
+                    : Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    offset: Offset(0, -4),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('Cancelar'),
-                  ),
-                  SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _handleSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1976d2),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  // Botón Cancelar
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.grey[400]!,
+                          Colors.grey[500]!,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          offset: Offset(0, 4),
+                          blurRadius: 8,
+                        ),
+                      ],
                     ),
-                    child: Text('Guardar'),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Navigator.of(context).pop(),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.close_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  // Botón Guardar
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF1976d2),
+                          Color(0xFF1565c0),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF1976d2).withOpacity(0.4),
+                          offset: Offset(0, 4),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _handleSave,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.save_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Guardar Cambios',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper Widgets
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+        SizedBox(width: 12),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1976d2),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? hint,
+    int maxLines = 1,
+    bool isRequired = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Color(0xFF1976d2).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label + (isRequired ? ' *' : ''),
+          hintText: hint,
+          prefixIcon: Icon(icon, color: Color(0xFF1976d2)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateTimeButton({
+    required String label,
+    required IconData icon,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Color(0xFF1976d2).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 16, color: Colors.grey[600]),
+                    SizedBox(width: 4),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976d2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown<T>({
+    required T? value,
+    required String label,
+    required IconData icon,
+    required List<DropdownMenuItem<T>> items,
+    required void Function(T?) onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Color(0xFF1976d2).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: DropdownButtonFormField<T>(
+        value: value,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Color(0xFF1976d2)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+        isExpanded: true,
+        items: items,
+        onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _buildRadioOption({
+    required String value,
+    required String groupValue,
+    required String label,
+    required IconData icon,
+    required Color color,
+    required void Function(String?) onChanged,
+  }) {
+    final isSelected = value == groupValue;
+    return InkWell(
+      onTap: () => onChanged(value),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey[300]!,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? color : Colors.grey[300],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? color : Colors.grey[600],
               ),
             ),
           ],

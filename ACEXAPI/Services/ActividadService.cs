@@ -92,6 +92,7 @@ public class ActividadService : IActividadService
     {
         var actividad = await _context.Actividades
             .Include(a => a.Responsable)
+                .ThenInclude(r => r.Departamento)
             .Include(a => a.Localizacion)
             .Include(a => a.EmpTransporte)
             .Include(a => a.Alojamiento)
@@ -282,7 +283,9 @@ public class ActividadService : IActividadService
                 Nombre = actividad.Responsable.Nombre,
                 Apellidos = actividad.Responsable.Apellidos,
                 Email = actividad.Responsable.Correo,
-                FotoUrl = actividad.Responsable.FotoUrl
+                FotoUrl = actividad.Responsable.FotoUrl,
+                DepartamentoId = actividad.Responsable.DepartamentoId,
+                DepartamentoNombre = actividad.Responsable.Departamento?.Nombre
             } : null,
             LocalizacionId = actividad.LocalizacionId,
             LocalizacionNombre = actividad.Localizacion?.Nombre,

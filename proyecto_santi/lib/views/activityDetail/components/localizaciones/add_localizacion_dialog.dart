@@ -300,220 +300,706 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.add_location, color: Color(0xFF1976d2)),
-          SizedBox(width: 8),
-          Text('Gestionar Localizaciones'),
-        ],
-      ),
-      content: Container(
-        width: isWeb ? 700 : double.maxFinite,
-        height: isWeb ? 650 : MediaQuery.of(context).size.height * 0.8,
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: isWeb ? 750 : double.maxFinite,
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.25),
+                  Color.fromRGBO(21, 101, 192, 0.20),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.95),
+                  Color.fromRGBO(144, 202, 249, 0.85),
+                ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.1) 
+              : const Color.fromRGBO(0, 0, 0, 0.05),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              offset: Offset(0, 10),
+              blurRadius: 30,
+            ),
+          ],
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Campo de búsqueda
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Buscar y añadir dirección',
-                hintText: 'Ej: Calle Mayor 1, Torrelavega',
-                prefixIcon: Icon(Icons.search),
-                suffixIcon: _isSearching
-                    ? Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                _searchResults = [];
-                              });
-                            },
-                          )
-                        : null,
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            // Resultados de búsqueda (si hay)
-            if (_searchResults.isNotEmpty) ...[
-              Text(
-                'Resultados de búsqueda - Haz clic para añadir',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
+            // Header
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF1976d2),
+                    Color(0xFF1565c0),
+                  ],
                 ),
-              ),
-              SizedBox(height: 8),
-              Container(
-                height: 150,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                child: ListView.builder(
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final result = _searchResults[index];
-                    
-                    return ListTile(
-                      dense: true,
-                      leading: Icon(Icons.add_circle_outline, color: Color(0xFF1976d2)),
-                      title: Text(
-                        result.displayName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      onTap: () => _addLocalizacionFromSearch(result),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 16),
-            ],
-            
-            Divider(thickness: 2),
-            SizedBox(height: 8),
-            
-            // Título de localizaciones
-            Row(
-              children: [
-                Icon(Icons.list_alt, size: 18, color: Colors.grey[700]),
-                SizedBox(width: 8),
-                Text(
-                  'Localizaciones de esta actividad (${_localizacionesActuales.length})',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFF1976d2).withOpacity(0.3),
+                    offset: Offset(0, 4),
+                    blurRadius: 8,
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            
-            // Lista de localizaciones actuales
-            Expanded(
-              child: _localizacionesActuales.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.add_location_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Gestionar Localizaciones',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (_hasChanges)
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.location_off, size: 48, color: Colors.grey[400]),
-                          SizedBox(height: 12),
+                          Icon(
+                            Icons.edit_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 4),
                           Text(
-                            'No hay localizaciones añadidas',
-                            style: TextStyle(color: Colors.grey[600]),
+                            'Cambios pendientes',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: _localizacionesActuales.length,
-                      itemBuilder: (context, index) {
-                        final loc = _localizacionesActuales[index];
-                        final icono = _iconosLocalizaciones[loc.id] ?? 
-                                     (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                        
-                        return Card(
-                          margin: EdgeInsets.only(bottom: 8),
-                          elevation: 2,
-                          color: loc.esPrincipal 
-                              ? Colors.red.withOpacity(0.05)
-                              : null,
-                          child: ListTile(
-                            leading: Icon(
-                              icono,
-                              color: loc.esPrincipal ? Colors.red : Color(0xFF1976d2),
-                              size: 28,
-                            ),
-                            title: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    loc.nombre,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: loc.esPrincipal ? FontWeight.bold : FontWeight.normal,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (loc.esPrincipal)
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      'PRINCIPAL',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            subtitle: Text(
-                              loc.direccionCompleta.isEmpty 
-                                  ? 'Sin dirección' 
-                                  : loc.direccionCompleta,
-                              style: TextStyle(fontSize: 11),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.edit, size: 20, color: Color(0xFF1976d2)),
-                                  onPressed: () => _editLocalizacion(loc),
-                                  tooltip: 'Editar',
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete, size: 20, color: Colors.red),
-                                  onPressed: () => _removeLocalizacion(loc),
-                                  tooltip: 'Eliminar',
-                                ),
-                              ],
-                            ),
+                    ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(Icons.close_rounded, color: Colors.white),
+                    onPressed: () {
+                      if (_hasChanges) {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: Text('¿Salir sin guardar?'),
+                            content: Text('Tienes cambios pendientes. ¿Deseas salir sin guardarlos?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text('Cancelar'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                  Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                child: Text('Salir sin guardar'),
+                              ),
+                            ],
                           ),
                         );
-                      },
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    tooltip: 'Cerrar',
+                  ),
+                ],
+              ),
+            ),
+            
+            // Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Campo de búsqueda moderno
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Color(0xFF1976d2).withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.1),
+                            offset: Offset(0, 2),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          labelText: 'Buscar y añadir dirección',
+                          hintText: 'Ej: Calle Mayor 1, Torrelavega',
+                          prefixIcon: Icon(
+                            Icons.search_rounded,
+                            color: Color(0xFF1976d2),
+                          ),
+                          suffixIcon: _isSearching
+                              ? Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976d2)),
+                                    ),
+                                  ),
+                                )
+                              : _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.clear_rounded, color: Colors.grey),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() {
+                                          _searchResults = [];
+                                        });
+                                      },
+                                    )
+                                  : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        ),
+                      ),
                     ),
+                    SizedBox(height: 16),
+                    
+                    // Resultados de búsqueda
+                    if (_searchResults.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.travel_explore_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Resultados de búsqueda - Haz clic para añadir',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1976d2),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        height: 180,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Color(0xFF1976d2).withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF1976d2).withOpacity(0.1),
+                              offset: Offset(0, 2),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: ListView.builder(
+                          padding: EdgeInsets.all(8),
+                          itemCount: _searchResults.length,
+                          itemBuilder: (context, index) {
+                            final result = _searchResults[index];
+                            
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.transparent,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => _addLocalizacionFromSearch(result),
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                            ),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Icon(
+                                            Icons.add_circle_outline_rounded,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            result.displayName,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: isDark ? Colors.white : Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                    
+                    // Divisor
+                    Container(
+                      height: 2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            Color(0xFF1976d2).withOpacity(0.3),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    
+                    // Título de localizaciones
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.list_alt_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Localizaciones de esta actividad',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1976d2),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF1976d2).withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '${_localizacionesActuales.length}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    
+                    // Lista de localizaciones actuales
+                    Container(
+                      constraints: BoxConstraints(minHeight: 200, maxHeight: 400),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark 
+                            ? Colors.white.withOpacity(0.1) 
+                            : Colors.black.withOpacity(0.05),
+                          width: 1,
+                        ),
+                      ),
+                      child: _localizacionesActuales.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(40),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF1976d2).withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.location_off_rounded,
+                                        size: 48,
+                                        color: Color(0xFF1976d2).withOpacity(0.5),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'No hay localizaciones añadidas',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isDark ? Colors.white70 : Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Busca y añade direcciones usando el campo superior',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDark ? Colors.white54 : Colors.black38,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: EdgeInsets.all(8),
+                              shrinkWrap: true,
+                              itemCount: _localizacionesActuales.length,
+                              itemBuilder: (context, index) {
+                                final loc = _localizacionesActuales[index];
+                                final icono = _iconosLocalizaciones[loc.id] ?? 
+                                             (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
+                                
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 8),
+                                  decoration: BoxDecoration(
+                                    gradient: loc.esPrincipal 
+                                        ? LinearGradient(
+                                            colors: [
+                                              Colors.red.withOpacity(0.15),
+                                              Colors.red.withOpacity(0.08),
+                                            ],
+                                          )
+                                        : null,
+                                    color: loc.esPrincipal ? null : Colors.white.withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: loc.esPrincipal
+                                        ? Colors.red.withOpacity(0.4)
+                                        : Colors.transparent,
+                                      width: loc.esPrincipal ? 2 : 1,
+                                    ),
+                                    boxShadow: loc.esPrincipal
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.red.withOpacity(0.2),
+                                            blurRadius: 8,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ]
+                                      : [],
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: loc.esPrincipal
+                                                ? [Colors.red[400]!, Colors.red[600]!]
+                                                : [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                            ),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Icon(
+                                            icono,
+                                            color: Colors.white,
+                                            size: 24,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      loc.nombre,
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: loc.esPrincipal ? FontWeight.bold : FontWeight.w600,
+                                                        color: loc.esPrincipal 
+                                                          ? Colors.red[700]
+                                                          : (isDark ? Colors.white : Colors.black87),
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (loc.esPrincipal)
+                                                    Container(
+                                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                          colors: [Colors.red[400]!, Colors.red[600]!],
+                                                        ),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.star_rounded,
+                                                            size: 12,
+                                                            color: Colors.white,
+                                                          ),
+                                                          SizedBox(width: 4),
+                                                          Text(
+                                                            'PRINCIPAL',
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              fontWeight: FontWeight.bold,
+                                                              color: Colors.white,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                loc.direccionCompleta.isEmpty 
+                                                    ? 'Sin dirección' 
+                                                    : loc.direccionCompleta,
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: isDark ? Colors.white70 : Colors.black54,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFF1976d2).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.edit_rounded,
+                                              size: 18,
+                                              color: Color(0xFF1976d2),
+                                            ),
+                                            onPressed: () => _editLocalizacion(loc),
+                                            tooltip: 'Editar',
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.delete_rounded,
+                                              size: 18,
+                                              color: Colors.red,
+                                            ),
+                                            onPressed: () => _removeLocalizacion(loc),
+                                            tooltip: 'Eliminar',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            // Actions
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark 
+                    ? Colors.grey[850]!.withOpacity(0.9)
+                    : Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    offset: Offset(0, -4),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // Botón Guardar
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF1976d2),
+                          Color(0xFF1565c0),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF1976d2).withOpacity(0.4),
+                          offset: Offset(0, 4),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _guardarYCerrar,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.check_circle_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Guardar',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      actions: [
-        ElevatedButton.icon(
-          onPressed: _guardarYCerrar,
-          icon: Icon(Icons.save),
-          label: Text('Guardar'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF1976d2),
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }

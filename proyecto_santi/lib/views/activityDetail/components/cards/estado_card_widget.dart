@@ -29,6 +29,10 @@ class EstadoCardWidget extends StatelessWidget {
         estadoColor = Colors.green;
         estadoIcon = Icons.check_circle_rounded;
         break;
+      case 'cancelada':
+        estadoColor = Colors.red;
+        estadoIcon = Icons.cancel_rounded;
+        break;
       case 'rechazada':
         estadoColor = Colors.red;
         estadoIcon = Icons.cancel_rounded;
