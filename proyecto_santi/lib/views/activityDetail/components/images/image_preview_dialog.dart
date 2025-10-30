@@ -107,7 +107,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                           child: Icon(
                             Icons.add_photo_alternate_rounded,
                             color: Color(0xFF1976d2),
-                            size: !isWeb ? 20.dg : 6.sp,
+                            size: 24,
                           ),
                         ),
                         SizedBox(width: 12),
@@ -115,7 +115,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                           child: Text(
                             widget.isEditing ? 'Editar Imagen' : 'Vista Previa de la Imagen',
                             style: TextStyle(
-                              fontSize: !isWeb ? 16.dg : 5.sp,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Color(0xFF1A237E),
                             ),
@@ -208,7 +208,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     Text(
                       'Descripción (opcional)',
                       style: TextStyle(
-                        fontSize: !isWeb ? 13.dg : 4.sp,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1976d2),
                       ),
@@ -231,14 +231,14 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                         maxLines: 3,
                         maxLength: 200,
                         style: TextStyle(
-                          fontSize: !isWeb ? 13.dg : 4.sp,
+                          fontSize: 14,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
                         decoration: InputDecoration(
                           hintText: 'Añade una descripción para esta imagen...',
                           hintStyle: TextStyle(
                             color: Colors.grey,
-                            fontSize: !isWeb ? 12.dg : 3.8.sp,
+                            fontSize: 13,
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(12),
@@ -271,7 +271,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                             child: Text(
                               'Cancelar',
                               style: TextStyle(
-                                fontSize: !isWeb ? 13.dg : 4.sp,
+                                fontSize: 14,
                                 color: isDark ? Colors.white70 : Colors.black87,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -320,14 +320,14 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                               children: [
                                 Icon(
                                   Icons.check_circle_rounded,
-                                  size: !isWeb ? 18.dg : 5.sp,
+                                  size: 20,
                                   color: Colors.white,
                                 ),
                                 SizedBox(width: 8),
                                 Text(
                                   widget.isEditing ? 'Guardar Cambios' : 'Añadir Imagen',
                                   style: TextStyle(
-                                    fontSize: !isWeb ? 13.dg : 4.sp,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),

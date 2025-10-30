@@ -1,0 +1,37 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "acexchat",
+          "appId": "1:312191800375:android:01a0a898e1616af5099bb2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "acexchat",
+          "configurations": {
+            "android": "1:312191800375:android:01a0a898e1616af5099bb2",
+            "ios": "1:312191800375:ios:07c84e5a9605b9e1099bb2",
+            "macos": "1:312191800375:ios:07c84e5a9605b9e1099bb2",
+            "web": "1:312191800375:web:763bafc4184da334099bb2",
+            "windows": "1:312191800375:web:2edcce375b87efba099bb2"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "eur3",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

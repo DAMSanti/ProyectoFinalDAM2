@@ -1,11 +1,13 @@
 using System.Text;
 using ACEXAPI.Data;
 using ACEXAPI.Middleware;
+using ACEXAPI.ModelBinders;
 using ACEXAPI.Services;
 using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -14,7 +16,13 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+{
+    // Agregar el model binder personalizado para decimales
+    // Esto asegura que los decimales siempre se parseen con InvariantCulture (punto como decimal)
+    // independientemente de la configuración regional del servidor
+    options.ModelBinderProviders.Insert(0, new DecimalModelBinderProvider());
+})
     .AddJsonOptions(options =>
     {
         // Configurar UTF-8 para caracteres especiales (tildes, ñ, etc.)
@@ -212,6 +220,28 @@ app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
         ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
         ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET");
         ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type");
+    }
+});
+
+// Servir archivos de chat desde wwwroot/chat_media con ruta /chat_media
+var chatMediaPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "chat_media");
+if (!Directory.Exists(chatMediaPath))
+{
+    Directory.CreateDirectory(chatMediaPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(chatMediaPath),
+    RequestPath = "/chat_media",
+    OnPrepareResponse = ctx =>
+    {
+        // Agregar headers CORS manualmente para archivos de chat
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type");
+        // Cache de 1 hora para multimedia
+        ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=3600");
     }
 });
 

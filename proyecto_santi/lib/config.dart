@@ -8,23 +8,21 @@ class AppConfig {
   // IMPORTANTE: Para Android físico, usar la IP local de tu PC en la misma red WiFi
   static String get apiBaseUrl {
     if (kIsWeb) {
-      // Para web, usa localhost en desarrollo
+      // Para web, usa localhost
       return 'http://localhost:5000/api';
     } else {
-      // Para mobile (Android/iOS)
+      // Para mobile (Android/iOS) y desktop
       try {
         if (Platform.isAndroid) {
-          // Para Android físico: usa la IP de tu PC WiFi (192.168.1.42)
-          // IMPORTANTE: Cambia esta IP si tu red es diferente
-          return 'http://192.168.1.42:5000/api';
+          // Para Android: 10.0.2.2 es el localhost del emulador
+          return 'http://10.0.2.2:5000/api';
         } else if (Platform.isIOS) {
-          // Para iOS, localhost funciona en simulador
           return 'http://localhost:5000/api';
         }
       } catch (e) {
         // Fallback para desktop
       }
-      // Para desktop, localhost funciona bien
+      // Para desktop (Windows/Mac/Linux)
       return 'http://localhost:5000/api';
     }
   }
@@ -36,8 +34,8 @@ class AppConfig {
     } else {
       try {
         if (Platform.isAndroid) {
-          // Para Android físico: usa la IP de tu PC WiFi
-          return 'http://192.168.1.42:5000/uploads';
+          // Para Android emulador
+          return 'http://10.0.2.2:5000/uploads';
         } else if (Platform.isIOS) {
           return 'http://localhost:5000/uploads';
         }

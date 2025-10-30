@@ -565,61 +565,74 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
           ),
         ] : [],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Si el ancho es menor a 200px, mostrar solo icono
+          final bool showOnlyIcon = constraints.maxWidth < 200;
+          
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: value
-                    ? LinearGradient(
-                        colors: [
-                          color.withOpacity(0.8),
-                          color.withOpacity(0.6),
-                        ],
-                      )
-                    : LinearGradient(
-                        colors: [
-                          Colors.grey.withOpacity(0.3),
-                          Colors.grey.withOpacity(0.2),
-                        ],
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: value
+                          ? LinearGradient(
+                              colors: [
+                                color.withOpacity(0.8),
+                                color.withOpacity(0.6),
+                              ],
+                            )
+                          : LinearGradient(
+                              colors: [
+                                Colors.grey.withOpacity(0.3),
+                                Colors.grey.withOpacity(0.2),
+                              ],
+                            ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: value ? Colors.white : Colors.grey[600],
-                  size: isWeb ? 20 : 22.0,
+                      child: Icon(
+                        icon,
+                        color: value ? Colors.white : Colors.grey[600],
+                        size: isWeb ? 20 : 22.0,
+                      ),
+                    ),
+                    if (!showOnlyIcon) ...[
+                      SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: isWeb ? 14 : 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: value ? color : Colors.grey[600],
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              SizedBox(width: 12),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: isWeb ? 14 : 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: value ? color : Colors.grey[600],
+              Transform.scale(
+                scale: 0.9,
+                child: Switch(
+                  value: value,
+                  onChanged: onChanged,
+                  activeColor: color,
+                  activeTrackColor: color.withOpacity(0.5),
+                  inactiveThumbColor: Colors.grey[400],
+                  inactiveTrackColor: Colors.grey[300],
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
-          Transform.scale(
-            scale: 0.9,
-            child: Switch(
-              value: value,
-              onChanged: onChanged,
-              activeColor: color,
-              activeTrackColor: color.withOpacity(0.5),
-              inactiveThumbColor: Colors.grey[400],
-              inactiveTrackColor: Colors.grey[300],
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -744,7 +757,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     if (titulo == 'Presupuesto Estimado') {
                       if (_editandoPresupuesto) {
                         // Guardar cambios
-                        final nuevoPresupuesto = double.tryParse(_presupuestoController.text);
+                        // Reemplazar coma por punto para asegurar parseo correcto
+                        final textoLimpio = _presupuestoController.text.replaceAll(',', '.');
+                        final nuevoPresupuesto = double.tryParse(textoLimpio);
                         if (nuevoPresupuesto != null && nuevoPresupuesto >= 0) {
                           if (mounted) {
                             setState(() {
@@ -777,7 +792,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     } else if (titulo == 'Transporte') {
                       if (_editandoTransporte) {
                         // Guardar cambios de transporte
-                        final nuevoPrecio = double.tryParse(_precioTransporteController.text);
+                        // Reemplazar coma por punto para asegurar parseo correcto
+                        final textoLimpio = _precioTransporteController.text.replaceAll(',', '.');
+                        final nuevoPrecio = double.tryParse(textoLimpio);
                         if (nuevoPrecio != null && nuevoPrecio >= 0) {
                           // Capturar la empresa seleccionada ANTES del setState
                           final empresaSeleccionada = _empresaTransporteLocal;
@@ -866,7 +883,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       // Lógica de edición de Alojamiento
                       if (_editandoAlojamiento) {
                         // Guardar cambios
-                        final nuevoPrecio = double.tryParse(_precioAlojamientoController.text);
+                        // Reemplazar coma por punto para asegurar parseo correcto
+                        final textoLimpio = _precioAlojamientoController.text.replaceAll(',', '.');
+                        final nuevoPrecio = double.tryParse(textoLimpio);
                         final alojamientoSeleccionado = _alojamientoLocal;
                         
                         if (nuevoPrecio != null && nuevoPrecio >= 0) {
@@ -1006,7 +1025,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               autofocus: true,
               onSubmitted: (value) {
                 // Guardar al presionar Enter
-                final nuevoPresupuesto = double.tryParse(value);
+                // Reemplazar coma por punto para asegurar parseo correcto
+                final textoLimpio = value.replaceAll(',', '.');
+                final nuevoPresupuesto = double.tryParse(textoLimpio);
                 if (nuevoPresupuesto != null && nuevoPresupuesto >= 0) {
                   setState(() {
                     _editandoPresupuesto = false;
@@ -1720,7 +1741,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                   return;
                 }
                 
-                final cantidad = double.tryParse(cantidadStr);
+                // Reemplazar coma por punto para asegurar parseo correcto
+                final textoLimpio = cantidadStr.replaceAll(',', '.');
+                final cantidad = double.tryParse(textoLimpio);
                 if (cantidad == null || cantidad <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Ingresa una cantidad válida')),

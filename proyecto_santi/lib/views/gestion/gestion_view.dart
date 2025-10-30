@@ -12,11 +12,11 @@ class GestionView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Gestión',
-          style: TextStyle(fontSize: kIsWeb ? 6.sp : 20.dg),
+          style: TextStyle(fontSize: kIsWeb ? 20 : 20),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(kIsWeb ? 6.sp : 24.dg),
+        padding: EdgeInsets.all(kIsWeb ? 20 : 24),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 1200),
@@ -26,22 +26,22 @@ class GestionView extends StatelessWidget {
                 Text(
                   'Panel de Administración',
                   style: TextStyle(
-                    fontSize: kIsWeb ? 8.sp : 28.dg,
+                    fontSize: kIsWeb ? 24 : 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1976d2),
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: kIsWeb ? 4.sp : 16.dg),
+                SizedBox(height: kIsWeb ? 12 : 16),
                 Text(
                   'Selecciona una entidad para gestionar',
                   style: TextStyle(
-                    fontSize: kIsWeb ? 4.sp : 16.dg,
+                    fontSize: kIsWeb ? 14 : 16,
                     color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: kIsWeb ? 8.sp : 32.dg),
+                SizedBox(height: kIsWeb ? 24 : 32),
                 _buildEntityGrid(context),
               ],
             ),
@@ -103,8 +103,8 @@ class GestionView extends StatelessWidget {
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: kIsWeb ? 4 : 2,
         childAspectRatio: 1.2,
-        crossAxisSpacing: kIsWeb ? 4.sp : 16.dg,
-        mainAxisSpacing: kIsWeb ? 4.sp : 16.dg,
+        crossAxisSpacing: kIsWeb ? 12 : 16,
+        mainAxisSpacing: kIsWeb ? 12 : 16,
       ),
       itemCount: entities.length,
       itemBuilder: (context, index) {
@@ -136,20 +136,20 @@ class GestionView extends StatelessWidget {
         onTap: () => Navigator.pushNamed(context, route),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
+          padding: EdgeInsets.all(kIsWeb ? 12 : 16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
-                size: kIsWeb ? 12.sp : 48.dg,
+                size: kIsWeb ? 40 : 48,
                 color: color,
               ),
-              SizedBox(height: kIsWeb ? 3.sp : 12.dg),
+              SizedBox(height: kIsWeb ? 8 : 12),
               Text(
                 name,
                 style: TextStyle(
-                  fontSize: kIsWeb ? 4.sp : 16.dg,
+                  fontSize: kIsWeb ? 14 : 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),

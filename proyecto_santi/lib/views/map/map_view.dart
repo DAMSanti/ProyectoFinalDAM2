@@ -454,7 +454,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     child: Icon(
                       Icons.search_rounded,
                       color: isDark ? Colors.white : Color(0xFF1976d2),
-                      size: !isWeb ? 20.dg : 7.sp,
+                      size: 24,
                     ),
                   ),
                   SizedBox(width: 12),
@@ -464,7 +464,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       focusNode: _searchFocusNode,
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black87,
-                        fontSize: !isWeb ? 14.dg : 5.sp,
+                        fontSize: 14,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Buscar actividades...',
@@ -488,7 +488,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         icon: Icon(
                           Icons.close_rounded,
                           color: Colors.red,
-                          size: !isWeb ? 18.dg : 6.sp,
+                          size: 20,
                         ),
                         onPressed: () {
                           _searchController.clear();
@@ -585,7 +585,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                       actividad.titulo,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
-                                        fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                        fontSize: 14,
                                         color: isDark ? Colors.white : Colors.black87,
                                       ),
                                       maxLines: 1,
@@ -598,7 +598,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                         child: Text(
                                           actividad.descripcion!,
                                           style: TextStyle(
-                                            fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                            fontSize: 12,
                                             color: isDark
                                                 ? Colors.white.withOpacity(0.6)
                                                 : Colors.grey[600],
@@ -654,7 +654,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       'No se encontraron actividades',
                       style: TextStyle(
                         color: Colors.grey,
-                        fontSize: !isWeb ? 13.dg : 4.5.sp,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -776,7 +776,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           child: Icon(
                             Icons.event_rounded,
                             color: Colors.white,
-                            size: !isWeb ? 24.dg : 8.sp,
+                            size: 28,
                           ),
                         ),
                         SizedBox(width: 12),
@@ -787,7 +787,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               Text(
                                 _selectedActividad!.titulo,
                                 style: TextStyle(
-                                  fontSize: !isWeb ? 16.dg : 5.5.sp,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
@@ -808,7 +808,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                 child: Text(
                                   'Localización Principal',
                                   style: TextStyle(
-                                    fontSize: !isWeb ? 10.dg : 3.5.sp,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF4CAF50),
                                   ),
@@ -828,7 +828,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             icon: Icon(
                               Icons.close_rounded,
                               color: isDark ? Colors.white : Colors.black87,
-                              size: !isWeb ? 20.dg : 7.sp,
+                              size: 24,
                             ),
                             onPressed: () {
                               setState(() {
@@ -876,7 +876,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           children: [
                             Icon(
                               Icons.location_on_rounded,
-                              size: !isWeb ? 18.dg : 6.sp,
+                              size: 20,
                               color: Colors.red,
                             ),
                             SizedBox(width: 8),
@@ -887,7 +887,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                   color: isDark
                                       ? Colors.white.withOpacity(0.8)
                                       : Colors.grey[700],
-                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                  fontSize: 13,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -918,7 +918,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           children: [
                             Icon(
                               Icons.description_outlined,
-                              size: !isWeb ? 18.dg : 6.sp,
+                              size: 20,
                               color: Color(0xFF1976d2),
                             ),
                             SizedBox(width: 8),
@@ -929,7 +929,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                   color: isDark
                                       ? Colors.white.withOpacity(0.8)
                                       : Colors.grey[700],
-                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                  fontSize: 13,
                                 ),
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
@@ -964,12 +964,12 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           onPressed: () => _showActivityDetails(_selectedActividad!),
                           icon: Icon(
                             Icons.visibility_rounded,
-                            size: !isWeb ? 18.dg : 6.sp,
+                            size: 20,
                           ),
                           label: Text(
                             'Ver Detalles',
                             style: TextStyle(
-                              fontSize: !isWeb ? 14.dg : 5.sp,
+                              fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -1045,7 +1045,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               child: Icon(
                 Icons.info_outline_rounded,
                 color: Colors.white,
-                size: !isWeb ? 24.dg : 8.sp,
+                size: 28,
               ),
             ),
             SizedBox(width: 12),
@@ -1059,7 +1059,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     'Viendo localizaciones de:',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.9),
-                      fontSize: !isWeb ? 11.dg : 3.8.sp,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1068,7 +1068,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     _activityInDetailMode!.titulo,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: !isWeb ? 14.dg : 5.sp,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
@@ -1095,7 +1095,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               'Principal',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: !isWeb ? 10.dg : 3.5.sp,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -1121,7 +1121,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               'Secundaria',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: !isWeb ? 10.dg : 3.5.sp,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -1164,14 +1164,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         Icon(
                           Icons.info_outline_rounded,
                           color: Colors.white,
-                          size: !isWeb ? 24.dg : 8.sp,
+                          size: 28,
                         ),
                         SizedBox(height: 2),
                         Text(
                           'Info',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: !isWeb ? 10.dg : 3.5.sp,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1201,14 +1201,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         Icon(
                           Icons.close_rounded,
                           color: Colors.white,
-                          size: !isWeb ? 24.dg : 8.sp,
+                          size: 28,
                         ),
                         SizedBox(height: 2),
                         Text(
                           'Volver',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: !isWeb ? 10.dg : 3.5.sp,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

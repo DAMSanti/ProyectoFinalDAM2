@@ -143,9 +143,11 @@ class _DesktopShellState extends State<DesktopShell> {
         );
       case '/chatView':
         if (_chatViewArgs != null) {
+          final auth = Provider.of<Auth>(context, listen: false);
           return ChatView(
             activityId: _chatViewArgs!['activityId'],
             displayName: _chatViewArgs!['displayName'],
+            userId: auth.currentUser?.uuid ?? '0',
             onToggleTheme: widget.onToggleTheme,
             isDarkTheme: Theme.of(context).brightness == Brightness.dark,
           );
@@ -274,12 +276,14 @@ void navigateToChatInShell(BuildContext context, Map<String, dynamic> args) {
     shellState.navigateToChatView(args);
   } else {
     // Fallback para mobile o si no hay shell
+    final auth = Provider.of<Auth>(context, listen: false);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ChatView(
           activityId: args['activityId'],
           displayName: args['displayName'],
+          userId: auth.currentUser?.uuid ?? '0',
           onToggleTheme: () {},
           isDarkTheme: Theme.of(context).brightness == Brightness.dark,
         ),

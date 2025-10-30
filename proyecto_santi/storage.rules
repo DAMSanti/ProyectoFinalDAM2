@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Reglas para archivos multimedia del chat
+    match /chat_media/{actividadId}/{userId}/{fileName} {
+      // Permitir subida de archivos (máximo 10MB para imágenes, 50MB para videos)
+      allow write: if request.resource.size < 50 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*|video/.*|audio/.*');
+      
+      // Permitir lectura a cualquier usuario
+      allow read: if true;
+    }
+    
+    // Reglas para otros archivos (por si acaso)
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

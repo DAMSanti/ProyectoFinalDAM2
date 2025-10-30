@@ -181,6 +181,13 @@ public class ActividadService : IActividadService
 
     public async Task<ActividadDto?> UpdateAsync(int id, ActividadUpdateDto dto, IFormFile? folleto)
     {
+        // LOG: Valores recibidos del frontend
+        _logger.LogInformation("=== ACTUALIZAR ACTIVIDAD {Id} ===", id);
+        _logger.LogInformation("PresupuestoEstimado recibido: {Presupuesto}", dto.PresupuestoEstimado);
+        _logger.LogInformation("PrecioTransporte recibido: {PrecioTransporte}", dto.PrecioTransporte);
+        _logger.LogInformation("PrecioAlojamiento recibido: {PrecioAlojamiento}", dto.PrecioAlojamiento);
+        _logger.LogInformation("CostoReal recibido: {CostoReal}", dto.CostoReal);
+        
         var actividad = await _context.Actividades
             .Include(a => a.ProfesoresResponsables)
             .FirstOrDefaultAsync(a => a.Id == id);

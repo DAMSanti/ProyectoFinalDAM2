@@ -2,13 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/html.dart' as html;
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:ui_web' as ui_web;
+
+// Imports condicionales para plataforma
+import 'dart:io' if (dart.library.html) 'dart:html';
+import 'package:path_provider/path_provider.dart' if (dart.library.html) 'package:path_provider/path_provider.dart';
+
+// Import condicional para el helper de web
+import 'web_pdf_helper_stub.dart' if (dart.library.html) 'web_pdf_helper.dart';
 
 class PdfViewerDialog extends StatefulWidget {
   final String pdfUrl;
@@ -142,19 +145,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
         }
       } else {
         // Para móvil/escritorio
-        final response = await http.get(Uri.parse(fullUrl));
-        
-        if (response.statusCode == 200) {
-          final dir = await getApplicationDocumentsDirectory();
-          final file = File('${dir.path}/${widget.fileName}');
-          await file.writeAsBytes(response.bodyBytes);
-          
-          if (mounted) {
-            print('[PDF_VIEWER] PDF descargado en: ${file.path}');
-          }
-        } else {
-          throw Exception('Error al descargar el PDF');
-        }
+        await _downloadPdfNative(fullUrl);
       }
     } catch (e) {
       if (mounted) {
@@ -165,6 +156,24 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
         setState(() {
           _isDownloading = false;
         });
+      }
+    }
+  }
+
+  Future<void> _downloadPdfNative(String url) async {
+    if (!kIsWeb) {
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${dir.path}/${widget.fileName}');
+        await file.writeAsBytes(response.bodyBytes);
+        
+        if (mounted) {
+          print('[PDF_VIEWER] PDF descargado en: ${file.path}');
+        }
+      } else {
+        throw Exception('Error al descargar el PDF');
       }
     }
   }
@@ -395,24 +404,14 @@ class _WebPdfViewer extends StatefulWidget {
 }
 
 class _WebPdfViewerState extends State<_WebPdfViewer> {
+  bool _registered = false;
+
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      // Registrar el view factory para el iframe
-      ui_web.platformViewRegistry.registerViewFactory(
-        'pdf-viewer-${widget.blobUrl.hashCode}',
-        (int viewId) {
-          final iframe = html.IFrameElement()
-            ..src = widget.blobUrl
-            ..style.border = 'none'
-            ..style.width = '100%'
-            ..style.height = '100%';
-          
-          print('[PDF_VIEWER] IFrame creado con src: ${widget.blobUrl}');
-          return iframe;
-        },
-      );
+    if (kIsWeb && !_registered) {
+      registerWebPdfView(widget.blobUrl);
+      _registered = true;
     }
   }
 

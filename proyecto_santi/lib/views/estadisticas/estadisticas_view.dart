@@ -117,7 +117,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
           body: _isLoading
               ? Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
-                  padding: EdgeInsets.all(kIsWeb ? 6.sp : 16.dg),
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -127,7 +127,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                         child: Text(
                           'Estadísticas de Actividades',
                           style: TextStyle(
-                            fontSize: kIsWeb ? 7.sp : 24.dg,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF1976d2),
                           ),
@@ -224,7 +224,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
@@ -232,12 +232,12 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: kIsWeb ? 8.sp : 32.dg),
+          Icon(icon, color: color, size: 32),
           SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: kIsWeb ? 6.sp : 24.dg,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -246,7 +246,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
           Text(
             title,
             style: TextStyle(
-              fontSize: kIsWeb ? 3.5.sp : 12.dg,
+              fontSize: 12,
               color: Colors.grey,
             ),
             textAlign: TextAlign.center,

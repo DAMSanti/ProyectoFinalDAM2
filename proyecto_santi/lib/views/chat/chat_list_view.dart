@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -80,24 +82,38 @@ class ChatListViewState extends State<ChatListView> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: isDark 
-            ? const Color(0xFF0A0E21)
-            : const Color(0xFFF5F7FA),
-        body: Column(
-          children: [
-            // Search Bar (sin header)
-            Padding(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 16,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? const [
+                      Color(0xFF0A0E21),
+                      Color(0xFF1A1F3A),
+                    ]
+                  : const [
+                      Color(0xFFE3F2FD),
+                      Color(0xFFBBDEFB),
+                    ],
+            ),
+          ),
+          child: Column(
+            children: [
+              // Search Bar (sin header)
+              Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 16,
+                ),
+                child: _buildSearchBar(context, isDark, isWeb),
               ),
-              child: _buildSearchBar(context, isDark, isWeb),
-            ),
-            
-            // Activities List
-            Expanded(
-              child: _buildActivitiesList(context, isDark, isWeb),
-            ),
-          ],
+              
+              // Activities List
+              Expanded(
+                child: _buildActivitiesList(context, isDark, isWeb),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -107,22 +123,32 @@ class ChatListViewState extends State<ChatListView> {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  Colors.white.withOpacity(0.08),
+                  Colors.white.withOpacity(0.05),
+                ]
+              : [
+                  Colors.white.withOpacity(0.9),
+                  Colors.white.withOpacity(0.7),
+                ],
+        ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withOpacity(0.12)
+              : Colors.white.withOpacity(0.5),
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.1),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -131,27 +157,27 @@ class ChatListViewState extends State<ChatListView> {
         onChanged: _filterActivities,
         style: TextStyle(
           color: isDark ? Colors.white : Colors.black87,
-          fontSize: !isWeb ? 14.dg : 4.5.sp,
+          fontSize: 14,
         ),
         decoration: InputDecoration(
           hintText: 'Buscar actividades...',
           hintStyle: TextStyle(
             color: isDark ? Colors.white38 : Colors.black38,
-            fontSize: !isWeb ? 14.dg : 4.5.sp,
+            fontSize: 14,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: isDark
                 ? Colors.white.withOpacity(0.5)
                 : const Color(0xFF1976d2).withOpacity(0.7),
-            size: !isWeb ? 22.dg : 7.sp,
+            size: 24,
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.clear_rounded,
                     color: isDark ? Colors.white54 : Colors.black54,
-                    size: !isWeb ? 20.dg : 6.sp,
+                    size: 20,
                   ),
                   onPressed: () {
                     _searchController.clear();
@@ -188,7 +214,7 @@ class ChatListViewState extends State<ChatListView> {
                   'Cargando chats...',
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.black54,
-                    fontSize: !isWeb ? 14.dg : 4.5.sp,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -209,7 +235,7 @@ class ChatListViewState extends State<ChatListView> {
                   ),
                   child: Icon(
                     Icons.error_outline_rounded,
-                    size: !isWeb ? 48.dg : 16.sp,
+                    size: 48,
                     color: Colors.red,
                   ),
                 ),
@@ -217,7 +243,7 @@ class ChatListViewState extends State<ChatListView> {
                 Text(
                   'Error al cargar los chats',
                   style: TextStyle(
-                    fontSize: !isWeb ? 16.dg : 5.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white70 : Colors.black87,
                   ),
@@ -226,7 +252,7 @@ class ChatListViewState extends State<ChatListView> {
                 Text(
                   snapshot.error.toString(),
                   style: TextStyle(
-                    fontSize: !isWeb ? 12.dg : 4.sp,
+                    fontSize: 13,
                     color: Colors.red,
                   ),
                   textAlign: TextAlign.center,
@@ -253,7 +279,7 @@ class ChatListViewState extends State<ChatListView> {
                     _searchController.text.isEmpty
                         ? Icons.chat_bubble_outline_rounded
                         : Icons.search_off_rounded,
-                    size: !isWeb ? 64.dg : 20.sp,
+                    size: 64,
                     color: isDark
                         ? Colors.white.withOpacity(0.3)
                         : const Color(0xFF1976d2).withOpacity(0.5),
@@ -265,7 +291,7 @@ class ChatListViewState extends State<ChatListView> {
                       ? 'No hay actividades disponibles'
                       : 'No se encontraron resultados',
                   style: TextStyle(
-                    fontSize: !isWeb ? 16.dg : 5.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
@@ -276,7 +302,7 @@ class ChatListViewState extends State<ChatListView> {
                       ? 'Aún no hay actividades para chatear'
                       : 'Intenta con otra búsqueda',
                   style: TextStyle(
-                    fontSize: !isWeb ? 13.dg : 4.sp,
+                    fontSize: 13,
                     color: isDark ? Colors.white54 : Colors.black45,
                   ),
                 ),
@@ -303,12 +329,17 @@ class ChatListViewState extends State<ChatListView> {
                 isDark: isDark,
                 isWeb: isWeb,
                 onTap: () {
+                  final auth = Provider.of<Auth>(context, listen: false);
+                  final userId = auth.currentUser?.uuid ?? '0';
+                  final userName = auth.currentUser?.nombre ?? 'Usuario';
+                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ChatView(
                         activityId: actividad.id.toString(),
                         displayName: actividad.titulo,
+                        userId: userId,
                         onToggleTheme: widget.onToggleTheme,
                         isDarkTheme: widget.isDarkTheme,
                       ),
@@ -324,7 +355,7 @@ class ChatListViewState extends State<ChatListView> {
   }
 }
 
-class ActividadCard extends StatelessWidget {
+class ActividadCard extends StatefulWidget {
   final Actividad actividad;
   final bool isDark;
   final bool isWeb;
@@ -338,23 +369,24 @@ class ActividadCard extends StatelessWidget {
     required this.onTap,
   });
 
+  @override
+  State<ActividadCard> createState() => _ActividadCardState();
+}
+
+class _ActividadCardState extends State<ActividadCard> {
+  bool _isHovered = false;
+
   String _formatDateRange() {
     try {
-      final inicio = DateFormat('dd/MM/yyyy').parse(actividad.fini);
-      final fin = DateFormat('dd/MM/yyyy').parse(actividad.ffin);
-      
-      if (inicio.year == fin.year && inicio.month == fin.month && inicio.day == fin.day) {
-        return DateFormat('dd MMM yyyy', 'es_ES').format(inicio);
-      }
-      
-      return '${DateFormat('dd MMM', 'es_ES').format(inicio)} - ${DateFormat('dd MMM yyyy', 'es_ES').format(fin)}';
+      final inicio = DateTime.parse(widget.actividad.fini);
+      return DateFormat('dd/MM/yyyy').format(inicio);
     } catch (e) {
-      return '${actividad.fini} - ${actividad.ffin}';
+      return widget.actividad.fini;
     }
   }
 
   Color _getStatusColor() {
-    switch (actividad.estado.toLowerCase()) {
+    switch (widget.actividad.estado.toLowerCase()) {
       case 'aprobada':
         return const Color(0xFF4CAF50);
       case 'pendiente':
@@ -367,7 +399,7 @@ class ActividadCard extends StatelessWidget {
   }
 
   IconData _getStatusIcon() {
-    switch (actividad.estado.toLowerCase()) {
+    switch (widget.actividad.estado.toLowerCase()) {
       case 'aprobada':
         return Icons.check_circle_rounded;
       case 'pendiente':
@@ -381,236 +413,274 @@ class ActividadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [
-                  Color.fromRGBO(25, 118, 210, 0.25),
-                  Color.fromRGBO(21, 101, 192, 0.20),
-                ]
-              : const [
-                  Color.fromRGBO(187, 222, 251, 0.85),
-                  Color.fromRGBO(144, 202, 249, 0.75),
-                ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark 
-                ? const Color.fromRGBO(0, 0, 0, 0.4) 
-                : const Color.fromRGBO(0, 0, 0, 0.15),
-            offset: const Offset(0, 4),
-            blurRadius: 12.0,
-            spreadRadius: -1,
-          ),
-          // Sombra adicional para más profundidad
-          BoxShadow(
-            color: const Color(0xFF1976d2).withOpacity(isDark ? 0.15 : 0.1),
-            offset: const Offset(0, 8),
-            blurRadius: 16.0,
-            spreadRadius: -2,
-          ),
-        ],
-        border: Border.all(
-          color: isDark 
-              ? const Color.fromRGBO(255, 255, 255, 0.1) 
-              : const Color.fromRGBO(0, 0, 0, 0.05),
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Avatar con más sombra
-                Container(
-                  width: !isWeb ? 52.dg : 17.sp,
-                  height: !isWeb ? 52.dg : 17.sp,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF1976d2),
-                        Color(0xFF42A5F5),
+    final estadoColor = _getStatusColor();
+    final estadoIcon = _getStatusIcon();
+    
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          transform: _isHovered 
+              ? (Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..setTranslationRaw(8.0, 0.0, 0.0)
+                ..multiply(Matrix4.diagonal3Values(1.005, 1.005, 1.0)))
+              : Matrix4.identity(),
+          child: Container(
+            height: 95, // Altura fija para el surco horizontal
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.0),
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: widget.isDark
+                    ? const [
+                        Color.fromRGBO(25, 118, 210, 0.20),
+                        Color.fromRGBO(21, 101, 192, 0.15),
+                      ]
+                    : const [
+                        Color.fromRGBO(187, 222, 251, 0.75),
+                        Color.fromRGBO(144, 202, 249, 0.65),
                       ],
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF1976d2).withOpacity(0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      actividad.titulo.isNotEmpty
-                          ? actividad.titulo[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: !isWeb ? 20.dg : 7.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+              ),
+              boxShadow: [
+                // Sombra principal
+                BoxShadow(
+                  color: _isHovered 
+                      ? const Color.fromRGBO(25, 118, 210, 0.30)
+                      : (widget.isDark ? const Color.fromRGBO(0, 0, 0, 0.35) : const Color.fromRGBO(0, 0, 0, 0.12)),
+                  offset: _isHovered ? const Offset(6, 8) : const Offset(2, 3),
+                  blurRadius: _isHovered ? 20.0 : 10.0,
+                  spreadRadius: _isHovered ? 0 : -1,
                 ),
-                const SizedBox(width: 16),
-                
-                // Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title con más contraste
-                      Text(
-                        actividad.titulo,
-                        style: TextStyle(
-                          fontSize: !isWeb ? 15.dg : 5.sp,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF1565c0),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      
-                      // Description con mejor contraste
-                      if (actividad.descripcion != null && actividad.descripcion!.isNotEmpty)
-                        Text(
-                          actividad.descripcion!,
-                          style: TextStyle(
-                            fontSize: !isWeb ? 12.dg : 4.sp,
-                            color: isDark ? Colors.white.withOpacity(0.8) : Colors.black.withOpacity(0.7),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      const SizedBox(height: 8),
-                      
-                      // Date and Status con más visibilidad
-                      Row(
-                        children: [
-                          // Date con fondo más sólido
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.15)
-                                  : Colors.white.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.calendar_today_rounded,
-                                  size: !isWeb ? 11.dg : 3.5.sp,
-                                  color: isDark
-                                      ? Colors.white.withOpacity(0.9)
-                                      : const Color(0xFF1976d2),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _formatDateRange(),
-                                  style: TextStyle(
-                                    fontSize: !isWeb ? 10.dg : 3.5.sp,
-                                    color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          
-                          // Status con más opacidad
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor().withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _getStatusColor().withOpacity(0.5),
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _getStatusColor().withOpacity(0.2),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _getStatusIcon(),
-                                  size: !isWeb ? 11.dg : 3.5.sp,
-                                  color: _getStatusColor(),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  actividad.estado,
-                                  style: TextStyle(
-                                    fontSize: !isWeb ? 10.dg : 3.5.sp,
-                                    color: _getStatusColor(),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                // Sombra secundaria en hover
+                if (_isHovered)
+                  const BoxShadow(
+                    color: Color.fromRGBO(25, 118, 210, 0.15),
+                    offset: Offset(3, 4),
+                    blurRadius: 12.0,
                   ),
-                ),
-                
-                // Arrow Icon
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.05)
-                        : const Color(0xFF1976d2).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: !isWeb ? 16.dg : 5.sp,
-                    color: isDark
-                        ? Colors.white54
-                        : const Color(0xFF1976d2),
-                  ),
-                ),
               ],
+              border: Border.all(
+                color: _isHovered
+                    ? const Color.fromRGBO(25, 118, 210, 0.5)
+                    : (widget.isDark ? const Color.fromRGBO(255, 255, 255, 0.08) : const Color.fromRGBO(0, 0, 0, 0.04)),
+                width: _isHovered ? 1.5 : 1,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: Stack(
+                  children: [
+                    // Barra lateral izquierda decorativa
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 4,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: widget.actividad.tipo == 'Complementaria'
+                              ? [
+                                  Color(0xFF1976d2), // Azul oscuro
+                                  Color(0xFF42A5F5), // Azul medio
+                                  Color(0xFF64B5F6), // Azul claro
+                                ]
+                              : [
+                                  Color(0xFFE65100), // Naranja oscuro
+                                  Color(0xFFFF6F00), // Naranja medio
+                                  Color(0xFFFF9800), // Naranja claro
+                                ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Efecto de brillo en hover
+                    if (_isHovered)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                const Color.fromRGBO(25, 118, 210, 0.08),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    // Icono decorativo de fondo
+                    Positioned(
+                      right: -15,
+                      top: -15,
+                      child: Opacity(
+                        opacity: widget.isDark ? 0.04 : 0.03,
+                        child: Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 90,
+                          color: Color(0xFF1976d2),
+                        ),
+                      ),
+                    ),
+                    // Contenido principal
+                    InkWell(
+                      onTap: widget.onTap,
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
+                        child: Row(
+                          children: [
+                            // Icono del tipo de actividad
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(25, 118, 210, 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color.fromRGBO(25, 118, 210, 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.chat_rounded,
+                                color: Color(0xFF1976d2),
+                                size: 24,
+                              ),
+                            ),
+                            
+                            const SizedBox(width: 14),
+                            
+                            // Información de la actividad
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Título
+                                  Text(
+                                    widget.actividad.titulo,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: widget.isDark ? Colors.white : Color(0xFF1A237E),
+                                      letterSpacing: -0.3,
+                                      height: 1.2,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                  
+                                  const SizedBox(height: 4),
+                                  
+                                  // Descripción
+                                  Text(
+                                    widget.actividad.descripcion?.isNotEmpty == true 
+                                        ? widget.actividad.descripcion! 
+                                        : 'Sin descripción',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: widget.isDark ? Colors.white60 : Colors.black54,
+                                      height: 1.3,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(width: 14),
+                            
+                            // Fecha y estado
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Fecha con icono
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.access_time_rounded,
+                                      size: 14,
+                                      color: widget.isDark ? Colors.white54 : Colors.black45,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      _formatDateRange(),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: widget.isDark ? Colors.white60 : Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 6),
+                                
+                                // Badge de estado
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(
+                                      (estadoColor.r * 255.0).round(),
+                                      (estadoColor.g * 255.0).round(),
+                                      (estadoColor.b * 255.0).round(),
+                                      0.15,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Color.fromRGBO(
+                                        (estadoColor.r * 255.0).round(),
+                                        (estadoColor.g * 255.0).round(),
+                                        (estadoColor.b * 255.0).round(),
+                                        0.4,
+                                      ),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        estadoIcon,
+                                        size: 12,
+                                        color: estadoColor,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        widget.actividad.estado,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: estadoColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

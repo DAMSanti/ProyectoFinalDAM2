@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "presence": {
+      "$uid": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "typing": {
+      "$actividadId": {
+        "$uid": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+}

@@ -33,7 +33,7 @@ class _CrudSearchBarState extends State<CrudSearchBar> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
+      padding: EdgeInsets.all(kIsWeb ? 12 : 16),
       child: Row(
         children: [
           Expanded(
@@ -42,10 +42,10 @@ class _CrudSearchBarState extends State<CrudSearchBar> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(color: Colors.grey),
-                prefixIcon: Icon(Icons.search, size: kIsWeb ? 4.sp : 20.dg),
+                prefixIcon: Icon(Icons.search, size: kIsWeb ? 18 : 20),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear, size: kIsWeb ? 4.sp : 20.dg),
+                        icon: Icon(Icons.clear, size: kIsWeb ? 18 : 20),
                         onPressed: () {
                           _searchController.clear();
                           widget.onSearch('');
@@ -57,11 +57,11 @@ class _CrudSearchBarState extends State<CrudSearchBar> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 contentPadding: EdgeInsets.symmetric(
-                  horizontal: kIsWeb ? 4.sp : 16.dg,
-                  vertical: kIsWeb ? 3.sp : 12.dg,
+                  horizontal: kIsWeb ? 12 : 16,
+                  vertical: kIsWeb ? 10 : 12,
                 ),
               ),
-              style: TextStyle(fontSize: kIsWeb ? 4.sp : 14.dg),
+              style: TextStyle(fontSize: kIsWeb ? 13 : 14),
               onChanged: (value) {
                 widget.onSearch(value);
                 setState(() {});
@@ -69,20 +69,20 @@ class _CrudSearchBarState extends State<CrudSearchBar> {
             ),
           ),
           if (widget.onAdd != null) ...[
-            SizedBox(width: kIsWeb ? 4.sp : 16.dg),
+            SizedBox(width: kIsWeb ? 12 : 16),
             ElevatedButton.icon(
               onPressed: widget.onAdd,
-              icon: Icon(Icons.add, size: kIsWeb ? 4.sp : 20.dg),
+              icon: Icon(Icons.add, size: kIsWeb ? 18 : 20),
               label: Text(
                 widget.addButtonText ?? 'Añadir',
-                style: TextStyle(fontSize: kIsWeb ? 4.sp : 14.dg),
+                style: TextStyle(fontSize: kIsWeb ? 13 : 14),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF1976d2),
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(
-                  horizontal: kIsWeb ? 6.sp : 24.dg,
-                  vertical: kIsWeb ? 4.sp : 16.dg,
+                  horizontal: kIsWeb ? 20 : 24,
+                  vertical: kIsWeb ? 12 : 16,
                 ),
               ),
             ),

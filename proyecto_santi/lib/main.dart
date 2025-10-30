@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
-import 'package:proyecto_santi/config.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,24 +18,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Inicializamos Firebase con la info de la APi en secure storage. TODO: variables de entorno.
-    await SecureStorageConfig.storeFirebaseConfig();
-    await initializeDateFormatting('es_ES', null);
-
-    final config = await SecureStorageConfig
-        .retrieveFirebaseConfig(); // Retrieve the config
-
-    final firebaseConfig = FirebaseOptions(
-      apiKey: config['apiKey']!,
-      authDomain: config['authDomain']!,
-      projectId: config['projectId']!,
-      storageBucket: config['storageBucket']!,
-      messagingSenderId: config['messagingSenderId']!,
-      appId: config['appId']!,
-      measurementId: config['measurementId']!,
+    // Inicializamos Firebase con las opciones generadas automáticamente
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
-
-    await Firebase.initializeApp(options: firebaseConfig);
+    
+    await initializeDateFormatting('es_ES', null);
 
     // Limitamos el tamaño minimo de la ventana en windows, linux y mac
     if (!kIsWeb &&
