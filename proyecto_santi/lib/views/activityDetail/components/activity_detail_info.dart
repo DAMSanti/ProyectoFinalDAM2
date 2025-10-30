@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
@@ -39,10 +39,10 @@ class ActivityDetailInfo extends StatefulWidget {
   final Map<String, String> selectedImagesDescriptions;
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
-  final Function(int)? removeApiImage; // Nueva funci�n para eliminar fotos de la API
-  final Function(int)? editLocalImage; // Nueva función para editar imágenes locales
+  final Function(int)? removeApiImage; // Nueva funci?n para eliminar fotos de la API
+  final Function(int)? editLocalImage; // Nueva funci�n para editar im�genes locales
   final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
-  final int reloadTrigger; // N�mero que cambia cuando se debe recargar
+  final int reloadTrigger; // N?mero que cambia cuando se debe recargar
 
   const ActivityDetailInfo({
     super.key,
@@ -75,12 +75,12 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   List<Profesor> _profesoresParticipantesOriginales = [];
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
   List<Localizacion> _localizaciones = [];
-  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci�n
-  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripción
+  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci?n
+  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripci�n
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   bool _loadingLocalizaciones = false;
-  int? _editingGrupoId; // ID del grupo que se est� editando
+  int? _editingGrupoId; // ID del grupo que se est? editando
   
   // Variables para el folleto
   String? _folletoFileName;
@@ -139,7 +139,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
 
           
           if (!_iconosLocalizaciones.containsKey(loc.id)) {
-            // Si la localizaci�n tiene un icono guardado en la BD, usarlo
+            // Si la localizaci?n tiene un icono guardado en la BD, usarlo
             if (loc.icono != null && loc.icono!.isNotEmpty) {
               final iconData = IconHelper.getIcon(
                 loc.icono,
@@ -148,7 +148,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               _iconosLocalizaciones[loc.id] = iconData;
 
             } else {
-              // Si no tiene icono guardado, usar el icono por defecto seg�n si es principal
+              // Si no tiene icono guardado, usar el icono por defecto seg?n si es principal
               _iconosLocalizaciones[loc.id] = loc.esPrincipal ? Icons.location_pin : Icons.location_on;
 
             }
@@ -207,7 +207,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     } catch (e) {
       print('[ERROR] Error cargando participantes: $e');
       print('[ERROR] Stack trace: ${StackTrace.current}');
-      // Inicializar listas vac�as en caso de error
+      // Inicializar listas vac?as en caso de error
       setState(() {
         _profesoresParticipantesOriginales = [];
         _gruposParticipantesOriginales = [];
@@ -224,7 +224,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
   }
   
-  // M�todo p�blico para recargar datos desde el padre (al revertir)
+  // M?todo p?blico para recargar datos desde el padre (al revertir)
   Future<void> reloadData() async {
     print('[ACTIVITY_DETAIL_INFO] Recargando datos...');
     setState(() {
@@ -241,7 +241,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     print('[ACTIVITY_DETAIL_INFO] Datos recargados correctamente');
   }
 
-  // Método público para guardar las descripciones de fotos pendientes
+  // M�todo p�blico para guardar las descripciones de fotos pendientes
   Future<bool> savePhotoDescriptions() async {
     if (_photoDescriptionChanges.isEmpty) {
       print('[ACTIVITY_DETAIL_INFO] No hay cambios de descripciones de fotos para guardar');
@@ -289,7 +289,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           // En web, usar bytes en lugar de path
           if (kIsWeb) {
             _folletoFilePath = null; // No disponible en web
-            // Guardar bytes para subir despu�s
+            // Guardar bytes para subir despu?s
             if (file.bytes != null) {
               // Notificar con los bytes directamente
               if (widget.onActivityDataChanged != null) {
@@ -322,7 +322,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       _folletoFileName = null;
       _folletoFilePath = null;
       
-      // Notificar el cambio para activar el bot�n guardar
+      // Notificar el cambio para activar el bot?n guardar
       if (widget.onActivityDataChanged != null) {
         widget.onActivityDataChanged!({
           'deleteFolleto': true,
@@ -441,7 +441,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
+          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -460,7 +460,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título con icono
+                // T�tulo con icono
                 Row(
                   children: [
                     Container(
@@ -519,7 +519,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Layout responsivo: dos columnas en pantallas anchas, una columna en móvil
+        // Layout responsivo: dos columnas en pantallas anchas, una columna en m�vil
         constraints.maxWidth > 800
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -584,7 +584,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
+          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -603,7 +603,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título con icono y botón agregar
+                // T�tulo con icono y bot�n agregar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -848,7 +848,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
+          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -867,7 +867,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título con icono y botón agregar
+                // T�tulo con icono y bot�n agregar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1136,9 +1136,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     );
   }
 
-  /// Muestra el diálogo para editar la descripción de una foto existente
+  /// Muestra el di�logo para editar la descripci�n de una foto existente
   void _showImageEditDialog(BuildContext context, Photo photo) async {
-    // Obtener la descripción actual (puede haber cambios pendientes)
+    // Obtener la descripci�n actual (puede haber cambios pendientes)
     final currentDescription = _photoDescriptionChanges.containsKey(photo.id)
         ? _photoDescriptionChanges[photo.id]
         : photo.descripcion;
@@ -1151,14 +1151,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           initialDescription: currentDescription?.isNotEmpty == true ? currentDescription : null,
           isEditing: true,
           onConfirm: (description) {
-            // Solo retornar el valor, no guardar aún
+            // Solo retornar el valor, no guardar a�n
             Navigator.of(dialogContext).pop(description);
           },
         );
       },
     );
     
-    // Si se confirmó (result no es null), guardar cambio localmente
+    // Si se confirm� (result no es null), guardar cambio localmente
     if (result != null && mounted) {
       setState(() {
         // Guardar el cambio en el mapa temporal
@@ -1196,7 +1196,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   void _showAddProfesorDialog(BuildContext context) async {
     setState(() => _loadingProfesores = true);
     
-    // Capturar el ScaffoldMessenger antes del diálogo async
+    // Capturar el ScaffoldMessenger antes del di�logo async
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
@@ -1205,7 +1205,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (!mounted) return;
       
-      // Mostrar di�logo con selecci�n m�ltiple
+      // Mostrar di?logo con selecci?n m?ltiple
       final selectedProfesores = await showDialog<List<Profesor>>(
         context: context,
         builder: (BuildContext context) {
@@ -1218,7 +1218,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (selectedProfesores != null && selectedProfesores.isNotEmpty) {
         setState(() {
-          // Agregar solo los profesores que no est�n ya en la lista
+          // Agregar solo los profesores que no est?n ya en la lista
           for (var profesor in selectedProfesores) {
             if (!_profesoresParticipantes.any((p) => p.uuid == profesor.uuid)) {
               _profesoresParticipantes.add(profesor);
@@ -1258,7 +1258,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   void _showAddGrupoDialog(BuildContext context) async {
     setState(() => _loadingGrupos = true);
     
-    // Capturar el ScaffoldMessenger antes del diálogo async
+    // Capturar el ScaffoldMessenger antes del di�logo async
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     
     try {
@@ -1268,7 +1268,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (!mounted) return;
       
-      // Mostrar di�logo con selecci�n de cursos/grupos
+      // Mostrar di?logo con selecci?n de cursos/grupos
       final gruposSeleccionados = await showDialog<List<Grupo>>(
         context: context,
         builder: (BuildContext context) {
@@ -1282,7 +1282,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       
       if (gruposSeleccionados != null && gruposSeleccionados.isNotEmpty) {
         setState(() {
-          // Agregar los grupos seleccionados con el n�mero total de alumnos por defecto
+          // Agregar los grupos seleccionados con el n?mero total de alumnos por defecto
           for (var grupo in gruposSeleccionados) {
             if (!_gruposParticipantes.any((gp) => gp.grupo.id == grupo.id)) {
               _gruposParticipantes.add(GrupoParticipante(
@@ -1419,13 +1419,13 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   Widget _buildPresupuestoYLocalizacion(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
-    // En pantallas peque�as (< 800px), mostrar en columna
+    // En pantallas peque?as (< 800px), mostrar en columna
     // En pantallas grandes, mostrar en fila (50/50)
     if (constraints.maxWidth < 800) {
       return Column(
         children: [
           ActivityBudgetSection(
-            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci�n al revertir
+            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci?n al revertir
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
@@ -1433,7 +1433,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             onBudgetChanged: (budgetData) {
               // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el bot�n guardar
+              // Notificar al padre que hubo cambios para activar el bot?n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
@@ -1455,7 +1455,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         Expanded(
           flex: 1,
           child: ActivityBudgetSection(
-            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci�n al revertir
+            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci?n al revertir
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
@@ -1463,7 +1463,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             onBudgetChanged: (budgetData) {
               // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el bot�n guardar
+              // Notificar al padre que hubo cambios para activar el bot?n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
@@ -1668,7 +1668,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     );
   }
 
-  // Método para mostrar el diálogo de añadir localización
+  // M�todo para mostrar el di�logo de a�adir localizaci�n
   void _showAddLocalizacionDialog(BuildContext context) async {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
@@ -1718,7 +1718,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
   }
 
-  // M�todo para mostrar confirmaci�n de eliminaci�n de imagen
+  // M?todo para mostrar confirmaci?n de eliminaci?n de imagen
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int index) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -1746,7 +1746,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
   }
 
-  // M�todo para construir secci�n de comentarios
+  // M?todo para construir secci?n de comentarios
   Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
@@ -1796,7 +1796,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 }
 
-// Widget para scroll horizontal de im�genes
+// Widget para scroll horizontal de im?genes
 class _HorizontalImageScroller extends StatefulWidget {
   final BoxConstraints constraints;
   final bool isAdminOrSolicitante;
@@ -1844,7 +1844,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
       height: 200.0,
       child: Row(
         children: [
-          // Botón de cámara fijo (no hace scroll) - Modernizado
+          // Bot�n de c�mara fijo (no hace scroll) - Modernizado
           if (widget.isAdminOrSolicitante)
             Container(
               width: 160.0,
@@ -1912,7 +1912,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                 ),
               ),
             ),
-          // �rea con scroll para las im�genes
+          // ?rea con scroll para las im?genes
           Expanded(
             child: Listener(
               onPointerSignal: (pointerSignal) {

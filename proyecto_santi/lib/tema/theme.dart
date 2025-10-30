@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // Define tus colores globales
-const Color colorFondoLight = Color.fromARGB(255, 213, 223, 235);
+const Color colorFondoLight = Color.fromARGB(255, 187, 222, 251);
 const Color colorTextoLight = Color.fromARGB(255, 108, 124, 136);
-const Color colorAccentLight = Color.fromARGB(255, 150, 178, 200);
+const Color colorAccentLight = Color.fromARGB(255, 227, 242, 253);
 const Color colorSoftLight = Color.fromARGB(255, 176, 196, 222);
 const Color colorAccentDLight = Color.fromARGB(255, 126, 136, 180);
 //0xFF6C7C88

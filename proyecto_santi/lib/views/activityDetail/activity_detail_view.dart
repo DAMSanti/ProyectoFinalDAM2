@@ -747,7 +747,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           final actividadParaGuardar = Actividad(
             id: _actividadOriginal!.id,
             titulo: _datosEditados!['nombre'] ?? _actividadOriginal!.titulo,
-            tipo: _actividadOriginal!.tipo,
+            tipo: _datosEditados!['tipoActividad'] ?? _actividadOriginal!.tipo,
             descripcion: _datosEditados!['descripcion'] ?? _actividadOriginal!.descripcion,
             fini: _datosEditados!['fechaInicio'] ?? _actividadOriginal!.fini,
             ffin: _datosEditados!['fechaFin'] ?? _actividadOriginal!.ffin,
@@ -763,9 +763,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             precioAlojamiento: _datosEditados!['precioAlojamiento'] ?? _actividadOriginal!.precioAlojamiento,
             alojamiento: alojamientoParaGuardar,
             comentarios: _actividadOriginal!.comentarios,
-            estado: _datosEditados!.containsKey('aprobada')
-              ? (_datosEditados!['aprobada'] == true ? 'Aprobada' : 'Pendiente')
-              : _actividadOriginal!.estado,
+            estado: _datosEditados!['estado'] ?? _actividadOriginal!.estado,
             comentEstado: _actividadOriginal!.comentEstado,
             incidencias: _actividadOriginal!.incidencias,
             urlFolleto: _actividadOriginal!.urlFolleto,
