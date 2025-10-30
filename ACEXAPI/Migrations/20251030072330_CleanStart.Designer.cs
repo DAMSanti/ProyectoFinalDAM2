@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ACEXAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251029152635_SyncModelWithDatabase")]
-    partial class SyncModelWithDatabase
+    [Migration("20251030072330_CleanStart")]
+    partial class CleanStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,9 +43,6 @@ namespace ACEXAPI.Migrations
                     b.Property<decimal?>("CostoReal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("DepartamentoId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(1000)
@@ -108,8 +105,6 @@ namespace ACEXAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlojamientoId");
-
-                    b.HasIndex("DepartamentoId");
 
                     b.HasIndex("EmpTransporteId");
 
@@ -706,10 +701,6 @@ namespace ACEXAPI.Migrations
                         .HasForeignKey("AlojamientoId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("ACEXAPI.Models.Departamento", null)
-                        .WithMany("Actividades")
-                        .HasForeignKey("DepartamentoId");
-
                     b.HasOne("ACEXAPI.Models.EmpTransporte", "EmpTransporte")
                         .WithMany("Actividades")
                         .HasForeignKey("EmpTransporteId")
@@ -899,8 +890,6 @@ namespace ACEXAPI.Migrations
 
             modelBuilder.Entity("ACEXAPI.Models.Departamento", b =>
                 {
-                    b.Navigation("Actividades");
-
                     b.Navigation("Profesores");
                 });
 

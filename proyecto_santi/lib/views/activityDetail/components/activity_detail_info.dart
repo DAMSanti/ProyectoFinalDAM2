@@ -1690,7 +1690,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     // Si hay cambios, actualizar el estado local
     if (result != null && result['hasChanges'] == true) {
       final localizacionesRecibidas = List<Localizacion>.from(result['localizaciones']);
-      print('[DEBUG SAVE ICONOS] Localizaciones recibidas del di�logo: ${localizacionesRecibidas.length}');
+      print('[DEBUG SAVE ICONOS] Localizaciones recibidas del diálogo: ${localizacionesRecibidas.length}');
       
       for (var loc in localizacionesRecibidas) {
         print('[DEBUG SAVE ICONOS] Loc ID: ${loc.id}, Nombre: ${loc.nombre}, Icono: ${loc.icono}');
@@ -1702,7 +1702,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         if (result.containsKey('iconos')) {
           final iconosDelDialogo = result['iconos'] as Map<int, IconData>;
           _iconosLocalizaciones = Map<int, IconData>.from(iconosDelDialogo);
-          print('[DEBUG SAVE ICONOS] Iconos recibidos del di�logo: ${_iconosLocalizaciones.length}');
+          print('[DEBUG SAVE ICONOS] Iconos recibidos del diálogo: ${_iconosLocalizaciones.length}');
           for (var entry in _iconosLocalizaciones.entries) {
             print('[DEBUG SAVE ICONOS] ID: ${entry.key}, IconData codePoint: ${entry.value.codePoint}');
           }

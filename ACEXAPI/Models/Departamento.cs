@@ -16,5 +16,6 @@ public class Departamento
 
     // Relaciones
     public ICollection<Profesor> Profesores { get; set; } = new List<Profesor>();
-    public ICollection<Actividad> Actividades { get; set; } = new List<Actividad>();
+    // Actividades ya NO tienen relación directa con Departamento
+    // La relación es: Actividad -> Responsable (Profesor) -> Departamento
 }

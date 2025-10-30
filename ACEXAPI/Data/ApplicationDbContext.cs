@@ -75,6 +75,9 @@ public class ApplicationDbContext : DbContext
 
         // Configurar relaciones
         modelBuilder.Entity<Actividad>()
+            .Ignore("DepartamentoId"); // Ignorar esta columna que existe en BD pero no en el modelo
+
+        modelBuilder.Entity<Actividad>()
             .HasOne(a => a.Alojamiento)
             .WithMany(al => al.Actividades)
             .HasForeignKey(a => a.AlojamientoId)

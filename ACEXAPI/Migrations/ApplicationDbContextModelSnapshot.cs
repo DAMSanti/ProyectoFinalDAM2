@@ -887,8 +887,6 @@ namespace ACEXAPI.Migrations
 
             modelBuilder.Entity("ACEXAPI.Models.Departamento", b =>
                 {
-                    b.Navigation("Actividades");
-
                     b.Navigation("Profesores");
                 });
 

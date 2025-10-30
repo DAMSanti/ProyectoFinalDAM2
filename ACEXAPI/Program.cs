@@ -71,8 +71,14 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Database
+var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"============================================");
+Console.WriteLine($"ENTORNO: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"CONNECTION STRING: {dbConnectionString}");
+Console.WriteLine($"============================================");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(dbConnectionString));
 
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]!;
