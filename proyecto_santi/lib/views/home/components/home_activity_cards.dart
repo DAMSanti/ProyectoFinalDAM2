@@ -202,35 +202,35 @@ class ActivityInfo extends StatelessWidget {
               )
             : null,
       ),
-      padding: const EdgeInsets.fromLTRB(14.0, 12.0, 14.0, 12.0), // Padding reducido vertical
+      padding: const EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 8.0), // Padding optimizado para móvil
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, // Ocupar solo el espacio necesario
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Título con icono
+          // Título con icono más compacto
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(25, 118, 210, 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Icon(
                   Icons.event_note_rounded,
                   color: Color(0xFF1976d2),
-                  size: 18,
+                  size: 14,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   actividad.titulo,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14, // Reducido de 16
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Color(0xFF1A237E),
-                    letterSpacing: -0.5,
+                    color: isDark ? Colors.white : const Color(0xFF1A237E),
+                    letterSpacing: -0.3,
                     height: 1.2,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -240,28 +240,28 @@ class ActivityInfo extends StatelessWidget {
             ],
           ),
           
-          SizedBox(height: 10),
+          const SizedBox(height: 6), // Reducido de 10
           
-          // Descripción
+          // Descripción más compacta
           Text(
             actividad.descripcion?.isNotEmpty == true 
                 ? actividad.descripcion! 
                 : 'Sin descripción',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 11, // Reducido de 13
               color: isDark ? Colors.white70 : Colors.black87,
-              height: 1.4,
+              height: 1.3,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
           
-          const SizedBox(height: 10),
+          const SizedBox(height: 6), // Reducido de 10
           
-          // Divider sutil
+          // Divider más fino
           Container(
             height: 1,
-            margin: const EdgeInsets.symmetric(vertical: 6),
+            margin: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -273,32 +273,38 @@ class ActivityInfo extends StatelessWidget {
             ),
           ),
           
-          // Fecha y estado
+          // Fecha y estado más compactos
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Fecha con icono
-              Row(
-                children: [
-                  Icon(
-                    Icons.access_time_rounded,
-                    size: 15,
-                    color: isDark ? Colors.white60 : Colors.black45,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    fechaHora,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.white70 : Colors.black54,
-                      fontWeight: FontWeight.w500,
+              // Fecha con icono más pequeño
+              Flexible(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 12, // Reducido de 15
+                      color: isDark ? Colors.white60 : Colors.black45,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        fechaHora,
+                        style: TextStyle(
+                          fontSize: 10, // Reducido de 12
+                          color: isDark ? Colors.white70 : Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              // Badge de estado
+              const SizedBox(width: 4),
+              // Badge de estado más pequeño
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // Reducido
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(
                     (estadoColor.r * 255.0).round(),
@@ -306,7 +312,7 @@ class ActivityInfo extends StatelessWidget {
                     (estadoColor.b * 255.0).round(),
                     0.15,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Color.fromRGBO(
                       (estadoColor.r * 255.0).round(),
@@ -322,14 +328,14 @@ class ActivityInfo extends StatelessWidget {
                   children: [
                     Icon(
                       estadoIcon,
-                      size: 14,
+                      size: 10, // Reducido de 14
                       color: estadoColor,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 3),
                     Text(
                       actividad.estado,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 9, // Reducido de 12
                         fontWeight: FontWeight.bold,
                         color: estadoColor,
                       ),

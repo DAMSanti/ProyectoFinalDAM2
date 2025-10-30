@@ -120,25 +120,192 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
 
   void _showImagePicker() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
+    XFile? image;
+    
+    // En móvil, mostrar opciones de cámara o galería
+    if (isMobile) {
+      final ImageSource? source = await showModalBottomSheet<ImageSource>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        Color.fromRGBO(25, 118, 210, 0.25),
+                        Color.fromRGBO(21, 101, 192, 0.20),
+                      ]
+                    : [
+                        Color.fromRGBO(187, 222, 251, 0.95),
+                        Color.fromRGBO(144, 202, 249, 0.85),
+                      ],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle visual
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white30 : Colors.black26,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Título
+                  Text(
+                    'Seleccionar imagen',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // Opción: Tomar foto
+                  ListTile(
+                    leading: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1976d2).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.camera_alt_rounded,
+                        color: Color(0xFF1976d2),
+                        size: 24,
+                      ),
+                    ),
+                    title: Text(
+                      'Tomar foto',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Usa la cámara',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                  // Opción: Galería
+                  ListTile(
+                    leading: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.photo_library_rounded,
+                        color: Colors.purple,
+                        size: 24,
+                      ),
+                    ),
+                    title: Text(
+                      'Galería',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Elige de tus fotos',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
+                  SizedBox(height: 8),
+                  // Botón cancelar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: isDark 
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.black.withOpacity(0.05),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      
+      // Si el usuario canceló, salir
+      if (source == null) return;
+      
+      // Obtener imagen de la fuente seleccionada
+      image = await picker.pickImage(source: source);
+    } else {
+      // En desktop, usar directamente la galería
+      image = await picker.pickImage(source: ImageSource.gallery);
+    }
     
     if (image != null && mounted) {
+      // Capturar la imagen en una variable local no-nullable
+      final XFile selectedImage = image;
+      
       // Mostrar diálogo de preview con descripción
       await showDialog(
         context: context,
         builder: (BuildContext dialogContext) {
           return ImagePreviewDialog(
-            imageFile: image,
+            imageFile: selectedImage,
             onConfirm: (description) {
               // Cerrar el diálogo
               Navigator.of(dialogContext).pop();
               
               // Añadir la imagen con su descripción
               setState(() {
-                selectedImages.add(image);
+                selectedImages.add(selectedImage);
                 // Guardar la descripción asociada a esta imagen
                 if (description.isNotEmpty) {
-                  selectedImagesDescriptions[image.path] = description;
+                  selectedImagesDescriptions[selectedImage.path] = description;
                 }
                 isDataChanged = true;
               });
@@ -1347,12 +1514,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: shouldShowAppBar()
-                ? AndroidAppBar(
-              onToggleTheme: widget.onToggleTheme,
-              title: 'Actividades',
-            )
-                : null,
+            appBar: null,
             drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
                 ? OrientationBuilder(
               builder: (context, orientation) {

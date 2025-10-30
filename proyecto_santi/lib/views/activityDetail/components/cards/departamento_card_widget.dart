@@ -5,10 +5,12 @@ import 'package:proyecto_santi/models/profesor.dart';
 
 class DepartamentoCardWidget extends StatelessWidget {
   final Profesor? responsable;
+  final bool isMobile;
 
   const DepartamentoCardWidget({
     super.key,
     required this.responsable,
+    this.isMobile = false,
   });
 
   @override
@@ -25,12 +27,12 @@ class DepartamentoCardWidget extends StatelessWidget {
     final departamentoNombre = responsable?.depart?.nombre ?? 'Sin asignar';
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(
         color: isDark 
             ? Colors.white.withOpacity(0.05) 
             : Colors.white.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: isDark 
               ? Colors.white.withOpacity(0.1) 
@@ -42,18 +44,18 @@ class DepartamentoCardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(isMobile ? 5 : 6),
             decoration: BoxDecoration(
               color: const Color.fromRGBO(25, 118, 210, 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
             ),
             child: Icon(
               Icons.business_rounded,
               color: Color(0xFF1976d2),
-              size: isWeb ? 16 : 18.0,
+              size: isMobile ? 14 : (isWeb ? 16 : 18.0),
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: isMobile ? 8 : 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,16 +64,16 @@ class DepartamentoCardWidget extends StatelessWidget {
                 Text(
                   'Departamento',
                   style: TextStyle(
-                    fontSize: isWeb ? 11 : 13.0,
+                    fontSize: isMobile ? 10 : (isWeb ? 11 : 13.0),
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1976d2),
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: isMobile ? 2 : 4),
                 Text(
                   departamentoNombre,
                   style: TextStyle(
-                    fontSize: isWeb ? 13 : 15.0,
+                    fontSize: isMobile ? 12 : (isWeb ? 13 : 15.0),
                     fontWeight: FontWeight.w500,
                     color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                     height: 1.3,

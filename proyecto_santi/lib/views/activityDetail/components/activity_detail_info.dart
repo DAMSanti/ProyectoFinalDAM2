@@ -1836,18 +1836,19 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = widget.constraints.maxWidth < 600;
     
     return SizedBox(
       width: widget.constraints.maxWidth,
       height: 200.0,
       child: Row(
         children: [
-          // Bot�n de c�mara fijo (no hace scroll) - Modernizado
+          // Botón de cámara fijo (no hace scroll) - Adaptado para móvil
           if (widget.isAdminOrSolicitante)
             Container(
-              width: 160.0,
+              width: isMobile ? 100.0 : 160.0, // Más compacto en móvil
               height: 200.0,
-              margin: EdgeInsets.only(right: 12),
+              margin: EdgeInsets.only(right: isMobile ? 8 : 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -1862,17 +1863,17 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                           Color.fromRGBO(144, 202, 249, 0.5),
                         ],
                 ),
-                borderRadius: BorderRadius.circular(16.0),
+                borderRadius: BorderRadius.circular(isMobile ? 12.0 : 16.0),
                 border: Border.all(
                   color: Color(0xFF1976d2).withOpacity(0.3),
-                  width: 2,
+                  width: isMobile ? 1.5 : 2,
                   strokeAlign: BorderSide.strokeAlignInside,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Color(0xFF1976d2).withOpacity(0.2),
-                    offset: Offset(0, 4),
-                    blurRadius: 12,
+                    offset: Offset(0, isMobile ? 2 : 4),
+                    blurRadius: isMobile ? 8 : 12,
                   ),
                 ],
               ),
@@ -1880,33 +1881,10 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: widget.showImagePicker,
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF1976d2).withOpacity(0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add_photo_alternate_rounded,
-                          color: Color(0xFF1976d2),
-                          size: 48,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        'Añadir Foto',
-                        style: TextStyle(
-                          color: Color(0xFF1976d2),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(isMobile ? 12.0 : 16.0),
+                  child: isMobile
+                      ? _buildMobileAddButton(isDark)
+                      : _buildDesktopAddButton(isDark),
                 ),
               ),
             ),
@@ -1966,6 +1944,94 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Botón compacto para móviles - Diseño vertical minimalista
+  Widget _buildMobileAddButton(bool isDark) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Icono de cámara más pequeño y estilizado
+        Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF1976d2).withOpacity(0.2),
+                Color(0xFF1976d2).withOpacity(0.1),
+              ],
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFF1976d2).withOpacity(0.3),
+                offset: Offset(0, 2),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.add_a_photo_rounded,
+            color: Color(0xFF1976d2),
+            size: 32,
+          ),
+        ),
+        SizedBox(height: 8),
+        // Texto compacto
+        Column(
+          children: [
+            Icon(
+              Icons.add_circle_rounded,
+              color: Color(0xFF1976d2).withOpacity(0.7),
+              size: 16,
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Foto',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Color(0xFF1976d2),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Botón para desktop - Diseño más espacioso
+  Widget _buildDesktopAddButton(bool isDark) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Color(0xFF1976d2).withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.add_photo_alternate_rounded,
+            color: Color(0xFF1976d2),
+            size: 48,
+          ),
+        ),
+        SizedBox(height: 12),
+        Text(
+          'Añadir Foto',
+          style: TextStyle(
+            color: Color(0xFF1976d2),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

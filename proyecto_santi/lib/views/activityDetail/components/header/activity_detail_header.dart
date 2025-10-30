@@ -32,6 +32,8 @@ class ActivityDetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     // Parsear fechas y horas
     final DateTime fechaInicio = DateTime.parse(actividad.fini);
@@ -73,7 +75,7 @@ class ActivityDetailHeader extends StatelessWidget {
             Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -113,11 +115,11 @@ class ActivityDetailHeader extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Container(
-                  height: 4,
+                  height: isMobile ? 3 : 4,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(isMobile ? 16 : 20),
+                      topRight: Radius.circular(isMobile ? 16 : 20),
                     ),
                     gradient: LinearGradient(
                       colors: actividad.tipo == 'Complementaria'
@@ -136,21 +138,22 @@ class ActivityDetailHeader extends StatelessWidget {
                 ),
               ),
               // Patrón decorativo de fondo
-              Positioned(
-                right: -30,
-                top: -30,
-                child: Opacity(
-                  opacity: isDark ? 0.03 : 0.02,
-                  child: Icon(
-                    Icons.event_note_rounded,
-                    size: 150,
-                    color: Color(0xFF1976d2),
+              if (!isMobile)
+                Positioned(
+                  right: -30,
+                  top: -30,
+                  child: Opacity(
+                    opacity: isDark ? 0.03 : 0.02,
+                    child: Icon(
+                      Icons.event_note_rounded,
+                      size: 150,
+                      color: Color(0xFF1976d2),
+                    ),
                   ),
                 ),
-              ),
               // Contenido
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(isMobile ? 12.0 : 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -158,59 +161,71 @@ class ActivityDetailHeader extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(isMobile ? 6 : 8),
                           decoration: BoxDecoration(
                             color: const Color.fromRGBO(25, 118, 210, 0.15),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                           ),
                           child: Icon(
                             Icons.event_note_rounded,
                             color: Color(0xFF1976d2),
-                            size: isWeb ? 20 : 22.0,
+                            size: isMobile ? 18 : (isWeb ? 20 : 22.0),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: isMobile ? 8 : 12),
                         Expanded(
                           child: Text(
                             actividad.titulo,
                             style: TextStyle(
-                              fontSize: isWeb ? 20 : 22.0,
+                              fontSize: isMobile ? 16 : (isWeb ? 20 : 22.0),
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Color(0xFF1976d2),
                               letterSpacing: -0.5,
                               height: 1.2,
                             ),
+                            maxLines: isMobile ? 2 : null,
+                            overflow: isMobile ? TextOverflow.ellipsis : null,
                           ),
                         ),
                         if (isAdminOrSolicitante)
                           Container(
                             decoration: BoxDecoration(
                               color: Color(0xFF1976d2).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                             ),
                             child: IconButton(
-                              icon: Icon(Icons.edit_rounded, color: Color(0xFF1976d2)),
+                              icon: Icon(
+                                Icons.edit_rounded, 
+                                color: Color(0xFF1976d2),
+                                size: isMobile ? 18 : 24,
+                              ),
                               onPressed: onEditPressed,
                               tooltip: 'Editar actividad',
+                              padding: EdgeInsets.all(isMobile ? 6 : 8),
+                              constraints: isMobile ? BoxConstraints() : null,
                             ),
                           ),
                       ],
                     ),
                     
-                    SizedBox(height: 16),
+                    SizedBox(height: isMobile ? 10 : 16),
                     
                     // Descripción directamente debajo del título
                     if (actividad.descripcion != null && actividad.descripcion!.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                        padding: EdgeInsets.only(
+                          left: isMobile ? 4 : 8.0, 
+                          right: isMobile ? 4 : 8.0, 
+                          bottom: isMobile ? 6 : 8.0,
+                        ),
                         child: Text(
                           actividad.descripcion!,
                           style: TextStyle(
-                            fontSize: isWeb ? 14 : 16.0,
+                            fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                             color: isDark ? Colors.white.withOpacity(0.85) : Colors.black87,
                             height: 1.5,
                           ),
-                          maxLines: 3,
+                          maxLines: isMobile ? 2 : 3,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -218,7 +233,7 @@ class ActivityDetailHeader extends StatelessWidget {
                     // Divider decorativo
                     Container(
                       height: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      margin: EdgeInsets.symmetric(vertical: isMobile ? 6 : 8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -232,72 +247,131 @@ class ActivityDetailHeader extends StatelessWidget {
                       ),
                     ),
                     
-                    SizedBox(height: 12),
+                    SizedBox(height: isMobile ? 8 : 12),
                     
-                    // Primera fila: Fecha/Hora (izq), Departamento (centro), Estado (der)
-                    Row(
-                      children: [
-                        // Fecha y hora
-                        Expanded(
-                          flex: 4,
-                          child: InfoCardWidget(
-                            icon: Icons.access_time_rounded,
-                            label: 'Fecha y Hora',
-                            value: dateText,
+                    // Layout condicional: móvil = vertical, desktop = horizontal
+                    if (isMobile) ...[
+                      // MÓVIL: Layout vertical compacto
+                      // Fila 1: Fecha y Estado
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: InfoCardWidget(
+                              icon: Icons.access_time_rounded,
+                              label: 'Fecha',
+                              value: dateText,
+                              isMobile: true,
+                            ),
                           ),
-                        ),
-                        
-                        SizedBox(width: 12),
-                        
-                        // Departamento
-                        Expanded(
-                          flex: 3,
-                          child: DepartamentoCardWidget(
-                            responsable: actividad.responsable,
+                          SizedBox(width: 8),
+                          Expanded(
+                            flex: 4,
+                            child: EstadoCardWidget(
+                              estado: actividad.estado,
+                              isMobile: true,
+                            ),
                           ),
-                        ),
-                        
-                        SizedBox(width: 12),
-                        
-                        // Estado
-                        Expanded(
-                          flex: 3,
-                          child: EstadoCardWidget(estado: actividad.estado),
-                        ),
-                      ],
-                    ),
-                    
-                    SizedBox(height: 12),
-                    
-                    // Segunda fila: Responsable (izq) y Folleto (der)
-                    Row(
-                      children: [
-                        // Responsable con foto
-                        Expanded(
-                          flex: 6,
-                          child: _ResponsableCard(
-                            responsable: actividad.responsable,
-                            isDark: isDark,
-                            isWeb: isWeb,
+                        ],
+                      ),
+                      
+                      SizedBox(height: 8),
+                      
+                      // Fila 2: Departamento
+                      DepartamentoCardWidget(
+                        responsable: actividad.responsable,
+                        isMobile: true,
+                      ),
+                      
+                      SizedBox(height: 8),
+                      
+                      // Fila 3: Responsable
+                      _ResponsableCard(
+                        responsable: actividad.responsable,
+                        isDark: isDark,
+                        isWeb: isWeb,
+                        isMobile: true,
+                      ),
+                      
+                      SizedBox(height: 8),
+                      
+                      // Fila 4: Folleto
+                      FolletoCardWidget(
+                        folletoFileName: folletoFileName,
+                        folletoMarkedForDeletion: folletoMarkedForDeletion,
+                        actividadFolletoUrl: actividad.urlFolleto,
+                        isAdminOrSolicitante: isAdminOrSolicitante,
+                        onSelectFolleto: onSelectFolleto,
+                        onDeleteFolleto: onDeleteFolleto,
+                        isMobile: true,
+                      ),
+                    ] else ...[
+                      // DESKTOP: Layout original horizontal
+                      // Primera fila: Fecha/Hora (izq), Departamento (centro), Estado (der)
+                      Row(
+                        children: [
+                          // Fecha y hora
+                          Expanded(
+                            flex: 4,
+                            child: InfoCardWidget(
+                              icon: Icons.access_time_rounded,
+                              label: 'Fecha y Hora',
+                              value: dateText,
+                            ),
                           ),
-                        ),
-                        
-                        SizedBox(width: 12),
-                        
-                        // Folleto
-                        Expanded(
-                          flex: 4,
-                          child: FolletoCardWidget(
-                            folletoFileName: folletoFileName,
-                            folletoMarkedForDeletion: folletoMarkedForDeletion,
-                            actividadFolletoUrl: actividad.urlFolleto,
-                            isAdminOrSolicitante: isAdminOrSolicitante,
-                            onSelectFolleto: onSelectFolleto,
-                            onDeleteFolleto: onDeleteFolleto,
+                          
+                          SizedBox(width: 12),
+                          
+                          // Departamento
+                          Expanded(
+                            flex: 3,
+                            child: DepartamentoCardWidget(
+                              responsable: actividad.responsable,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                          
+                          SizedBox(width: 12),
+                          
+                          // Estado
+                          Expanded(
+                            flex: 3,
+                            child: EstadoCardWidget(estado: actividad.estado),
+                          ),
+                        ],
+                      ),
+                      
+                      SizedBox(height: 12),
+                      
+                      // Segunda fila: Responsable (izq) y Folleto (der)
+                      Row(
+                        children: [
+                          // Responsable con foto
+                          Expanded(
+                            flex: 6,
+                            child: _ResponsableCard(
+                              responsable: actividad.responsable,
+                              isDark: isDark,
+                              isWeb: isWeb,
+                            ),
+                          ),
+                          
+                          SizedBox(width: 12),
+                          
+                          // Folleto
+                          Expanded(
+                            flex: 4,
+                            child: FolletoCardWidget(
+                              folletoFileName: folletoFileName,
+                              folletoMarkedForDeletion: folletoMarkedForDeletion,
+                              actividadFolletoUrl: actividad.urlFolleto,
+                              isAdminOrSolicitante: isAdminOrSolicitante,
+                              onSelectFolleto: onSelectFolleto,
+                              onDeleteFolleto: onDeleteFolleto,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -307,11 +381,14 @@ class ActivityDetailHeader extends StatelessWidget {
         // Etiqueta de tipo de actividad (lengüeta de carpeta) - Por encima de todo
         Positioned(
           top: 0,
-          left: 40,
+          left: isMobile ? 20 : 40,
           child: Transform.translate(
-            offset: Offset(0, -28),
+            offset: Offset(0, isMobile ? -22 : -28),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 16, 
+                vertical: isMobile ? 6 : 8,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: actividad.tipo == 'Complementaria'
@@ -325,8 +402,8 @@ class ActivityDetailHeader extends StatelessWidget {
                       ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+                  topLeft: Radius.circular(isMobile ? 10 : 12),
+                  topRight: Radius.circular(isMobile ? 10 : 12),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -342,7 +419,7 @@ class ActivityDetailHeader extends StatelessWidget {
                 actividad.tipo == 'Complementaria' ? 'COMPLEMENTARIA' : 'EXTRAESCOLAR',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: isWeb ? 11 : 13.0,
+                  fontSize: isMobile ? 10 : (isWeb ? 11 : 13.0),
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
                 ),
@@ -362,11 +439,13 @@ class _ResponsableCard extends StatelessWidget {
   final dynamic responsable;
   final bool isDark;
   final bool isWeb;
+  final bool isMobile;
 
   const _ResponsableCard({
     required this.responsable,
     required this.isDark,
     required this.isWeb,
+    this.isMobile = false,
   });
 
   @override
@@ -380,12 +459,12 @@ class _ResponsableCard extends StatelessWidget {
         : 'SR';
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(
         color: isDark 
             ? Colors.white.withOpacity(0.05) 
             : Colors.white.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: isDark 
               ? Colors.white.withOpacity(0.1) 
@@ -398,8 +477,8 @@ class _ResponsableCard extends StatelessWidget {
         children: [
           // Foto de perfil circular
           Container(
-            width: 40,
-            height: 40,
+            width: isMobile ? 36 : 40,
+            height: isMobile ? 36 : 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
@@ -423,14 +502,14 @@ class _ResponsableCard extends StatelessWidget {
                 iniciales,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: isWeb ? 14 : 16.0,
+                  fontSize: isMobile ? 14 : (isWeb ? 14 : 16.0),
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
           
-          SizedBox(width: 12),
+          SizedBox(width: isMobile ? 10 : 12),
           
           // Información del responsable
           Expanded(
@@ -441,16 +520,16 @@ class _ResponsableCard extends StatelessWidget {
                 Text(
                   'Responsable',
                   style: TextStyle(
-                    fontSize: isWeb ? 11 : 13.0,
+                    fontSize: isMobile ? 11 : (isWeb ? 11 : 13.0),
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1976d2),
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: isMobile ? 2 : 4),
                 Text(
                   nombre,
                   style: TextStyle(
-                    fontSize: isWeb ? 13 : 15.0,
+                    fontSize: isMobile ? 13 : (isWeb ? 13 : 15.0),
                     color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                     height: 1.3,
                   ),

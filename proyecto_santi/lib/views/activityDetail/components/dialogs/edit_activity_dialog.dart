@@ -337,15 +337,275 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     Navigator.of(context).pop();
   }
 
+  // Layout especial para mobile landscape (2 columnas)
+  Widget _buildLandscapeMobileLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // COLUMNA IZQUIERDA - Información básica y fechas
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Información Básica
+              _buildSectionTitle('Información Básica', Icons.info_rounded, true, true),
+              SizedBox(height: 8),
+              _buildTextField(
+                controller: _nombreController,
+                label: 'Nombre',
+                hint: 'Nombre de la actividad',
+                icon: Icons.title_rounded,
+                isRequired: true,
+                isMobile: true,
+                isMobileLandscape: true,
+              ),
+              SizedBox(height: 8),
+              _buildTextField(
+                controller: _descripcionController,
+                label: 'Descripción',
+                hint: 'Descripción breve',
+                icon: Icons.description_rounded,
+                maxLines: 2,
+                isMobile: true,
+                isMobileLandscape: true,
+              ),
+              SizedBox(height: 12),
+              
+              // Fechas y Horas
+              _buildSectionTitle('Fechas y Horarios', Icons.event_rounded, true, true),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDateTimeButton(
+                      label: 'Inicio',
+                      icon: Icons.calendar_today_rounded,
+                      value: '${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}',
+                      onTap: () => _selectDate(context, true),
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _buildDateTimeButton(
+                      label: 'Hora',
+                      icon: Icons.access_time_rounded,
+                      value: '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
+                      onTap: () => _selectTime(context, true),
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDateTimeButton(
+                      label: 'Fin',
+                      icon: Icons.calendar_today_rounded,
+                      value: '${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}',
+                      onTap: () => _selectDate(context, false),
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _buildDateTimeButton(
+                      label: 'Hora',
+                      icon: Icons.access_time_rounded,
+                      value: '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
+                      onTap: () => _selectTime(context, false),
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        
+        SizedBox(width: 12),
+        
+        // COLUMNA DERECHA - Responsable, estado y tipo
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Responsable
+              _buildSectionTitle('Responsable', Icons.people_rounded, true, true),
+              SizedBox(height: 8),
+              _buildDropdown<String>(
+                value: _profesores.any((p) => p.uuid == _selectedProfesorId) 
+                    ? _selectedProfesorId 
+                    : null,
+                label: 'Profesor',
+                icon: Icons.person_rounded,
+                items: [
+                  DropdownMenuItem<String>(
+                    value: null,
+                    child: Text('Seleccionar...', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  ),
+                  ..._profesores.map((profesor) {
+                    return DropdownMenuItem<String>(
+                      value: profesor.uuid,
+                      child: Text(
+                        '${profesor.nombre} ${profesor.apellidos}',
+                        style: TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedProfesorId = value;
+                  });
+                },
+                isMobile: true,
+                isMobileLandscape: true,
+              ),
+              SizedBox(height: 12),
+              
+              // Estado
+              _buildSectionTitle('Estado', Icons.check_circle_rounded, true, true),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildRadioOption(
+                      value: 'Pendiente',
+                      groupValue: _estadoActividad,
+                      label: 'Pend.',
+                      icon: Icons.schedule_rounded,
+                      color: Colors.orange,
+                      onChanged: (value) {
+                        setState(() {
+                          _estadoActividad = value!;
+                        });
+                      },
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Expanded(
+                    child: _buildRadioOption(
+                      value: 'Aprobada',
+                      groupValue: _estadoActividad,
+                      label: 'Aprob.',
+                      icon: Icons.check_circle_rounded,
+                      color: Colors.green,
+                      onChanged: (value) {
+                        setState(() {
+                          _estadoActividad = value!;
+                        });
+                      },
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Expanded(
+                    child: _buildRadioOption(
+                      value: 'Cancelada',
+                      groupValue: _estadoActividad,
+                      label: 'Cancel.',
+                      icon: Icons.cancel_rounded,
+                      color: Colors.red,
+                      onChanged: (value) {
+                        setState(() {
+                          _estadoActividad = value!;
+                        });
+                      },
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              
+              // Tipo
+              _buildSectionTitle('Tipo', Icons.category_rounded, true, true),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildRadioOption(
+                      value: 'Complementaria',
+                      groupValue: _tipoActividad,
+                      label: 'Compl.',
+                      icon: Icons.school_rounded,
+                      color: Color(0xFF1976d2),
+                      onChanged: (value) {
+                        setState(() {
+                          _tipoActividad = value!;
+                        });
+                      },
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: _buildRadioOption(
+                      value: 'Extraescolar',
+                      groupValue: _tipoActividad,
+                      label: 'Extra.',
+                      icon: Icons.sports_soccer_rounded,
+                      color: Colors.purple,
+                      onChanged: (value) {
+                        setState(() {
+                          _tipoActividad = value!;
+                        });
+                      },
+                      isMobile: true,
+                      isMobileLandscape: true,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
+    final isPortrait = orientation == Orientation.portrait;
+    final isMobile = screenWidth < 600;
+    // Considerar landscape mobile si:
+    // 1. Es mobile normal (< 600px) en landscape, O
+    // 2. Está en landscape con altura pequeña (< 500px) - para tablets pequeños en landscape
+    final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
     
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: isMobileLandscape
+          ? EdgeInsets.symmetric(horizontal: 20, vertical: 16)
+          : (isMobile 
+              ? EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+              : EdgeInsets.symmetric(horizontal: 40, vertical: 24)),
       child: Container(
-        width: 650,
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
+        width: isMobile ? double.infinity : 650,
+        constraints: BoxConstraints(
+          maxHeight: isMobileLandscape
+              ? screenHeight * 0.95
+              : (isMobile 
+                  ? screenHeight * 0.92 
+                  : screenHeight * 0.9)
+        ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -383,7 +643,10 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
           children: [
             // Header moderno
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
+                vertical: isMobileLandscape ? 10 : (isMobile ? 14 : 20)
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -394,8 +657,8 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                   ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
+                  topRight: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -408,24 +671,24 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                     ),
                     child: Icon(
                       Icons.edit_rounded,
                       color: Colors.white,
-                      size: 24,
+                      size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
                     ),
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
                   Expanded(
                     child: Text(
                       'Editar Actividad',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: isMobileLandscape ? 16 : (isMobile ? 18 : 22),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
@@ -434,10 +697,13 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
                     ),
                     child: IconButton(
                       icon: Icon(Icons.close_rounded, color: Colors.white),
+                      iconSize: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
+                      padding: EdgeInsets.all(isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
+                      constraints: BoxConstraints(),
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: 'Cerrar',
                     ),
@@ -468,83 +734,137 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                       ),
                     )
                   : SingleChildScrollView(
-                      padding: EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Nombre
-                          _buildSectionTitle('Información Básica', Icons.info_rounded),
-                          SizedBox(height: 12),
-                          _buildTextField(
-                            controller: _nombreController,
-                            label: 'Nombre de la actividad',
-                            hint: 'Ej: Visita al Museo del Prado',
-                            icon: Icons.title_rounded,
-                            isRequired: true,
-                          ),
-                          SizedBox(height: 16),
-                          
-                          // Descripción
-                          _buildTextField(
-                            controller: _descripcionController,
-                            label: 'Descripción',
-                            hint: 'Describe brevemente la actividad...',
-                            icon: Icons.description_rounded,
-                            maxLines: 3,
-                          ),
-                          SizedBox(height: 24),
-                          
-                          // Fechas y Horas
-                          _buildSectionTitle('Fechas y Horarios', Icons.event_rounded),
-                          SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildDateTimeButton(
-                                  label: 'Fecha Inicio',
-                                  icon: Icons.calendar_today_rounded,
-                                  value: '${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
-                                  onTap: () => _selectDate(context, true),
+                      padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 24)),
+                      child: isMobileLandscape 
+                          ? _buildLandscapeMobileLayout()
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Nombre
+                                _buildSectionTitle('Información Básica', Icons.info_rounded, isMobile, isMobileLandscape),
+                                SizedBox(height: isMobile ? 10 : 12),
+                                _buildTextField(
+                                  controller: _nombreController,
+                                  label: 'Nombre de la actividad',
+                                  hint: 'Ej: Visita al Museo del Prado',
+                                  icon: Icons.title_rounded,
+                                  isRequired: true,
+                                  isMobile: isMobile,
+                                  isMobileLandscape: isMobileLandscape,
                                 ),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: _buildDateTimeButton(
-                                  label: 'Hora Inicio',
-                                  icon: Icons.access_time_rounded,
-                                  value: '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
-                                  onTap: () => _selectTime(context, true),
+                                SizedBox(height: isMobile ? 12 : 16),
+                                
+                                // Descripción
+                                _buildTextField(
+                                  controller: _descripcionController,
+                                  label: 'Descripción',
+                                  hint: 'Describe brevemente la actividad...',
+                                  icon: Icons.description_rounded,
+                                  maxLines: 3,
+                                  isMobile: isMobile,
+                                  isMobileLandscape: isMobileLandscape,
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildDateTimeButton(
-                                  label: 'Fecha Fin',
-                                  icon: Icons.calendar_today_rounded,
-                                  value: '${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
-                                  onTap: () => _selectDate(context, false),
+                                SizedBox(height: isMobile ? 16 : 24),
+                                
+                                // Fechas y Horas
+                                _buildSectionTitle('Fechas y Horarios', Icons.event_rounded, isMobile, isMobileLandscape),
+                                SizedBox(height: isMobile ? 10 : 12),
+                                if (isMobile) ...[
+                                  // Layout vertical para móviles portrait
+                                  _buildDateTimeButton(
+                                    label: 'Fecha Inicio',
+                                    icon: Icons.calendar_today_rounded,
+                                    value: '${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
+                                    onTap: () => _selectDate(context, true),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                  SizedBox(height: 10),
+                                  _buildDateTimeButton(
+                                    label: 'Hora Inicio',
+                                    icon: Icons.access_time_rounded,
+                                    value: '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
+                                    onTap: () => _selectTime(context, true),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                  SizedBox(height: 10),
+                                  _buildDateTimeButton(
+                                    label: 'Fecha Fin',
+                                    icon: Icons.calendar_today_rounded,
+                                    value: '${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
+                                    onTap: () => _selectDate(context, false),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                  SizedBox(height: 10),
+                                  _buildDateTimeButton(
+                                    label: 'Hora Fin',
+                                    icon: Icons.access_time_rounded,
+                                    value: '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
+                                    onTap: () => _selectTime(context, false),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                ] else ...[
+                            // Layout horizontal para desktop
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDateTimeButton(
+                                    label: 'Fecha Inicio',
+                                    icon: Icons.calendar_today_rounded,
+                                    value: '${_fechaInicio.day.toString().padLeft(2, '0')}/${_fechaInicio.month.toString().padLeft(2, '0')}/${_fechaInicio.year}',
+                                    onTap: () => _selectDate(context, true),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: _buildDateTimeButton(
-                                  label: 'Hora Fin',
-                                  icon: Icons.access_time_rounded,
-                                  value: '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
-                                  onTap: () => _selectTime(context, false),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildDateTimeButton(
+                                    label: 'Hora Inicio',
+                                    icon: Icons.access_time_rounded,
+                                    value: '${_horaInicio.hour.toString().padLeft(2, '0')}:${_horaInicio.minute.toString().padLeft(2, '0')}',
+                                    onTap: () => _selectTime(context, true),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 24),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildDateTimeButton(
+                                    label: 'Fecha Fin',
+                                    icon: Icons.calendar_today_rounded,
+                                    value: '${_fechaFin.day.toString().padLeft(2, '0')}/${_fechaFin.month.toString().padLeft(2, '0')}/${_fechaFin.year}',
+                                    onTap: () => _selectDate(context, false),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildDateTimeButton(
+                                    label: 'Hora Fin',
+                                    icon: Icons.access_time_rounded,
+                                    value: '${_horaFin.hour.toString().padLeft(2, '0')}:${_horaFin.minute.toString().padLeft(2, '0')}',
+                                    onTap: () => _selectTime(context, false),
+                                    isMobile: isMobile,
+                                    isMobileLandscape: isMobileLandscape,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          SizedBox(height: isMobileLandscape ? 12 : (isMobile ? 16 : 24)),
                           
                           // Responsables
-                          _buildSectionTitle('Responsables', Icons.people_rounded),
-                          SizedBox(height: 12),
+                          _buildSectionTitle('Responsables', Icons.people_rounded, isMobile, isMobileLandscape),
+                          SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                           _buildDropdown<String>(
                             value: _profesores.any((p) => p.uuid == _selectedProfesorId) 
                                 ? _selectedProfesorId 
@@ -568,17 +888,19 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                 _selectedProfesorId = value;
                               });
                             },
+                            isMobile: isMobile,
+                            isMobileLandscape: isMobileLandscape,
                           ),
-                          SizedBox(height: 24),
+                          SizedBox(height: isMobileLandscape ? 12 : (isMobile ? 16 : 24)),
                           
                           // Estado de la Actividad
-                          _buildSectionTitle('Estado y Tipo', Icons.check_circle_rounded),
-                          SizedBox(height: 12),
+                          _buildSectionTitle('Estado y Tipo', Icons.check_circle_rounded, isMobile, isMobileLandscape),
+                          SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                           Container(
-                            padding: EdgeInsets.all(16),
+                            padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                               border: Border.all(
                                 color: Color(0xFF1976d2).withOpacity(0.3),
                                 width: 1,
@@ -590,12 +912,12 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                 Text(
                                   'Estado de la Actividad',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1976d2),
                                   ),
                                 ),
-                                SizedBox(height: 12),
+                                SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                                 Row(
                                   children: [
                                     Expanded(
@@ -610,9 +932,11 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                             _estadoActividad = value!;
                                           });
                                         },
+                                        isMobile: isMobile,
+                                        isMobileLandscape: isMobileLandscape,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
                                     Expanded(
                                       child: _buildRadioOption(
                                         value: 'Aprobada',
@@ -625,9 +949,11 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                             _estadoActividad = value!;
                                           });
                                         },
+                                        isMobile: isMobile,
+                                        isMobileLandscape: isMobileLandscape,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
+                                    SizedBox(width: isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
                                     Expanded(
                                       child: _buildRadioOption(
                                         value: 'Cancelada',
@@ -640,6 +966,8 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                             _estadoActividad = value!;
                                           });
                                         },
+                                        isMobile: isMobile,
+                                        isMobileLandscape: isMobileLandscape,
                                       ),
                                     ),
                                   ],
@@ -647,14 +975,14 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
                           
                           // Tipo de Actividad
                           Container(
-                            padding: EdgeInsets.all(16),
+                            padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                               border: Border.all(
                                 color: Color(0xFF1976d2).withOpacity(0.3),
                                 width: 1,
@@ -666,12 +994,12 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                 Text(
                                   'Tipo de Actividad',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF1976d2),
                                   ),
                                 ),
-                                SizedBox(height: 12),
+                                SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                                 Row(
                                   children: [
                                     Expanded(
@@ -686,9 +1014,11 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                             _tipoActividad = value!;
                                           });
                                         },
+                                        isMobile: isMobile,
+                                        isMobileLandscape: isMobileLandscape,
                                       ),
                                     ),
-                                    SizedBox(width: 12),
+                                    SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                                     Expanded(
                                       child: _buildRadioOption(
                                         value: 'Extraescolar',
@@ -701,6 +1031,8 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                                             _tipoActividad = value!;
                                           });
                                         },
+                                        isMobile: isMobile,
+                                        isMobileLandscape: isMobileLandscape,
                                       ),
                                     ),
                                   ],
@@ -715,14 +1047,14 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
             
             // Actions
             Container(
-              padding: EdgeInsets.all(24),
+              padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 24)),
               decoration: BoxDecoration(
                 color: isDark 
                     ? Colors.grey[850]!.withOpacity(0.9)
                     : Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 16)),
+                  bottomRight: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 16)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -736,97 +1068,111 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   // Botón Cancelar
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.grey[400]!,
-                          Colors.grey[500]!,
+                  Expanded(
+                    flex: isMobile ? 1 : 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.grey[400]!,
+                            Colors.grey[500]!,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
+                            blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          offset: Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => Navigator.of(context).pop(),
-                        borderRadius: BorderRadius.circular(10),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.close_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Cancelar',
-                                style: TextStyle(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => Navigator.of(context).pop(),
+                          borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
+                              vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12)
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.close_rounded,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
+                                Text(
+                                  'Cancelar',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
                   // Botón Guardar
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF1976d2),
-                          Color(0xFF1565c0),
+                  Expanded(
+                    flex: isMobile ? 1 : 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF1976d2),
+                            Color(0xFF1565c0),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.4),
+                            offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
+                            blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF1976d2).withOpacity(0.4),
-                          offset: Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _handleSave,
-                        borderRadius: BorderRadius.circular(10),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.save_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Guardar Cambios',
-                                style: TextStyle(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _handleSave,
+                          borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
+                              vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12)
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.save_rounded,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
+                                Text(
+                                  isMobile ? 'Guardar' : 'Guardar Cambios',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -842,24 +1188,24 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
   }
 
   // Helper Widgets
-  Widget _buildSectionTitle(String title, IconData icon) {
+  Widget _buildSectionTitle(String title, IconData icon, bool isMobile, bool isMobileLandscape) {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.all(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: Colors.white, size: isMobileLandscape ? 14 : (isMobile ? 16 : 20)),
         ),
-        SizedBox(width: 12),
+        SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         Text(
           title,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
             fontWeight: FontWeight.bold,
             color: Color(0xFF1976d2),
           ),
@@ -875,11 +1221,13 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     String? hint,
     int maxLines = 1,
     bool isRequired = false,
+    bool isMobile = false,
+    bool isMobileLandscape = false,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
           color: Color(0xFF1976d2).withOpacity(0.3),
           width: 1,
@@ -888,17 +1236,23 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        style: TextStyle(fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16)),
         decoration: InputDecoration(
           labelText: label + (isRequired ? ' *' : ''),
+          labelStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
           hintText: hint,
-          prefixIcon: Icon(icon, color: Color(0xFF1976d2)),
+          hintStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
+          prefixIcon: Icon(icon, color: Color(0xFF1976d2), size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             borderSide: BorderSide.none,
           ),
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 16), 
+            vertical: isMobileLandscape ? 10 : (isMobile ? 12 : 16)
+          ),
         ),
       ),
     );
@@ -909,11 +1263,13 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     required IconData icon,
     required String value,
     required VoidCallback onTap,
+    bool isMobile = false,
+    bool isMobileLandscape = false,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
           color: Color(0xFF1976d2).withOpacity(0.3),
           width: 1,
@@ -923,31 +1279,31 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(icon, size: 16, color: Colors.grey[600]),
+                    Icon(icon, size: isMobileLandscape ? 12 : (isMobile ? 14 : 16), color: Colors.grey[600]),
                     SizedBox(width: 4),
                     Text(
                       label,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isMobileLandscape ? 10 : (isMobile ? 11 : 12),
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1976d2),
                   ),
@@ -966,11 +1322,13 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     required IconData icon,
     required List<DropdownMenuItem<T>> items,
     required void Function(T?) onChanged,
+    bool isMobile = false,
+    bool isMobileLandscape = false,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
           color: Color(0xFF1976d2).withOpacity(0.3),
           width: 1,
@@ -978,16 +1336,21 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       ),
       child: DropdownButtonFormField<T>(
         value: value,
+        style: TextStyle(fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16), color: Colors.black87),
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Color(0xFF1976d2)),
+          labelStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
+          prefixIcon: Icon(icon, color: Color(0xFF1976d2), size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             borderSide: BorderSide.none,
           ),
           filled: true,
           fillColor: Colors.transparent,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 16), 
+            vertical: isMobileLandscape ? 10 : (isMobile ? 12 : 16)
+          ),
         ),
         isExpanded: true,
         items: items,
@@ -1003,16 +1366,21 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
     required IconData icon,
     required Color color,
     required void Function(String?) onChanged,
+    bool isMobile = false,
+    bool isMobileLandscape = false,
   }) {
     final isSelected = value == groupValue;
     return InkWell(
       onTap: () => onChanged(value),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        padding: EdgeInsets.symmetric(
+          vertical: isMobileLandscape ? 5 : (isMobile ? 6 : 8), 
+          horizontal: isMobileLandscape ? 1 : (isMobile ? 2 : 4)
+        ),
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,
             width: 2,
@@ -1021,7 +1389,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
               decoration: BoxDecoration(
                 color: isSelected ? color : Colors.grey[300],
                 shape: BoxShape.circle,
@@ -1029,15 +1397,15 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
               child: Icon(
                 icon,
                 color: Colors.white,
-                size: 20,
+                size: isMobileLandscape ? 14 : (isMobile ? 16 : 20),
               ),
             ),
-            SizedBox(height: 4),
+            SizedBox(height: isMobileLandscape ? 2 : (isMobile ? 3 : 4)),
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: isMobileLandscape ? 9 : (isMobile ? 10 : 11),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color: isSelected ? color : Colors.grey[600],
               ),

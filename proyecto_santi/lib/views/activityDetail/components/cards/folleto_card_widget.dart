@@ -10,6 +10,7 @@ class FolletoCardWidget extends StatelessWidget {
   final bool isAdminOrSolicitante;
   final VoidCallback onSelectFolleto;
   final VoidCallback onDeleteFolleto;
+  final bool isMobile;
 
   const FolletoCardWidget({
     super.key,
@@ -19,6 +20,7 @@ class FolletoCardWidget extends StatelessWidget {
     required this.isAdminOrSolicitante,
     required this.onSelectFolleto,
     required this.onDeleteFolleto,
+    this.isMobile = false,
   });
 
   String _extractFileName(String url) {
@@ -69,14 +71,14 @@ class FolletoCardWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: hasFolleto ? _openPdfViewer : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(isMobile ? 10 : 12),
           decoration: BoxDecoration(
             color: isDark 
                 ? Colors.white.withOpacity(0.05) 
                 : Colors.white.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
             border: Border.all(
               color: isDark 
                   ? Colors.white.withOpacity(0.1) 
@@ -95,16 +97,16 @@ class FolletoCardWidget extends StatelessWidget {
                     Text(
                       'Folleto',
                       style: TextStyle(
-                        fontSize: isWeb ? 11 : 13.0,
+                        fontSize: isMobile ? 10 : (isWeb ? 11 : 13.0),
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1976d2),
                       ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: isMobile ? 2 : 4),
                     Text(
                       displayFileName,
                       style: TextStyle(
-                        fontSize: isWeb ? 13 : 15.0,
+                        fontSize: isMobile ? 12 : (isWeb ? 13 : 15.0),
                         color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                         decoration: hasFolleto ? TextDecoration.underline : null,
                       ),
@@ -115,30 +117,30 @@ class FolletoCardWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 10),
+              SizedBox(width: isMobile ? 8 : 10),
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(isMobile ? 5 : 6),
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(25, 118, 210, 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                 ),
                 child: Icon(
                   Icons.picture_as_pdf_rounded,
                   color: Color(0xFF1976d2),
-                  size: isWeb ? 16 : 18.0,
+                  size: isMobile ? 14 : (isWeb ? 16 : 18.0),
                 ),
               ),
               if (isAdminOrSolicitante) ...[
-                SizedBox(width: 8),
+                SizedBox(width: isMobile ? 6 : 8),
                 Container(
                   decoration: BoxDecoration(
                     color: Color(0xFF1976d2).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                   ),
                   child: IconButton(
                     icon: Icon(Icons.upload_file_rounded, color: Color(0xFF1976d2)),
-                    iconSize: isWeb ? 18 : 20.0,
-                    padding: EdgeInsets.all(8),
+                    iconSize: isMobile ? 16 : (isWeb ? 18 : 20.0),
+                    padding: EdgeInsets.all(isMobile ? 6 : 8),
                     constraints: BoxConstraints(),
                     onPressed: onSelectFolleto,
                     tooltip: 'Subir folleto PDF',
@@ -146,16 +148,16 @@ class FolletoCardWidget extends StatelessWidget {
                 ),
                 if (!folletoMarkedForDeletion && 
                     (folletoFileName != null || actividadFolletoUrl != null)) ...[
-                  SizedBox(width: 4),
+                  SizedBox(width: isMobile ? 3 : 4),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                     ),
                     child: IconButton(
                       icon: Icon(Icons.close_rounded, color: Colors.red),
-                      iconSize: isWeb ? 18 : 20.0,
-                      padding: EdgeInsets.all(8),
+                      iconSize: isMobile ? 16 : (isWeb ? 18 : 20.0),
+                      padding: EdgeInsets.all(isMobile ? 6 : 8),
                       constraints: BoxConstraints(),
                       onPressed: onDeleteFolleto,
                       tooltip: 'Eliminar folleto',

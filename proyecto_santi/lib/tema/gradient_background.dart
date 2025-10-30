@@ -8,12 +8,20 @@ class GradientBackgroundLight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+    
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [colorAccentLight, colorFondoLight],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          // Portrait y Landscape: oscuro arriba, claro abajo
+          colors: [colorFondoLight, colorAccentLight],
+          // Diagonal en portrait, vertical en landscape
+          begin: orientation == Orientation.portrait 
+              ? Alignment.topLeft 
+              : Alignment.topCenter,
+          end: orientation == Orientation.portrait 
+              ? Alignment.bottomRight 
+              : Alignment.bottomCenter,
         ),
       ),
       child: child,
@@ -28,12 +36,20 @@ class GradientBackgroundLight extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
+      final orientation = MediaQuery.of(context).orientation;
+      
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [colorAccentDark, colorFondoDark],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            // Portrait y Landscape: oscuro arriba, claro abajo
+            colors: [colorFondoDark, colorAccentDark],
+            // Diagonal en portrait, vertical en landscape
+            begin: orientation == Orientation.portrait 
+                ? Alignment.topLeft 
+                : Alignment.topCenter,
+            end: orientation == Orientation.portrait 
+                ? Alignment.bottomRight 
+                : Alignment.bottomCenter,
           ),
         ),
         child: child,

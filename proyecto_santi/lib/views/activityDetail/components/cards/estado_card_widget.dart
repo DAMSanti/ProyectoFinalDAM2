@@ -4,10 +4,12 @@ import 'dart:io';
 
 class EstadoCardWidget extends StatelessWidget {
   final String estado;
+  final bool isMobile;
 
   const EstadoCardWidget({
     super.key,
     required this.estado,
+    this.isMobile = false,
   });
 
   @override
@@ -46,7 +48,10 @@ class EstadoCardWidget extends StatelessWidget {
     }
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 16, 
+        vertical: isMobile ? 10 : 12
+      ),
       decoration: BoxDecoration(
         color: Color.fromRGBO(
           (estadoColor.r * 255.0).round(),
@@ -54,7 +59,7 @@ class EstadoCardWidget extends StatelessWidget {
           (estadoColor.b * 255.0).round(),
           0.15,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: Color.fromRGBO(
             (estadoColor.r * 255.0).round(),
@@ -76,7 +81,7 @@ class EstadoCardWidget extends StatelessWidget {
                 Text(
                   'Estado',
                   style: TextStyle(
-                    fontSize: isWeb ? 11 : 13.0,
+                    fontSize: isMobile ? 10 : (isWeb ? 11 : 13.0),
                     fontWeight: FontWeight.w600,
                     color: estadoColor,
                   ),
@@ -84,7 +89,7 @@ class EstadoCardWidget extends StatelessWidget {
                 Text(
                   estado,
                   style: TextStyle(
-                    fontSize: isWeb ? 14 : 16.0,
+                    fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                     fontWeight: FontWeight.bold,
                     color: estadoColor,
                   ),
@@ -92,11 +97,11 @@ class EstadoCardWidget extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 8),
+          SizedBox(width: isMobile ? 6 : 8),
           Icon(
             estadoIcon,
             color: estadoColor,
-            size: isWeb ? 18 : 20.0,
+            size: isMobile ? 16 : (isWeb ? 18 : 20.0),
           ),
         ],
       ),

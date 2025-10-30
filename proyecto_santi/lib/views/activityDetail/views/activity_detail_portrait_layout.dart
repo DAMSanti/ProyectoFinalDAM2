@@ -45,37 +45,40 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Stack(
-          children: [
-            SingleChildScrollView(
-              padding: EdgeInsets.only(top: 40.0), // Adjust the top padding to make space for the DetailBar
-              child: ActivityDetailInfo(
-                actividad: actividad,
-                isAdminOrSolicitante: isAdminOrSolicitante,
-                imagesActividad: imagesActividad,
-                selectedImages: selectedImages,
-                selectedImagesDescriptions: selectedImagesDescriptions,
-                showImagePicker: _showImagePicker,
-                removeSelectedImage: _removeSelectedImage,
-                editLocalImage: _editLocalImage,
-                onActivityDataChanged: onActivityDataChanged,
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: EdgeInsets.only(top: 40.0),
+                child: ActivityDetailInfo(
+                  actividad: actividad,
+                  isAdminOrSolicitante: isAdminOrSolicitante,
+                  imagesActividad: imagesActividad,
+                  selectedImages: selectedImages,
+                  selectedImagesDescriptions: selectedImagesDescriptions,
+                  showImagePicker: _showImagePicker,
+                  removeSelectedImage: _removeSelectedImage,
+                  editLocalImage: _editLocalImage,
+                  onActivityDataChanged: onActivityDataChanged,
+                ),
               ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: DetailBar(
-                isDataChanged: isDataChanged,
-                onSaveChanges: _saveChanges,
-                onRevertChanges: _revertChanges,
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: DetailBar(
+                  isDataChanged: isDataChanged,
+                  onSaveChanges: _saveChanges,
+                  onRevertChanges: _revertChanges,
+                ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }

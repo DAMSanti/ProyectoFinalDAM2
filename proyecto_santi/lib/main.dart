@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
@@ -40,6 +41,14 @@ void main() async {
     await NotificationService().initialize();
     
     await initializeDateFormatting('es_ES', null);
+
+    // Configurar modo inmersivo en Android (ocultar barra de navegación)
+    if (!kIsWeb && Platform.isAndroid) {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [SystemUiOverlay.top], // Solo mantener la barra de estado
+      );
+    }
 
     // Limitamos el tamaño minimo de la ventana en windows, linux y mac
     if (!kIsWeb &&

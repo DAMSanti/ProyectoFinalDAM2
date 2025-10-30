@@ -52,17 +52,21 @@ class ActivitiesSectionHeader extends StatelessWidget {
             ),
           ),
           
-          SizedBox(width: 16),
+          SizedBox(width: 12),
           
-          // Título centrado con estilo
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-              color: sectionColor,
-              fontFamily: 'Roboto',
+          // Título centrado con estilo (flexible para evitar overflow)
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                color: sectionColor,
+                fontFamily: 'Roboto',
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
           

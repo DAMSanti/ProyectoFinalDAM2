@@ -315,8 +315,14 @@ class DesktopShellFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Determinar si es móvil o desktop basándose en el ancho
-        final isMobile = constraints.maxWidth < 800;
+        // Determinar si es móvil basándose en el ancho y alto
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+        final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+        
+        // Móvil: ancho < 800 o (landscape con altura < 600)
+        final isMobile = width < 800 || (isLandscape && height < 600);
+        final isMobileLandscape = isMobile && isLandscape;
         final isDark = Theme.of(context).brightness == Brightness.dark;
         
         if (isMobile) {
@@ -327,12 +333,14 @@ class DesktopShellFrame extends StatelessWidget {
           // Versión móvil: Scaffold con Drawer oculto
           return Scaffold(
             appBar: AppBar(
+              toolbarHeight: isMobileLandscape ? 48 : 56, // Más compacto en landscape
               // Sin título, solo iconos y usuario
               leading: Builder(
                 builder: (context) => IconButton(
                   icon: Icon(
                     Icons.menu,
-                    color: isDark ? Colors.white : Color(0xFF1976d2),
+                    size: isMobileLandscape ? 20 : 24,
+                    color: isDark ? Colors.white : const Color(0xFF1976d2),
                   ),
                   onPressed: () {
                     Scaffold.of(context).openDrawer();
@@ -346,39 +354,42 @@ class DesktopShellFrame extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     onTap: () => _showAccountSettingsDialog(context, currentUser, isDark),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobileLandscape ? 4.0 : 8.0,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                currentUser.nombre,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white : Color(0xFF1976d2),
+                          if (!isMobileLandscape) // Ocultar texto en landscape
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  currentUser.nombre,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.white : const Color(0xFF1976d2),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                currentUser.rol,
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                                Text(
+                                  currentUser.rol,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark ? Colors.amber : const Color(0xFF1976d2).withOpacity(0.7),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 8),
+                              ],
+                            ),
+                          SizedBox(width: isMobileLandscape ? 4 : 8),
                           UserAvatar(
                             user: currentUser,
-                            size: 36,
-                            fontSize: 14,
+                            size: isMobileLandscape ? 28 : 36,
+                            fontSize: isMobileLandscape ? 12 : 14,
                           ),
                         ],
                       ),
@@ -387,7 +398,8 @@ class DesktopShellFrame extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                    color: isDark ? Colors.amber : Color(0xFF1976d2),
+                    size: isMobileLandscape ? 20 : 24,
+                    color: isDark ? Colors.amber : const Color(0xFF1976d2),
                   ),
                   onPressed: onToggleTheme,
                   tooltip: 'Cambiar tema',
@@ -397,6 +409,7 @@ class DesktopShellFrame extends StatelessWidget {
             drawer: MenuDesktopStatic(
               currentRoute: currentRoute,
               onNavigate: onNavigate,
+              showLogo: !isMobileLandscape, // Ocultar logo en landscape móvil
             ),
             body: child,
           );
@@ -666,23 +679,28 @@ class DesktopShellFrame extends StatelessWidget {
 class MenuDesktopStatic extends StatelessWidget {
   final String currentRoute;
   final Function(String) onNavigate;
+  final bool showLogo;
 
   const MenuDesktopStatic({
     super.key,
     required this.currentRoute,
     required this.onNavigate,
+    this.showLogo = true, // Por defecto mostrar logo
   });
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      shape: ContinuousRectangleBorder(),
+      shape: const ContinuousRectangleBorder(),
       child: _buildMenuContent(context),
     );
   }
 
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final height = MediaQuery.of(context).size.height;
+    final isMobileLandscape = isLandscape && height < 600;
     
     // Obtener el usuario actual para verificar si es admin
     final auth = Provider.of<Auth>(context, listen: false);
@@ -694,118 +712,176 @@ class MenuDesktopStatic extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
-              ? [Color(0xFF1a1a2e), Color(0xFF16213e)]
-              : [Color(0xFFe3f2fd), Color(0xFFbbdefb)],
+              ? [const Color(0xFF1a1a2e), const Color(0xFF16213e)]
+              : [const Color(0xFFe3f2fd), const Color(0xFFbbdefb)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: Column(
         children: <Widget>[
-          // Header
-          Container(
-            height: 140.0,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [Color(0xFF0f3460), Color(0xFF16213e)]
-                    : [Color(0xFF1976d2), Color(0xFF2196f3)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+          // Header - Mostrar solo si showLogo es true
+          if (showLogo)
+            Container(
+              height: 140.0,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [const Color(0xFF0f3460), const Color(0xFF16213e)]
+                      : [const Color(0xFF1976d2), const Color(0xFF2196f3)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0, 4),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.school,
-                    size: 48,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Column(
-                  children: [
-                    Text(
-                      'ACEX',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                      ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
-                    Text(
-                      'Sistema de Gestión',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                    child: const Icon(
+                      Icons.school,
+                      size: 48,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Column(
+                    children: [
+                      Text(
+                        'ACEX',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      Text(
+                        'Sistema de Gestión',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          // Mostrar info de usuario en landscape móvil cuando no hay logo
+          else if (isMobileLandscape && currentUser != null)
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+              decoration: BoxDecoration(
+                color: isDark 
+                    ? Colors.white.withOpacity(0.05)
+                    : Colors.black.withOpacity(0.05),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark ? Colors.white12 : Colors.black12,
+                    width: 1,
+                  ),
                 ),
-              ],
+              ),
+              child: Row(
+                children: [
+                  UserAvatar(
+                    user: currentUser,
+                    size: 32,
+                    fontSize: 14,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          currentUser.nombre,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF1976d2),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          currentUser.rol,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: isDark ? Colors.amber : const Color(0xFF1976d2).withOpacity(0.7),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          SizedBox(height: 16),
+          SizedBox(height: showLogo ? 16 : (isMobileLandscape ? 4 : 8)),
 
           // Items del menú
           Expanded(
             child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: isMobileLandscape ? 6 : 8),
               children: [
                 _buildDrawerItem(
                   context,
                   icon: Icons.home_rounded,
                   text: 'Inicio',
                   routeName: '/home',
+                  isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
                   icon: Icons.event_rounded,
                   text: 'Actividades',
                   routeName: '/actividades',
+                  isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
                   icon: Icons.chat_bubble_rounded,
                   text: 'Chat',
                   routeName: '/chat',
+                  isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
                   icon: Icons.map_rounded,
                   text: 'Mapa',
                   routeName: '/mapa',
+                  isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
                   icon: Icons.bar_chart_rounded,
                   text: 'Estadísticas',
                   routeName: '/estadisticas',
+                  isCompact: isMobileLandscape,
                 ),
                 // Menú de Gestión solo para administradores
                 if (isAdmin) ...[
-                  SizedBox(height: 8),
-                  _buildGestionMenu(context, isDark),
+                  SizedBox(height: isMobileLandscape ? 4 : 8),
+                  _buildGestionMenu(context, isDark, isCompact: isMobileLandscape),
                 ],
               ],
             ),
@@ -814,7 +890,10 @@ class MenuDesktopStatic extends StatelessWidget {
           // Separador
           Container(
             height: 1,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: EdgeInsets.symmetric(
+              horizontal: 16, 
+              vertical: isMobileLandscape ? 4 : 8,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -828,7 +907,10 @@ class MenuDesktopStatic extends StatelessWidget {
 
           // Footer
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobileLandscape ? 6 : 8, 
+              vertical: isMobileLandscape ? 4 : 8,
+            ),
             child: Column(
               children: [
                 _buildDrawerItem(
@@ -837,89 +919,101 @@ class MenuDesktopStatic extends StatelessWidget {
                   text: 'Configuración',
                   routeName: '/configuracion',
                   isSettings: true,
+                  isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
                   icon: Icons.logout_rounded,
                   text: 'Salir',
                   routeName: '/',
                   isLogout: true,
+                  isCompact: isMobileLandscape,
                 ),
               ],
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: isMobileLandscape ? 8 : 16),
         ],
       ),
     );
   }
 
-  Widget _buildGestionMenu(BuildContext context, bool isDark) {
+  Widget _buildGestionMenu(BuildContext context, bool isDark, {bool isCompact = false}) {
     return Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent,
       ),
       child: ExpansionTile(
-        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        tilePadding: EdgeInsets.symmetric(
+          horizontal: isCompact ? 12 : 16, 
+          vertical: isCompact ? 2 : 4,
+        ),
         childrenPadding: EdgeInsets.zero,
         leading: Icon(
           Icons.admin_panel_settings_rounded,
-          color: isDark ? Colors.white70 : Color(0xFF1976d2),
-          size: 24,
+          color: isDark ? Colors.white70 : const Color(0xFF1976d2),
+          size: isCompact ? 20 : 24,
         ),
         title: Text(
           'Gestión',
           style: TextStyle(
-            color: isDark ? Colors.white : Color(0xFF1976d2),
-            fontSize: 15,
+            color: isDark ? Colors.white : const Color(0xFF1976d2),
+            fontSize: isCompact ? 13 : 15,
             fontWeight: FontWeight.w500,
           ),
         ),
-        iconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
-        collapsedIconColor: isDark ? Colors.white70 : Color(0xFF1976d2),
+        iconColor: isDark ? Colors.white70 : const Color(0xFF1976d2),
+        collapsedIconColor: isDark ? Colors.white70 : const Color(0xFF1976d2),
         children: [
-          _buildSubMenuItem(context, isDark, Icons.event, 'Actividades', '/gestion/actividades'),
-          _buildSubMenuItem(context, isDark, Icons.person, 'Profesores', '/gestion/profesores'),
-          _buildSubMenuItem(context, isDark, Icons.business, 'Departamentos', '/gestion/departamentos'),
-          _buildSubMenuItem(context, isDark, Icons.group, 'Grupos', '/gestion/grupos'),
-          _buildSubMenuItem(context, isDark, Icons.school, 'Cursos', '/gestion/cursos'),
-          _buildSubMenuItem(context, isDark, Icons.hotel, 'Alojamientos', '/gestion/alojamientos'),
-          _buildSubMenuItem(context, isDark, Icons.directions_bus, 'Empresas de Transporte', '/gestion/empresas-transporte'),
+          _buildSubMenuItem(context, isDark, Icons.event, 'Actividades', '/gestion/actividades', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.person, 'Profesores', '/gestion/profesores', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.business, 'Departamentos', '/gestion/departamentos', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.group, 'Grupos', '/gestion/grupos', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.school, 'Cursos', '/gestion/cursos', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.hotel, 'Alojamientos', '/gestion/alojamientos', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.directions_bus, 'Empresas de Transporte', '/gestion/empresas-transporte', isCompact: isCompact),
         ],
       ),
     );
   }
 
-  Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName) {
+  Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName, {bool isCompact = false}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 4, left: 8, right: 8),
+      margin: EdgeInsets.only(
+        bottom: isCompact ? 2 : 4, 
+        left: isCompact ? 6 : 8, 
+        right: isCompact ? 6 : 8,
+      ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(isCompact ? 6 : 8),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(isCompact ? 6 : 8),
           onTap: () {
             this.onNavigate(routeName);
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.symmetric(
+              horizontal: isCompact ? 12 : 16, 
+              vertical: isCompact ? 6 : 10,
+            ),
             child: Row(
               children: [
                 Icon(
                   icon,
-                  color: isDark ? Colors.white60 : Color(0xFF1976d2).withOpacity(0.7),
-                  size: 20,
+                  color: isDark ? Colors.white60 : const Color(0xFF1976d2).withOpacity(0.7),
+                  size: isCompact ? 18 : 20,
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: isCompact ? 10 : 12),
                 Expanded(
                   child: Text(
                     text,
                     style: TextStyle(
-                      color: isDark ? Colors.white70 : Color(0xFF1976d2),
-                      fontSize: 14,
+                      color: isDark ? Colors.white70 : const Color(0xFF1976d2),
+                      fontSize: isCompact ? 12 : 14,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -939,6 +1033,7 @@ class MenuDesktopStatic extends StatelessWidget {
     required String routeName,
     bool isLogout = false,
     bool isSettings = false,
+    bool isCompact = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCurrentRoute = currentRoute == routeName;
@@ -948,17 +1043,17 @@ class MenuDesktopStatic extends StatelessWidget {
         gradient: isCurrentRoute
             ? LinearGradient(
                 colors: isDark
-                    ? [Color(0xFF0f3460), Color(0xFF16213e)]
-                    : [Color(0xFF1976d2), Color(0xFF2196f3)],
+                    ? [const Color(0xFF0f3460), const Color(0xFF16213e)]
+                    : [const Color(0xFF1976d2), const Color(0xFF2196f3)],
               )
             : null,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
         boxShadow: isCurrentRoute
             ? [
                 BoxShadow(
                   color: (isDark ? Colors.blue : Colors.blue).withOpacity(0.3),
-                  offset: Offset(0, 4),
-                  blurRadius: 8,
+                  offset: Offset(0, isCompact ? 2 : 4),
+                  blurRadius: isCompact ? 4 : 8,
                 ),
               ]
             : null,
@@ -966,7 +1061,7 @@ class MenuDesktopStatic extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
           onTap: () async {
             if (isLogout) {
               // Mostrar diálogo de confirmación para salir
@@ -974,16 +1069,16 @@ class MenuDesktopStatic extends StatelessWidget {
                 context: context,
                 builder: (BuildContext dialogContext) {
                   return AlertDialog(
-                    title: Text('Confirmar salida'),
-                    content: Text('¿Estás seguro de que quieres cerrar sesión?'),
+                    title: const Text('Confirmar salida'),
+                    content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: Text('No'),
+                        child: const Text('No'),
                       ),
                       TextButton(
                         onPressed: () => Navigator.of(dialogContext).pop(true),
-                        child: Text('Sí'),
+                        child: const Text('Sí'),
                       ),
                     ],
                   );
@@ -995,36 +1090,37 @@ class MenuDesktopStatic extends StatelessWidget {
               }
             } else if (isSettings) {
               // Mostrar ventana de configuración
+              final isDarkSettings = Theme.of(context).brightness == Brightness.dark;
               showDialog(
                 context: context,
                 builder: (BuildContext dialogContext) {
                   return AlertDialog(
-                    title: Text('Configuración'),
+                    title: const Text('Configuración'),
                     content: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Opciones de la aplicación',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           ListTile(
-                            leading: Icon(Icons.palette),
-                            title: Text('Tema'),
-                            subtitle: Text(Theme.of(context).brightness == Brightness.dark 
+                            leading: const Icon(Icons.palette),
+                            title: const Text('Tema'),
+                            subtitle: Text(isDarkSettings 
                                 ? 'Modo oscuro' 
                                 : 'Modo claro'),
                             contentPadding: EdgeInsets.zero,
                           ),
-                          ListTile(
+                          const ListTile(
                             leading: Icon(Icons.info),
                             title: Text('Versión'),
                             subtitle: Text('1.0.0'),
                             contentPadding: EdgeInsets.zero,
                           ),
-                          ListTile(
+                          const ListTile(
                             leading: Icon(Icons.description),
                             title: Text('Acerca de'),
                             subtitle: Text('Sistema de Gestión ACEX'),
@@ -1047,34 +1143,37 @@ class MenuDesktopStatic extends StatelessWidget {
             }
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: EdgeInsets.symmetric(
+              horizontal: isCompact ? 12 : 16, 
+              vertical: isCompact ? 8 : 14,
+            ),
             child: Row(
               children: [
                 Icon(
                   icon,
                   color: isCurrentRoute
                       ? Colors.white
-                      : (isDark ? Colors.white70 : Color(0xFF1976d2)),
-                  size: 24,
+                      : (isDark ? Colors.white70 : const Color(0xFF1976d2)),
+                  size: isCompact ? 20 : 24,
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: isCompact ? 12 : 16),
                 Expanded(
                   child: Text(
                     text,
                     style: TextStyle(
                       color: isCurrentRoute
                           ? Colors.white
-                          : (isDark ? Colors.white : Color(0xFF1976d2)),
-                      fontSize: 15,
+                          : (isDark ? Colors.white : const Color(0xFF1976d2)),
+                      fontSize: isCompact ? 13 : 15,
                       fontWeight: isCurrentRoute ? FontWeight.w600 : FontWeight.w500,
                     ),
                   ),
                 ),
                 if (isCurrentRoute)
                   Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
+                    width: isCompact ? 6 : 8,
+                    height: isCompact ? 6 : 8,
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),

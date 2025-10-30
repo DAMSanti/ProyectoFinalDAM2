@@ -48,12 +48,7 @@ class ActivitiesViewState extends State<ActivitiesView> {
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: shouldShowAppBar()
-                ? AndroidAppBar(
-              onToggleTheme: widget.onToggleTheme,
-              title: 'Actividades',
-            )
-                : null,
+            appBar: null,
             drawer: !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS)
                 ? OrientationBuilder(
               builder: (context, orientation) {

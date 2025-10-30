@@ -34,12 +34,14 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushReplacementNamed(context, '/home');
-        return false;
-      },
-      child: Stack(
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pushReplacementNamed(context, '/home');
+          return false;
+        },
+        child: Stack(
         children: [
           Theme.of(context).brightness == Brightness.dark
               ? GradientBackgroundDark(child: Container())
@@ -137,6 +139,7 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

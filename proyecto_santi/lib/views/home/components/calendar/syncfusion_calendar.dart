@@ -162,40 +162,88 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
     
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Cambiar a layout vertical si el ancho es menor a 1200px
-        final isNarrowScreen = constraints.maxWidth < 1200;
+        // Detectar si es una pantalla móvil (ancho < 600px)
+        final isMobileScreen = constraints.maxWidth < 600;
+        // Detectar orientación
+        final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+        final isMobileLandscape = isMobileScreen && isLandscape;
+        // Para pantallas grandes, cambiar a layout vertical si el ancho es menor a 1200px
+        final isNarrowScreen = constraints.maxWidth < 1200 && !isMobileScreen;
         
-        if (isNarrowScreen) {
-          // Layout vertical: botones a la izquierda, calendario a la derecha
+        // En móvil landscape, usar botones verticales a la izquierda
+        if (isMobileLandscape) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Botones verticales usando el widget extraído
+              // Botones verticales compactos para móvil landscape
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
                 isDark: isDark,
                 isVertical: true,
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 8),
+              // Calendario expandido
+              Expanded(
+                child: _buildCalendarContainer(context, isDark, isMobileScreen),
+              ),
+            ],
+          );
+        }
+        // En móvil portrait, SIEMPRE usar botones horizontales arriba
+        else if (isMobileScreen) {
+          return Column(
+            children: [
+              // Botones horizontales compactos para móvil
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: CalendarViewButtons(
+                  currentView: _currentView,
+                  onViewChanged: _changeView,
+                  isDark: isDark,
+                  isVertical: false,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Calendario expandido
+              Expanded(
+                child: _buildCalendarContainer(context, isDark, isMobileScreen),
+              ),
+            ],
+          );
+        }
+        // Para pantallas medianas (tablet), botones verticales a la izquierda
+        else if (isNarrowScreen) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Botones verticales
+              CalendarViewButtons(
+                currentView: _currentView,
+                onViewChanged: _changeView,
+                isDark: isDark,
+                isVertical: true,
+              ),
+              const SizedBox(width: 16),
               // Calendario expandido
               Expanded(
                 child: _buildCalendarContainer(context, isDark, isNarrowScreen),
               ),
             ],
           );
-        } else {
-          // Layout horizontal original: botones arriba, calendario abajo
+        } 
+        // Para pantallas grandes, botones horizontales arriba
+        else {
           return Column(
             children: [
-              // Botones horizontales usando el widget extraído
+              // Botones horizontales
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
                 isDark: isDark,
                 isVertical: false,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Expanded(
                 child: _buildCalendarContainer(context, isDark, isNarrowScreen),
               ),
