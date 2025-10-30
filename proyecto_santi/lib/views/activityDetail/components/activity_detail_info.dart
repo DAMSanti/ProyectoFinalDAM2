@@ -1385,14 +1385,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     
     if (nuevoNumero == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor ingrese un n�mero v�lido')),
+        SnackBar(content: Text('Por favor ingrese un número válido')),
       );
       return;
     }
     
     if (nuevoNumero <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El n�mero debe ser mayor a 0')),
+        SnackBar(content: Text('El número debe ser mayor a 0')),
       );
       return;
     }
@@ -1401,7 +1401,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'El n�mero no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
+            'El número no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
           ),
         ),
       );
@@ -1658,7 +1658,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 localizaciones: _localizaciones,
                 iconosLocalizaciones: _iconosLocalizaciones,
                 onLocalizacionTapped: (localizacion) {
-                  print('[MAP] Localizaci�n seleccionada: ${localizacion.nombre}');
+                  print('[MAP] Localización seleccionada: ${localizacion.nombre}');
                 },
               ),
             ),
@@ -1725,7 +1725,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('Eliminar foto'),
-          content: Text('�Est�s seguro de que deseas eliminar esta foto?'),
+          content: Text('¿Estás seguro de que deseas eliminar esta foto?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),

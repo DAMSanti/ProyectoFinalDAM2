@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
+import '../dialogs/pdf_viewer_dialog.dart';
 
 class FolletoCardWidget extends StatelessWidget {
   final String? folletoFileName;
@@ -42,104 +43,130 @@ class FolletoCardWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark 
-            ? Colors.white.withOpacity(0.05) 
-            : Colors.white.withOpacity(0.4),
+    // Determinar si hay un folleto disponible para ver
+    final bool hasFolleto = !folletoMarkedForDeletion && actividadFolletoUrl != null;
+    final String displayFileName = folletoMarkedForDeletion 
+        ? 'Sin folleto' 
+        : (folletoFileName ?? 
+            (actividadFolletoUrl != null 
+                ? _extractFileName(actividadFolletoUrl!)
+                : 'Sin folleto'));
+
+    void _openPdfViewer() {
+      if (hasFolleto) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return PdfViewerDialog(
+              pdfUrl: actividadFolletoUrl!,
+              fileName: displayFileName,
+            );
+          },
+        );
+      }
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: hasFolleto ? _openPdfViewer : null,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark 
-              ? Colors.white.withOpacity(0.1) 
-              : Colors.white.withOpacity(0.5),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Folleto',
-                  style: TextStyle(
-                    fontSize: !isWeb ? 11.dg : 3.5.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1976d2),
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  folletoMarkedForDeletion 
-                      ? 'Sin folleto' 
-                      : (folletoFileName ?? 
-                          (actividadFolletoUrl != null 
-                              ? _extractFileName(actividadFolletoUrl!)
-                              : 'Sin folleto')),
-                  style: TextStyle(
-                    fontSize: !isWeb ? 13.dg : 4.sp,
-                    color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                ),
-              ],
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isDark 
+                ? Colors.white.withOpacity(0.05) 
+                : Colors.white.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark 
+                  ? Colors.white.withOpacity(0.1) 
+                  : Colors.white.withOpacity(0.5),
             ),
           ),
-          SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(25, 118, 210, 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.picture_as_pdf_rounded,
-              color: Color(0xFF1976d2),
-              size: !isWeb ? 16.dg : 5.sp,
-            ),
-          ),
-          if (isAdminOrSolicitante) ...[
-            SizedBox(width: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF1976d2).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Folleto',
+                      style: TextStyle(
+                        fontSize: !isWeb ? 11.dg : 3.5.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1976d2),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      displayFileName,
+                      style: TextStyle(
+                        fontSize: !isWeb ? 13.dg : 4.sp,
+                        color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
+                        decoration: hasFolleto ? TextDecoration.underline : null,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                    ),
+                  ],
+                ),
               ),
-              child: IconButton(
-                icon: Icon(Icons.upload_file_rounded, color: Color(0xFF1976d2)),
-                iconSize: !isWeb ? 18.dg : 5.sp,
-                padding: EdgeInsets.all(8),
-                constraints: BoxConstraints(),
-                onPressed: onSelectFolleto,
-                tooltip: 'Subir folleto PDF',
-              ),
-            ),
-            if (!folletoMarkedForDeletion && 
-                (folletoFileName != null || actividadFolletoUrl != null)) ...[
-              SizedBox(width: 4),
+              SizedBox(width: 10),
               Container(
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: const Color.fromRGBO(25, 118, 210, 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: IconButton(
-                  icon: Icon(Icons.close_rounded, color: Colors.red),
-                  iconSize: !isWeb ? 18.dg : 5.sp,
-                  padding: EdgeInsets.all(8),
-                  constraints: BoxConstraints(),
-                  onPressed: onDeleteFolleto,
-                  tooltip: 'Eliminar folleto',
+                child: Icon(
+                  Icons.picture_as_pdf_rounded,
+                  color: Color(0xFF1976d2),
+                  size: !isWeb ? 16.dg : 5.sp,
                 ),
               ),
+              if (isAdminOrSolicitante) ...[
+                SizedBox(width: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFF1976d2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.upload_file_rounded, color: Color(0xFF1976d2)),
+                    iconSize: !isWeb ? 18.dg : 5.sp,
+                    padding: EdgeInsets.all(8),
+                    constraints: BoxConstraints(),
+                    onPressed: onSelectFolleto,
+                    tooltip: 'Subir folleto PDF',
+                  ),
+                ),
+                if (!folletoMarkedForDeletion && 
+                    (folletoFileName != null || actividadFolletoUrl != null)) ...[
+                  SizedBox(width: 4),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close_rounded, color: Colors.red),
+                      iconSize: !isWeb ? 18.dg : 5.sp,
+                      padding: EdgeInsets.all(8),
+                      constraints: BoxConstraints(),
+                      onPressed: onDeleteFolleto,
+                      tooltip: 'Eliminar folleto',
+                    ),
+                  ),
+                ],
+              ],
             ],
-          ],
-        ],
+          ),
+        ),
       ),
     );
   }
