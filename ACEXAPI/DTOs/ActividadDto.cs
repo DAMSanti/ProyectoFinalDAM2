@@ -90,6 +90,13 @@ public class ActividadListDto
     public DateTime? FechaFin { get; set; }
     public string Estado { get; set; } = "Pendiente";
     public string Tipo { get; set; } = "Complementaria";
+    
+    // Información del profesor responsable
+    public Guid? ResponsableId { get; set; }
+    public ProfesorSimpleDto? Responsable { get; set; }
+    
+    // Información del profesor solicitante (mantener por compatibilidad)
+    public ProfesorSimpleDto? Solicitante { get; set; }
 }
 
 public class LocalizacionDto

@@ -107,15 +107,29 @@ class AllActividadesState extends State<AllActividades> {
       bool matchesProfesor = true;
       if (widget.selectedProfesorId != null && widget.selectedProfesorId!.isNotEmpty) {
         try {
+          // Normalizar el UUID seleccionado a lowercase
+          final selectedId = widget.selectedProfesorId!.toLowerCase();
+          
+          print('[FILTRO DEBUG] Buscando profesor ID: $selectedId en actividad ${actividad.id} "${actividad.titulo}"');
+          
           // Verificar si es el solicitante
-          bool isSolicitante = actividad.solicitante?.uuid == widget.selectedProfesorId;
+          bool isSolicitante = actividad.solicitante?.uuid.toLowerCase() == selectedId;
+          print('[FILTRO DEBUG]   Solicitante: ${actividad.solicitante?.uuid.toLowerCase()} == $selectedId ? $isSolicitante');
+          
+          // Verificar si es el responsable
+          bool isResponsable = actividad.responsable?.uuid.toLowerCase() == selectedId;
+          print('[FILTRO DEBUG]   Responsable: ${actividad.responsable?.uuid.toLowerCase()} == $selectedId ? $isResponsable');
           
           // Verificar si es participante
           bool isParticipante = false;
           final profesoresIds = await _profesorService.fetchProfesoresParticipantes(actividad.id);
-          isParticipante = profesoresIds.contains(widget.selectedProfesorId);
+          print('[FILTRO DEBUG]   Participantes IDs (${profesoresIds.length}): ${profesoresIds.map((id) => id.toLowerCase()).join(", ")}');
+          isParticipante = profesoresIds.any((id) => id.toLowerCase() == selectedId);
+          print('[FILTRO DEBUG]   Es participante? $isParticipante');
           
-          matchesProfesor = isSolicitante || isParticipante;
+          matchesProfesor = isSolicitante || isResponsable || isParticipante;
+          
+          print('[FILTRO DEBUG]   RESULTADO: ${matchesProfesor ? "✓ COINCIDE" : "✗ NO COINCIDE"}');
         } catch (e) {
           print('[ERROR] Error obteniendo profesores para actividad ${actividad.id}: $e');
           matchesProfesor = false;
@@ -271,13 +285,26 @@ class OtrasActividadesState extends State<OtrasActividades> {
       bool matchesProfesor = true;
       if (widget.selectedProfesorId != null && widget.selectedProfesorId!.isNotEmpty) {
         try {
-          bool isSolicitante = actividad.solicitante?.uuid == widget.selectedProfesorId;
+          // Normalizar el UUID seleccionado a lowercase
+          final selectedId = widget.selectedProfesorId!.toLowerCase();
+          
+          print('[FILTRO DEBUG OTRAS] Buscando profesor ID: $selectedId en actividad ${actividad.id} "${actividad.titulo}"');
+          
+          bool isSolicitante = actividad.solicitante?.uuid.toLowerCase() == selectedId;
+          print('[FILTRO DEBUG OTRAS]   Solicitante: ${actividad.solicitante?.uuid.toLowerCase()} == $selectedId ? $isSolicitante');
+          
+          bool isResponsable = actividad.responsable?.uuid.toLowerCase() == selectedId;
+          print('[FILTRO DEBUG OTRAS]   Responsable: ${actividad.responsable?.uuid.toLowerCase()} == $selectedId ? $isResponsable');
           
           bool isParticipante = false;
           final profesoresIds = await _profesorService.fetchProfesoresParticipantes(actividad.id);
-          isParticipante = profesoresIds.contains(widget.selectedProfesorId);
+          print('[FILTRO DEBUG OTRAS]   Participantes IDs (${profesoresIds.length}): ${profesoresIds.map((id) => id.toLowerCase()).join(", ")}');
+          isParticipante = profesoresIds.any((id) => id.toLowerCase() == selectedId);
+          print('[FILTRO DEBUG OTRAS]   Es participante? $isParticipante');
           
-          matchesProfesor = isSolicitante || isParticipante;
+          matchesProfesor = isSolicitante || isResponsable || isParticipante;
+          
+          print('[FILTRO DEBUG OTRAS]   RESULTADO: ${matchesProfesor ? "✓ COINCIDE" : "✗ NO COINCIDE"}');
         } catch (e) {
           print('[ERROR] Error obteniendo profesores para actividad ${actividad.id}: $e');
           matchesProfesor = false;

@@ -43,7 +43,8 @@ public class ActividadService : IActividadService
     public async Task<PaginatedResult<ActividadListDto>> GetAllAsync(QueryParameters queryParams)
     {
         var query = _context.Actividades
-            .Include(a => a.Responsable)
+            .Include(a => a.Responsable!)
+                .ThenInclude(r => r.Departamento)
             .AsQueryable();
 
         // B�squeda
@@ -76,6 +77,29 @@ public class ActividadService : IActividadService
                 FechaFin = a.FechaFin,
                 Estado = a.Estado,
                 Tipo = a.Tipo,
+                ResponsableId = a.ResponsableId,
+                Responsable = a.Responsable != null ? new ProfesorSimpleDto
+                {
+                    Id = 0, // No usado, solo para compatibilidad
+                    Uuid = a.Responsable.Uuid,
+                    Nombre = a.Responsable.Nombre,
+                    Apellidos = a.Responsable.Apellidos,
+                    Email = a.Responsable.Correo,
+                    FotoUrl = a.Responsable.FotoUrl,
+                    DepartamentoId = a.Responsable.DepartamentoId,
+                    DepartamentoNombre = a.Responsable.Departamento != null ? a.Responsable.Departamento.Nombre : null
+                } : null,
+                Solicitante = a.Responsable != null ? new ProfesorSimpleDto
+                {
+                    Id = 0, // No usado, solo para compatibilidad
+                    Uuid = a.Responsable.Uuid,
+                    Nombre = a.Responsable.Nombre,
+                    Apellidos = a.Responsable.Apellidos,
+                    Email = a.Responsable.Correo,
+                    FotoUrl = a.Responsable.FotoUrl,
+                    DepartamentoId = a.Responsable.DepartamentoId,
+                    DepartamentoNombre = a.Responsable.Departamento != null ? a.Responsable.Departamento.Nombre : null
+                } : null
             })
             .ToListAsync();
 
