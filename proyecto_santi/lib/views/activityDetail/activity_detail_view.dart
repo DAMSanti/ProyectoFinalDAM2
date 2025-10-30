@@ -1154,6 +1154,8 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
                 localizacionId,
                 esPrincipal: loc.esPrincipal,
                 icono: loc.icono,
+                descripcion: loc.descripcion,
+                tipoLocalizacion: loc.tipoLocalizacion,
               );
 
             }
@@ -1166,6 +1168,8 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               loc.id,
               esPrincipal: loc.esPrincipal,
               icono: loc.icono,
+              descripcion: loc.descripcion,
+              tipoLocalizacion: loc.tipoLocalizacion,
             );
           }
           

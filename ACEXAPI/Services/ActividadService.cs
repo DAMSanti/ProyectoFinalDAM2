@@ -19,9 +19,9 @@ public interface IActividadService
     Task<string?> UpdateFolletoAsync(int actividadId, IFormFile folleto);
     Task<bool> DeleteFolletoAsync(int actividadId);
     Task<List<LocalizacionDto>> GetLocalizacionesAsync(int actividadId);
-    Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono);
+    Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono, string? descripcion = null, string? tipoLocalizacion = null);
     Task<bool> RemoveLocalizacionAsync(int actividadId, int localizacionId);
-    Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono);
+    Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono, string? descripcion = null, string? tipoLocalizacion = null);
 }
 
 public class ActividadService : IActividadService
@@ -462,14 +462,16 @@ public class ActividadService : IActividadService
                 Longitud = al.Localizacion.Longitud,
                 EsPrincipal = al.EsPrincipal,
                 Orden = al.Orden,
-                Icono = al.Localizacion.Icono
+                Icono = al.Localizacion.Icono,
+                Descripcion = al.Descripcion,
+                TipoLocalizacion = al.TipoLocalizacion
             })
             .ToListAsync();
 
         return localizaciones;
     }
 
-    public async Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null)
+    public async Task<bool> AddLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null, string? descripcion = null, string? tipoLocalizacion = null)
     {
         // Verificar que la actividad y localización existen
         var actividadExists = await _context.Actividades.AnyAsync(a => a.Id == actividadId);
@@ -511,6 +513,8 @@ public class ActividadService : IActividadService
             LocalizacionId = localizacionId,
             EsPrincipal = esPrincipal,
             Orden = orden,
+            Descripcion = descripcion,
+            TipoLocalizacion = tipoLocalizacion,
             FechaAsignacion = DateTime.UtcNow
         };
 
@@ -534,7 +538,7 @@ public class ActividadService : IActividadService
         return true;
     }
 
-    public async Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null)
+    public async Task<bool> UpdateLocalizacionAsync(int actividadId, int localizacionId, bool esPrincipal, int orden, string? icono = null, string? descripcion = null, string? tipoLocalizacion = null)
     {
         var actividadLocalizacion = await _context.ActividadLocalizaciones
             .Include(al => al.Localizacion)
@@ -564,6 +568,8 @@ public class ActividadService : IActividadService
 
         actividadLocalizacion.EsPrincipal = esPrincipal;
         actividadLocalizacion.Orden = orden;
+        actividadLocalizacion.Descripcion = descripcion;
+        actividadLocalizacion.TipoLocalizacion = tipoLocalizacion;
 
         await _context.SaveChangesAsync();
 

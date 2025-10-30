@@ -205,7 +205,9 @@ public class ActividadController : ControllerBase
             localizacionId, 
             dto?.EsPrincipal ?? false, 
             dto?.Orden ?? 0,
-            dto?.Icono
+            dto?.Icono,
+            dto?.Descripcion,
+            dto?.TipoLocalizacion
         );
         if (!result)
             return NotFound(new { message = "Actividad o localización no encontrada" });
@@ -243,7 +245,9 @@ public class ActividadController : ControllerBase
             localizacionId, 
             dto.EsPrincipal, 
             dto.Orden,
-            dto.Icono
+            dto.Icono,
+            dto.Descripcion,
+            dto.TipoLocalizacion
         );
         if (!result)
             return NotFound(new { message = "Relación no encontrada" });

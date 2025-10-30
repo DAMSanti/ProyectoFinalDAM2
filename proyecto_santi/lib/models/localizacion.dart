@@ -9,6 +9,8 @@ class Localizacion {
   final double? longitud;
   final bool esPrincipal;
   final String? icono; // Nombre del icono de Material Icons
+  final String? descripcion; // Descripción o comentario sobre esta localización
+  final String? tipoLocalizacion; // Tipo: "Punto de salida", "Punto de llegada", "Alojamiento", "Actividad"
 
   Localizacion({
     required this.id,
@@ -21,6 +23,8 @@ class Localizacion {
     this.longitud,
     this.esPrincipal = false,
     this.icono,
+    this.descripcion,
+    this.tipoLocalizacion,
   });
 
   factory Localizacion.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,8 @@ class Localizacion {
       longitud: (json['longitud'] as num?)?.toDouble(),
       esPrincipal: json['esPrincipal'] as bool? ?? false,
       icono: json['icono']?.toString(),
+      descripcion: json['descripcion']?.toString(),
+      tipoLocalizacion: json['tipoLocalizacion']?.toString(),
     );
   }
 
@@ -50,6 +56,8 @@ class Localizacion {
       'longitud': longitud,
       'esPrincipal': esPrincipal,
       'icono': icono,
+      'descripcion': descripcion,
+      'tipoLocalizacion': tipoLocalizacion,
     };
   }
 

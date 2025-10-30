@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import '../dialogs/pdf_viewer_dialog.dart';
 
@@ -96,7 +95,7 @@ class FolletoCardWidget extends StatelessWidget {
                     Text(
                       'Folleto',
                       style: TextStyle(
-                        fontSize: !isWeb ? 11.dg : 3.5.sp,
+                        fontSize: isWeb ? 11 : 13.0,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1976d2),
                       ),
@@ -105,7 +104,7 @@ class FolletoCardWidget extends StatelessWidget {
                     Text(
                       displayFileName,
                       style: TextStyle(
-                        fontSize: !isWeb ? 13.dg : 4.sp,
+                        fontSize: isWeb ? 13 : 15.0,
                         color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                         decoration: hasFolleto ? TextDecoration.underline : null,
                       ),
@@ -126,7 +125,7 @@ class FolletoCardWidget extends StatelessWidget {
                 child: Icon(
                   Icons.picture_as_pdf_rounded,
                   color: Color(0xFF1976d2),
-                  size: !isWeb ? 16.dg : 5.sp,
+                  size: isWeb ? 16 : 18.0,
                 ),
               ),
               if (isAdminOrSolicitante) ...[
@@ -138,7 +137,7 @@ class FolletoCardWidget extends StatelessWidget {
                   ),
                   child: IconButton(
                     icon: Icon(Icons.upload_file_rounded, color: Color(0xFF1976d2)),
-                    iconSize: !isWeb ? 18.dg : 5.sp,
+                    iconSize: isWeb ? 18 : 20.0,
                     padding: EdgeInsets.all(8),
                     constraints: BoxConstraints(),
                     onPressed: onSelectFolleto,
@@ -155,7 +154,7 @@ class FolletoCardWidget extends StatelessWidget {
                     ),
                     child: IconButton(
                       icon: Icon(Icons.close_rounded, color: Colors.red),
-                      iconSize: !isWeb ? 18.dg : 5.sp,
+                      iconSize: isWeb ? 18 : 20.0,
                       padding: EdgeInsets.all(8),
                       constraints: BoxConstraints(),
                       onPressed: onDeleteFolleto,

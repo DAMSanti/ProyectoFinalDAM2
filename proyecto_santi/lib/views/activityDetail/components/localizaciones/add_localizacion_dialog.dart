@@ -178,6 +178,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
     if (result != null) {
       final nuevoPrincipal = result['esPrincipal'] as bool;
       final nuevoIcono = result['icono'] as IconData?;
+      final nuevaDescripcion = result['descripcion'] as String?;
+      final nuevoTipo = result['tipoLocalizacion'] as String?;
       String? nuevoIconoNombre;
       
       // Actualizar icono si se seleccionó uno y convertirlo a nombre string
@@ -207,6 +209,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               longitud: l.longitud,
               esPrincipal: false,
               icono: l.icono,
+              descripcion: l.descripcion,
+              tipoLocalizacion: l.tipoLocalizacion,
             );
           }
           
@@ -214,8 +218,10 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
           if (l.id == loc.id) {
             final iconoCambio = nuevoIconoNombre != null && nuevoIconoNombre != l.icono;
             final principalCambio = nuevoPrincipal != l.esPrincipal;
+            final descripcionCambio = nuevaDescripcion != l.descripcion;
+            final tipoCambio = nuevoTipo != l.tipoLocalizacion;
             
-            if (iconoCambio || principalCambio) {
+            if (iconoCambio || principalCambio || descripcionCambio || tipoCambio) {
               cambioRealizado = true;
               return Localizacion(
                 id: l.id,
@@ -228,6 +234,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                 longitud: l.longitud,
                 esPrincipal: nuevoPrincipal,
                 icono: nuevoIconoNombre ?? l.icono,
+                descripcion: nuevaDescripcion,
+                tipoLocalizacion: nuevoTipo,
               );
             }
           }

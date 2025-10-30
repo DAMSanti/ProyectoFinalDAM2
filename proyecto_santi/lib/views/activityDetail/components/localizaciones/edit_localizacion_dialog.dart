@@ -24,12 +24,30 @@ class EditLocalizacionDialog extends StatefulWidget {
 class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
   late bool _esPrincipal;
   IconData? _iconoSeleccionado;
+  late TextEditingController _descripcionController;
+  String? _tipoSeleccionado;
+  
+  // Tipos de localización disponibles
+  final List<String> _tiposLocalizacion = [
+    'Punto de salida',
+    'Punto de llegada',
+    'Alojamiento',
+    'Actividad',
+  ];
 
   @override
   void initState() {
     super.initState();
     _esPrincipal = widget.localizacion.esPrincipal;
     _iconoSeleccionado = widget.iconoActual;
+    _descripcionController = TextEditingController(text: widget.localizacion.descripcion ?? '');
+    _tipoSeleccionado = widget.localizacion.tipoLocalizacion;
+  }
+  
+  @override
+  void dispose() {
+    _descripcionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -260,6 +278,169 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                     
                     SizedBox(height: widget.puedeSerPrincipal ? 20 : 0),
                     
+                    // Tipo de localización
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.label_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Tipo de localización:',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1976d2),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Color(0xFF1976d2).withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.1),
+                            offset: Offset(0, 2),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: DropdownButtonFormField<String>(
+                        value: _tipoSeleccionado,
+                        decoration: InputDecoration(
+                          hintText: 'Selecciona el tipo',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          prefixIcon: Icon(
+                            Icons.category_rounded,
+                            color: Color(0xFF1976d2),
+                          ),
+                        ),
+                        items: _tiposLocalizacion.map((tipo) {
+                          IconData iconoTipo;
+                          switch (tipo) {
+                            case 'Punto de salida':
+                              iconoTipo = Icons.location_on_rounded;
+                              break;
+                            case 'Punto de llegada':
+                              iconoTipo = Icons.flag_rounded;
+                              break;
+                            case 'Alojamiento':
+                              iconoTipo = Icons.hotel_rounded;
+                              break;
+                            case 'Actividad':
+                              iconoTipo = Icons.local_activity_rounded;
+                              break;
+                            default:
+                              iconoTipo = Icons.place_rounded;
+                          }
+                          
+                          return DropdownMenuItem<String>(
+                            value: tipo,
+                            child: Row(
+                              children: [
+                                Icon(iconoTipo, size: 20, color: Color(0xFF1976d2)),
+                                SizedBox(width: 10),
+                                Text(tipo),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _tipoSeleccionado = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    
+                    // Campo de descripción
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.description_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Descripción:',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1976d2),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Color(0xFF1976d2).withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.1),
+                            offset: Offset(0, 2),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _descripcionController,
+                        maxLines: 3,
+                        maxLength: 500,
+                        decoration: InputDecoration(
+                          hintText: 'Añade un comentario o descripción sobre esta localización...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    
                     // Selector de icono
                     Row(
                       children: [
@@ -471,6 +652,8 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                           Navigator.of(context).pop({
                             'esPrincipal': _esPrincipal,
                             'icono': _iconoSeleccionado,
+                            'descripcion': _descripcionController.text.trim(),
+                            'tipoLocalizacion': _tipoSeleccionado,
                           });
                         },
                         borderRadius: BorderRadius.circular(10),

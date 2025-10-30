@@ -83,76 +83,92 @@ class CalendarViewButtons extends StatelessWidget {
   }
 
   Widget _buildVerticalButtons() {
-    return Container(
-      width: 80,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? const [
-                  Color.fromRGBO(26, 35, 126, 0.08),
-                  Color.fromRGBO(13, 71, 161, 0.05),
-                ]
-              : const [
-                  Color(0xFFe3f2fd),
-                  Color.fromRGBO(187, 222, 251, 0.3),
-                ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Color.fromRGBO(
-            (AppThemeConstants.primaryBlue.r * 255.0).round(),
-            (AppThemeConstants.primaryBlue.g * 255.0).round(),
-            (AppThemeConstants.primaryBlue.b * 255.0).round(),
-            0.15,
-          ),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(
-              (AppThemeConstants.primaryBlue.r * 255.0).round(),
-              (AppThemeConstants.primaryBlue.g * 255.0).round(),
-              (AppThemeConstants.primaryBlue.b * 255.0).round(),
-              0.08,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Ajustar el espaciado según la altura disponible
+        final availableHeight = constraints.maxHeight;
+        final spacing = availableHeight < 220 ? 4.0 : 8.0;
+        final verticalPadding = availableHeight < 220 ? 8.0 : 12.0;
+        
+        return Container(
+          width: 80,
+          padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? const [
+                      Color.fromRGBO(26, 35, 126, 0.08),
+                      Color.fromRGBO(13, 71, 161, 0.05),
+                    ]
+                  : const [
+                      Color(0xFFe3f2fd),
+                      Color.fromRGBO(187, 222, 251, 0.3),
+                    ],
             ),
-            blurRadius: 20,
-            offset: const Offset(5, 0),
-            spreadRadius: -3,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Color.fromRGBO(
+                (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                0.15,
+              ),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(
+                  (AppThemeConstants.primaryBlue.r * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.g * 255.0).round(),
+                  (AppThemeConstants.primaryBlue.b * 255.0).round(),
+                  0.08,
+                ),
+                blurRadius: 20,
+                offset: const Offset(5, 0),
+                spreadRadius: -3,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _buildButton('Día', CalendarView.day, Icons.view_day, showText: false),
-          SizedBox(height: 12),
-          _buildButton('Semana', CalendarView.week, Icons.view_week, showText: false),
-          SizedBox(height: 12),
-          _buildButton('Mes', CalendarView.month, Icons.calendar_view_month, showText: false),
-          SizedBox(height: 12),
-          _buildButton('Agenda', CalendarView.schedule, Icons.view_agenda, showText: false),
-        ],
-      ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(child: _buildButton('Día', CalendarView.day, Icons.view_day, showText: false)),
+              SizedBox(height: spacing),
+              Flexible(child: _buildButton('Semana', CalendarView.week, Icons.view_week, showText: false)),
+              SizedBox(height: spacing),
+              Flexible(child: _buildButton('Mes', CalendarView.month, Icons.calendar_view_month, showText: false)),
+              SizedBox(height: spacing),
+              Flexible(child: _buildButton('Agenda', CalendarView.schedule, Icons.view_agenda, showText: false)),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildButton(String label, CalendarView view, IconData icon, {required bool showText}) {
     final isSelected = currentView == view;
     
-    Widget buttonContent = Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => onViewChanged(view),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: showText ? 16 : 12,
-            vertical: 12,
-          ),
-          decoration: BoxDecoration(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Ajustar tamaño del icono según el espacio disponible
+        final iconSize = constraints.maxHeight < 50 ? 20.0 : 24.0;
+        final buttonPadding = constraints.maxHeight < 50 ? 8.0 : 10.0;
+        
+        Widget buttonContent = Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onViewChanged(view),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: showText ? 16 : 12,
+                vertical: showText ? 12 : buttonPadding,
+              ),
+              decoration: BoxDecoration(
             gradient: isSelected
                 ? LinearGradient(
                     begin: Alignment.topLeft,
@@ -215,13 +231,15 @@ class CalendarViewButtons extends StatelessWidget {
                 )
               : Icon(
                   icon,
-                  size: 24,
+                  size: iconSize,
                   color: isSelected ? Colors.white : Color(0xFF1976d2),
                 ),
-        ),
-      ),
-    );
+            ),
+          ),
+        );
 
-    return showText ? Expanded(child: buttonContent) : buttonContent;
+        return showText ? Expanded(child: buttonContent) : buttonContent;
+      },
+    );
   }
 }

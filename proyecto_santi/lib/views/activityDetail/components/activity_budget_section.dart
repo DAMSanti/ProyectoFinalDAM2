@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../models/actividad.dart';
 import '../../../models/alojamiento.dart';
 import '../../../models/empresa_transporte.dart';
@@ -270,14 +269,14 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 child: Icon(
                   Icons.account_balance_wallet_rounded,
                   color: Color(0xFF1976d2),
-                  size: !isWeb ? 18.dg : 6.sp,
+                  size: isWeb ? 18 : 20.0,
                 ),
               ),
               SizedBox(width: 10),
               Text(
                 'Presupuesto y Gastos',
                 style: TextStyle(
-                  fontSize: !isWeb ? 16.dg : 5.5.sp,
+                  fontSize: isWeb ? 16 : 18.0,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1976d2),
                 ),
@@ -455,12 +454,12 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.send_rounded, color: Colors.white, size: !isWeb ? 16.dg : 5.sp),
+                            Icon(Icons.send_rounded, color: Colors.white, size: isWeb ? 16 : 18.0),
                             SizedBox(width: 8),
                             Text(
                               'Solicitar Presupuestos',
                               style: TextStyle(
-                                fontSize: !isWeb ? 12.dg : 4.sp,
+                                fontSize: isWeb ? 12 : 14.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -500,12 +499,12 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.send_rounded, color: Colors.white, size: !isWeb ? 16.dg : 5.sp),
+                            Icon(Icons.send_rounded, color: Colors.white, size: isWeb ? 16 : 18.0),
                             SizedBox(width: 8),
                             Text(
                               'Solicitar Presupuestos',
                               style: TextStyle(
-                                fontSize: !isWeb ? 12.dg : 4.sp,
+                                fontSize: isWeb ? 12 : 14.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -593,14 +592,14 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 child: Icon(
                   icon,
                   color: value ? Colors.white : Colors.grey[600],
-                  size: !isWeb ? 20.dg : 6.sp,
+                  size: isWeb ? 20 : 22.0,
                 ),
               ),
               SizedBox(width: 12),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: !isWeb ? 14.dg : 5.sp,
+                  fontSize: isWeb ? 14 : 16.0,
                   fontWeight: FontWeight.bold,
                   color: value ? color : Colors.grey[600],
                 ),
@@ -697,7 +696,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         child: Icon(
                           icono,
                           color: Colors.white,
-                          size: !isWeb ? 22.dg : 7.sp,
+                          size: isWeb ? 22 : 24.0,
                         ),
                       ),
                       SizedBox(width: 12),
@@ -705,7 +704,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         child: Text(
                           titulo,
                           style: TextStyle(
-                            fontSize: !isWeb ? 14.dg : 4.5.sp,
+                            fontSize: isWeb ? 14 : 16.0,
                             fontWeight: FontWeight.bold,
                             color: color,
                           ),
@@ -734,7 +733,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       (_editandoAlojamiento && titulo == 'Alojamiento')
                         ? Icons.check_circle 
                         : Icons.edit_rounded, 
-                      size: !isWeb ? 20.dg : 6.sp
+                      size: isWeb ? 20 : 22.0
                     ),
                     color: ((_editandoPresupuesto && titulo == 'Presupuesto Estimado') || 
                             (_editandoTransporte && titulo == 'Transporte') ||
@@ -968,7 +967,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: !isWeb ? 10.dg : 3.sp,
+                fontSize: isWeb ? 10 : 12.0,
                 color: Colors.grey[500],
               ),
             ),
@@ -982,7 +981,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
               controller: _presupuestoController,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               style: TextStyle(
-                fontSize: !isWeb ? 16.dg : 5.5.sp,
+                fontSize: isWeb ? 16 : 18.0,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
@@ -990,7 +989,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 suffix: Text(
                   '€',
                   style: TextStyle(
-                    fontSize: !isWeb ? 16.dg : 5.5.sp,
+                    fontSize: isWeb ? 16 : 18.0,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -1034,7 +1033,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     controller: _precioTransporteController,
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
                     style: TextStyle(
-                      fontSize: !isWeb ? 16.dg : 5.5.sp,
+                      fontSize: isWeb ? 16 : 18.0,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -1042,7 +1041,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       suffix: Text(
                         '€',
                         style: TextStyle(
-                          fontSize: !isWeb ? 16.dg : 5.5.sp,
+                          fontSize: isWeb ? 16 : 18.0,
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
@@ -1086,7 +1085,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                           hint: Text(
                             'Sin selección',
                             style: TextStyle(
-                              fontSize: !isWeb ? 12.dg : 4.sp,
+                              fontSize: isWeb ? 12 : 14.0,
                               color: color, // Cambiar a morado
                               fontWeight: FontWeight.w500,
                             ),
@@ -1100,7 +1099,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                               return Text(
                                 empresa.nombre,
                                 style: TextStyle(
-                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                  fontSize: isWeb ? 12 : 14.0,
                                   color: color, // Texto seleccionado en morado
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -1114,7 +1113,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                                   child: Text(
                                     'No hay empresas disponibles',
                                     style: TextStyle(
-                                      fontSize: !isWeb ? 12.dg : 4.sp,
+                                      fontSize: isWeb ? 12 : 14.0,
                                       color: Colors.grey[600],
                                     ),
                                   ),
@@ -1143,7 +1142,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                                     child: Text(
                                       empresa.nombre,
                                       style: TextStyle(
-                                        fontSize: !isWeb ? 12.dg : 4.sp,
+                                        fontSize: isWeb ? 12 : 14.0,
                                         color: Colors.black87,
                                       ),
                                     ),
@@ -1176,7 +1175,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     controller: _precioAlojamientoController,
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
                     style: TextStyle(
-                      fontSize: !isWeb ? 16.dg : 5.5.sp,
+                      fontSize: isWeb ? 16 : 18.0,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -1184,7 +1183,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       suffix: Text(
                         '€',
                         style: TextStyle(
-                          fontSize: !isWeb ? 16.dg : 5.5.sp,
+                          fontSize: isWeb ? 16 : 18.0,
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
@@ -1232,7 +1231,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                           hint: Text(
                             'Seleccione alojamiento',
                             style: TextStyle(
-                              fontSize: !isWeb ? 12.dg : 4.sp,
+                              fontSize: isWeb ? 12 : 14.0,
                               color: color,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1248,7 +1247,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                                   child: Text(
                                     'Cargando alojamientos...',
                                     style: TextStyle(
-                                      fontSize: !isWeb ? 12.dg : 4.sp,
+                                      fontSize: isWeb ? 12 : 14.0,
                                       color: Colors.grey[600],
                                     ),
                                   ),
@@ -1279,7 +1278,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                                     child: Text(
                                       'Sin selección',
                                       style: TextStyle(
-                                        fontSize: !isWeb ? 12.dg : 4.sp,
+                                        fontSize: isWeb ? 12 : 14.0,
                                         color: Colors.grey[600],
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -1294,7 +1293,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                                     child: Text(
                                       alojamiento.nombre,
                                       style: TextStyle(
-                                        fontSize: !isWeb ? 12.dg : 4.sp,
+                                        fontSize: isWeb ? 12 : 14.0,
                                         color: Colors.black87,
                                       ),
                                     ),
@@ -1340,13 +1339,13 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                             Icon(
                               icono,
                               color: color,
-                              size: !isWeb ? 20.dg : 6.sp,
+                              size: isWeb ? 20 : 22.0,
                             ),
                             SizedBox(width: 8),
                             Text(
                               titulo,
                               style: TextStyle(
-                                fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                fontSize: isWeb ? 13 : 15.0,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[600],
                               ),
@@ -1356,7 +1355,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         Text(
                           '${valor.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            fontSize: !isWeb ? 16.dg : 5.5.sp,
+                            fontSize: isWeb ? 16 : 18.0,
                             fontWeight: FontWeight.bold,
                             color: color,
                           ),
@@ -1368,7 +1367,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                   Text(
                     '${valor.toStringAsFixed(2)} €',
                     style: TextStyle(
-                      fontSize: !isWeb ? 16.dg : 5.5.sp,
+                      fontSize: isWeb ? 16 : 18.0,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),
@@ -1381,7 +1380,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       child: Text(
                         empresaTransporte?.nombre ?? 'Sin selección',
                         style: TextStyle(
-                          fontSize: !isWeb ? 12.dg : 4.sp,
+                          fontSize: isWeb ? 12 : 14.0,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
                         ),
@@ -1398,7 +1397,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       child: Text(
                         _alojamientoLocal?.nombre ?? 'Sin selección',
                         style: TextStyle(
-                          fontSize: !isWeb ? 12.dg : 4.sp,
+                          fontSize: isWeb ? 12 : 14.0,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
                         ),
@@ -1478,7 +1477,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     child: Icon(
                       Icons.receipt_long_rounded,
                       color: Colors.white,
-                      size: !isWeb ? 22.dg : 7.sp,
+                      size: isWeb ? 22 : 24.0,
                     ),
                   ),
                   SizedBox(width: 12),
@@ -1488,7 +1487,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                       Text(
                         'Gastos Varios',
                         style: TextStyle(
-                          fontSize: !isWeb ? 14.dg : 4.5.sp,
+                          fontSize: isWeb ? 14 : 16.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.amber[700],
                         ),
@@ -1497,7 +1496,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         Text(
                           '${totalGastos.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            fontSize: !isWeb ? 16.dg : 5.sp,
+                            fontSize: isWeb ? 16 : 18.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.amber[800],
                           ),
@@ -1558,13 +1557,13 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     Icon(
                       Icons.receipt_long_outlined,
                       color: Colors.amber.withOpacity(0.5),
-                      size: !isWeb ? 40.dg : 12.sp,
+                      size: isWeb ? 40 : 44.0,
                     ),
                     SizedBox(height: 8),
                     Text(
                       'No hay gastos personalizados',
                       style: TextStyle(
-                        fontSize: !isWeb ? 12.dg : 4.sp,
+                        fontSize: isWeb ? 12 : 14.0,
                         color: Colors.grey[600],
                         fontStyle: FontStyle.italic,
                       ),
@@ -1621,7 +1620,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                           child: Icon(
                             Icons.receipt_rounded, 
                             color: Colors.white, 
-                            size: !isWeb ? 18.dg : 5.sp
+                            size: isWeb ? 18 : 20.0
                           ),
                         ),
                         SizedBox(width: 12),
@@ -1629,7 +1628,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                           child: Text(
                             gasto.concepto,
                             style: TextStyle(
-                              fontSize: !isWeb ? 13.dg : 4.sp,
+                              fontSize: isWeb ? 13 : 15.0,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey[800],
                             ),
@@ -1638,7 +1637,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         Text(
                           '${gasto.cantidad.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            fontSize: !isWeb ? 14.dg : 4.5.sp,
+                            fontSize: isWeb ? 14 : 16.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.amber[800],
                           ),
@@ -1651,7 +1650,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: IconButton(
-                              icon: Icon(Icons.delete_rounded, color: Colors.red[700], size: !isWeb ? 18.dg : 5.sp),
+                              icon: Icon(Icons.delete_rounded, color: Colors.red[700], size: isWeb ? 18 : 20.0),
                               onPressed: () => _eliminarGasto(gasto),
                               padding: EdgeInsets.all(6),
                               constraints: BoxConstraints(),

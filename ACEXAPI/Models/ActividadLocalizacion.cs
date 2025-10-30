@@ -29,6 +29,18 @@ namespace ACEXAPI.Models
         public int Orden { get; set; } = 0;
 
         /// <summary>
+        /// Descripción o comentario sobre esta localización en el contexto de la actividad
+        /// </summary>
+        [StringLength(500)]
+        public string? Descripcion { get; set; }
+
+        /// <summary>
+        /// Tipo de localización: "Punto de salida", "Punto de llegada", "Alojamiento", "Actividad"
+        /// </summary>
+        [StringLength(50)]
+        public string? TipoLocalizacion { get; set; }
+
+        /// <summary>
         /// Fecha en la que se asignó esta localización a la actividad
         /// </summary>
         public DateTime FechaAsignacion { get; set; } = DateTime.UtcNow;

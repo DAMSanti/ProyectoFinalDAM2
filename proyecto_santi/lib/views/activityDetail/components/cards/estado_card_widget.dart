@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 
 class EstadoCardWidget extends StatelessWidget {
@@ -77,7 +76,7 @@ class EstadoCardWidget extends StatelessWidget {
                 Text(
                   'Estado',
                   style: TextStyle(
-                    fontSize: !isWeb ? 11.dg : 3.5.sp,
+                    fontSize: isWeb ? 11 : 13.0,
                     fontWeight: FontWeight.w600,
                     color: estadoColor,
                   ),
@@ -85,7 +84,7 @@ class EstadoCardWidget extends StatelessWidget {
                 Text(
                   estado,
                   style: TextStyle(
-                    fontSize: !isWeb ? 14.dg : 4.5.sp,
+                    fontSize: isWeb ? 14 : 16.0,
                     fontWeight: FontWeight.bold,
                     color: estadoColor,
                   ),
@@ -97,7 +96,7 @@ class EstadoCardWidget extends StatelessWidget {
           Icon(
             estadoIcon,
             color: estadoColor,
-            size: !isWeb ? 18.dg : 5.5.sp,
+            size: isWeb ? 18 : 20.0,
           ),
         ],
       ),

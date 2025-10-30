@@ -472,14 +472,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       child: Icon(
                         Icons.photo_library_rounded,
                         color: Color(0xFF1976d2),
-                        size: !isWeb ? 18.dg : 6.sp,
+                        size: isWeb ? 18 : 20.0,
                       ),
                     ),
                     SizedBox(width: 10),
                     Text(
                       'Fotos de la Actividad',
                       style: TextStyle(
-                        fontSize: !isWeb ? 14.dg : 5.sp,
+                        fontSize: isWeb ? 14 : 16.0,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : Color(0xFF1976d2),
                       ),
@@ -545,8 +545,8 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildProfesoresParticipantes(BuildContext context) {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Container(
       decoration: BoxDecoration(
@@ -618,14 +618,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                           child: Icon(
                             Icons.people_rounded,
                             color: Color(0xFF1976d2),
-                            size: !isWeb ? 18.dg : 6.sp,
+                            size: isWeb ? 18 : 20.0,
                           ),
                         ),
                         SizedBox(width: 10),
                         Text(
                           'Profesores Participantes',
                           style: TextStyle(
-                            fontSize: !isWeb ? 14.dg : 5.sp,
+                            fontSize: isWeb ? 14 : 16.0,
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Color(0xFF1976d2),
                           ),
@@ -642,7 +642,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                           icon: Icon(
                             Icons.add_circle_outline_rounded,
                             color: Color(0xFF1976d2),
-                            size: !isWeb ? 20.dg : 6.sp,
+                            size: 20,
                           ),
                           onPressed: _loadingProfesores ? null : () {
                             _showAddProfesorDialog(context);
@@ -671,7 +671,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontStyle: FontStyle.italic,
-                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                  fontSize: isWeb ? 12 : 14.0,
                                 ),
                               ),
                             ],
@@ -723,7 +723,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: !isWeb ? 16.dg : 5.sp,
+                                          fontSize: isWeb ? 16 : 18.0,
                                         ),
                                       ),
                                     ),
@@ -732,7 +732,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                     '${profesor.nombre} ${profesor.apellidos}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                      fontSize: isWeb ? 13 : 15.0,
                                       color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   ),
@@ -750,7 +750,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                           child: Text(
                                             profesor.correo,
                                             style: TextStyle(
-                                              fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                              fontSize: isWeb ? 11 : 13.0,
                                               color: Colors.grey[600],
                                             ),
                                             overflow: TextOverflow.ellipsis,
@@ -769,7 +769,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                             icon: Icon(
                                               Icons.delete_outline_rounded,
                                               color: Colors.red,
-                                              size: !isWeb ? 18.dg : 5.5.sp,
+                                              size: 18,
                                             ),
                                             onPressed: () {
                                               setState(() {
@@ -809,8 +809,8 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildGruposParticipantes(BuildContext context) {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Container(
       decoration: BoxDecoration(
@@ -883,7 +883,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                             child: Icon(
                               Icons.school_rounded,
                               color: Color(0xFF1976d2),
-                              size: !isWeb ? 18.dg : 6.sp,
+                              size: isWeb ? 18 : 20.0,
                             ),
                           ),
                           SizedBox(width: 10),
@@ -894,7 +894,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                 Text(
                                   'Grupos/Cursos Participantes',
                                   style: TextStyle(
-                                    fontSize: !isWeb ? 14.dg : 5.sp,
+                                    fontSize: isWeb ? 14 : 16.0,
                                     fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.white : Color(0xFF1976d2),
                                   ),
@@ -911,7 +911,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                       child: Text(
                                         'Total alumnos: $_totalAlumnosParticipantes',
                                         style: TextStyle(
-                                          fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                          fontSize: isWeb ? 11 : 13.0,
                                           color: Color(0xFF1976d2),
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -934,7 +934,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                           icon: Icon(
                             Icons.add_circle_outline_rounded,
                             color: Color(0xFF1976d2),
-                            size: !isWeb ? 20.dg : 6.sp,
+                            size: 20,
                           ),
                           onPressed: _loadingGrupos ? null : () {
                             _showAddGrupoDialog(context);
@@ -963,7 +963,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontStyle: FontStyle.italic,
-                                  fontSize: !isWeb ? 12.dg : 4.sp,
+                                  fontSize: isWeb ? 12 : 14.0,
                                 ),
                               ),
                             ],
@@ -1017,7 +1017,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: !isWeb ? 16.dg : 5.sp,
+                                          fontSize: isWeb ? 16 : 18.0,
                                         ),
                                       ),
                                     ),
@@ -1026,7 +1026,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                     grupoParticipante.grupo.nombre,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: !isWeb ? 13.dg : 4.5.sp,
+                                      fontSize: isWeb ? 13 : 15.0,
                                       color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   ),
@@ -1063,7 +1063,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                                   Text(
                                                     '${grupoParticipante.numeroParticipantes}/${grupoParticipante.grupo.numeroAlumnos} alumnos',
                                                     style: TextStyle(
-                                                      fontSize: !isWeb ? 11.dg : 3.8.sp,
+                                                      fontSize: 11,
                                                       color: Color(0xFF1976d2),
                                                       fontWeight: FontWeight.w500,
                                                       decoration: widget.isAdminOrSolicitante 
@@ -1095,7 +1095,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                                             icon: Icon(
                                               Icons.delete_outline_rounded,
                                               color: Colors.red,
-                                              size: !isWeb ? 18.dg : 5.5.sp,
+                                              size: 18,
                                             ),
                                             onPressed: () {
                                               setState(() {
@@ -1483,8 +1483,8 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   }
 
   Widget _buildLocalizacion(BuildContext context, BoxConstraints constraints) {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Container(
       constraints: BoxConstraints(minHeight: 500),
@@ -1539,14 +1539,14 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                     child: Icon(
                       Icons.location_on_rounded,
                       color: Color(0xFF1976d2),
-                      size: !isWeb ? 18.dg : 6.sp,
+                      size: isWeb ? 18 : 20.0,
                     ),
                   ),
                   SizedBox(width: 10),
                   Text(
                     'Localizaciones',
                     style: TextStyle(
-                      fontSize: !isWeb ? 16.dg : 5.5.sp,
+                      fontSize: isWeb ? 14 : 16.0,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1976d2),
                     ),
@@ -1574,7 +1574,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       child: Text(
                         '${_localizaciones.length}',
                         style: TextStyle(
-                          fontSize: !isWeb ? 12.dg : 4.sp,
+                          fontSize: isWeb ? 12 : 14.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -1615,13 +1615,13 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                             Icon(
                               Icons.add_location_rounded,
                               color: Colors.white,
-                              size: !isWeb ? 18.dg : 5.sp,
+                              size: isWeb ? 18 : 20.0,
                             ),
                             SizedBox(width: 6),
                             Text(
                               'Añadir',
                               style: TextStyle(
-                                fontSize: !isWeb ? 13.dg : 4.sp,
+                                fontSize: isWeb ? 13 : 15.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -1670,8 +1670,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
 
   // M�todo para mostrar el di�logo de a�adir localizaci�n
   void _showAddLocalizacionDialog(BuildContext context) async {
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -1769,13 +1767,13 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               Icon(
                 Icons.comment,
                 color: Color(0xFF1976d2),
-                size: !isWeb ? 16.dg : 5.sp,
+                size: isWeb ? 16 : 18.0,
               ),
               SizedBox(width: 8),
               Text(
                 'Comentarios',
                 style: TextStyle(
-                  fontSize: !isWeb ? 14.dg : 5.sp,
+                  fontSize: isWeb ? 14 : 16.0,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1976d2),
                 ),
@@ -1786,7 +1784,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
           Text(
             widget.actividad.comentarios!,
             style: TextStyle(
-              fontSize: !isWeb ? 14.dg : 4.5.sp,
+              fontSize: isWeb ? 13 : 15.0,
               height: 1.5,
             ),
           ),

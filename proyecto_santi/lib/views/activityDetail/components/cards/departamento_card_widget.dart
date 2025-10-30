@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:proyecto_santi/models/profesor.dart';
 
@@ -51,7 +50,7 @@ class DepartamentoCardWidget extends StatelessWidget {
             child: Icon(
               Icons.business_rounded,
               color: Color(0xFF1976d2),
-              size: !isWeb ? 16.dg : 5.sp,
+              size: isWeb ? 16 : 18.0,
             ),
           ),
           SizedBox(width: 10),
@@ -63,7 +62,7 @@ class DepartamentoCardWidget extends StatelessWidget {
                 Text(
                   'Departamento',
                   style: TextStyle(
-                    fontSize: !isWeb ? 11.dg : 3.5.sp,
+                    fontSize: isWeb ? 11 : 13.0,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1976d2),
                   ),
@@ -72,7 +71,7 @@ class DepartamentoCardWidget extends StatelessWidget {
                 Text(
                   departamentoNombre,
                   style: TextStyle(
-                    fontSize: !isWeb ? 13.dg : 4.sp,
+                    fontSize: isWeb ? 13 : 15.0,
                     fontWeight: FontWeight.w500,
                     color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                     height: 1.3,

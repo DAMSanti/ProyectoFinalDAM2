@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -67,54 +66,12 @@ class ActivityDetailHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Etiqueta de tipo de actividad (lengüeta de carpeta)
-        Transform.translate(
-          offset: Offset(0, 8),
-          child: Padding(
-            padding: EdgeInsets.only(left: 40),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: actividad.tipo == 'Complementaria'
-                    ? [
-                        Color(0xFF1976d2),
-                        Color(0xFF42A5F5),
-                      ]
-                    : [
-                        Color(0xFFE65100),
-                        Color(0xFFFF6F00),
-                      ],
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (actividad.tipo == 'Complementaria' 
-                        ? Color(0xFF1976d2) 
-                        : Color(0xFFE65100)).withOpacity(0.4),
-                    offset: Offset(0, -2),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Text(
-                actividad.tipo == 'Complementaria' ? 'COMPLEMENTARIA' : 'EXTRAESCOLAR',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: !isWeb ? 11.dg : 3.5.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-          ),
-        ),
-        
-        // Contenedor principal del header
-        Container(
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Contenedor principal del header
+            Container(
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
@@ -209,7 +166,7 @@ class ActivityDetailHeader extends StatelessWidget {
                           child: Icon(
                             Icons.event_note_rounded,
                             color: Color(0xFF1976d2),
-                            size: !isWeb ? 20.dg : 6.sp,
+                            size: isWeb ? 20 : 22.0,
                           ),
                         ),
                         SizedBox(width: 12),
@@ -217,7 +174,7 @@ class ActivityDetailHeader extends StatelessWidget {
                           child: Text(
                             actividad.titulo,
                             style: TextStyle(
-                              fontSize: !isWeb ? 20.dg : 7.sp,
+                              fontSize: isWeb ? 20 : 22.0,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Color(0xFF1976d2),
                               letterSpacing: -0.5,
@@ -249,7 +206,7 @@ class ActivityDetailHeader extends StatelessWidget {
                         child: Text(
                           actividad.descripcion!,
                           style: TextStyle(
-                            fontSize: !isWeb ? 14.dg : 4.5.sp,
+                            fontSize: isWeb ? 14 : 16.0,
                             color: isDark ? Colors.white.withOpacity(0.85) : Colors.black87,
                             height: 1.5,
                           ),
@@ -347,6 +304,54 @@ class ActivityDetailHeader extends StatelessWidget {
             ],
           ),
         ),
+        // Etiqueta de tipo de actividad (lengüeta de carpeta) - Por encima de todo
+        Positioned(
+          top: 0,
+          left: 40,
+          child: Transform.translate(
+            offset: Offset(0, -28),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: actividad.tipo == 'Complementaria'
+                    ? [
+                        Color(0xFF1976d2),
+                        Color(0xFF42A5F5),
+                      ]
+                    : [
+                        Color(0xFFE65100),
+                        Color(0xFFFF6F00),
+                      ],
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (actividad.tipo == 'Complementaria' 
+                        ? Color(0xFF1976d2) 
+                        : Color(0xFFE65100)).withOpacity(0.4),
+                    offset: Offset(0, -2),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Text(
+                actividad.tipo == 'Complementaria' ? 'COMPLEMENTARIA' : 'EXTRAESCOLAR',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isWeb ? 11 : 13.0,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
       ],
     );
   }
@@ -418,7 +423,7 @@ class _ResponsableCard extends StatelessWidget {
                 iniciales,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: !isWeb ? 14.dg : 4.5.sp,
+                  fontSize: isWeb ? 14 : 16.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -436,7 +441,7 @@ class _ResponsableCard extends StatelessWidget {
                 Text(
                   'Responsable',
                   style: TextStyle(
-                    fontSize: !isWeb ? 11.dg : 3.5.sp,
+                    fontSize: isWeb ? 11 : 13.0,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1976d2),
                   ),
@@ -445,7 +450,7 @@ class _ResponsableCard extends StatelessWidget {
                 Text(
                   nombre,
                   style: TextStyle(
-                    fontSize: !isWeb ? 13.dg : 4.sp,
+                    fontSize: isWeb ? 13 : 15.0,
                     color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
                     height: 1.3,
                   ),

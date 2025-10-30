@@ -105,6 +105,8 @@ public class LocalizacionDto
     public bool EsPrincipal { get; set; }
     public int Orden { get; set; }
     public string? Icono { get; set; }
+    public string? Descripcion { get; set; }
+    public string? TipoLocalizacion { get; set; }
 }
 
 public class AddLocalizacionDto
@@ -112,6 +114,8 @@ public class AddLocalizacionDto
     public bool EsPrincipal { get; set; } = false;
     public int Orden { get; set; } = 0;
     public string? Icono { get; set; }
+    public string? Descripcion { get; set; }
+    public string? TipoLocalizacion { get; set; }
 }
 
 public class UpdateLocalizacionDto
@@ -119,4 +123,6 @@ public class UpdateLocalizacionDto
     public bool EsPrincipal { get; set; }
     public int Orden { get; set; }
     public string? Icono { get; set; }
+    public string? Descripcion { get; set; }
+    public string? TipoLocalizacion { get; set; }
 }

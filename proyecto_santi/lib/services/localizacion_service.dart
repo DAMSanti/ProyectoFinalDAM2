@@ -78,6 +78,8 @@ class LocalizacionService {
     int localizacionId, {
     bool esPrincipal = false,
     String? icono,
+    String? descripcion,
+    String? tipoLocalizacion,
   }) async {
     try {
       print('[LocalizacionService] Adding localización $localizacionId to actividad $actividadId');
@@ -86,6 +88,8 @@ class LocalizacionService {
         {
           'esPrincipal': esPrincipal,
           if (icono != null) 'icono': icono,
+          if (descripcion != null && descripcion.isNotEmpty) 'descripcion': descripcion,
+          if (tipoLocalizacion != null && tipoLocalizacion.isNotEmpty) 'tipoLocalizacion': tipoLocalizacion,
         },
       );
       
@@ -115,6 +119,8 @@ class LocalizacionService {
     int localizacionId, {
     required bool esPrincipal,
     String? icono,
+    String? descripcion,
+    String? tipoLocalizacion,
   }) async {
     try {
       print('[LocalizacionService] Updating localización $localizacionId in actividad $actividadId');
@@ -123,6 +129,8 @@ class LocalizacionService {
         {
           'esPrincipal': esPrincipal,
           if (icono != null) 'icono': icono,
+          if (descripcion != null) 'descripcion': descripcion,
+          if (tipoLocalizacion != null) 'tipoLocalizacion': tipoLocalizacion,
         },
       );
       
