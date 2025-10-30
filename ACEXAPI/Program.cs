@@ -88,6 +88,9 @@ Console.WriteLine($"============================================");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(dbConnectionString));
 
+// Registrar el servicio de notificaciones (debe estar DESPUÉS del DbContext)
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 var key = Encoding.UTF8.GetBytes(jwtKey);

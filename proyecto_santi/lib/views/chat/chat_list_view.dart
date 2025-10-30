@@ -5,6 +5,7 @@ import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
@@ -329,22 +330,11 @@ class ChatListViewState extends State<ChatListView> {
                 isDark: isDark,
                 isWeb: isWeb,
                 onTap: () {
-                  final auth = Provider.of<Auth>(context, listen: false);
-                  final userId = auth.currentUser?.uuid ?? '0';
-                  final userName = auth.currentUser?.nombre ?? 'Usuario';
-                  
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatView(
-                        activityId: actividad.id.toString(),
-                        displayName: actividad.titulo,
-                        userId: userId,
-                        onToggleTheme: widget.onToggleTheme,
-                        isDarkTheme: widget.isDarkTheme,
-                      ),
-                    ),
-                  );
+                  // Navegar usando el shell en lugar de Navigator.push
+                  navigateToChatInShell(context, {
+                    'activityId': actividad.id.toString(),
+                    'displayName': actividad.titulo,
+                  });
                 },
               );
             },

@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<ActividadLocalizacion> ActividadLocalizaciones { get; set; }
     public DbSet<GastoPersonalizado> GastosPersonalizados { get; set; }
+    public DbSet<FcmToken> FcmTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

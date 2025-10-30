@@ -43,6 +43,7 @@ publish/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+firebase-credentials.json
 
 # ============================================
 # Flutter / Dart

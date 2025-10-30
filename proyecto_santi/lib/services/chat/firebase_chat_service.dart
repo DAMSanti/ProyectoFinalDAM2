@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_santi/models/chat/chat_message.dart';
 import 'package:proyecto_santi/models/chat/message_type.dart';
+import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/config.dart';
 import 'package:uuid/uuid.dart';
+import 'package:dio/dio.dart';
 
 /// Servicio para manejar operaciones de chat con Firebase Firestore
 class FirebaseChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Uuid _uuid = const Uuid();
+  final ApiService _apiService = ApiService();
 
   /// Stream de mensajes de una actividad en tiempo real
   /// Los mensajes se ordenan por timestamp (más recientes primero)
@@ -72,6 +76,13 @@ class FirebaseChatService {
         .collection('chats')
         .doc(messageId)
         .set(chatMessage.toFirestore());
+
+    // Enviar notificación a través del backend
+    await _sendNotification(
+      actividadId: actividadId,
+      senderName: senderName,
+      messagePreview: message.length > 50 ? '${message.substring(0, 50)}...' : message,
+    );
   }
 
   /// Envía un mensaje con multimedia (imagen, video, audio, archivo)
@@ -108,6 +119,31 @@ class FirebaseChatService {
         .collection('chats')
         .doc(messageId)
         .set(chatMessage.toFirestore());
+
+    // Enviar notificación con descripción según el tipo de media
+    String mediaDescription;
+    switch (type) {
+      case MessageType.image:
+        mediaDescription = '📷 Envió una imagen';
+        break;
+      case MessageType.video:
+        mediaDescription = '🎥 Envió un video';
+        break;
+      case MessageType.audio:
+        mediaDescription = '🎵 Envió un audio';
+        break;
+      case MessageType.file:
+        mediaDescription = '📎 Envió un archivo';
+        break;
+      default:
+        mediaDescription = message;
+    }
+
+    await _sendNotification(
+      actividadId: actividadId,
+      senderName: senderName,
+      messagePreview: mediaDescription,
+    );
   }
 
   /// Edita un mensaje existente
@@ -252,4 +288,50 @@ class FirebaseChatService {
       return message.message.toLowerCase().contains(searchText.toLowerCase());
     }).toList();
   }
+
+  /// Método privado para enviar notificación a través del backend
+  Future<void> _sendNotification({
+    required String actividadId,
+    required String senderName,
+    required String messagePreview,
+  }) async {
+    try {
+      // Extraer el ID numérico de la actividad si viene en formato string
+      int? actividadIdInt;
+      try {
+        actividadIdInt = int.parse(actividadId);
+      } catch (e) {
+        print('[ChatService] No se pudo convertir actividadId a int: $actividadId');
+        return;
+      }
+
+      final dio = Dio();
+      dio.options.baseUrl = AppConfig.apiBaseUrl;
+      
+      // Obtener el token JWT
+      final jwtToken = _apiService.token;
+      
+      if (jwtToken == null) {
+        print('[ChatService] No JWT token available, skipping notification');
+        return;
+      }
+      
+      dio.options.headers['Authorization'] = 'Bearer $jwtToken';
+      
+      await dio.post(
+        '/Chat/notify-new-message',
+        data: {
+          'actividadId': actividadIdInt,
+          'senderName': senderName,
+          'messagePreview': messagePreview,
+        },
+      );
+      
+      print('[ChatService] Notification sent successfully');
+    } catch (e) {
+      print('[ChatService] Error sending notification: $e');
+      // No lanzamos el error para no bloquear el envío del mensaje
+    }
+  }
 }
+

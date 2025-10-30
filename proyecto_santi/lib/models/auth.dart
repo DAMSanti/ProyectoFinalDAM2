@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/config.dart';
 import 'package:proyecto_santi/services/services.dart';
+import 'package:proyecto_santi/services/notification_service.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 
@@ -61,6 +62,20 @@ class Auth extends ChangeNotifier {
         );
         
         _isAuthenticated = true;
+        
+        // Enviar token FCM al backend para notificaciones push
+        final userId = usuario?['id']?.toString();
+        if (userId != null) {
+          await NotificationService().sendTokenToBackend(userId);
+          
+          // Suscribirse a tópicos relevantes
+          await NotificationService().subscribeToTopic('all_users');
+          if (usuario?['rol']?.toString() == 'Profesor' || 
+              usuario?['rol']?.toString() == 'Coordinador') {
+            await NotificationService().subscribeToTopic('profesores');
+          }
+        }
+        
         notifyListeners();
         return true;
       }
@@ -74,6 +89,10 @@ class Auth extends ChangeNotifier {
 
   /// Cierra la sesión del usuario actual
   Future<void> logout() async {
+    // Desuscribirse de tópicos de notificaciones
+    await NotificationService().unsubscribeFromTopic('all_users');
+    await NotificationService().unsubscribeFromTopic('profesores');
+    
     _isAuthenticated = false;
     _currentUser = null;
     _jwtToken = null;

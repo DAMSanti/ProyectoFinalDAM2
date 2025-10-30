@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/views/login/login_view.dart';
@@ -7,11 +8,20 @@ import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
+import 'package:proyecto_santi/services/notification_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
+
+/// Handler global para mensajes en background
+/// Debe estar fuera de cualquier clase y ser top-level
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print('[Background] Notification received: ${message.notification?.title}');
+}
 
 void main() async {
   // Esta es la base de flutter, vamos a repetirlo en consultas asincronas
@@ -22,6 +32,12 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    
+    // Configurar el handler de notificaciones en background
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    
+    // Inicializar el servicio de notificaciones
+    await NotificationService().initialize();
     
     await initializeDateFormatting('es_ES', null);
 

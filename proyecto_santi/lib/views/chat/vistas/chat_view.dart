@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
+import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/models/chat/chat_message.dart';
 import 'package:proyecto_santi/models/chat/message_type.dart';
 import 'package:proyecto_santi/services/chat/firebase_chat_service.dart';
@@ -182,14 +183,10 @@ class _ChatViewState extends State<ChatView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context);
+        navigateBackFromDetail(context, '/chat');
         return false;
       },
       child: Scaffold(
-        appBar: AndroidAppBar(
-          onToggleTheme: widget.onToggleTheme,
-          title: 'Chat - ${widget.displayName}',
-        ),
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -200,10 +197,13 @@ class _ChatViewState extends State<ChatView> {
                   : [const Color(0xFFE3F2FD), const Color(0xFFBBDEFB)],
             ),
           ),
-          child: Column(
+          child: Stack(
             children: [
-              // Lista de mensajes
-              Expanded(
+              Column(
+                children: [
+                  const SizedBox(height: 48), // Espacio para la flecha de volver
+                  // Lista de mensajes
+                  Expanded(
                 child: StreamBuilder<List<ChatMessage>>(
                   stream: _chatService.getMessagesStream(widget.activityId),
                   builder: (context, snapshot) {
@@ -348,8 +348,41 @@ class _ChatViewState extends State<ChatView> {
               ),
             ],
           ),
-        ),
+          // Flecha de volver (posicionada en la esquina superior izquierda)
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.isDarkTheme
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.3),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: widget.isDarkTheme ? Colors.white : const Color(0xFF1976d2),
+                  size: 24,
+                ),
+                onPressed: () {
+                  navigateBackFromDetail(context, '/chat');
+                },
+                tooltip: 'Volver',
+              ),
+            ),
+          ),
+        ],
       ),
+    ),
+  ),
     );
   }
 

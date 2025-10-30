@@ -14,8 +14,8 @@ class AppConfig {
       // Para mobile (Android/iOS) y desktop
       try {
         if (Platform.isAndroid) {
-          // Para Android: 10.0.2.2 es el localhost del emulador
-          return 'http://10.0.2.2:5000/api';
+          // Para Android dispositivo físico: IP de tu PC en la red WiFi
+          return 'http://192.168.1.42:5000/api';
         } else if (Platform.isIOS) {
           return 'http://localhost:5000/api';
         }
@@ -34,8 +34,8 @@ class AppConfig {
     } else {
       try {
         if (Platform.isAndroid) {
-          // Para Android emulador
-          return 'http://10.0.2.2:5000/uploads';
+          // Para Android dispositivo físico: IP de tu PC en la red WiFi
+          return 'http://192.168.1.42:5000/uploads';
         } else if (Platform.isIOS) {
           return 'http://localhost:5000/uploads';
         }
