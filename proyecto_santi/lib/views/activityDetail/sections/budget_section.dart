@@ -8,12 +8,12 @@ import '../../../models/gasto_personalizado.dart';
 import '../../../services/actividad_service.dart';
 import '../../../services/gasto_personalizado_service.dart';
 import '../../../services/api_service.dart';
-import 'widgets/budget_toggle_switch_widget.dart';
-import 'widgets/gastos_varios_card_widget.dart';
-import 'widgets/budget_card_widget.dart';
-import 'widgets/budget_sections_widgets.dart';
-import 'widgets/budget_dialogs.dart';
-import 'helpers/budget_edit_handlers.dart';
+import '../widgets/budget/budget_toggle_switch.dart';
+import '../widgets/budget/gastos_varios_card.dart';
+import '../widgets/budget/budget_card.dart';
+import '../widgets/budget/budget_sections.dart';
+import '../dialogs/budget_dialogs.dart';
+import '../helpers/budget_edit_helpers.dart';
 
 /// Widget para mostrar y gestionar el presupuesto de una actividad.
 /// 
