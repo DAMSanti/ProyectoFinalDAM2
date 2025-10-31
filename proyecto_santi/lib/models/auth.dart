@@ -35,10 +35,15 @@ class Auth extends ChangeNotifier {
         
         final usuario = loginResult['usuario'];
         
-        // Guardamos el token y email en almacenamiento seguro
+        // ✅ MEJORADO: Calcular expiración del token (24 horas por defecto)
+        final tokenExpiry = DateTime.now().add(Duration(hours: 24));
+        
+        // Guardamos el token, email y expiración en almacenamiento seguro
         await SecureStorageConfig.storeUserCredentials(
           email,
           usuario?['id']?.toString() ?? '',
+          jwtToken: _jwtToken,
+          tokenExpiry: tokenExpiry,
         );
         
         // Creamos un objeto Profesor temporal con los datos del usuario
@@ -104,21 +109,76 @@ class Auth extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Verifica si hay una sesión activa al iniciar la app
+  /// ✅ MEJORADO: Verifica si hay una sesión activa al iniciar la app y la restaura
   Future<void> checkAuthStatus() async {
     try {
       final credentials = await SecureStorageConfig.getUserCredentials();
       final email = credentials['email'];
-      final userId = credentials['userId'];
+      final userId = credentials['uuid'];
+      final savedToken = credentials['jwtToken'];
       
-      if (email != null && email.isNotEmpty && userId != null && userId.isNotEmpty) {
-        // Tenemos credenciales guardadas, pero sin contraseña no podemos hacer login automático
-        // El usuario deberá volver a ingresar su contraseña
-        print('[Auth] Sesión expirada. Se requiere login nuevamente.');
-        await logout();
+      // Verificar si tenemos token guardado
+      if (savedToken != null && savedToken.isNotEmpty) {
+        // Verificar si el token ha expirado
+        final isExpired = await SecureStorageConfig.isTokenExpired();
+        
+        if (!isExpired) {
+          // ✅ Token válido - Restaurar sesión automáticamente
+          print('[Auth] 🔄 Restaurando sesión desde token guardado...');
+          
+          _jwtToken = savedToken;
+          _apiService.setToken(savedToken);
+          
+          // Intentar obtener datos del usuario actual
+          try {
+            final profesores = await _profesorService.fetchProfesores();
+            final profesor = profesores.firstWhere(
+              (p) => p.correo == email && p.activo == 1,
+              orElse: () => throw Exception('Profesor no encontrado'),
+            );
+            
+            _currentUser = profesor;
+            _isAuthenticated = true;
+            
+            // Reconfigurar notificaciones
+            await NotificationService().sendTokenToBackend(userId ?? '');
+            await NotificationService().subscribeToTopic('all_users');
+            if (profesor.rol == 'Profesor' || profesor.rol == 'Coordinador') {
+              await NotificationService().subscribeToTopic('profesores');
+            }
+            
+            print('[Auth] ✅ Sesión restaurada exitosamente para: ${profesor.nombre}');
+          } catch (e) {
+            print('[Auth] ⚠️ Error obteniendo datos de usuario, usando datos guardados: $e');
+            
+            // Crear usuario temporal con datos guardados
+            _currentUser = Profesor(
+              uuid: userId ?? '',
+              dni: '',
+              nombre: email ?? 'Usuario',
+              apellidos: '',
+              correo: email ?? '',
+              password: '',
+              rol: 'Usuario',
+              activo: 1,
+              urlFoto: null,
+              esJefeDep: 0,
+              depart: Departamento(id: 0, codigo: 'USR', nombre: 'Usuario'),
+            );
+            _isAuthenticated = true;
+          }
+        } else {
+          // Token expirado - Limpiar y requerir login
+          print('[Auth] ⏰ Token expirado. Se requiere login nuevamente.');
+          await logout();
+        }
+      } else if (email != null && email.isNotEmpty) {
+        // Tenemos email pero no token - Requerir login
+        print('[Auth] 📧 Email guardado pero sin token. Se requiere login.');
+        _isAuthenticated = false;
       }
     } catch (e) {
-      print('[Auth] Error verificando estado de autenticación: $e');
+      print('[Auth] ❌ Error verificando estado de autenticación: $e');
       _isAuthenticated = false;
       _currentUser = null;
       _jwtToken = null;

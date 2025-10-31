@@ -10,6 +10,7 @@ import 'package:proyecto_santi/tema/theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/notification_service.dart';
+import 'package:proyecto_santi/services/lifecycle_manager.dart'; // ✅ NUEVO
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -88,12 +89,29 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  LifecycleManager? _lifecycleManager; // ✅ NUEVO
 
   void _toggleTheme() {
     setState(() {
       _themeMode =
       _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+    // ✅ NUEVO: Inicializar lifecycle manager después de que el auth esté disponible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<Auth>();
+      _lifecycleManager = LifecycleManager(auth);
+    });
+  }
+  
+  @override
+  void dispose() {
+    _lifecycleManager?.dispose(); // ✅ NUEVO: Liberar recursos
+    super.dispose();
   }
 
 // Construimos la App con las rutas y el tema

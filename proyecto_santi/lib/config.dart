@@ -74,6 +74,8 @@ class SecureStorageConfig {
   static const String _keyMeasurementId = 'measurementId';
   static const String _keyUserEmail = 'userEmail';
   static const String _keyUserUuid = 'userUuid';
+  static const String _keyJwtToken = 'jwtToken'; // ✅ NUEVO: Guardar token JWT
+  static const String _keyTokenExpiry = 'tokenExpiry'; // ✅ NUEVO: Timestamp de expiración
 
   /// Guarda la configuraciÃ³n de Firebase
   static Future<void> storeFirebaseConfig() async {
@@ -100,9 +102,17 @@ class SecureStorageConfig {
   }
 
   /// Guarda las credenciales del usuario
-  static Future<void> storeUserCredentials(String email, String uuid) async {
+  static Future<void> storeUserCredentials(String email, String uuid, {String? jwtToken, DateTime? tokenExpiry}) async {
     await _secureStorage.write(key: _keyUserEmail, value: email);
     await _secureStorage.write(key: _keyUserUuid, value: uuid);
+    
+    // ✅ NUEVO: Guardar token JWT y su expiración
+    if (jwtToken != null) {
+      await _secureStorage.write(key: _keyJwtToken, value: jwtToken);
+    }
+    if (tokenExpiry != null) {
+      await _secureStorage.write(key: _keyTokenExpiry, value: tokenExpiry.toIso8601String());
+    }
   }
 
   /// Recupera las credenciales del usuario
@@ -110,13 +120,30 @@ class SecureStorageConfig {
     return {
       'email': await _secureStorage.read(key: _keyUserEmail),
       'uuid': await _secureStorage.read(key: _keyUserUuid),
+      'jwtToken': await _secureStorage.read(key: _keyJwtToken), // ✅ NUEVO
+      'tokenExpiry': await _secureStorage.read(key: _keyTokenExpiry), // ✅ NUEVO
     };
+  }
+  
+  /// ✅ NUEVO: Verifica si el token guardado está expirado
+  static Future<bool> isTokenExpired() async {
+    final expiryStr = await _secureStorage.read(key: _keyTokenExpiry);
+    if (expiryStr == null) return true;
+    
+    try {
+      final expiry = DateTime.parse(expiryStr);
+      return DateTime.now().isAfter(expiry);
+    } catch (e) {
+      return true;
+    }
   }
 
   /// Limpia las credenciales del usuario (logout)
   static Future<void> clearUserCredentials() async {
     await _secureStorage.delete(key: _keyUserEmail);
     await _secureStorage.delete(key: _keyUserUuid);
+    await _secureStorage.delete(key: _keyJwtToken); // ✅ NUEVO
+    await _secureStorage.delete(key: _keyTokenExpiry); // ✅ NUEVO
   }
 
   /// Limpia toda la informaciÃ³n almacenada
