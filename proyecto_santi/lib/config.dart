@@ -4,45 +4,61 @@ import 'dart:io' show Platform;
 
 /// Configuración de la aplicación
 class AppConfig {
+  // 🌐 SERVIDOR DE PRODUCCIÓN - Cambia esto a true para usar el servidor remoto
+  static const bool useProductionServer = true;
+  static const String productionUrl = 'http://64.226.85.100';
+  static const String localUrl = 'http://localhost:5000';
+  static const String localAndroidUrl = 'http://192.168.1.42:5000';
+  
   // URL base de la API (ACEXAPI C# .NET)
-  // IMPORTANTE: Para Android físico, usar la IP local de tu PC en la misma red WiFi
+  // IMPORTANTE: Para Android físico en local, usar la IP local de tu PC en la misma red WiFi
   static String get apiBaseUrl {
+    // Si está en modo producción, usa el servidor remoto
+    if (useProductionServer) {
+      return '$productionUrl/api';
+    }
+    
     if (kIsWeb) {
       // Para web, usa localhost
-      return 'http://localhost:5000/api';
+      return '$localUrl/api';
     } else {
       // Para mobile (Android/iOS) y desktop
       try {
         if (Platform.isAndroid) {
           // Para Android dispositivo físico: IP de tu PC en la red WiFi
-          return 'http://192.168.1.42:5000/api';
+          return '$localAndroidUrl/api';
         } else if (Platform.isIOS) {
-          return 'http://localhost:5000/api';
+          return '$localUrl/api';
         }
       } catch (e) {
         // Fallback para desktop
       }
       // Para desktop (Windows/Mac/Linux)
-      return 'http://localhost:5000/api';
+      return '$localUrl/api';
     }
   }
   
   // URL de imágenes
   static String get imagenesBaseUrl {
+    // Si está en modo producción, usa el servidor remoto
+    if (useProductionServer) {
+      return '$productionUrl/uploads';
+    }
+    
     if (kIsWeb) {
-      return 'http://localhost:5000/uploads';
+      return '$localUrl/uploads';
     } else {
       try {
         if (Platform.isAndroid) {
           // Para Android dispositivo físico: IP de tu PC en la red WiFi
-          return 'http://192.168.1.42:5000/uploads';
+          return '$localAndroidUrl/uploads';
         } else if (Platform.isIOS) {
-          return 'http://localhost:5000/uploads';
+          return '$localUrl/uploads';
         }
       } catch (e) {
         // Fallback
       }
-      return 'http://localhost:5000/uploads';
+      return '$localUrl/uploads';
     }
   }
   

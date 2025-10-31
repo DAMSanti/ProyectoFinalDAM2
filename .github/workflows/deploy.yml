@@ -1,0 +1,79 @@
+name: Deploy ACEXAPI to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ACEXAPI/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'  # Ajusta según tu versión de .NET
+          
+      - name: Restore dependencies
+        run: dotnet restore ACEXAPI/ACEXAPI.csproj
+        
+      - name: Build
+        run: dotnet build ACEXAPI/ACEXAPI.csproj --configuration Release --no-restore
+        
+      - name: Test (opcional)
+        run: |
+          if [ -d "ACEXAPI.Tests" ]; then
+            dotnet test ACEXAPI.Tests/ACEXAPI.Tests.csproj --no-restore --verbosity normal
+          else
+            echo "No tests found, skipping..."
+          fi
+        
+      - name: Publish
+        run: dotnet publish ACEXAPI/ACEXAPI.csproj --configuration Release --output ./publish --no-restore
+        
+      - name: Deploy to DigitalOcean
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: "./publish/*"
+          target: "/var/www/acexapi/publish"
+          strip_components: 1
+          
+      - name: Restart service via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            chmod -R 755 /var/www/acexapi
+            systemctl restart acexapi.service
+            sleep 5
+            systemctl status acexapi.service --no-pager
+            
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            if systemctl is-active --quiet acexapi.service; then
+              echo "✓ Service is running successfully"
+              curl -f http://localhost:5000 || echo "API is accessible"
+            else
+              echo "✗ Service failed to start"
+              journalctl -u acexapi.service -n 50 --no-pager
+              exit 1
+            fi
