@@ -170,6 +170,33 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       });
     }
   }
+
+  // Método para eliminar una imagen de la API cuando ya se confirmó la eliminación (desde diálogo de edición)
+  void _removeApiImageConfirmed(int index) {
+    print('DEBUG: _removeApiImageConfirmed llamado con index: $index');
+    print('DEBUG: imagesActividad.length: ${imagesActividad.length}');
+    
+    if (index < imagesActividad.length) {
+      final photo = imagesActividad[index];
+      print('DEBUG: Eliminando foto ID: ${photo.id}');
+      
+      setState(() {
+        // Marcar la imagen para eliminar
+        imagesToDelete.add(photo.id);
+        print('DEBUG: Foto agregada a imagesToDelete. Total: ${imagesToDelete.length}');
+        
+        // Remover de la lista de visualización
+        imagesActividad.removeAt(index);
+        print('DEBUG: Foto removida de imagesActividad. Nueva longitud: ${imagesActividad.length}');
+        
+        // Marcar que hay cambios
+        isDataChanged = true;
+        print('DEBUG: isDataChanged = true');
+      });
+    } else {
+      print('ERROR: Index fuera de rango! index: $index, length: ${imagesActividad.length}');
+    }
+  }
   
   // Método para editar la descripción de una imagen local
   void _editLocalImage(int index) async {
@@ -218,9 +245,9 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     // Esto restaurará folleto, profesores participantes, grupos participantes, etc.
     await _loadActivityDetails();
     
-    // Después de recargar, incrementar el widgetKey para forzar reconstrucción
+    // Incrementar _widgetKey para que los componentes internos se recarguen
     setState(() {
-      _widgetKey++; // Incrementar para forzar reconstrucción del widget con datos actualizados
+      _widgetKey++;
     });
   }
   
@@ -563,6 +590,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         showImagePicker: _showImagePicker,
         removeSelectedImage: _removeSelectedImage,
         removeApiImage: _removeApiImage,
+        removeApiImageConfirmed: _removeApiImageConfirmed,
         editLocalImage: _editLocalImage,
         saveChanges: _saveChanges,
         revertChanges: _revertChanges,
@@ -574,7 +602,6 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {
             return ActivityDetailPortraitLayout(
-              key: ValueKey(_widgetKey), // Forzar reconstrucción al revertir
               actividad: actividadAMostrar,
               isDarkTheme: widget.isDarkTheme,
               onToggleTheme: widget.onToggleTheme,
@@ -585,14 +612,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               selectedImagesDescriptions: selectedImagesDescriptions,
               showImagePicker: _showImagePicker,
               removeSelectedImage: _removeSelectedImage,
+              removeApiImage: _removeApiImage,
+              removeApiImageConfirmed: _removeApiImageConfirmed,
               editLocalImage: _editLocalImage,
               saveChanges: _saveChanges,
               revertChanges: _revertChanges,
               onActivityDataChanged: _handleActivityDataChanged,
+              reloadTrigger: _widgetKey,
             );
           } else {
             return ActivityDetailSmallLandscapeLayout(
-              key: ValueKey(_widgetKey), // Forzar reconstrucción al revertir
               actividad: actividadAMostrar,
               isDarkTheme: widget.isDarkTheme,
               onToggleTheme: widget.onToggleTheme,
@@ -603,10 +632,13 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
               selectedImagesDescriptions: selectedImagesDescriptions,
               showImagePicker: _showImagePicker,
               removeSelectedImage: _removeSelectedImage,
+              removeApiImage: _removeApiImage,
+              removeApiImageConfirmed: _removeApiImageConfirmed,
               editLocalImage: _editLocalImage,
               saveChanges: _saveChanges,
               revertChanges: _revertChanges,
               onActivityDataChanged: _handleActivityDataChanged,
+              reloadTrigger: _widgetKey,
             );
           }
         },

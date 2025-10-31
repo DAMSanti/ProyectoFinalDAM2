@@ -46,6 +46,27 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
     }
   }
 
+  @override
+  void didUpdateWidget(FolletoUploadWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si cambió el folletoUrl (por ejemplo, al revertir), actualizar el estado
+    if (widget.folletoUrl != oldWidget.folletoUrl) {
+      setState(() {
+        if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
+          _folletoFileName = _extractFileName(widget.folletoUrl!);
+          _folletoMarkedForDeletion = false;
+          _folletoChanged = false;
+          _folletoFilePath = null;
+        } else {
+          _folletoFileName = null;
+          _folletoMarkedForDeletion = false;
+          _folletoChanged = false;
+          _folletoFilePath = null;
+        }
+      });
+    }
+  }
+
   Future<void> _selectFolleto() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -90,16 +111,48 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
     }
   }
 
-  void _deleteFolleto() {
-    setState(() {
-      _folletoMarkedForDeletion = true;
-      _folletoFileName = null;
-      _folletoFilePath = null;
-      
-      widget.onFolletoChanged({
-        'deleteFolleto': true,
+  Future<void> _deleteFolleto() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              SizedBox(width: 12),
+              Text('Confirmar eliminación'),
+            ],
+          ),
+          content: Text('¿Estás seguro de que deseas eliminar el folleto?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _folletoMarkedForDeletion = true;
+        _folletoFileName = null;
+        _folletoFilePath = null;
+        
+        widget.onFolletoChanged({
+          'deleteFolleto': true,
+        });
       });
-    });
+    }
   }
 
   String _extractFileName(String url) {

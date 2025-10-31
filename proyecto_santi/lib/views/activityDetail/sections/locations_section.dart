@@ -139,6 +139,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
   Widget _buildLocalizacionContainer(BuildContext context, BoxConstraints constraints) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isMobile = constraints.maxWidth < 600;
     
     return Container(
       constraints: BoxConstraints(minHeight: 500),
@@ -261,26 +262,35 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                       onTap: _loadingLocalizaciones ? null : () {
                         _showAddLocalizacionDialog(context);
                       },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.add_location_rounded,
-                              color: Colors.white,
-                              size: isWeb ? 18 : 20.0,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'Añadir',
-                              style: TextStyle(
-                                fontSize: isWeb ? 13 : 15.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                      child: Tooltip(
+                        message: 'Añadir localización',
+                        child: Padding(
+                          padding: EdgeInsets.all(isMobile ? 10 : 12),
+                          child: isMobile
+                              ? Icon(
+                                  Icons.add_location_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.add_location_rounded,
+                                      color: Colors.white,
+                                      size: isWeb ? 18 : 20.0,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Añadir',
+                                      style: TextStyle(
+                                        fontSize: isWeb ? 13 : 15.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                     ),

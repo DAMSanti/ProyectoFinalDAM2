@@ -47,10 +47,10 @@ class FolletoCardWidget extends StatelessWidget {
         folletoUrl: actividadFolletoUrl,
         isAdminOrSolicitante: isAdminOrSolicitante,
         onFolletoChanged: (data) {
-          // Propagar callbacks al padre
-          // El padre (activity_detail_info) maneja _selectFolleto y _deleteFolleto
-          // No es necesario hacer nada aquí, el widget FolletoUploadWidget
-          // ya llama a _selectFolleto internamente cuando se presiona upload
+          // Detectar si es eliminación
+          if (data['deleteFolleto'] == true) {
+            onDeleteFolleto();
+          }
         },
         compact: true, // Versión compacta para el header
         isMobile: isMobile,

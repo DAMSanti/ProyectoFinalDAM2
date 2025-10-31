@@ -24,6 +24,7 @@ class ActivityImagesSection extends StatefulWidget {
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
   final Function(int)? removeApiImage;
+  final Function(int)? removeApiImageConfirmed; // Nuevo: para eliminación ya confirmada
   final Function(int)? editLocalImage;
   final Function(Map<String, dynamic>)? onDataChanged;
 
@@ -36,6 +37,7 @@ class ActivityImagesSection extends StatefulWidget {
     required this.showImagePicker,
     required this.removeSelectedImage,
     this.removeApiImage,
+    this.removeApiImageConfirmed,
     this.editLocalImage,
     this.onDataChanged,
   });
@@ -171,12 +173,42 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
     );
   }
 
+  /// Maneja la eliminación de una foto existente (ya confirmada desde el diálogo)
+  Future<void> _handleDeletePhoto(Photo photo) async {
+    print('DEBUG: _handleDeletePhoto llamado para foto ID: ${photo.id}');
+    print('DEBUG: removeApiImageConfirmed es null? ${widget.removeApiImageConfirmed == null}');
+    
+    if (widget.removeApiImageConfirmed == null) {
+      print('ERROR: removeApiImageConfirmed es null!');
+      return;
+    }
+    
+    // Buscar el índice de la foto en la lista
+    final photoIndex = widget.imagesActividad.indexWhere((p) => p.id == photo.id);
+    print('DEBUG: photoIndex encontrado: $photoIndex');
+    
+    if (photoIndex == -1) {
+      print('ERROR: No se encontró la foto en la lista!');
+      return;
+    }
+    
+    // Limpiar cambios pendientes para esta foto antes de eliminar
+    _photoDescriptionChanges.remove(photo.id);
+    
+    // Llamar al método de eliminación confirmada (sin pedir confirmación de nuevo)
+    print('DEBUG: Llamando a removeApiImageConfirmed con index: $photoIndex');
+    widget.removeApiImageConfirmed!(photoIndex);
+    print('DEBUG: removeApiImageConfirmed ejecutado');
+  }
+
   /// Muestra el diálogo para editar la descripción de una foto existente
   void _showImageEditDialog(BuildContext context, Photo photo) async {
     // Obtener la descripción actual (puede haber cambios pendientes)
     final currentDescription = _photoDescriptionChanges.containsKey(photo.id)
         ? _photoDescriptionChanges[photo.id]
         : photo.descripcion;
+    
+    print('DEBUG: Abriendo diálogo para foto ID: ${photo.id}');
     
     final result = await showDialog<String>(
       context: context,
@@ -192,7 +224,17 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
       },
     );
     
-    // Si se confirmó, guardar cambio localmente
+    print('DEBUG: Diálogo cerrado con resultado: $result');
+    
+    // Manejar eliminación
+    if (result == 'delete') {
+      print('DEBUG: Resultado es delete, llamando a _handleDeletePhoto');
+      // Llamar al método de eliminación
+      await _handleDeletePhoto(photo);
+      return;
+    }
+    
+    // Si se confirmó la descripción, guardar cambio localmente
     if (result != null && mounted) {
       setState(() {
         _photoDescriptionChanges[photo.id] = result;

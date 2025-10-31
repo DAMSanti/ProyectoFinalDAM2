@@ -50,9 +50,16 @@ class BudgetCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     return Container(
       width: width > 600 ? width : double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10 : 18, 
+        vertical: isMobile ? 8 : 14,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -62,16 +69,16 @@ class BudgetCardWidget extends StatelessWidget {
             Colors.white.withOpacity(0.7),
           ],
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
         border: Border.all(
           color: color.withOpacity(0.4),
-          width: 2,
+          width: isMobile ? 1 : 2,
         ),
         boxShadow: [
           BoxShadow(
             color: color.withOpacity(0.2),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            blurRadius: isMobile ? 6 : 12,
+            offset: Offset(0, isMobile ? 2 : 4),
           ),
         ],
       ),
@@ -80,19 +87,23 @@ class BudgetCardWidget extends StatelessWidget {
         children: [
           _buildHeader(context),
           if (titulo != 'Coste por Alumno')
-            SizedBox(height: 8),
+            SizedBox(height: isMobile ? 6 : 8),
           if (isEditing && controller != null)
-            _buildEditingContent()
+            _buildEditingContent(context)
           else if (titulo == 'Coste por Alumno')
-            _buildCosteAlumnoContent()
+            _buildCosteAlumnoContent(context)
           else
-            _buildDisplayContent(),
+            _buildDisplayContent(context),
         ],
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     // Para "Coste por Alumno" no mostrar header separado
     if (titulo == 'Coste por Alumno') {
       return SizedBox.shrink();
@@ -104,38 +115,40 @@ class BudgetCardWidget extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      color.withOpacity(0.8),
-                      color.withOpacity(0.6),
+              // Ocultar icono en móvil
+              if (!isMobile)
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color.withOpacity(0.8),
+                        color.withOpacity(0.6),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+                  child: Icon(
+                    icono,
+                    color: Colors.white,
+                    size: isWeb ? 22 : 24.0,
+                  ),
                 ),
-                child: Icon(
-                  icono,
-                  color: Colors.white,
-                  size: isWeb ? 22 : 24.0,
-                ),
-              ),
-              SizedBox(width: 12),
+              if (!isMobile) SizedBox(width: 12),
               Flexible(
                 child: Text(
                   titulo,
                   style: TextStyle(
-                    fontSize: isWeb ? 14 : 16.0,
+                    fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
@@ -153,24 +166,33 @@ class BudgetCardWidget extends StatelessWidget {
                     ? [Colors.green.withOpacity(0.2), Colors.green.withOpacity(0.1)]
                     : [Colors.grey.withOpacity(0.2), Colors.grey.withOpacity(0.1)],
               ),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
             ),
-            child: IconButton(
-              icon: Icon(
-                isEditing ? Icons.check_circle : Icons.edit_rounded,
-                size: isWeb ? 20 : 22.0,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
+                onTap: onEditPressed,
+                child: Padding(
+                  padding: EdgeInsets.all(isMobile ? 4 : 8),
+                  child: Icon(
+                    isEditing ? Icons.check_circle : Icons.edit_rounded,
+                    size: isMobile ? 14 : (isWeb ? 20 : 22.0),
+                    color: isEditing ? Colors.green[700] : color,
+                  ),
+                ),
               ),
-              color: isEditing ? Colors.green[700] : color,
-              onPressed: onEditPressed,
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints(),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildEditingContent() {
+  Widget _buildEditingContent(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     // Si es transporte o alojamiento con dropdown
     if ((titulo == 'Transporte' && empresasDisponibles != null) ||
         (titulo == 'Alojamiento' && alojamientosDisponibles != null)) {
@@ -185,7 +207,7 @@ class BudgetCardWidget extends StatelessWidget {
               controller: controller,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               style: TextStyle(
-                fontSize: isWeb ? 16 : 18.0,
+                fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
@@ -193,13 +215,13 @@ class BudgetCardWidget extends StatelessWidget {
                 suffix: Text(
                   '€',
                   style: TextStyle(
-                    fontSize: isWeb ? 16 : 18.0,
+                    fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
                 ),
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 6 : 8, horizontal: 0),
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: color),
                 ),
@@ -210,13 +232,13 @@ class BudgetCardWidget extends StatelessWidget {
               autofocus: true,
             ),
           ),
-          SizedBox(width: 16),
+          SizedBox(width: isMobile ? 12 : 16),
           // Dropdown
           Expanded(
             flex: 3,
             child: titulo == 'Transporte'
-                ? _buildEmpresaDropdown()
-                : _buildAlojamientoDropdown(),
+                ? _buildEmpresaDropdown(context)
+                : _buildAlojamientoDropdown(context),
           ),
         ],
       );
@@ -227,7 +249,7 @@ class BudgetCardWidget extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       style: TextStyle(
-        fontSize: isWeb ? 16 : 18.0,
+        fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
         fontWeight: FontWeight.bold,
         color: color,
       ),
@@ -235,13 +257,13 @@ class BudgetCardWidget extends StatelessWidget {
         suffix: Text(
           '€',
           style: TextStyle(
-            fontSize: isWeb ? 16 : 18.0,
+            fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+        contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 6 : 8, horizontal: 0),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: color),
         ),
@@ -254,12 +276,16 @@ class BudgetCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmpresaDropdown() {
+  Widget _buildEmpresaDropdown(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     if (cargandoEmpresas) {
       return Center(
         child: SizedBox(
-          height: 20,
-          width: 20,
+          height: isMobile ? 16 : 20,
+          width: isMobile ? 16 : 20,
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: color,
@@ -271,7 +297,7 @@ class BudgetCardWidget extends StatelessWidget {
     final empresasUnicas = _getUniqueEmpresas();
 
     return Container(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: color, width: 1),
@@ -284,18 +310,18 @@ class BudgetCardWidget extends StatelessWidget {
         hint: Text(
           'Sin selección',
           style: TextStyle(
-            fontSize: isWeb ? 12 : 14.0,
+            fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
             color: color,
             fontWeight: FontWeight.w500,
           ),
         ),
-        icon: Icon(Icons.arrow_drop_down, color: color),
+        icon: Icon(Icons.arrow_drop_down, color: color, size: isMobile ? 18 : 24),
         selectedItemBuilder: (BuildContext context) {
           return empresasUnicas.map((empresa) {
             return Text(
               empresa.nombre,
               style: TextStyle(
-                fontSize: isWeb ? 12 : 14.0,
+                fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
@@ -309,7 +335,7 @@ class BudgetCardWidget extends StatelessWidget {
                   child: Text(
                     'No hay empresas disponibles',
                     style: TextStyle(
-                      fontSize: isWeb ? 12 : 14.0,
+                      fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                       color: Colors.grey[600],
                     ),
                   ),
@@ -321,7 +347,7 @@ class BudgetCardWidget extends StatelessWidget {
                   child: Text(
                     empresa.nombre,
                     style: TextStyle(
-                      fontSize: isWeb ? 12 : 14.0,
+                      fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                       color: Colors.black87,
                     ),
                   ),
@@ -332,12 +358,16 @@ class BudgetCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildAlojamientoDropdown() {
+  Widget _buildAlojamientoDropdown(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     if (cargandoAlojamientos) {
       return Center(
         child: SizedBox(
-          height: 20,
-          width: 20,
+          height: isMobile ? 16 : 20,
+          width: isMobile ? 16 : 20,
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: color,
@@ -349,7 +379,7 @@ class BudgetCardWidget extends StatelessWidget {
     final alojamientosUnicos = _getUniqueAlojamientos();
 
     return Container(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: color, width: 1),
@@ -362,19 +392,19 @@ class BudgetCardWidget extends StatelessWidget {
         hint: Text(
           'Seleccione alojamiento',
           style: TextStyle(
-            fontSize: isWeb ? 12 : 14.0,
+            fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
             color: color,
             fontWeight: FontWeight.w500,
           ),
         ),
-        icon: Icon(Icons.arrow_drop_down, color: color),
+        icon: Icon(Icons.arrow_drop_down, color: color, size: isMobile ? 18 : 24),
         items: [
           DropdownMenuItem<Alojamiento>(
             value: null,
             child: Text(
               'Sin selección',
               style: TextStyle(
-                fontSize: isWeb ? 12 : 14.0,
+                fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                 color: Colors.grey[600],
                 fontStyle: FontStyle.italic,
               ),
@@ -386,7 +416,7 @@ class BudgetCardWidget extends StatelessWidget {
               child: Text(
                 alojamiento.nombre,
                 style: TextStyle(
-                  fontSize: isWeb ? 12 : 14.0,
+                  fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                   color: Colors.black87,
                 ),
               ),
@@ -398,7 +428,11 @@ class BudgetCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCosteAlumnoContent() {
+  Widget _buildCosteAlumnoContent(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -408,13 +442,13 @@ class BudgetCardWidget extends StatelessWidget {
             Icon(
               icono,
               color: color,
-              size: isWeb ? 20 : 22.0,
+              size: isMobile ? 16 : (isWeb ? 20 : 22.0),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: isMobile ? 6 : 8),
             Text(
               titulo,
               style: TextStyle(
-                fontSize: isWeb ? 13 : 15.0,
+                fontSize: isMobile ? 12 : (isWeb ? 13 : 15.0),
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[600],
               ),
@@ -424,7 +458,7 @@ class BudgetCardWidget extends StatelessWidget {
         Text(
           '${valor.toStringAsFixed(2)} €',
           style: TextStyle(
-            fontSize: isWeb ? 16 : 18.0,
+            fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -433,7 +467,11 @@ class BudgetCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDisplayContent() {
+  Widget _buildDisplayContent(BuildContext context) {
+    // Detectar si es móvil
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -441,7 +479,7 @@ class BudgetCardWidget extends StatelessWidget {
         Text(
           '${valor.toStringAsFixed(2)} €',
           style: TextStyle(
-            fontSize: isWeb ? 16 : 18.0,
+            fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -449,11 +487,11 @@ class BudgetCardWidget extends StatelessWidget {
         if (titulo == 'Transporte' && empresaTransporte != null)
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: isMobile ? 6 : 8),
               child: Text(
                 empresaTransporte!.nombre,
                 style: TextStyle(
-                  fontSize: isWeb ? 12 : 14.0,
+                  fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
                 ),
@@ -465,11 +503,11 @@ class BudgetCardWidget extends StatelessWidget {
         if (titulo == 'Alojamiento' && alojamiento != null)
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: isMobile ? 6 : 8),
               child: Text(
                 alojamiento!.nombre,
                 style: TextStyle(
-                  fontSize: isWeb ? 12 : 14.0,
+                  fontSize: isMobile ? 11 : (isWeb ? 12 : 14.0),
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[600],
                 ),

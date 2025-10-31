@@ -275,6 +275,12 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
+    final isPortrait = orientation == Orientation.portrait;
+    final isMobile = screenWidth < 600;
+    final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
     
     // Calcular valores - usar los valores locales si están disponibles
     final presupuesto = _presupuestoEstimadoLocal ?? widget.actividad.presupuestoEstimado ?? 0.0;
@@ -297,8 +303,8 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
         : 0.0;
     
     return Container(
-      constraints: BoxConstraints(minHeight: 500),
-      padding: EdgeInsets.all(20),
+      constraints: BoxConstraints(minHeight: isMobile ? 400 : 500),
+      padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -350,73 +356,117 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 ),
               ),
               SizedBox(width: 10),
-              Text(
-                'Presupuesto y Gastos',
-                style: TextStyle(
-                  fontSize: isWeb ? 16 : 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
+              Expanded(
+                child: Text(
+                  'Presupuesto y Gastos',
+                  style: TextStyle(
+                    fontSize: isWeb ? 14 : 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1976d2),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
           
           // Switches para activar/desactivar Transporte y Alojamiento
           if (widget.isAdminOrSolicitante) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: BudgetToggleSwitchWidget(
-                    label: 'Transporte',
-                    icon: Icons.directions_bus,
-                    color: Colors.purple,
-                    value: _transporteReq,
-                    isWeb: isWeb,
-                    onChanged: (value) {
-                      setState(() {
-                        _transporteReq = value;
-                      });
-                      // Notificar cambios al padre con los nuevos valores
-                      widget.onBudgetChanged?.call({
-                        'transporteReq': value ? 1 : 0,
-                        'alojamientoReq': _alojamientoReq ? 1 : 0,
-                      });
-                    },
-                  ),
+            // En móvil portrait, mostrar en columna; en landscape y desktop, en fila
+            isMobile && isPortrait
+              ? Column(
+                  children: [
+                    BudgetToggleSwitchWidget(
+                      label: 'Transporte',
+                      icon: Icons.directions_bus,
+                      color: Colors.purple,
+                      value: _transporteReq,
+                      isWeb: isWeb,
+                      onChanged: (value) {
+                        setState(() {
+                          _transporteReq = value;
+                        });
+                        widget.onBudgetChanged?.call({
+                          'transporteReq': value ? 1 : 0,
+                          'alojamientoReq': _alojamientoReq ? 1 : 0,
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    BudgetToggleSwitchWidget(
+                      label: 'Alojamiento',
+                      icon: Icons.hotel,
+                      color: Colors.teal,
+                      value: _alojamientoReq,
+                      isWeb: isWeb,
+                      onChanged: (value) {
+                        setState(() {
+                          _alojamientoReq = value;
+                        });
+                        widget.onBudgetChanged?.call({
+                          'transporteReq': _transporteReq ? 1 : 0,
+                          'alojamientoReq': value ? 1 : 0,
+                        });
+                      },
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: BudgetToggleSwitchWidget(
+                        label: 'Transporte',
+                        icon: Icons.directions_bus,
+                        color: Colors.purple,
+                        value: _transporteReq,
+                        isWeb: isWeb,
+                        onChanged: (value) {
+                          setState(() {
+                            _transporteReq = value;
+                          });
+                          widget.onBudgetChanged?.call({
+                            'transporteReq': value ? 1 : 0,
+                            'alojamientoReq': _alojamientoReq ? 1 : 0,
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: isMobile ? 10 : 16),
+                    Expanded(
+                      child: BudgetToggleSwitchWidget(
+                        label: 'Alojamiento',
+                        icon: Icons.hotel,
+                        color: Colors.teal,
+                        value: _alojamientoReq,
+                        isWeb: isWeb,
+                        onChanged: (value) {
+                          setState(() {
+                            _alojamientoReq = value;
+                          });
+                          widget.onBudgetChanged?.call({
+                            'transporteReq': _transporteReq ? 1 : 0,
+                            'alojamientoReq': value ? 1 : 0,
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: BudgetToggleSwitchWidget(
-                    label: 'Alojamiento',
-                    icon: Icons.hotel,
-                    color: Colors.teal,
-                    value: _alojamientoReq,
-                    isWeb: isWeb,
-                    onChanged: (value) {
-                      setState(() {
-                        _alojamientoReq = value;
-                      });
-                      // Notificar cambios al padre con los nuevos valores
-                      widget.onBudgetChanged?.call({
-                        'transporteReq': _transporteReq ? 1 : 0,
-                        'alojamientoReq': value ? 1 : 0,
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
           ],
           
-          // Fila superior: Presupuesto Estimado y Coste Real lado a lado
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: BudgetCardWidget(
+          // Espaciado después de switches
+          if (widget.isAdminOrSolicitante)
+            SizedBox(height: isMobile ? 8 : 10),
+          
+          // Tarjetas de presupuesto - Layout adaptativo
+          // Mobile landscape / Mobile portrait: columna vertical
+          // Desktop: fila con 2+1
+          isMobileLandscape
+            ? Column(
+                children: [
+                  // Presupuesto Estimado
+                  BudgetCardWidget(
                     titulo: 'Presupuesto Estimado',
                     valor: presupuesto,
                     icono: Icons.account_balance_wallet,
@@ -428,10 +478,9 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     controller: _presupuestoController,
                     onEditPressed: _handleEditPresupuesto,
                   ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: BudgetCardWidget(
+                  SizedBox(height: 6),
+                  // Coste Real
+                  BudgetCardWidget(
                     titulo: 'Coste Real',
                     valor: costoReal,
                     icono: Icons.euro,
@@ -439,32 +488,114 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                     width: double.infinity,
                     isWeb: isWeb,
                   ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Coste por Alumno justo debajo
-          SizedBox(height: 10),
-          BudgetCardWidget(
-            titulo: 'Coste por Alumno',
-            valor: costoPorAlumno,
-            icono: Icons.person,
-            color: Colors.orange,
-            width: double.infinity,
-            isWeb: isWeb,
-          ),
+                  SizedBox(height: 6),
+                  // Coste por Alumno
+                  BudgetCardWidget(
+                    titulo: 'Coste por Alumno',
+                    valor: costoPorAlumno,
+                    icono: Icons.person,
+                    color: Colors.orange,
+                    width: double.infinity,
+                    isWeb: isWeb,
+                  ),
+                ],
+              )
+            : (isMobile
+              ? Column(
+                  children: [
+                    // Presupuesto Estimado
+                    BudgetCardWidget(
+                      titulo: 'Presupuesto Estimado',
+                      valor: presupuesto,
+                      icono: Icons.account_balance_wallet,
+                      color: Colors.blue,
+                      width: double.infinity,
+                      isWeb: isWeb,
+                      showEdit: true,
+                      isEditing: _editandoPresupuesto,
+                      controller: _presupuestoController,
+                      onEditPressed: _handleEditPresupuesto,
+                    ),
+                    SizedBox(height: 10),
+                    // Coste Real
+                    BudgetCardWidget(
+                      titulo: 'Coste Real',
+                      valor: costoReal,
+                      icono: Icons.euro,
+                      color: costoReal > presupuesto ? Colors.red : Colors.green,
+                      width: double.infinity,
+                      isWeb: isWeb,
+                    ),
+                    SizedBox(height: 10),
+                    // Coste por Alumno
+                    BudgetCardWidget(
+                      titulo: 'Coste por Alumno',
+                      valor: costoPorAlumno,
+                      icono: Icons.person,
+                      color: Colors.orange,
+                      width: double.infinity,
+                      isWeb: isWeb,
+                    ),
+                  ],
+                )
+              : Column(
+                children: [
+                  // Fila superior: Presupuesto Estimado y Coste Real
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: BudgetCardWidget(
+                            titulo: 'Presupuesto Estimado',
+                            valor: presupuesto,
+                            icono: Icons.account_balance_wallet,
+                            color: Colors.blue,
+                            width: double.infinity,
+                            isWeb: isWeb,
+                            showEdit: true,
+                            isEditing: _editandoPresupuesto,
+                            controller: _presupuestoController,
+                            onEditPressed: _handleEditPresupuesto,
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: BudgetCardWidget(
+                            titulo: 'Coste Real',
+                            valor: costoReal,
+                            icono: Icons.euro,
+                            color: costoReal > presupuesto ? Colors.red : Colors.green,
+                            width: double.infinity,
+                            isWeb: isWeb,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Coste por Alumno debajo
+                  SizedBox(height: 10),
+                  BudgetCardWidget(
+                    titulo: 'Coste por Alumno',
+                    valor: costoPorAlumno,
+                    icono: Icons.person,
+                    color: Colors.orange,
+                    width: double.infinity,
+                    isWeb: isWeb,
+                  ),
+                ],
+              )),
           
           // Mostrar tarjetas de Transporte y Alojamiento si están activos
           if (_transporteReq || _alojamientoReq) ...[
-            SizedBox(height: 10),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (_transporteReq)
-                    Expanded(
-                      child: BudgetCardWidget(
+            SizedBox(height: isMobile ? 8 : 10),
+            // Mobile landscape / Mobile portrait: columna vertical
+            // Desktop: fila horizontal
+            isMobileLandscape
+              ? Column(
+                  children: [
+                    if (_transporteReq) ...[
+                      BudgetCardWidget(
                         titulo: 'Transporte',
                         valor: precioTransporte,
                         icono: Icons.directions_bus,
@@ -484,12 +615,10 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         },
                         cargandoEmpresas: _cargandoEmpresas,
                       ),
-                    ),
-                  if (_transporteReq && _alojamientoReq)
-                    SizedBox(width: 16),
-                  if (_alojamientoReq)
-                    Expanded(
-                      child: BudgetCardWidget(
+                      if (_alojamientoReq) SizedBox(height: 6),
+                    ],
+                    if (_alojamientoReq)
+                      BudgetCardWidget(
                         titulo: 'Alojamiento',
                         valor: precioAlojamiento,
                         icono: Icons.hotel,
@@ -509,111 +638,442 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                         },
                         cargandoAlojamientos: _cargandoAlojamientos,
                       ),
-                    ),
-                ],
-              ),
-            ),
+                  ],
+                )
+              : (isMobile
+                ? Column(
+                    children: [
+                      if (_transporteReq) ...[
+                        BudgetCardWidget(
+                          titulo: 'Transporte',
+                          valor: precioTransporte,
+                          icono: Icons.directions_bus,
+                          color: Colors.purple,
+                          width: double.infinity,
+                          isWeb: isWeb,
+                          showEdit: true,
+                          isEditing: _editandoTransporte,
+                          controller: _precioTransporteController,
+                          empresaTransporte: _empresaTransporteLocal,
+                          empresasDisponibles: _empresasDisponibles,
+                          onEditPressed: _handleEditTransporte,
+                          onEmpresaChanged: (empresa) {
+                            setState(() {
+                              _empresaTransporteLocal = empresa;
+                            });
+                          },
+                          cargandoEmpresas: _cargandoEmpresas,
+                        ),
+                        if (_alojamientoReq) SizedBox(height: 10),
+                      ],
+                      if (_alojamientoReq)
+                        BudgetCardWidget(
+                          titulo: 'Alojamiento',
+                          valor: precioAlojamiento,
+                          icono: Icons.hotel,
+                          color: Colors.teal,
+                          width: double.infinity,
+                          isWeb: isWeb,
+                          showEdit: true,
+                          isEditing: _editandoAlojamiento,
+                          controller: _precioAlojamientoController,
+                          alojamiento: _alojamientoLocal,
+                          alojamientosDisponibles: _alojamientosDisponibles,
+                          onEditPressed: _handleEditAlojamiento,
+                          onAlojamientoChanged: (alojamiento) {
+                            setState(() {
+                              _alojamientoLocal = alojamiento;
+                            });
+                          },
+                          cargandoAlojamientos: _cargandoAlojamientos,
+                        ),
+                    ],
+                  )
+                : IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_transporteReq)
+                        Expanded(
+                          child: BudgetCardWidget(
+                            titulo: 'Transporte',
+                            valor: precioTransporte,
+                            icono: Icons.directions_bus,
+                            color: Colors.purple,
+                            width: double.infinity,
+                            isWeb: isWeb,
+                            showEdit: true,
+                            isEditing: _editandoTransporte,
+                            controller: _precioTransporteController,
+                            empresaTransporte: _empresaTransporteLocal,
+                            empresasDisponibles: _empresasDisponibles,
+                            onEditPressed: _handleEditTransporte,
+                            onEmpresaChanged: (empresa) {
+                              setState(() {
+                                _empresaTransporteLocal = empresa;
+                              });
+                            },
+                            cargandoEmpresas: _cargandoEmpresas,
+                          ),
+                        ),
+                      if (_transporteReq && _alojamientoReq)
+                        SizedBox(width: 16),
+                      if (_alojamientoReq)
+                        Expanded(
+                          child: BudgetCardWidget(
+                            titulo: 'Alojamiento',
+                            valor: precioAlojamiento,
+                            icono: Icons.hotel,
+                            color: Colors.teal,
+                            width: double.infinity,
+                            isWeb: isWeb,
+                            showEdit: true,
+                            isEditing: _editandoAlojamiento,
+                            controller: _precioAlojamientoController,
+                            alojamiento: _alojamientoLocal,
+                            alojamientosDisponibles: _alojamientosDisponibles,
+                            onEditPressed: _handleEditAlojamiento,
+                            onAlojamientoChanged: (alojamiento) {
+                              setState(() {
+                                _alojamientoLocal = alojamiento;
+                              });
+                            },
+                            cargandoAlojamientos: _cargandoAlojamientos,
+                          ),
+                        ),
+                    ],
+                  ),
+                )),
           ],
           
           // Botones de Solicitar Presupuestos (Transporte y Alojamiento)
           if (widget.isAdminOrSolicitante && (_transporteReq || _alojamientoReq)) ...[
-            SizedBox(height: 10),
-            Row(
-              children: [
-                if (_transporteReq)
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.purple.withOpacity(0.85),
-                              Colors.purple.withOpacity(0.65),
+            SizedBox(height: isMobile ? 8 : 10),
+            // Mobile landscape / Mobile portrait: columna con botones completos
+            // Desktop: fila con botones abreviados
+            isMobileLandscape
+              ? Column(
+                  children: [
+                    if (_transporteReq) ...[
+                      InkWell(
+                        onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14, 
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.purple.withOpacity(0.85),
+                                Colors.purple.withOpacity(0.65),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.withOpacity(0.4),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.purple.withOpacity(0.4),
-                              blurRadius: 8,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.send_rounded, color: Colors.white, size: isWeb ? 16 : 18.0),
-                            SizedBox(width: 8),
-                            Text(
-                              'Solicitar Presupuestos',
-                              style: TextStyle(
-                                fontSize: isWeb ? 12 : 14.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.send_rounded, 
+                                color: Colors.white, 
+                                size: 14,
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_transporteReq && _alojamientoReq)
-                  SizedBox(width: 16),
-                if (_alojamientoReq)
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.teal.withOpacity(0.85),
-                              Colors.teal.withOpacity(0.65),
+                              SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Solicitar Presupuestos',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.teal.withOpacity(0.4),
-                              blurRadius: 8,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.send_rounded, color: Colors.white, size: isWeb ? 16 : 18.0),
-                            SizedBox(width: 8),
-                            Text(
-                              'Solicitar Presupuestos',
-                              style: TextStyle(
-                                fontSize: isWeb ? 12 : 14.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                  ),
-              ],
-            ),
+                      if (_alojamientoReq) SizedBox(height: 6),
+                    ],
+                    if (_alojamientoReq)
+                      InkWell(
+                        onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14, 
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.teal.withOpacity(0.85),
+                                Colors.teal.withOpacity(0.65),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.teal.withOpacity(0.4),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.send_rounded, 
+                                color: Colors.white, 
+                                size: 14,
+                              ),
+                              SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Solicitar Presupuestos',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                )
+              : (isMobile
+                ? Column(
+                    children: [
+                      if (_transporteReq) ...[
+                        InkWell(
+                          onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16, 
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.purple.withOpacity(0.85),
+                                  Colors.purple.withOpacity(0.65),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.purple.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.send_rounded, 
+                                  color: Colors.white, 
+                                  size: 16,
+                                ),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'Solicitar Presupuestos',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (_alojamientoReq) SizedBox(height: 10),
+                      ],
+                      if (_alojamientoReq)
+                        InkWell(
+                          onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16, 
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.teal.withOpacity(0.85),
+                                  Colors.teal.withOpacity(0.65),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.teal.withOpacity(0.4),
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.send_rounded, 
+                                color: Colors.white, 
+                                size: 16,
+                              ),
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  'Solicitar Presupuestos',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                )
+                : Row(
+                  children: [
+                    if (_transporteReq)
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => _mostrarDialogoSolicitarPresupuestosTransporte(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.purple.withOpacity(0.85),
+                                  Colors.purple.withOpacity(0.65),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.purple.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'Solicitar',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (_transporteReq && _alojamientoReq) SizedBox(width: 10),
+                    if (_alojamientoReq)
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => _mostrarDialogoSolicitarPresupuestosAlojamiento(context),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.teal.withOpacity(0.85),
+                                  Colors.teal.withOpacity(0.65),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.teal.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'Solicitar',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                )),
           ],
           
           // Card de Gastos Varios
-          SizedBox(height: 10),
+          SizedBox(height: isMobile ? 8 : 10),
           GastosVariosCardWidget(
             gastos: _gastosPersonalizados,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,

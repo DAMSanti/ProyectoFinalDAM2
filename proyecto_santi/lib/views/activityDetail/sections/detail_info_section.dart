@@ -43,6 +43,7 @@ class ActivityDetailInfo extends StatefulWidget {
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
   final Function(int)? removeApiImage; // Nueva funci?n para eliminar fotos de la API
+  final Function(int)? removeApiImageConfirmed; // Para eliminación ya confirmada
   final Function(int)? editLocalImage; // Nueva funci�n para editar im�genes locales
   final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
   final int reloadTrigger; // N?mero que cambia cuando se debe recargar
@@ -57,6 +58,7 @@ class ActivityDetailInfo extends StatefulWidget {
     required this.showImagePicker,
     required this.removeSelectedImage,
     this.removeApiImage, // Opcional
+    this.removeApiImageConfirmed, // Opcional
     this.editLocalImage, // Opcional
     this.onActivityDataChanged, // Opcional
     this.reloadTrigger = 0, // Por defecto 0
@@ -369,6 +371,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 showImagePicker: widget.showImagePicker,
                 removeSelectedImage: widget.removeSelectedImage,
                 removeApiImage: widget.removeApiImage,
+                removeApiImageConfirmed: widget.removeApiImageConfirmed,
                 editLocalImage: widget.editLocalImage,
                 onDataChanged: widget.onActivityDataChanged,
               ),

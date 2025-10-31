@@ -17,6 +17,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   final VoidCallback _showImagePicker;
   final Function(int) _removeSelectedImage;
   final Function(int)? _removeApiImage;
+  final Function(int)? _removeApiImageConfirmed;
   final Function(int)? _editLocalImage;
   final VoidCallback _saveChanges;
   final VoidCallback? _revertChanges;
@@ -36,6 +37,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
     required VoidCallback showImagePicker,
     required Function(int) removeSelectedImage,
     Function(int)? removeApiImage,
+    Function(int)? removeApiImageConfirmed,
     Function(int)? editLocalImage,
     required VoidCallback saveChanges,
     VoidCallback? revertChanges,
@@ -44,6 +46,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   })  : _showImagePicker = showImagePicker,
         _removeSelectedImage = removeSelectedImage,
         _removeApiImage = removeApiImage,
+        _removeApiImageConfirmed = removeApiImageConfirmed,
         _editLocalImage = editLocalImage,
         _saveChanges = saveChanges,
         _revertChanges = revertChanges;
@@ -65,6 +68,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
                 showImagePicker: _showImagePicker,
                 removeSelectedImage: _removeSelectedImage,
                 removeApiImage: _removeApiImage,
+                removeApiImageConfirmed: _removeApiImageConfirmed,
                 editLocalImage: _editLocalImage,
                 onActivityDataChanged: onActivityDataChanged,
                 reloadTrigger: reloadTrigger,

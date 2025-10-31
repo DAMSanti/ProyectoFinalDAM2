@@ -16,10 +16,13 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
   final Map<String, String> selectedImagesDescriptions;
   final VoidCallback _showImagePicker;
   final Function(int) _removeSelectedImage;
+  final Function(int)? _removeApiImage;
+  final Function(int)? _removeApiImageConfirmed;
   final Function(int)? _editLocalImage;
   final VoidCallback _saveChanges;
   final VoidCallback? _revertChanges;
   final Function(Map<String, dynamic>)? onActivityDataChanged;
+  final int reloadTrigger;
 
   const ActivityDetailPortraitLayout({
     super.key,
@@ -33,12 +36,17 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
     required this.selectedImagesDescriptions,
     required VoidCallback showImagePicker,
     required Function(int) removeSelectedImage,
+    Function(int)? removeApiImage,
+    Function(int)? removeApiImageConfirmed,
     Function(int)? editLocalImage,
     required VoidCallback saveChanges,
     VoidCallback? revertChanges,
     this.onActivityDataChanged,
+    this.reloadTrigger = 0,
   })  : _showImagePicker = showImagePicker,
         _removeSelectedImage = removeSelectedImage,
+        _removeApiImage = removeApiImage,
+        _removeApiImageConfirmed = removeApiImageConfirmed,
         _editLocalImage = editLocalImage,
         _saveChanges = saveChanges,
         _revertChanges = revertChanges;
@@ -61,8 +69,11 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
                   selectedImagesDescriptions: selectedImagesDescriptions,
                   showImagePicker: _showImagePicker,
                   removeSelectedImage: _removeSelectedImage,
+                  removeApiImage: _removeApiImage,
+                  removeApiImageConfirmed: _removeApiImageConfirmed,
                   editLocalImage: _editLocalImage,
                   onActivityDataChanged: onActivityDataChanged,
+                  reloadTrigger: reloadTrigger,
                 ),
               ),
               Positioned(

@@ -368,14 +368,14 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 50,
+          width: 40,
           child: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            style: TextStyle(fontSize: 12),
+            style: TextStyle(fontSize: 11),
             decoration: InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              contentPadding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.blue),
               ),
@@ -388,30 +388,29 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
             },
           ),
         ),
-        Text(
-          '/${grupoParticipante.grupo.numeroAlumnos} alumnos',
-          style: TextStyle(fontSize: 12),
+        SizedBox(width: 2),
+        Flexible(
+          child: Text(
+            '/${grupoParticipante.grupo.numeroAlumnos} al',
+            style: TextStyle(fontSize: 11),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        SizedBox(width: 8),
-        IconButton(
-          icon: Icon(Icons.check, color: Colors.green, size: 16),
-          padding: EdgeInsets.zero,
-          constraints: BoxConstraints(),
-          onPressed: () {
+        SizedBox(width: 4),
+        InkWell(
+          onTap: () {
             _saveEditedParticipantes(grupoParticipante, controller.text);
           },
-          tooltip: 'Guardar',
+          child: Icon(Icons.check, color: Colors.green, size: 16),
         ),
-        IconButton(
-          icon: Icon(Icons.close, color: Colors.red, size: 16),
-          padding: EdgeInsets.zero,
-          constraints: BoxConstraints(),
-          onPressed: () {
+        SizedBox(width: 4),
+        InkWell(
+          onTap: () {
             setState(() {
               _editingGrupoId = null;
             });
           },
-          tooltip: 'Cancelar',
+          child: Icon(Icons.close, color: Colors.red, size: 16),
         ),
       ],
     );
@@ -464,21 +463,55 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
           color: Colors.red,
           size: 18,
         ),
-        onPressed: () {
-          widget.onRemoveGrupo(grupoParticipante);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text('Grupo eliminado'),
+        onPressed: () async {
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return AlertDialog(
+                title: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                    SizedBox(width: 12),
+                    Text('Confirmar eliminación'),
+                  ],
+                ),
+                content: Text(
+                  '¿Estás seguro de que deseas eliminar el grupo "${grupoParticipante.grupo.nombre}"?',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text('Cancelar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text('Eliminar'),
+                  ),
                 ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-            ),
+              );
+            },
           );
+
+          if (confirmed == true) {
+            widget.onRemoveGrupo(grupoParticipante);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text('Grupo eliminado'),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
         },
         tooltip: 'Eliminar grupo',
       ),
