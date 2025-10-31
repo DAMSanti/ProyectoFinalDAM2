@@ -335,6 +335,7 @@ class LocalizacionCard extends StatelessWidget {
   final bool isDark;
   final VoidCallback onEdit;
   final VoidCallback onRemove;
+  final bool isMobile;
 
   const LocalizacionCard({
     Key? key,
@@ -343,12 +344,13 @@ class LocalizacionCard extends StatelessWidget {
     required this.isDark,
     required this.onEdit,
     required this.onRemove,
+    this.isMobile = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       decoration: BoxDecoration(
         gradient: localizacion.esPrincipal 
             ? LinearGradient(
@@ -359,7 +361,7 @@ class LocalizacionCard extends StatelessWidget {
               )
             : null,
         color: localizacion.esPrincipal ? null : Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: localizacion.esPrincipal
             ? Colors.red.withOpacity(0.4)
@@ -379,24 +381,24 @@ class LocalizacionCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: Row(
             children: [
               // Icono de la localización
               Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(isMobile ? 6 : 10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: localizacion.esPrincipal
                       ? [Colors.red, Colors.red.shade700]
                       : [Color(0xFF1976d2), Color(0xFF1565c0)],
                   ),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                   boxShadow: [
                     BoxShadow(
                       color: (localizacion.esPrincipal ? Colors.red : Color(0xFF1976d2))
                           .withOpacity(0.3),
-                      blurRadius: 6,
+                      blurRadius: isMobile ? 4 : 6,
                       offset: Offset(0, 2),
                     ),
                   ],
@@ -404,10 +406,10 @@ class LocalizacionCard extends StatelessWidget {
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 24,
+                  size: isMobile ? 18 : 24,
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: isMobile ? 8 : 12),
               
               // Información de la localización
               Expanded(
@@ -420,7 +422,7 @@ class LocalizacionCard extends StatelessWidget {
                           child: Text(
                             localizacion.nombre,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: isMobile ? 12 : 14,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
@@ -430,10 +432,13 @@ class LocalizacionCard extends StatelessWidget {
                         ),
                         if (localizacion.esPrincipal)
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 6 : 8, 
+                              vertical: isMobile ? 2 : 4
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.red,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.red.withOpacity(0.3),
@@ -443,9 +448,9 @@ class LocalizacionCard extends StatelessWidget {
                               ],
                             ),
                             child: Text(
-                              'PRINCIPAL',
+                              isMobile ? 'P' : 'PRINCIPAL',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: isMobile ? 8 : 9,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 letterSpacing: 0.5,
@@ -455,14 +460,14 @@ class LocalizacionCard extends StatelessWidget {
                       ],
                     ),
                     if (localizacion.direccion != null || localizacion.ciudad != null) ...[
-                      SizedBox(height: 4),
+                      SizedBox(height: isMobile ? 2 : 4),
                       Text(
                         [
                           if (localizacion.direccion != null) localizacion.direccion,
                           if (localizacion.ciudad != null) localizacion.ciudad,
                         ].join(', '),
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: isMobile ? 10 : 11,
                           color: isDark ? Colors.white70 : Colors.black54,
                         ),
                         maxLines: 1,
@@ -478,20 +483,20 @@ class LocalizacionCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.edit_rounded, size: 20),
+                    icon: Icon(Icons.edit_rounded, size: isMobile ? 16 : 20),
                     color: Color(0xFF1976d2),
                     onPressed: onEdit,
                     tooltip: 'Editar',
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(isMobile ? 6 : 8),
                     constraints: BoxConstraints(),
                   ),
-                  SizedBox(width: 4),
+                  SizedBox(width: isMobile ? 2 : 4),
                   IconButton(
-                    icon: Icon(Icons.delete_rounded, size: 20),
+                    icon: Icon(Icons.delete_rounded, size: isMobile ? 16 : 20),
                     color: Colors.red,
                     onPressed: onRemove,
                     tooltip: 'Eliminar',
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(isMobile ? 6 : 8),
                     constraints: BoxConstraints(),
                   ),
                 ],

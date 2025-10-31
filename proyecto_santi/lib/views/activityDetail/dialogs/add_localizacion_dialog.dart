@@ -310,12 +310,26 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final orientation = MediaQuery.of(context).orientation;
+    final isPortrait = orientation == Orientation.portrait;
+    final isMobile = screenWidth < 600;
+    final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
     
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: isMobileLandscape
+          ? EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+          : (isMobile 
+              ? EdgeInsets.symmetric(horizontal: 16, vertical: 40)
+              : EdgeInsets.symmetric(horizontal: 40, vertical: 24)),
       child: Container(
-        width: isWeb ? 750 : double.maxFinite,
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
+        width: isWeb ? 750 : (isMobile ? double.infinity : 600),
+        constraints: BoxConstraints(
+          maxHeight: isMobileLandscape
+              ? screenHeight * 0.95
+              : (isMobile ? screenHeight * 0.85 : screenHeight * 0.9)),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -330,7 +344,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                   Color.fromRGBO(144, 202, 249, 0.85),
                 ],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
           border: Border.all(
             color: isDark 
               ? const Color.fromRGBO(255, 255, 255, 0.1) 
@@ -340,8 +354,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
-              offset: Offset(0, 10),
-              blurRadius: 30,
+              offset: Offset(0, isMobileLandscape ? 6 : 10),
+              blurRadius: isMobileLandscape ? 20 : 30,
             ),
           ],
         ),
@@ -350,7 +364,10 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
           children: [
             // Header
             Container(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobileLandscape ? 12 : (isMobile ? 12 : 20),
+                vertical: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -359,8 +376,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                   ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
+                  topRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -373,29 +390,29 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                     ),
                     child: Icon(
                       Icons.add_location_rounded,
                       color: Colors.white,
-                      size: 24,
+                      size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 8 : 12)),
                   Expanded(
                     child: Text(
-                      'Gestionar Localizaciones',
+                      isMobile ? 'Localizaciones' : 'Gestionar Localizaciones',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  if (_hasChanges)
+                  if (_hasChanges && !isMobile)
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
@@ -426,9 +443,20 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                         ],
                       ),
                     ),
+                  if (_hasChanges && isMobile)
+                    Tooltip(
+                      message: 'Cambios pendientes',
+                      child: Icon(
+                        Icons.circle,
+                        size: 8,
+                        color: Colors.orange[300],
+                      ),
+                    ),
                   SizedBox(width: 8),
                   IconButton(
-                    icon: Icon(Icons.close_rounded, color: Colors.white),
+                    icon: Icon(Icons.close_rounded, color: Colors.white, size: isMobile ? 20 : 24),
+                    padding: EdgeInsets.all(isMobile ? 4 : 8),
+                    constraints: BoxConstraints(),
                     onPressed: () {
                       if (_hasChanges) {
                         showDialog(
@@ -462,133 +490,23 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               ),
             ),
             
-            // Content
+            // Content - Layout condicional
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Campo de búsqueda
-                    SearchAddressField(
-                      controller: _searchController,
-                      isSearching: _isSearching,
-                      onClear: () {
-                        _searchController.clear();
-                        setState(() {
-                          _searchResults = [];
-                        });
-                      },
-                    ),
-                    SizedBox(height: 16),
-                    
-                    // Resultados de búsqueda
-                    SearchResultsList(
-                      results: _searchResults,
-                      onResultTap: _addLocalizacionFromSearch,
-                      isDark: isDark,
-                    ),
-                    
-                    // Divisor
-                    DecorativeDivider(),
-                    SizedBox(height: 20),
-                    
-                    // Título de localizaciones
-                    SectionHeader(
-                      icon: Icons.list_alt_rounded,
-                      title: 'Localizaciones de esta actividad',
-                      count: _localizacionesActuales.length,
-                    ),
-                    SizedBox(height: 16),
-                    
-                    // Lista de localizaciones actuales
-                    Container(
-                      constraints: BoxConstraints(minHeight: 200, maxHeight: 400),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark 
-                            ? Colors.white.withOpacity(0.1) 
-                            : Colors.black.withOpacity(0.05),
-                          width: 1,
-                        ),
-                      ),
-                      child: _localizacionesActuales.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(40),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF1976d2).withOpacity(0.1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.location_off_rounded,
-                                        size: 48,
-                                        color: Color(0xFF1976d2).withOpacity(0.5),
-                                      ),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'No hay localizaciones añadidas',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isDark ? Colors.white70 : Colors.black54,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Busca y añade direcciones usando el campo superior',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark ? Colors.white54 : Colors.black38,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: EdgeInsets.all(8),
-                              shrinkWrap: true,
-                              itemCount: _localizacionesActuales.length,
-                              itemBuilder: (context, index) {
-                                final loc = _localizacionesActuales[index];
-                                final icono = _iconosLocalizaciones[loc.id] ?? 
-                                             (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                                
-                                return LocalizacionCard(
-                                  localizacion: loc,
-                                  icon: icono,
-                                  isDark: isDark,
-                                  onEdit: () => _editLocalizacion(loc),
-                                  onRemove: () => _removeLocalizacion(loc),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
-              ),
+              child: isMobileLandscape
+                  ? _buildLandscapeMobileLayout(isDark, isMobile, isMobileLandscape)
+                  : _buildPortraitLayout(isDark, isMobile, isMobileLandscape),
             ),
             
-            // Actions
+            // Actions - Footer adaptivo
             Container(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
               decoration: BoxDecoration(
                 color: isDark 
                     ? Colors.grey[850]!.withOpacity(0.9)
                     : Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
+                  bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -599,51 +517,58 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.end,
                 children: [
                   // Botón Guardar
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF1976d2),
-                          Color(0xFF1565c0),
+                  Flexible(
+                    child: Container(
+                      constraints: isMobile ? BoxConstraints(minWidth: double.infinity) : BoxConstraints(),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF1976d2),
+                            Color(0xFF1565c0),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF1976d2).withOpacity(0.4),
+                            offset: Offset(0, 4),
+                            blurRadius: 8,
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFF1976d2).withOpacity(0.4),
-                          offset: Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _guardarYCerrar,
-                        borderRadius: BorderRadius.circular(10),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.check_circle_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Guardar',
-                                style: TextStyle(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _guardarYCerrar,
+                          borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobileLandscape ? 16 : (isMobile ? 20 : 24), 
+                              vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12)
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_rounded,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  size: isMobileLandscape ? 14 : (isMobile ? 18 : 20),
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
+                                Text(
+                                  'Guardar',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isMobileLandscape ? 13 : (isMobile ? 15 : 16),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -654,6 +579,284 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Layout para móvil en modo landscape (horizontal)
+  Widget _buildLandscapeMobileLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
+    return Padding(
+      padding: EdgeInsets.all(12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Columna izquierda: Buscador y resultados
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Campo de búsqueda compacto
+                SearchAddressField(
+                  controller: _searchController,
+                  isSearching: _isSearching,
+                  onClear: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchResults = [];
+                    });
+                  },
+                ),
+                SizedBox(height: 10),
+                
+                // Resultados de búsqueda (lista compacta)
+                if (_searchResults.isNotEmpty)
+                  Expanded(
+                    child: SearchResultsList(
+                      results: _searchResults,
+                      onResultTap: _addLocalizacionFromSearch,
+                      isDark: isDark,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          
+          SizedBox(width: 12),
+          
+          // Columna derecha: Lista de localizaciones
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Título compacto
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                        ),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(
+                        Icons.list_alt_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Localizaciones',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Color(0xFF1976d2),
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF1976d2).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${_localizacionesActuales.length}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1976d2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                
+                // Lista de localizaciones compacta
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark 
+                          ? Colors.white.withOpacity(0.1) 
+                          : Colors.black.withOpacity(0.05),
+                        width: 1,
+                      ),
+                    ),
+                    child: _localizacionesActuales.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.location_off_rounded,
+                                  size: 32,
+                                  color: Color(0xFF1976d2).withOpacity(0.5),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Sin localizaciones',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white70 : Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: EdgeInsets.all(6),
+                            itemCount: _localizacionesActuales.length,
+                            itemBuilder: (context, index) {
+                              final loc = _localizacionesActuales[index];
+                              final icono = _iconosLocalizaciones[loc.id] ?? 
+                                           (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
+                              
+                              return LocalizacionCard(
+                                localizacion: loc,
+                                icon: icono,
+                                isDark: isDark,
+                                isMobile: true, // Usar versión compacta
+                                onEdit: () => _editLocalizacion(loc),
+                                onRemove: () => _removeLocalizacion(loc),
+                              );
+                            },
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Layout para portrait (vertical) - móvil y escritorio
+  Widget _buildPortraitLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(isMobile ? 12 : 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Campo de búsqueda
+          SearchAddressField(
+            controller: _searchController,
+            isSearching: _isSearching,
+            onClear: () {
+              _searchController.clear();
+              setState(() {
+                _searchResults = [];
+              });
+            },
+          ),
+          SizedBox(height: isMobile ? 12 : 16),
+          
+          // Resultados de búsqueda
+          SearchResultsList(
+            results: _searchResults,
+            onResultTap: _addLocalizacionFromSearch,
+            isDark: isDark,
+          ),
+          
+          // Divisor
+          if (_searchResults.isEmpty) DecorativeDivider(),
+          SizedBox(height: isMobile ? 12 : 20),
+          
+          // Título de localizaciones
+          SectionHeader(
+            icon: Icons.list_alt_rounded,
+            title: isMobile ? 'Localizaciones' : 'Localizaciones de esta actividad',
+            count: _localizacionesActuales.length,
+          ),
+          SizedBox(height: isMobile ? 12 : 16),
+          
+          // Lista de localizaciones actuales
+          Container(
+            constraints: BoxConstraints(
+              minHeight: isMobile ? 180 : 200, 
+              maxHeight: isMobile ? 350 : 400
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
+              border: Border.all(
+                color: isDark 
+                  ? Colors.white.withOpacity(0.1) 
+                  : Colors.black.withOpacity(0.05),
+                width: 1,
+              ),
+            ),
+            child: _localizacionesActuales.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(isMobile ? 24 : 40),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(isMobile ? 16 : 20),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF1976d2).withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.location_off_rounded,
+                              size: isMobile ? 36 : 48,
+                              color: Color(0xFF1976d2).withOpacity(0.5),
+                            ),
+                          ),
+                          SizedBox(height: isMobile ? 12 : 16),
+                          Text(
+                            isMobile ? 'No hay localizaciones' : 'No hay localizaciones añadidas',
+                            style: TextStyle(
+                              fontSize: isMobile ? 13 : 14,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (!isMobile) ...[
+                            SizedBox(height: 8),
+                            Text(
+                              'Busca y añade direcciones usando el campo superior',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white54 : Colors.black38,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.all(isMobile ? 6 : 8),
+                    shrinkWrap: true,
+                    itemCount: _localizacionesActuales.length,
+                    itemBuilder: (context, index) {
+                      final loc = _localizacionesActuales[index];
+                      final icono = _iconosLocalizaciones[loc.id] ?? 
+                                   (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
+                      
+                      return LocalizacionCard(
+                        localizacion: loc,
+                        icon: icono,
+                        isDark: isDark,
+                        isMobile: isMobile,
+                        onEdit: () => _editLocalizacion(loc),
+                        onRemove: () => _removeLocalizacion(loc),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

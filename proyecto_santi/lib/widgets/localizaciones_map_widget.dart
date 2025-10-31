@@ -94,18 +94,117 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final localizacionesConCoords = widget.localizaciones
         .where((loc) => loc.latitud != null && loc.longitud != null)
         .toList();
 
-    // Siempre mostrar el mapa, incluso si no hay localizaciones
+    // Si no hay localizaciones, mostrar mensaje sobre el mapa
+    if (localizacionesConCoords.isEmpty) {
+      return Stack(
+        children: [
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              center: _calcularCentro(),
+              zoom: 13.0,
+              minZoom: 3.0,
+              maxZoom: 18.0,
+              interactiveFlags: InteractiveFlag.all,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c'],
+                userAgentPackageName: 'com.proyecto_santi.app',
+              ),
+              MarkerLayer(markers: []), // Sin marcadores
+            ],
+          ),
+          // Mensaje de no hay localizaciones
+          Center(
+            child: Container(
+              margin: EdgeInsets.all(20),
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                    ? [
+                        Color.fromRGBO(25, 118, 210, 0.95),
+                        Color.fromRGBO(21, 101, 192, 0.90),
+                      ]
+                    : [
+                        Color.fromRGBO(187, 222, 251, 0.95),
+                        Color.fromRGBO(144, 202, 249, 0.90),
+                      ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark 
+                    ? Color.fromRGBO(255, 255, 255, 0.2) 
+                    : Color.fromRGBO(0, 0, 0, 0.1),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    offset: Offset(0, 4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1976d2).withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.location_off_rounded,
+                      size: 48,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No hay localizaciones',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Color(0xFF1976d2),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Esta actividad aún no tiene\nlocalizaciones asignadas',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Si hay localizaciones, mostrar el mapa con marcadores
     return Stack(
       children: [
         FlutterMap(
           mapController: _mapController,
           options: MapOptions(
             center: _calcularCentro(),
-            zoom: localizacionesConCoords.isEmpty ? 13.0 : (localizacionesConCoords.length == 1 ? 14.0 : 12.0),
+            zoom: localizacionesConCoords.length == 1 ? 14.0 : 12.0,
             minZoom: 3.0,
             maxZoom: 18.0,
             interactiveFlags: InteractiveFlag.all,
@@ -116,34 +215,9 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
               subdomains: ['a', 'b', 'c'],
               userAgentPackageName: 'com.proyecto_santi.app',
             ),
-            // Mostrar marcador por defecto o los marcadores de localizaciones
+            // Mostrar marcadores de localizaciones
             MarkerLayer(
-              markers: localizacionesConCoords.isEmpty 
-                ? [
-                    // Marcador por defecto en IES Miguel Herrero Pereda
-                    Marker(
-                      point: LatLng(43.3506, -4.0462),
-                      width: 40,
-                      height: 50,
-                      builder: (ctx) => Column(
-                        children: [
-                          Icon(
-                            Icons.school,
-                            color: Color(0xFF1976d2),
-                            size: 40,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.black.withOpacity(0.5),
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]
-                : localizacionesConCoords.map((localizacion) {
+              markers: localizacionesConCoords.map((localizacion) {
                 final isSelected = _selectedLocalizacion?.id == localizacion.id;
                 final isPrincipal = localizacion.esPrincipal;
                 
@@ -203,12 +277,11 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             ),
           ],
         ),
-        // Leyenda (solo mostrar si hay localizaciones)
-        if (localizacionesConCoords.isNotEmpty)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Card(
+        // Leyenda
+        Positioned(
+          top: 8,
+          right: 8,
+          child: Card(
             elevation: 4,
             child: Padding(
               padding: EdgeInsets.all(8),
