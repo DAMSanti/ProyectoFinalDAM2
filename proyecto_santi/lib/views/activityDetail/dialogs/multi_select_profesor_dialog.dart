@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
+import 'package:proyecto_santi/shared/widgets/dialog_footer.dart';
 
 /// Diálogo para seleccionar múltiples profesores participantes
 class MultiSelectProfesorDialog extends StatefulWidget {
@@ -100,65 +102,12 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 20),
-                vertical: isMobileLandscape ? 10 : (isMobile ? 14 : 20),
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF1976d2),
-                    Color(0xFF1565c0),
-                  ],
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
-                  topRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFF1976d2).withOpacity(0.3),
-                    offset: Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
-                    ),
-                    child: Icon(
-                      Icons.group_add_rounded,
-                      color: Colors.white,
-                      size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
-                    ),
-                  ),
-                  SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-                  Expanded(
-                    child: Text(
-                      isMobile ? 'Agregar Profesores' : 'Agregar Profesores Participantes',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close_rounded, color: Colors.white),
-                    iconSize: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.all(isMobileLandscape ? 4 : (isMobile ? 4 : 8)),
-                    constraints: BoxConstraints(),
-                    tooltip: 'Cerrar',
-                  ),
-                ],
-              ),
+            DialogHeader(
+              isMobile: isMobile,
+              isMobileLandscape: isMobileLandscape,
+              onClose: () => Navigator.of(context).pop(),
+              title: isMobile ? 'Agregar Profesores' : 'Agregar Profesores Participantes',
+              icon: Icons.group_add_rounded,
             ),
             
             // Content - Layout condicional
@@ -168,149 +117,8 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                   : _buildPortraitLayout(isDark, isMobile, isMobileLandscape),
             ),
             
-            // Actions - Footer adaptivo
-            Container(
-              padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
-              decoration: BoxDecoration(
-                color: isDark 
-                    ? Colors.grey[850]!.withOpacity(0.9)
-                    : Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
-                  bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    offset: Offset(0, -4),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
-                children: [
-                  // Botón Cancelar
-                  Expanded(
-                    flex: isMobile ? 1 : 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.grey[400]!,
-                            Colors.grey[500]!,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            offset: Offset(0, 4),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => Navigator.of(context).pop(),
-                          borderRadius: BorderRadius.circular(10),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
-                              vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12),
-                            ),
-                            child: Row(
-                              mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.close_rounded,
-                                  color: Colors.white,
-                                  size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
-                                ),
-                                SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
-                                Text(
-                                  'Cancelar',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  // Botón Agregar
-                  Expanded(
-                    flex: isMobile ? 1 : 0,
-                    child: Opacity(
-                      opacity: _selectedProfesores.isEmpty ? 0.5 : 1.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF1976d2),
-                              Color(0xFF1565c0),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: _selectedProfesores.isEmpty
-                            ? []
-                            : [
-                                BoxShadow(
-                                  color: Color(0xFF1976d2).withOpacity(0.4),
-                                  offset: Offset(0, 4),
-                                  blurRadius: 8,
-                                ),
-                              ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _selectedProfesores.isEmpty
-                                ? null
-                                : () => Navigator.of(context).pop(_selectedProfesores),
-                            borderRadius: BorderRadius.circular(10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
-                                vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12),
-                              ),
-                              child: Row(
-                                mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.group_add_rounded,
-                                    color: Colors.white,
-                                    size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
-                                  ),
-                                  SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
-                                  Text(
-                                    'Agregar${_selectedProfesores.isEmpty ? '' : ' (${_selectedProfesores.length})'}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Actions - Footer with custom logic for add button
+            _buildCustomFooter(isDark, isMobile, isMobileLandscape, context),
           ],
         ),
       ),
@@ -685,6 +493,152 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
               );
             },
           ),
+    );
+  }
+
+  // Custom footer with special logic for enabled/disabled state
+  Widget _buildCustomFooter(bool isDark, bool isMobile, bool isMobileLandscape, BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
+      decoration: BoxDecoration(
+        color: isDark 
+            ? Colors.grey[850]!.withOpacity(0.9)
+            : Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
+          bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: Offset(0, -4),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
+        children: [
+          // Botón Cancelar - using base DialogFooter styling
+          Expanded(
+            flex: isMobile ? 1 : 0,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.grey[400]!,
+                    Colors.grey[500]!,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    offset: Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
+                      vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12),
+                    ),
+                    child: Row(
+                      mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                          size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
+                        ),
+                        SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
+                        Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          // Botón Agregar with custom disabled state logic
+          Expanded(
+            flex: isMobile ? 1 : 0,
+            child: Opacity(
+              opacity: _selectedProfesores.isEmpty ? 0.5 : 1.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1976d2),
+                      Color(0xFF1565c0),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: _selectedProfesores.isEmpty
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Color(0xFF1976d2).withOpacity(0.4),
+                          offset: Offset(0, 4),
+                          blurRadius: 8,
+                        ),
+                      ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _selectedProfesores.isEmpty
+                        ? null
+                        : () => Navigator.of(context).pop(_selectedProfesores),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 24), 
+                        vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 12),
+                      ),
+                      child: Row(
+                        mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.group_add_rounded,
+                            color: Colors.white,
+                            size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
+                          ),
+                          SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
+                          Text(
+                            'Agregar${_selectedProfesores.isEmpty ? '' : ' (${_selectedProfesores.length})'}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

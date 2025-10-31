@@ -1,178 +1,191 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
-// Define tus colores globales
-const Color colorFondoLight = Color.fromARGB(255, 187, 222, 251);
-const Color colorTextoLight = Color.fromARGB(255, 108, 124, 136);
-const Color colorAccentLight = Color.fromARGB(255, 227, 242, 253);
-const Color colorSoftLight = Color.fromARGB(255, 176, 196, 222);
-const Color colorAccentDLight = Color.fromARGB(255, 126, 136, 180);
-//0xFF6C7C88
-//0xFFACC2D5
-//0xFF96B2C8
+// ============================================================================
+// NOTA: Los colores ahora están centralizados en app_colors.dart
+// Estas constantes se mantienen por compatibilidad con código existente
+// ============================================================================
+
+// Colores del tema claro
+const Color colorFondoLight = AppColors.backgroundLight;
+const Color colorTextoLight = AppColors.textLight;
+const Color colorAccentLight = AppColors.accentLight;
+const Color colorSoftLight = AppColors.softLight;
+const Color colorAccentDLight = AppColors.accentDarkLight;
+
+// Colores del tema oscuro
+const Color colorFondoDark = AppColors.backgroundDark;
+const Color colorTextoDark = AppColors.textDark;
+const Color colorAccentDark = AppColors.accentDark;
 
 // Tema claro
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
-  scaffoldBackgroundColor: colorFondoLight,
-  primaryColor: colorAccentLight,
+  scaffoldBackgroundColor: AppColors.backgroundLight,
+  primaryColor: AppColors.accentLight,
   // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: TextStyle(color: colorTextoLight), focusedBorder: OutlineInputBorder( borderSide: BorderSide(color: colorAccentDLight)),
-    enabledBorder: OutlineInputBorder( borderSide: BorderSide(color: colorTextoLight)),
+    labelStyle: TextStyle(color: AppColors.textLight), 
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: AppColors.accentDarkLight)
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: AppColors.textLight)
+    ),
   ),
   // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: colorAccentLight, // Color de fondo del botón
-      foregroundColor: colorTextoLight, // Color del texto del botón
+      backgroundColor: AppColors.accentLight,
+      foregroundColor: AppColors.textLight,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
   // TEXTOS
   textTheme: TextTheme(
-    displayLarge: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    displayMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    displaySmall: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    headlineLarge: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    headlineMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    headlineSmall: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
-    bodyLarge: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    bodyMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 14),
-    bodySmall: TextStyle(color: colorTextoLight, inherit: true, fontSize: 12),
-    titleLarge: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    titleMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    labelLarge: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    labelMedium: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
-    labelSmall: TextStyle(color: colorTextoLight, inherit: true, fontSize: 16),
+    displayLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    displayMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    displaySmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    headlineLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    headlineMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    headlineSmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
+    bodyLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    bodyMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 14),
+    bodySmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 12),
+    titleLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    titleMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
+    titleSmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    labelLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    labelMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
+    labelSmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.transparent,
     titleTextStyle: TextStyle(
-      color: Color(0xFF1976d2), // Azul consistente
+      color: AppColors.primary, // Azul consistente
       fontSize: 20,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.5,
       inherit: true,
     ),
-    iconTheme: IconThemeData(color: Color(0xFF1976d2)),
+    iconTheme: IconThemeData(color: AppColors.primary),
   ),
   // CARDS
   cardTheme: CardThemeData(
-    color: colorAccentLight,
+    color: AppColors.accentLight,
     shadowColor: Colors.grey,
     elevation: 4,
   ),
   // LISTTILE
   listTileTheme: ListTileThemeData(
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
-    subtitleTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
-    textColor: colorTextoLight,
-    iconColor: colorTextoLight,
+    titleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
+    subtitleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
+    textColor: AppColors.textLight,
+    iconColor: AppColors.textLight,
   ),
   // DIALOG
   dialogTheme: DialogThemeData(
-    backgroundColor: colorFondoLight,
-    titleTextStyle: TextStyle(color: colorTextoLight, fontSize: 20, inherit: true),
-    contentTextStyle: TextStyle(color: colorTextoLight, fontSize: 16, inherit: true),
+    backgroundColor: AppColors.backgroundLight,
+    titleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 20, inherit: true),
+    contentTextStyle: TextStyle(color: AppColors.textLight, fontSize: 16, inherit: true),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
   ),
   // DRAWER
   drawerTheme: DrawerThemeData(
-    backgroundColor: colorFondoLight,
+    backgroundColor: AppColors.backgroundLight,
   ),
   colorScheme: ColorScheme.light(
-      primary: colorAccentLight,
-      secondary: colorFondoLight // Color específico para el DrawerHeader
+      primary: AppColors.accentLight,
+      secondary: AppColors.backgroundLight
   ),
 );
-
-
-const Color colorFondoDark = Color.fromARGB(255, 47, 67, 75);
-const Color colorTextoDark = Color.fromARGB(255, 169, 231, 255);
-const Color colorAccentDark = Color.fromARGB(255, 32, 56, 71);
 
 // Tema oscuro
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  scaffoldBackgroundColor: colorFondoDark,
-  primaryColor: colorAccentDark,
+  scaffoldBackgroundColor: AppColors.backgroundDark,
+  primaryColor: AppColors.accentDark,
   // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
-    labelStyle: TextStyle(color: colorTextoDark), focusedBorder: OutlineInputBorder( borderSide: BorderSide(color: colorAccentDark)),
-    enabledBorder: OutlineInputBorder( borderSide: BorderSide(color: colorTextoDark)),
+    labelStyle: TextStyle(color: AppColors.textDark), 
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: AppColors.accentDark)
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: AppColors.textDark)
+    ),
   ),
   // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: colorAccentDark, // Color de fondo del botón
-      foregroundColor: colorTextoDark, // Color del texto del botón
+      backgroundColor: AppColors.accentDark,
+      foregroundColor: AppColors.textDark,
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
   // TEXTOS
   textTheme: TextTheme(
-    displayLarge: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    displayMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    displaySmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    headlineLarge: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    headlineMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    headlineSmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
-    bodyLarge: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    bodyMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 14),
-    bodySmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 12),
-    titleLarge: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    titleMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    labelLarge: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    labelMedium: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
-    labelSmall: TextStyle(color: colorTextoDark, inherit: true, fontSize: 16),
+    displayLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    displayMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    displaySmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    headlineLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    headlineMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    headlineSmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
+    bodyLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    bodyMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 14),
+    bodySmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 12),
+    titleLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    titleMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16, fontWeight: FontWeight.bold),
+    titleSmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    labelLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    labelMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
+    labelSmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
   ),
   // APPBAR
   appBarTheme: AppBarTheme(
-    backgroundColor: colorAccentDark,
+    backgroundColor: AppColors.accentDark,
     titleTextStyle: TextStyle(
-      color: Color(0xFF1976d2), // Azul consistente también en tema oscuro
+      color: AppColors.primary, // Azul consistente también en tema oscuro
       fontSize: 20,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.5,
       inherit: true,
     ),
-    iconTheme: IconThemeData(color: colorTextoDark),
+    iconTheme: IconThemeData(color: AppColors.textDark),
   ),
   // CARDS
   cardTheme: CardThemeData(
-    color: colorAccentDark,
+    color: AppColors.accentDark,
     shadowColor: Colors.grey,
     elevation: 4,
   ),
-// LISTTILE
+  // LISTTILE
   listTileTheme: ListTileThemeData(
-    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
-    subtitleTextStyle: TextStyle(color: colorTextoDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
-    textColor: colorTextoDark,
-    iconColor: colorTextoDark,
+    titleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
+    subtitleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
+    textColor: AppColors.textDark,
+    iconColor: AppColors.textDark,
   ),
   // DIALOG
   dialogTheme: DialogThemeData(
-    backgroundColor: colorFondoDark,
-    titleTextStyle: TextStyle(color: colorTextoDark, fontSize: 20, inherit: true),
-    contentTextStyle: TextStyle(color: colorTextoDark, fontSize: 16, inherit: true),
+    backgroundColor: AppColors.backgroundDark,
+    titleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 20, inherit: true),
+    contentTextStyle: TextStyle(color: AppColors.textDark, fontSize: 16, inherit: true),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
   ),
   // DRAWER
   drawerTheme: DrawerThemeData(
-    backgroundColor: colorFondoDark,
+    backgroundColor: AppColors.backgroundDark,
   ),
   colorScheme: ColorScheme.dark(
-      primary: colorAccentDark,
-      secondary: colorFondoDark // Color específico para el DrawerHeader
+      primary: AppColors.accentDark,
+      secondary: AppColors.backgroundDark
   ),
 );

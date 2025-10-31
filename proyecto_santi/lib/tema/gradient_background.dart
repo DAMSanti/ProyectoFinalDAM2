@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/tema/theme.dart';
+import 'app_colors.dart';
 
 class GradientBackgroundLight extends StatelessWidget {
   final Widget child;
@@ -14,7 +14,7 @@ class GradientBackgroundLight extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           // Portrait y Landscape: oscuro arriba, claro abajo
-          colors: [colorFondoLight, colorAccentLight],
+          colors: [AppColors.backgroundLight, AppColors.accentLight],
           // Diagonal en portrait, vertical en landscape
           begin: orientation == Orientation.portrait 
               ? Alignment.topLeft 
@@ -29,7 +29,7 @@ class GradientBackgroundLight extends StatelessWidget {
   }
 }
 
-  class GradientBackgroundDark extends StatelessWidget {
+class GradientBackgroundDark extends StatelessWidget {
     final Widget child;
 
     const GradientBackgroundDark({required this.child});
@@ -42,7 +42,7 @@ class GradientBackgroundLight extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             // Portrait y Landscape: oscuro arriba, claro abajo
-            colors: [colorFondoDark, colorAccentDark],
+            colors: [AppColors.backgroundDark, AppColors.accentDark],
             // Diagonal en portrait, vertical en landscape
             begin: orientation == Orientation.portrait 
                 ? Alignment.topLeft 

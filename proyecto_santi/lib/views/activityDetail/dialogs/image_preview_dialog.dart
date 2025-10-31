@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'layouts/image_preview_portrait_layout.dart';
+import 'layouts/image_preview_landscape_layout.dart';
+import 'widgets/image_preview_widget.dart';
+import 'widgets/image_description_field.dart';
+
 class ImagePreviewDialog extends StatefulWidget {
   final XFile? imageFile;
   final String? imageUrl;
@@ -109,8 +114,22 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
             // Contenido adaptativo
             Expanded(
               child: isMobileLandscape
-                  ? _buildLandscapeLayout(isDark, isMobile, isMobileLandscape)
-                  : _buildPortraitLayout(isDark, isMobile, isMobileLandscape),
+                  ? ImagePreviewLandscapeLayout(
+                      isDark: isDark,
+                      isMobile: isMobile,
+                      isMobileLandscape: isMobileLandscape,
+                      imageFile: widget.imageFile,
+                      imageUrl: widget.imageUrl,
+                      descriptionController: _descriptionController,
+                    )
+                  : ImagePreviewPortraitLayout(
+                      isDark: isDark,
+                      isMobile: isMobile,
+                      isMobileLandscape: isMobileLandscape,
+                      imageFile: widget.imageFile,
+                      imageUrl: widget.imageUrl,
+                      descriptionController: _descriptionController,
+                    ),
             ),
             
             // Footer con botones
@@ -176,230 +195,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
           ),
         ],
       ),
-    );
-  }
-
-  // Layout para portrait (vertical)
-  Widget _buildPortraitLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(isMobile ? 16 : 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Preview de la imagen
-          Container(
-            constraints: BoxConstraints(
-              maxHeight: isMobile ? 300 : 400,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-              color: isDark 
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.5),
-              border: Border.all(
-                color: isDark 
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.white.withOpacity(0.6),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.1),
-                  offset: Offset(0, 4),
-                  blurRadius: 12,
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
-              child: _buildImage(),
-            ),
-          ),
-          
-          SizedBox(height: isMobile ? 16 : 20),
-          
-          // Campo de descripción
-          _buildDescriptionField(isDark, isMobile, isMobileLandscape),
-        ],
-      ),
-    );
-  }
-
-  // Layout para landscape (horizontal - 2 columnas)
-  Widget _buildLandscapeLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
-    return Padding(
-      padding: EdgeInsets.all(isMobileLandscape ? 12 : 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Columna izquierda: Imagen
-          Expanded(
-            flex: 3,
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: double.infinity,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: isDark 
-                    ? Colors.black.withOpacity(0.3)
-                    : Colors.white.withOpacity(0.5),
-                border: Border.all(
-                  color: isDark 
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.white.withOpacity(0.6),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFF1976d2).withOpacity(0.1),
-                    offset: Offset(0, 2),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: _buildImage(),
-              ),
-            ),
-          ),
-          
-          SizedBox(width: 12),
-          
-          // Columna derecha: Descripción
-          Expanded(
-            flex: 2,
-            child: _buildDescriptionField(isDark, isMobile, isMobileLandscape),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Widget de imagen reutilizable
-  Widget _buildImage() {
-    if (widget.imageUrl != null) {
-      return Image.network(
-        widget.imageUrl!,
-        fit: BoxFit.contain,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.broken_image_rounded,
-                  size: 64,
-                  color: Colors.grey,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Error al cargar',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    } else if (kIsWeb) {
-      return Image.network(
-        widget.imageFile!.path,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: Icon(
-              Icons.broken_image_rounded,
-              size: 64,
-              color: Colors.grey,
-            ),
-          );
-        },
-      );
-    } else {
-      return Image.file(
-        File(widget.imageFile!.path),
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: Icon(
-              Icons.broken_image_rounded,
-              size: 64,
-              color: Colors.grey,
-            ),
-          );
-        },
-      );
-    }
-  }
-
-  // Campo de descripción reutilizable
-  Widget _buildDescriptionField(bool isDark, bool isMobile, bool isMobileLandscape) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.description_rounded,
-              size: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
-              color: Color(0xFF1976d2),
-            ),
-            SizedBox(width: 6),
-            Text(
-              'Descripción (opcional)',
-              style: TextStyle(
-                fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1976d2),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
-        Container(
-          decoration: BoxDecoration(
-            color: isDark 
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-            border: Border.all(
-              color: isDark 
-                  ? Colors.white.withOpacity(0.1)
-                  : Colors.white.withOpacity(0.5),
-            ),
-          ),
-          child: TextField(
-            controller: _descriptionController,
-            maxLines: isMobileLandscape ? 4 : 3,
-            maxLength: 200,
-            style: TextStyle(
-              fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-            decoration: InputDecoration(
-              hintText: isMobileLandscape 
-                  ? 'Añade descripción...' 
-                  : 'Añade una descripción para esta imagen...',
-              hintStyle: TextStyle(
-                color: Colors.grey,
-                fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 13),
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.all(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-              counterStyle: TextStyle(
-                fontSize: isMobileLandscape ? 9 : 11,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 

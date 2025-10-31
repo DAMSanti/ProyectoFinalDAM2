@@ -7,6 +7,8 @@ import 'package:proyecto_santi/services/geocoding_service.dart';
 import 'package:proyecto_santi/utils/icon_helper.dart';
 import 'edit_localizacion_dialog.dart';
 import '../widgets/locations/localizacion_widgets.dart';
+import 'layouts/add_localizacion_landscape_layout.dart';
+import 'layouts/add_localizacion_portrait_layout.dart';
 
 /// Diálogo para gestionar las localizaciones de una actividad
 /// Permite buscar, añadir, editar y eliminar localizaciones
@@ -493,8 +495,42 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
             // Content - Layout condicional
             Expanded(
               child: isMobileLandscape
-                  ? _buildLandscapeMobileLayout(isDark, isMobile, isMobileLandscape)
-                  : _buildPortraitLayout(isDark, isMobile, isMobileLandscape),
+                  ? AddLocalizacionLandscapeLayout(
+                      isDark: isDark,
+                      isMobile: isMobile,
+                      searchController: _searchController,
+                      isSearching: _isSearching,
+                      searchResults: _searchResults,
+                      localizacionesActuales: _localizacionesActuales,
+                      iconosLocalizaciones: _iconosLocalizaciones,
+                      onClearSearch: () {
+                        _searchController.clear();
+                        setState(() {
+                          _searchResults = [];
+                        });
+                      },
+                      onResultTap: _addLocalizacionFromSearch,
+                      onEdit: _editLocalizacion,
+                      onRemove: _removeLocalizacion,
+                    )
+                  : AddLocalizacionPortraitLayout(
+                      isDark: isDark,
+                      isMobile: isMobile,
+                      searchController: _searchController,
+                      isSearching: _isSearching,
+                      searchResults: _searchResults,
+                      localizacionesActuales: _localizacionesActuales,
+                      iconosLocalizaciones: _iconosLocalizaciones,
+                      onClearSearch: () {
+                        _searchController.clear();
+                        setState(() {
+                          _searchResults = [];
+                        });
+                      },
+                      onResultTap: _addLocalizacionFromSearch,
+                      onEdit: _editLocalizacion,
+                      onRemove: _removeLocalizacion,
+                    ),
             ),
             
             // Actions - Footer adaptivo
@@ -579,284 +615,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Layout para móvil en modo landscape (horizontal)
-  Widget _buildLandscapeMobileLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
-    return Padding(
-      padding: EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Columna izquierda: Buscador y resultados
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Campo de búsqueda compacto
-                SearchAddressField(
-                  controller: _searchController,
-                  isSearching: _isSearching,
-                  onClear: () {
-                    _searchController.clear();
-                    setState(() {
-                      _searchResults = [];
-                    });
-                  },
-                ),
-                SizedBox(height: 10),
-                
-                // Resultados de búsqueda (lista compacta)
-                if (_searchResults.isNotEmpty)
-                  Expanded(
-                    child: SearchResultsList(
-                      results: _searchResults,
-                      onResultTap: _addLocalizacionFromSearch,
-                      isDark: isDark,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          
-          SizedBox(width: 12),
-          
-          // Columna derecha: Lista de localizaciones
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Título compacto
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        Icons.list_alt_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Localizaciones',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Color(0xFF1976d2),
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF1976d2).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${_localizacionesActuales.length}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1976d2),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                
-                // Lista de localizaciones compacta
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isDark 
-                          ? Colors.white.withOpacity(0.1) 
-                          : Colors.black.withOpacity(0.05),
-                        width: 1,
-                      ),
-                    ),
-                    child: _localizacionesActuales.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.location_off_rounded,
-                                  size: 32,
-                                  color: Color(0xFF1976d2).withOpacity(0.5),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Sin localizaciones',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? Colors.white70 : Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: EdgeInsets.all(6),
-                            itemCount: _localizacionesActuales.length,
-                            itemBuilder: (context, index) {
-                              final loc = _localizacionesActuales[index];
-                              final icono = _iconosLocalizaciones[loc.id] ?? 
-                                           (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                              
-                              return LocalizacionCard(
-                                localizacion: loc,
-                                icon: icono,
-                                isDark: isDark,
-                                isMobile: true, // Usar versión compacta
-                                onEdit: () => _editLocalizacion(loc),
-                                onRemove: () => _removeLocalizacion(loc),
-                              );
-                            },
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Layout para portrait (vertical) - móvil y escritorio
-  Widget _buildPortraitLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(isMobile ? 12 : 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Campo de búsqueda
-          SearchAddressField(
-            controller: _searchController,
-            isSearching: _isSearching,
-            onClear: () {
-              _searchController.clear();
-              setState(() {
-                _searchResults = [];
-              });
-            },
-          ),
-          SizedBox(height: isMobile ? 12 : 16),
-          
-          // Resultados de búsqueda
-          SearchResultsList(
-            results: _searchResults,
-            onResultTap: _addLocalizacionFromSearch,
-            isDark: isDark,
-          ),
-          
-          // Divisor
-          if (_searchResults.isEmpty) DecorativeDivider(),
-          SizedBox(height: isMobile ? 12 : 20),
-          
-          // Título de localizaciones
-          SectionHeader(
-            icon: Icons.list_alt_rounded,
-            title: isMobile ? 'Localizaciones' : 'Localizaciones de esta actividad',
-            count: _localizacionesActuales.length,
-          ),
-          SizedBox(height: isMobile ? 12 : 16),
-          
-          // Lista de localizaciones actuales
-          Container(
-            constraints: BoxConstraints(
-              minHeight: isMobile ? 180 : 200, 
-              maxHeight: isMobile ? 350 : 400
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
-              border: Border.all(
-                color: isDark 
-                  ? Colors.white.withOpacity(0.1) 
-                  : Colors.black.withOpacity(0.05),
-                width: 1,
-              ),
-            ),
-            child: _localizacionesActuales.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(isMobile ? 24 : 40),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(isMobile ? 16 : 20),
-                            decoration: BoxDecoration(
-                              color: Color(0xFF1976d2).withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.location_off_rounded,
-                              size: isMobile ? 36 : 48,
-                              color: Color(0xFF1976d2).withOpacity(0.5),
-                            ),
-                          ),
-                          SizedBox(height: isMobile ? 12 : 16),
-                          Text(
-                            isMobile ? 'No hay localizaciones' : 'No hay localizaciones añadidas',
-                            style: TextStyle(
-                              fontSize: isMobile ? 13 : 14,
-                              color: isDark ? Colors.white70 : Colors.black54,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          if (!isMobile) ...[
-                            SizedBox(height: 8),
-                            Text(
-                              'Busca y añade direcciones usando el campo superior',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? Colors.white54 : Colors.black38,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(isMobile ? 6 : 8),
-                    shrinkWrap: true,
-                    itemCount: _localizacionesActuales.length,
-                    itemBuilder: (context, index) {
-                      final loc = _localizacionesActuales[index];
-                      final icono = _iconosLocalizaciones[loc.id] ?? 
-                                   (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                      
-                      return LocalizacionCard(
-                        localizacion: loc,
-                        icon: icono,
-                        isDark: isDark,
-                        isMobile: isMobile,
-                        onEdit: () => _editLocalizacion(loc),
-                        onRemove: () => _removeLocalizacion(loc),
-                      );
-                    },
-                  ),
-          ),
-        ],
       ),
     );
   }
