@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/views/activityDetail/state/activity_detail_state.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Clase que maneja toda la lógica relacionada con imágenes
 class ImageHandler {
@@ -45,7 +46,7 @@ class ImageHandler {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+              child: Text('Eliminar', style: TextStyle(color: AppColors.estadoRechazado)),
             ),
           ],
         );
@@ -83,10 +84,10 @@ class ImageHandler {
     for (XFile imageFile in state.selectedImages) {
       try {
         final bytes = await imageFile.readAsBytes();
-        await state.photoService.uploadPhoto(
-          actividadId,
-          imageFile.name,
-          bytes,
+        await state.photoService.uploadPhotosFromBytes(
+          activityId: actividadId,
+          filename: imageFile.name,
+          bytes: bytes,
         );
       } catch (e) {
         return false;

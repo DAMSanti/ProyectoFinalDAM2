@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Clase con métodos helper para construir formularios en diálogos
 class DialogFormHelpers {
@@ -15,7 +16,7 @@ class DialogFormHelpers {
           padding: EdgeInsets.all(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+              colors: AppColors.primaryGradient,
             ),
             borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           ),
@@ -27,7 +28,7 @@ class DialogFormHelpers {
           style: TextStyle(
             fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
           ),
         ),
       ],
@@ -47,10 +48,10 @@ class DialogFormHelpers {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -63,7 +64,7 @@ class DialogFormHelpers {
           labelStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
           hintText: hint,
           hintStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
-          prefixIcon: Icon(icon, color: Color(0xFF1976d2), size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
+          prefixIcon: Icon(icon, color: AppColors.primary, size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             borderSide: BorderSide.none,
@@ -90,10 +91,10 @@ class DialogFormHelpers {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -127,7 +128,7 @@ class DialogFormHelpers {
                   style: TextStyle(
                     fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16),
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                   ),
                 ),
               ],
@@ -150,10 +151,10 @@ class DialogFormHelpers {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -163,7 +164,7 @@ class DialogFormHelpers {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
-          prefixIcon: Icon(icon, color: Color(0xFF1976d2), size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
+          prefixIcon: Icon(icon, color: AppColors.primary, size: isMobileLandscape ? 18 : (isMobile ? 20 : 24)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             borderSide: BorderSide.none,
@@ -203,7 +204,7 @@ class DialogFormHelpers {
           horizontal: isMobileLandscape ? 1 : (isMobile ? 2 : 4),
         ),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,

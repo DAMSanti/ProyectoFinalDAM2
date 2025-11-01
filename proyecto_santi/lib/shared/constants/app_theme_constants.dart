@@ -53,21 +53,21 @@ class AppThemeConstants {
   
   // ===== SOMBRAS =====
   static BoxShadow get defaultShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.15),
+    color: Colors.black.withValues(alpha: 0.15),
     offset: const Offset(0, 4),
     blurRadius: 12.0,
     spreadRadius: -1,
   );
   
   static BoxShadow get hoverShadow => BoxShadow(
-    color: primaryBlue.withOpacity(0.35),
+    color: primaryBlue.withValues(alpha: 0.35),
     offset: const Offset(0, 12),
     blurRadius: 24.0,
     spreadRadius: 0,
   );
   
   static BoxShadow get lightShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.08),
+    color: Colors.black.withValues(alpha: 0.08),
     offset: const Offset(0, 2),
     blurRadius: 8.0,
     spreadRadius: -2,
@@ -86,8 +86,8 @@ class AppThemeConstants {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      lightBackgroundBlue.withOpacity(opacity * 0.85),
-      lightBackgroundBlue2.withOpacity(opacity * 0.75),
+      lightBackgroundBlue.withValues(alpha: opacity * 0.85),
+      lightBackgroundBlue2.withValues(alpha: opacity * 0.75),
     ],
   );
   
@@ -95,8 +95,8 @@ class AppThemeConstants {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      primaryBlue.withOpacity(opacity * 0.25),
-      darkBlue.withOpacity(opacity * 0.20),
+      primaryBlue.withValues(alpha: opacity * 0.25),
+      darkBlue.withValues(alpha: opacity * 0.20),
     ],
   );
   
@@ -105,7 +105,7 @@ class AppThemeConstants {
     end: Alignment.centerRight,
     colors: [
       Colors.transparent,
-      primaryBlue.withOpacity(0.3),
+      primaryBlue.withValues(alpha: 0.3),
       Colors.transparent,
     ],
   );
@@ -124,8 +124,8 @@ class AppThemeConstants {
     ],
     border: Border.all(
       color: isHovered
-          ? primaryBlue.withOpacity(0.6)
-          : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+          ? primaryBlue.withValues(alpha: 0.6)
+          : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
       width: isHovered ? 2 : 1,
     ),
   );

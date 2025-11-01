@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/services/geocoding_service.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
-/// Widgets reutilizables para el di谩logo de localizaciones
+/// Widgets reutilizables para el di醠ogo de localizaciones
 
-/// Campo de b煤squeda de direcciones
+/// Campo de b鷖queda de direcciones
 class SearchAddressField extends StatelessWidget {
   final TextEditingController controller;
   final bool isSearching;
@@ -21,15 +22,15 @@ class SearchAddressField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.1),
+            color: AppColors.primaryOpacity10,
             offset: Offset(0, 2),
             blurRadius: 8,
           ),
@@ -38,11 +39,11 @@ class SearchAddressField extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: 'Buscar y a帽adir direcci贸n',
+          labelText: 'Buscar y a馻dir direcci髇',
           hintText: 'Ej: Calle Mayor 1, Torrelavega',
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
           ),
           suffixIcon: isSearching
               ? Padding(
@@ -52,7 +53,7 @@ class SearchAddressField extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976d2)),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                     ),
                   ),
                 )
@@ -75,7 +76,7 @@ class SearchAddressField extends StatelessWidget {
   }
 }
 
-/// Lista de resultados de b煤squeda
+/// Lista de resultados de b鷖queda
 class SearchResultsList extends StatelessWidget {
   final List<GeocodingResult> results;
   final Function(GeocodingResult) onResultTap;
@@ -101,7 +102,7 @@ class SearchResultsList extends StatelessWidget {
               padding: EdgeInsets.all(6),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                  colors: AppColors.primaryGradient,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -113,11 +114,11 @@ class SearchResultsList extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Text(
-              'Resultados de b煤squeda - Haz clic para a帽adir',
+              'Resultados de b鷖queda - Haz clic para a馻dir',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
               ),
             ),
           ],
@@ -126,15 +127,15 @@ class SearchResultsList extends StatelessWidget {
         Container(
           height: 180,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: AppColors.primaryOpacity30,
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: AppColors.primaryOpacity10,
                 offset: Offset(0, 2),
                 blurRadius: 8,
               ),
@@ -149,7 +150,7 @@ class SearchResultsList extends StatelessWidget {
               return Container(
                 margin: EdgeInsets.only(bottom: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Material(
@@ -165,7 +166,7 @@ class SearchResultsList extends StatelessWidget {
                             padding: EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                colors: AppColors.primaryGradient,
                               ),
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -202,7 +203,7 @@ class SearchResultsList extends StatelessWidget {
   }
 }
 
-/// T铆tulo de secci贸n con icono y contador
+/// T韙ulo de secci髇 con icono y contador
 class SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -223,7 +224,7 @@ class SectionHeader extends StatelessWidget {
           padding: EdgeInsets.all(6),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+              colors: AppColors.primaryGradient,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -239,7 +240,7 @@ class SectionHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
           ),
         ),
         if (count != null) ...[
@@ -248,12 +249,12 @@ class SectionHeader extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                colors: AppColors.primaryGradient,
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.3),
+                  color: AppColors.primaryOpacity30,
                   blurRadius: 4,
                   offset: Offset(0, 2),
                 ),
@@ -274,7 +275,7 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-/// Mensaje de lista vac铆a
+/// Mensaje de lista vac韆
 class EmptyLocalizacionesMessage extends StatelessWidget {
   final bool isDark;
 
@@ -294,18 +295,18 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: AppColors.primaryOpacity10,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.location_off_rounded,
                 size: 48,
-                color: Color(0xFF1976d2).withOpacity(0.5),
+                color: AppColors.primaryOpacity50,
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'No hay localizaciones a帽adidas',
+              'No hay localizaciones a馻didas',
               style: TextStyle(
                 fontSize: 14,
                 color: isDark ? Colors.white70 : Colors.black54,
@@ -314,7 +315,7 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Busca y a帽ade direcciones usando el campo superior',
+              'Busca y a馻de direcciones usando el campo superior',
               style: TextStyle(
                 fontSize: 12,
                 color: isDark ? Colors.white54 : Colors.black38,
@@ -328,7 +329,7 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
   }
 }
 
-/// Card de localizaci贸n individual
+/// Card de localizaci髇 individual
 class LocalizacionCard extends StatelessWidget {
   final Localizacion localizacion;
   final IconData icon;
@@ -355,23 +356,23 @@ class LocalizacionCard extends StatelessWidget {
         gradient: localizacion.esPrincipal 
             ? LinearGradient(
                 colors: [
-                  Colors.red.withOpacity(0.15),
-                  Colors.red.withOpacity(0.08),
+                  Colors.red.withValues(alpha: 0.15),
+                  Colors.red.withValues(alpha: 0.08),
                 ],
               )
             : null,
-        color: localizacion.esPrincipal ? null : Colors.white.withOpacity(0.7),
+        color: localizacion.esPrincipal ? null : Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: localizacion.esPrincipal
-            ? Colors.red.withOpacity(0.4)
+            ? Colors.red.withValues(alpha: 0.4)
             : Colors.transparent,
           width: localizacion.esPrincipal ? 2 : 1,
         ),
         boxShadow: localizacion.esPrincipal
           ? [
               BoxShadow(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.red.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: Offset(0, 2),
               ),
@@ -384,20 +385,20 @@ class LocalizacionCard extends StatelessWidget {
           padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: Row(
             children: [
-              // Icono de la localizaci贸n
+              // Icono de la localizaci髇
               Container(
                 padding: EdgeInsets.all(isMobile ? 6 : 10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: localizacion.esPrincipal
                       ? [Colors.red, Colors.red.shade700]
-                      : [Color(0xFF1976d2), Color(0xFF1565c0)],
+                      : AppColors.primaryGradient,
                   ),
                   borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                   boxShadow: [
                     BoxShadow(
-                      color: (localizacion.esPrincipal ? Colors.red : Color(0xFF1976d2))
-                          .withOpacity(0.3),
+                      color: (localizacion.esPrincipal ? Colors.red : AppColors.primary)
+                          .withValues(alpha: 0.3),
                       blurRadius: isMobile ? 4 : 6,
                       offset: Offset(0, 2),
                     ),
@@ -411,7 +412,7 @@ class LocalizacionCard extends StatelessWidget {
               ),
               SizedBox(width: isMobile ? 8 : 12),
               
-              // Informaci贸n de la localizaci贸n
+              // Informaci髇 de la localizaci髇
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,11 +438,11 @@ class LocalizacionCard extends StatelessWidget {
                               vertical: isMobile ? 2 : 4
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: AppColors.estadoRechazado,
                               borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.red.withOpacity(0.3),
+                                  color: Colors.red.withValues(alpha: 0.3),
                                   blurRadius: 4,
                                   offset: Offset(0, 2),
                                 ),
@@ -478,13 +479,13 @@ class LocalizacionCard extends StatelessWidget {
                 ),
               ),
               
-              // Botones de acci贸n
+              // Botones de acci髇
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     icon: Icon(Icons.edit_rounded, size: isMobile ? 16 : 20),
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                     onPressed: onEdit,
                     tooltip: 'Editar',
                     padding: EdgeInsets.all(isMobile ? 6 : 8),
@@ -493,7 +494,7 @@ class LocalizacionCard extends StatelessWidget {
                   SizedBox(width: isMobile ? 2 : 4),
                   IconButton(
                     icon: Icon(Icons.delete_rounded, size: isMobile ? 16 : 20),
-                    color: Colors.red,
+                    color: AppColors.estadoRechazado,
                     onPressed: onRemove,
                     tooltip: 'Eliminar',
                     padding: EdgeInsets.all(isMobile ? 6 : 8),
@@ -521,7 +522,7 @@ class DecorativeDivider extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            Color(0xFF1976d2).withOpacity(0.3),
+            AppColors.primaryOpacity30,
             Colors.transparent,
           ],
         ),

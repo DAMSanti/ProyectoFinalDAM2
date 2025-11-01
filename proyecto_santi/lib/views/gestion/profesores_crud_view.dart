@@ -136,9 +136,9 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                 child: Container(
                   margin: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),

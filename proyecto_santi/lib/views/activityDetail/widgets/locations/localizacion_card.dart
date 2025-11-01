@@ -3,8 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
-/// Widget para mostrar una tarjeta de localizaciÃ³n
+/// Widget para mostrar una tarjeta de localización
 class LocalizacionCard extends StatelessWidget {
   final Localizacion localizacion;
   final bool isAdminOrSolicitante;
@@ -41,15 +42,15 @@ class LocalizacionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: localizacion.esPrincipal
-              ? Color(0xFFEF5350).withOpacity(0.4)
-              : Color(0xFF1976d2).withOpacity(0.3),
+              ? Color(0xFFEF5350).withValues(alpha: 0.4)
+              : AppColors.primaryOpacity30,
           width: localizacion.esPrincipal ? 2 : 1.5,
         ),
         boxShadow: [
           BoxShadow(
             color: localizacion.esPrincipal 
-              ? Color(0xFFEF5350).withOpacity(0.2)
-              : Color(0xFF1976d2).withOpacity(0.15),
+              ? Color(0xFFEF5350).withValues(alpha: 0.2)
+              : AppColors.primaryOpacity15,
             blurRadius: 10,
             offset: Offset(0, 3),
           ),
@@ -68,20 +69,20 @@ class LocalizacionCard extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: localizacion.esPrincipal
                       ? [
-                          Color(0xFFEF5350).withOpacity(0.8),
-                          Color(0xFFE53935).withOpacity(0.9),
+                          Color(0xFFEF5350).withValues(alpha: 0.8),
+                          Color(0xFFE53935).withValues(alpha: 0.9),
                         ]
                       : [
-                          Color(0xFF1976d2).withOpacity(0.8),
-                          Color(0xFF1565c0).withOpacity(0.9),
+                          AppColors.primaryOpacity80,
+                          AppColors.primaryDarkOpacity90,
                         ],
                   ),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: localizacion.esPrincipal 
-                        ? Color(0xFFEF5350).withOpacity(0.3)
-                        : Color(0xFF1976d2).withOpacity(0.3),
+                        ? Color(0xFFEF5350).withValues(alpha: 0.3)
+                        : AppColors.primaryOpacity30,
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     ),
@@ -103,7 +104,7 @@ class LocalizacionCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: !isWeb ? 15.dg : 5.sp,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1976d2),
+                        color: AppColors.primary,
                       ),
                     ),
                     if (localizacion.esPrincipal)
@@ -120,7 +121,7 @@ class LocalizacionCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Color(0xFFEF5350).withOpacity(0.4),
+                              color: Color(0xFFEF5350).withValues(alpha: 0.4),
                               blurRadius: 4,
                               offset: Offset(0, 2),
                             ),
@@ -143,14 +144,14 @@ class LocalizacionCard extends StatelessWidget {
                 SizedBox(width: 8),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: IconButton(
                     icon: Icon(Icons.delete_outline, size: !isWeb ? 20.dg : 6.sp),
                     onPressed: onDelete,
                     tooltip: 'Eliminar',
-                    color: Colors.red[700],
+                    color: AppColors.accionEliminar,
                   ),
                 ),
               ],
@@ -161,10 +162,10 @@ class LocalizacionCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -173,7 +174,7 @@ class LocalizacionCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.place_rounded, 
-                    color: Color(0xFF1976d2), 
+                    color: AppColors.primary, 
                     size: !isWeb ? 18.dg : 5.sp
                   ),
                   SizedBox(width: 10),
@@ -196,10 +197,10 @@ class LocalizacionCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: AppColors.primaryOpacity10,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Color(0xFF1976d2).withOpacity(0.2),
+                  color: AppColors.primaryOpacity20,
                   width: 1,
                 ),
               ),
@@ -208,7 +209,7 @@ class LocalizacionCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.my_location_rounded, 
-                    color: Color(0xFF1976d2), 
+                    color: AppColors.primary, 
                     size: !isWeb ? 14.dg : 4.sp
                   ),
                   SizedBox(width: 6),
@@ -216,7 +217,7 @@ class LocalizacionCard extends StatelessWidget {
                     'Lat: ${localizacion.latitud!.toStringAsFixed(4)}, Lng: ${localizacion.longitud!.toStringAsFixed(4)}',
                     style: TextStyle(
                       fontSize: !isWeb ? 10.dg : 3.sp,
-                      color: Color(0xFF1976d2),
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

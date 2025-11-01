@@ -2,14 +2,15 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget especializado para mostrar y gestionar la lista de profesores participantes.
 /// 
 /// Responsabilidades:
 /// - Renderizar lista de profesores con avatares
-/// - Mostrar información de contacto (email)
+/// - Mostrar informaci�n de contacto (email)
 /// - Permitir eliminar profesores (si isAdmin)
-/// - Botón para agregar nuevos profesores
+/// - Bot�n para agregar nuevos profesores
 /// - Empty state cuando no hay profesores
 class ProfesorListWidget extends StatelessWidget {
   final List<Profesor> profesores;
@@ -68,7 +69,7 @@ class ProfesorListWidget extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
+          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -87,7 +88,7 @@ class ProfesorListWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con título y botón agregar
+                // Header con t�tulo y bot�n agregar
                 _buildHeader(context, isDark, isWeb),
                 SizedBox(height: 16),
                 // Lista de profesores o empty state
@@ -134,7 +135,7 @@ class ProfesorListWidget extends StatelessWidget {
         if (isAdminOrSolicitante)
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFF1976d2).withOpacity(0.1),
+              color: Color(0xFF1976d2).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: IconButton(
@@ -160,7 +161,7 @@ class ProfesorListWidget extends StatelessWidget {
             Icon(
               Icons.people_outline_rounded,
               size: 48,
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
             ),
             SizedBox(height: 8),
             Text(
@@ -195,13 +196,13 @@ class ProfesorListWidget extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.white.withOpacity(0.6),
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.white.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
       child: ListTile(
@@ -259,7 +260,7 @@ class ProfesorListWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.3),
+            color: Color(0xFF1976d2).withValues(alpha: 0.3),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -281,7 +282,7 @@ class ProfesorListWidget extends StatelessWidget {
   Widget _buildDeleteButton(BuildContext context, Profesor profesor) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
@@ -313,7 +314,7 @@ class ProfesorListWidget extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => Navigator.of(dialogContext).pop(true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.estadoRechazado,
                       foregroundColor: Colors.white,
                     ),
                     child: Text('Eliminar'),

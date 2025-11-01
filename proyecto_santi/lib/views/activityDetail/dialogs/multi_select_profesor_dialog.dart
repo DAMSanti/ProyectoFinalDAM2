@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_footer.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
-/// DiÃ¡logo para seleccionar mÃºltiples profesores participantes
+/// Diálogo para seleccionar múltiples profesores participantes
 class MultiSelectProfesorDialog extends StatefulWidget {
   final List<Profesor> profesores;
   final List<Profesor> profesoresYaSeleccionados;
@@ -25,7 +26,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
   @override
   void initState() {
     super.initState();
-    // No pre-seleccionamos ninguno, el usuario elegirÃ¡
+    // No pre-seleccionamos ninguno, el usuario elegirá
   }
 
   List<Profesor> get _filteredProfesores {
@@ -92,7 +93,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               offset: Offset(0, isMobileLandscape ? 6 : 10),
               blurRadius: isMobileLandscape ? 20 : 30,
             ),
@@ -156,7 +157,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       padding: EdgeInsets.all(12),
       child: Row(
         children: [
-          // Columna izquierda: BÃºsqueda + contador (40%)
+          // Columna izquierda: Búsqueda + contador (40%)
           Expanded(
             flex: 4,
             child: Column(
@@ -183,19 +184,19 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
     );
   }
 
-  // Campo de bÃºsqueda reutilizable
+  // Campo de búsqueda reutilizable
   Widget _buildSearchField(bool isMobile, bool isMobileLandscape) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 10 : (isMobile ? 10 : 12)),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.1),
+            color: AppColors.primaryOpacity10,
             offset: Offset(0, 2),
             blurRadius: 8,
           ),
@@ -207,7 +208,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
           hintStyle: TextStyle(fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14)),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
             size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
           ),
           border: OutlineInputBorder(
@@ -242,13 +243,13 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1976d2).withOpacity(0.2),
-            Color(0xFF1565c0).withOpacity(0.15),
+            AppColors.primaryOpacity20,
+            AppColors.primaryDarkOpacity15,
           ],
         ),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -259,7 +260,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
             padding: EdgeInsets.all(isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                colors: AppColors.primaryGradient,
               ),
               borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 6 : 8)),
             ),
@@ -276,7 +277,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                   ? '${_selectedProfesores.length} selec.' 
                   : '${_selectedProfesores.length} profesor(es) seleccionado(s) para agregar',
               style: TextStyle(
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 14),
               ),
@@ -293,12 +294,12 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
   Widget _buildListaProfesores(bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(isMobileLandscape ? 10 : (isMobile ? 10 : 12)),
         border: Border.all(
           color: isDark 
-            ? Colors.white.withOpacity(0.1) 
-            : Colors.black.withOpacity(0.05),
+            ? Colors.white.withValues(alpha: 0.1) 
+            : Colors.black.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
@@ -310,13 +311,13 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 Container(
                   padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1976d2).withOpacity(0.1),
+                    color: AppColors.primaryOpacity10,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.search_off_rounded,
                     size: isMobileLandscape ? 32 : (isMobile ? 40 : 48),
-                    color: Color(0xFF1976d2).withOpacity(0.5),
+                    color: AppColors.primaryOpacity50,
                   ),
                 ),
                 SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
@@ -332,7 +333,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 0),
                   child: Text(
-                    'Intenta con otros tÃ©rminos de bÃºsqueda',
+                    'Intenta con otros términos de búsqueda',
                     style: TextStyle(
                       fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 13),
                       color: isDark ? Colors.white54 : Colors.black38,
@@ -355,16 +356,16 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 margin: EdgeInsets.only(bottom: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
                 decoration: BoxDecoration(
                   color: yaParticipante 
-                    ? Colors.grey.withOpacity(0.1)
+                    ? Colors.grey.withValues(alpha: 0.1)
                     : isSelected
-                      ? Color(0xFF1976d2).withOpacity(0.15)
-                      : Colors.white.withOpacity(0.7),
+                      ? AppColors.primaryOpacity15
+                      : Colors.white.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                   border: Border.all(
                     color: yaParticipante
-                      ? Colors.grey.withOpacity(0.3)
+                      ? Colors.grey.withValues(alpha: 0.3)
                       : isSelected
-                        ? Color(0xFF1976d2).withOpacity(0.5)
+                        ? AppColors.primaryOpacity50
                         : Colors.transparent,
                     width: isSelected ? 2 : 1,
                   ),
@@ -384,7 +385,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                           gradient: LinearGradient(
                             colors: yaParticipante
                               ? [Colors.grey[400]!, Colors.grey[500]!]
-                              : [Color(0xFF1976d2), Color(0xFF1565c0)],
+                              : AppColors.primaryGradient,
                           ),
                           shape: BoxShape.circle,
                         ),
@@ -440,10 +441,10 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.2),
+                            color: AppColors.estadoPendiente.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: Colors.orange.withOpacity(0.5),
+                              color: AppColors.estadoPendiente.withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
@@ -453,14 +454,14 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                               Icon(
                                 Icons.check_circle_rounded,
                                 size: isMobile ? 10 : 12,
-                                color: Colors.orange,
+                                color: AppColors.estadoPendiente,
                               ),
                               SizedBox(width: 4),
                               Text(
                                 isMobile ? 'Ya participa' : 'Ya participa en esta actividad',
                                 style: TextStyle(
                                   fontSize: isMobile ? 10 : 11,
-                                  color: Colors.orange,
+                                  color: AppColors.estadoPendiente,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -471,7 +472,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                     : null,
                   value: isSelected,
                   enabled: !yaParticipante,
-                  activeColor: Color(0xFF1976d2),
+                  activeColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                   ),
@@ -502,15 +503,15 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.grey[850]!.withOpacity(0.9)
-            : Colors.white.withOpacity(0.9),
+            ? Colors.grey[850]!.withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
           bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, -4),
             blurRadius: 8,
           ),
@@ -519,7 +520,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       child: Row(
         mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
         children: [
-          // BotÃ³n Cancelar - using base DialogFooter styling
+          // Botón Cancelar - using base DialogFooter styling
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Container(
@@ -533,7 +534,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     offset: Offset(0, 4),
                     blurRadius: 8,
                   ),
@@ -575,7 +576,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
             ),
           ),
           SizedBox(width: 12),
-          // BotÃ³n Agregar with custom disabled state logic
+          // Botón Agregar with custom disabled state logic
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Opacity(
@@ -584,8 +585,8 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF1976d2),
-                      Color(0xFF1565c0),
+                      AppColors.primary,
+                      AppColors.primaryDark,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -593,7 +594,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                     ? []
                     : [
                         BoxShadow(
-                          color: Color(0xFF1976d2).withOpacity(0.4),
+                          color: AppColors.primaryOpacity40,
                           offset: Offset(0, 4),
                           blurRadius: 8,
                         ),

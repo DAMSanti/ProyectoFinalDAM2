@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
@@ -17,7 +18,6 @@ import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/widgets/localizaciones_map_widget.dart';
 import 'package:proyecto_santi/utils/icon_helper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../dialogs/add_localizacion_dialog.dart';
 import '../dialogs/edit_localizacion_dialog.dart';
@@ -43,8 +43,8 @@ class ActivityDetailInfo extends StatefulWidget {
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
   final Function(int)? removeApiImage; // Nueva funci?n para eliminar fotos de la API
-  final Function(int)? removeApiImageConfirmed; // Para eliminación ya confirmada
-  final Function(int)? editLocalImage; // Nueva funci�n para editar im�genes locales
+  final Function(int)? removeApiImageConfirmed; // Para eliminaci�n ya confirmada
+  final Function(int)? editLocalImage; // Nueva funci?n para editar im?genes locales
   final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
   final int reloadTrigger; // N?mero que cambia cuando se debe recargar
 
@@ -81,7 +81,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
   List<Localizacion> _localizaciones = [];
   Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci?n
-  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripci�n
+  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripci?n
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   bool _loadingLocalizaciones = false;
@@ -106,6 +106,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     _localizacionService = LocalizacionService(_apiService);
     _actividadService = ActividadService(_apiService);
     _photoService = PhotoService(_apiService);
+    
     // Cargar participantes desde la base de datos
     _loadParticipantes();
     // Cargar localizaciones
@@ -219,6 +220,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   
   void _notifyChanges() {
     if (widget.onActivityDataChanged != null) {
+      // Solo notificar participantes, no sobrescribir otros datos
       widget.onActivityDataChanged!({
         'profesoresParticipantes': _profesoresParticipantes,
         'gruposParticipantes': _gruposParticipantes,
@@ -229,7 +231,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   // M?todo p?blico para recargar datos desde el padre (al revertir)
   Future<void> reloadData() async {
     setState(() {
-      // Limpiar estado del folleto
+      // Limpiar estado del folleto - el widget.actividad ya tiene la info actualizada
       _folletoFileName = null;
       _folletoFilePath = null;
       _folletoChanged = false;
@@ -241,7 +243,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     await _loadParticipantes();
   }
 
-  // M�todo p�blico para guardar las descripciones de fotos pendientes
+  // M?todo p?blico para guardar las descripciones de fotos pendientes
   Future<bool> savePhotoDescriptions() async {
     if (_photoDescriptionChanges.isEmpty) {
       return true;
@@ -267,62 +269,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     }
 
     return allSuccess;
-  }
-
-  Future<void> _selectFolleto() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-        withData: kIsWeb, // Importante para web
-      );
-
-      if (result != null) {
-        final file = result.files.single;
-        setState(() {
-          _folletoFileName = file.name;
-          // En web, usar bytes en lugar de path
-          if (kIsWeb) {
-            _folletoFilePath = null; // No disponible en web
-            // Guardar bytes para subir despu?s
-            if (file.bytes != null) {
-              // Notificar con los bytes directamente
-              if (widget.onActivityDataChanged != null) {
-                widget.onActivityDataChanged!({
-                  'folletoFileName': file.name,
-                  'folletoBytes': file.bytes,
-                });
-              }
-            }
-          } else {
-            _folletoFilePath = file.path;
-            if (widget.onActivityDataChanged != null) {
-              widget.onActivityDataChanged!({
-                'folletoFileName': file.name,
-                'folletoFilePath': file.path,
-              });
-            }
-          }
-          _folletoChanged = true;
-        });
-      }
-    } catch (e) {
-    }
-  }
-
-  void _deleteFolleto() {
-    setState(() {
-      _folletoMarkedForDeletion = true;
-      _folletoFileName = null;
-      _folletoFilePath = null;
-      
-      // Notificar el cambio para activar el bot?n guardar
-      if (widget.onActivityDataChanged != null) {
-        widget.onActivityDataChanged!({
-          'deleteFolleto': true,
-        });
-      }
-    });
   }
 
   String _extractFileName(String url) {
@@ -355,14 +301,37 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
               ActivityDetailHeader(
                 actividad: widget.actividad,
                 isAdminOrSolicitante: widget.isAdminOrSolicitante,
-                folletoFileName: _folletoFileName,
                 folletoMarkedForDeletion: _folletoMarkedForDeletion,
+                newFolletoFileName: _folletoChanged ? _folletoFileName : null,
                 onEditPressed: () => _showEditDialog(context),
-                onSelectFolleto: _selectFolleto,
-                onDeleteFolleto: _deleteFolleto,
+                onFolletoChanged: (data) {
+                  setState(() {
+                    if (data.containsKey('deleteFolleto') && data['deleteFolleto'] == true) {
+                      _folletoMarkedForDeletion = true;
+                      _folletoFileName = null;
+                      _folletoFilePath = null;
+                      _folletoChanged = false;
+                    } else {
+                      // Se seleccionó un nuevo folleto
+                      if (data.containsKey('folletoFileName')) {
+                        _folletoFileName = data['folletoFileName'];
+                      }
+                      if (data.containsKey('folletoFilePath')) {
+                        _folletoFilePath = data['folletoFilePath'];
+                      }
+                      _folletoChanged = true;
+                      _folletoMarkedForDeletion = false;
+                    }
+                  });
+                  
+                  // Notificar al widget padre con los datos del folleto
+                  if (widget.onActivityDataChanged != null) {
+                    widget.onActivityDataChanged!(data);
+                  }
+                },
               ),
               SizedBox(height: 16),
-              // Sección de imágenes (refactorizada)
+              // Secci�n de im�genes (refactorizada)
               ActivityImagesSection(
                 imagesActividad: widget.imagesActividad,
                 selectedImages: widget.selectedImages,
@@ -376,7 +345,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 onDataChanged: widget.onActivityDataChanged,
               ),
               SizedBox(height: 16),
-              // Sección de participantes (refactorizada)
+              // Secci�n de participantes (refactorizada)
               ActivityParticipantsSection(
                 profesoresParticipantes: _profesoresParticipantes,
                 gruposParticipantes: _gruposParticipantes,
@@ -451,7 +420,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             },
           ),
           SizedBox(height: 16),
-          // Sección de localizaciones (refactorizada)
+          // Secci�n de localizaciones (refactorizada)
           ActivityLocationsSection(
             actividadId: widget.actividad.id,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
@@ -497,7 +466,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         SizedBox(width: 16),
         Expanded(
           flex: 1,
-          // Sección de localizaciones (refactorizada)
+          // Secci�n de localizaciones (refactorizada)
           child: ActivityLocationsSection(
             actividadId: widget.actividad.id,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
@@ -531,7 +500,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoRechazado),
               child: Text('Eliminar'),
             ),
           ],
@@ -555,9 +524,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +535,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             children: [
               Icon(
                 Icons.comment,
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
                 size: isWeb ? 16 : 18.0,
               ),
               SizedBox(width: 8),
@@ -575,7 +544,7 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 style: TextStyle(
                   fontSize: isWeb ? 14 : 16.0,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
+                  color: AppColors.primary,
                 ),
               ),
             ],

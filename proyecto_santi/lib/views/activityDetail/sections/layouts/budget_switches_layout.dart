@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../widgets/budget/budget_toggle_switch.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget que maneja el layout responsive de los switches de transporte y alojamiento.
 /// 
@@ -39,7 +40,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
           BudgetToggleSwitchWidget(
             label: 'Transporte',
             icon: Icons.directions_bus,
-            color: Colors.purple,
+            color: AppColors.tipoComplementaria,
             value: transporteReq,
             isWeb: isWeb,
             onChanged: onTransporteChanged,
@@ -48,7 +49,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
           BudgetToggleSwitchWidget(
             label: 'Alojamiento',
             icon: Icons.hotel,
-            color: Colors.teal,
+            color: AppColors.presupuestoAlojamiento,
             value: alojamientoReq,
             isWeb: isWeb,
             onChanged: onAlojamientoChanged,
@@ -62,7 +63,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
             child: BudgetToggleSwitchWidget(
               label: 'Transporte',
               icon: Icons.directions_bus,
-              color: Colors.purple,
+              color: AppColors.tipoComplementaria,
               value: transporteReq,
               isWeb: isWeb,
               onChanged: onTransporteChanged,
@@ -73,7 +74,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
             child: BudgetToggleSwitchWidget(
               label: 'Alojamiento',
               icon: Icons.hotel,
-              color: Colors.teal,
+              color: AppColors.presupuestoAlojamiento,
               value: alojamientoReq,
               isWeb: isWeb,
               onChanged: onAlojamientoChanged,

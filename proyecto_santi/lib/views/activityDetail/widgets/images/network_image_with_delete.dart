@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Widget para mostrar una imagen de red con botón de eliminar en hover
+/// Widget para mostrar una imagen de red con bot�n de eliminar en hover
 class NetworkImageWithDelete extends StatefulWidget {
   final String imageUrl;
   final double maxHeight;
@@ -69,7 +70,7 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.error, color: Colors.red),
+                          Icon(Icons.error, color: AppColors.estadoRechazado),
                           SizedBox(height: 8),
                           Text(
                             'Error al cargar',
@@ -82,7 +83,7 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
                 ),
               ),
             ),
-            // Botón de eliminar (solo visible en hover y si está habilitado)
+            // Bot�n de eliminar (solo visible en hover y si est� habilitado)
             if (_isHovering && widget.showDeleteButton && widget.onDelete != null)
               Positioned(
                 top: 4,
@@ -91,7 +92,7 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
                   onTap: widget.onDelete,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                      color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     padding: EdgeInsets.all(6),

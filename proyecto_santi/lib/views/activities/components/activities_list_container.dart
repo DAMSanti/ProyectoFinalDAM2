@@ -22,12 +22,12 @@ class ActivitiesListContainer extends StatelessWidget {
         gradient: LinearGradient(
           colors: isDark
               ? [
-                  Color(0xFF1a1a2e).withOpacity(0.6),
-                  Color(0xFF16213e).withOpacity(0.6),
+                  Color(0xFF1a1a2e).withValues(alpha: 0.6),
+                  Color(0xFF16213e).withValues(alpha: 0.6),
                 ]
               : [
-                  Colors.white.withOpacity(0.95),
-                  Colors.white.withOpacity(0.85),
+                  Colors.white.withValues(alpha: 0.95),
+                  Colors.white.withValues(alpha: 0.85),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -35,15 +35,15 @@ class ActivitiesListContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.05),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.05),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.black.withOpacity(0.08),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: Offset(0, 4),
             spreadRadius: 0,
@@ -51,8 +51,8 @@ class ActivitiesListContainer extends StatelessWidget {
           // Inner shadow effect
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.white.withOpacity(0.8),
+                ? Colors.black.withValues(alpha: 0.2)
+                : Colors.white.withValues(alpha: 0.8),
             blurRadius: 8,
             offset: Offset(0, -2),
             spreadRadius: -4,

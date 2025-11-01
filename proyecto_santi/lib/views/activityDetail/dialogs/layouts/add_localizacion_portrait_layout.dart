@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import '../../../../models/localizacion.dart';
 import '../../../../services/geocoding_service.dart';
 import '../../widgets/locations/localizacion_widgets.dart';
@@ -73,12 +74,12 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
               maxHeight: isMobile ? 350 : 400
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
               border: Border.all(
                 color: isDark 
-                  ? Colors.white.withOpacity(0.1) 
-                  : Colors.black.withOpacity(0.05),
+                  ? Colors.white.withValues(alpha: 0.1) 
+                  : Colors.black.withValues(alpha: 0.05),
                 width: 1,
               ),
             ),
@@ -119,13 +120,13 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(isMobile ? 16 : 20),
               decoration: BoxDecoration(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: AppColors.primaryOpacity10,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.location_off_rounded,
                 size: isMobile ? 36 : 48,
-                color: Color(0xFF1976d2).withOpacity(0.5),
+                color: AppColors.primaryOpacity50,
               ),
             ),
             SizedBox(height: isMobile ? 12 : 16),

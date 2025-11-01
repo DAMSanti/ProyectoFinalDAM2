@@ -49,7 +49,7 @@ export 'widgets/images/network_image_with_delete.dart';
 export 'widgets/images/image_with_delete.dart';
 
 // Widgets - Locations
-export 'widgets/locations/localizacion_card.dart';
+// export 'widgets/locations/localizacion_card.dart'; // Comentado: LocalizacionCard ya está en localizacion_widgets.dart
 export 'widgets/locations/localizacion_widgets.dart';
 
 // Dialogs

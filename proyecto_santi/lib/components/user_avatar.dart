@@ -58,8 +58,8 @@ class UserAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: size / 2,
       backgroundColor: isDark 
-          ? Color(0xFF1976d2).withOpacity(0.3)
-          : Color(0xFF1976d2).withOpacity(0.2),
+          ? Color(0xFF1976d2).withValues(alpha: 0.3)
+          : Color(0xFF1976d2).withValues(alpha: 0.2),
       backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
       child: photoUrl == null
           ? Text(

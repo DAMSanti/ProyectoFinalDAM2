@@ -225,13 +225,13 @@ class _ChatViewState extends State<ChatView> {
                             Icon(
                               Icons.chat_bubble_outline,
                               size: 64,
-                              color: Colors.grey.withOpacity(0.5),
+                              color: Colors.grey.withValues(alpha: 0.5),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No hay mensajes aún',
                               style: TextStyle(
-                                color: Colors.grey.withOpacity(0.7),
+                                color: Colors.grey.withValues(alpha: 0.7),
                                 fontSize: 16,
                               ),
                             ),
@@ -239,7 +239,7 @@ class _ChatViewState extends State<ChatView> {
                             Text(
                               '¡Envía el primer mensaje!',
                               style: TextStyle(
-                                color: Colors.grey.withOpacity(0.5),
+                                color: Colors.grey.withValues(alpha: 0.5),
                                 fontSize: 14,
                               ),
                             ),
@@ -291,7 +291,7 @@ class _ChatViewState extends State<ChatView> {
                       : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, -2),
                     ),
@@ -355,12 +355,12 @@ class _ChatViewState extends State<ChatView> {
             child: Container(
               decoration: BoxDecoration(
                 color: widget.isDarkTheme
-                    ? Colors.black.withOpacity(0.3)
-                    : Colors.white.withOpacity(0.3),
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -411,7 +411,7 @@ class _ChatViewState extends State<ChatView> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

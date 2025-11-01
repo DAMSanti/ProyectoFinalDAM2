@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'dart:io';
 
 class InfoCardWidget extends StatelessWidget {
@@ -27,13 +28,13 @@ class InfoCardWidget extends StatelessWidget {
       padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.white.withOpacity(0.05) 
-            : Colors.white.withOpacity(0.4),
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.white.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: isDark 
-              ? Colors.white.withOpacity(0.1) 
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1) 
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -48,7 +49,7 @@ class InfoCardWidget extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              color: Color(0xFF1976d2),
+              color: AppColors.primary,
               size: isMobile ? 14 : (isWeb ? 16 : 18.0),
             ),
           ),
@@ -63,7 +64,7 @@ class InfoCardWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: isMobile ? 10 : (isWeb ? 11 : 13.0),
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                   ),
                 ),
                 SizedBox(height: isMobile ? 2 : 4),
@@ -71,7 +72,7 @@ class InfoCardWidget extends StatelessWidget {
                   value,
                   style: TextStyle(
                     fontSize: isMobile ? 12 : (isWeb ? 13 : 15.0),
-                    color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
+                    color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors.black87,
                     height: 1.3,
                   ),
                   maxLines: maxLines,

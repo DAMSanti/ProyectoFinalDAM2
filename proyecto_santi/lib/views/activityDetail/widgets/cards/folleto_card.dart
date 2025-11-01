@@ -10,8 +10,7 @@ class FolletoCardWidget extends StatelessWidget {
   final bool folletoMarkedForDeletion;
   final String? actividadFolletoUrl;
   final bool isAdminOrSolicitante;
-  final VoidCallback onSelectFolleto;
-  final VoidCallback onDeleteFolleto;
+  final Function(Map<String, dynamic>) onFolletoChanged;
   final bool isMobile;
 
   const FolletoCardWidget({
@@ -20,8 +19,7 @@ class FolletoCardWidget extends StatelessWidget {
     required this.folletoMarkedForDeletion,
     required this.actividadFolletoUrl,
     required this.isAdminOrSolicitante,
-    required this.onSelectFolleto,
-    required this.onDeleteFolleto,
+    required this.onFolletoChanged,
     this.isMobile = false,
   });
 
@@ -34,24 +32,22 @@ class FolletoCardWidget extends StatelessWidget {
       padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.white.withOpacity(0.05) 
-            : Colors.white.withOpacity(0.4),
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.white.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: isDark 
-              ? Colors.white.withOpacity(0.1) 
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1) 
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
       child: FolletoUploadWidget(
+        key: ValueKey('${actividadFolletoUrl ?? 'no_folleto'}_${folletoFileName ?? 'none'}_${folletoMarkedForDeletion}'), // Key para forzar recreación al revertir
         folletoUrl: actividadFolletoUrl,
+        initialFolletoFileName: folletoFileName,
+        initialFolletoMarkedForDeletion: folletoMarkedForDeletion,
         isAdminOrSolicitante: isAdminOrSolicitante,
-        onFolletoChanged: (data) {
-          // Detectar si es eliminación
-          if (data['deleteFolleto'] == true) {
-            onDeleteFolleto();
-          }
-        },
+        onFolletoChanged: onFolletoChanged,
         compact: true, // Versión compacta para el header
         isMobile: isMobile,
       ),

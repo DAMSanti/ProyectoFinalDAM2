@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import '../widgets/multi_select_cursos_list.dart';
@@ -83,10 +84,10 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
   Widget _buildSearchField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -96,7 +97,7 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
           hintStyle: TextStyle(fontSize: 13),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
             size: 18,
           ),
           border: OutlineInputBorder(
@@ -120,13 +121,13 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1976d2).withOpacity(0.2),
-            Color(0xFF1565c0).withOpacity(0.15),
+            AppColors.primaryOpacity20,
+            AppColors.primaryDarkOpacity15,
           ],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -137,7 +138,7 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
             padding: EdgeInsets.all(4),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                colors: AppColors.primaryGradient,
               ),
               borderRadius: BorderRadius.circular(6),
             ),
@@ -152,7 +153,7 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
             child: Text(
               '${selectedGrupos.length} seleccionado(s)',
               style: TextStyle(
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),

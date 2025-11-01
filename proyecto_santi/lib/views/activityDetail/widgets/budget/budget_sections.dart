@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/models/gasto_personalizado.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 import 'budget_card.dart';
 import 'gastos_varios_card.dart';
 
-/// Widgets auxiliares para la sección de presupuesto
+/// Widgets auxiliares para la secci�n de presupuesto
 
 /// Tarjetas de resumen de presupuesto (estimado y real)
 class BudgetSummaryCards extends StatelessWidget {
@@ -71,7 +72,7 @@ class BudgetSummaryCards extends StatelessWidget {
   }
 }
 
-/// Sección de transporte (tarjeta + detalles)
+/// Secci�n de transporte (tarjeta + detalles)
 class TransporteSection extends StatelessWidget {
   final bool transporteReq;
   final bool isEditing;
@@ -143,10 +144,10 @@ class TransporteSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(isDark ? 0.05 : 0.6),
+        color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.purple.withOpacity(0.3),
+          color: Colors.purple.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -178,7 +179,7 @@ class TransporteSection extends StatelessWidget {
                   labelText: 'Seleccionar empresa',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.8),
+                  fillColor: Colors.white.withValues(alpha: 0.8),
                 ),
                 items: empresasDisponibles.map((emp) {
                   return DropdownMenuItem(
@@ -197,7 +198,7 @@ class TransporteSection extends StatelessWidget {
               icon: Icon(Icons.email_rounded, size: 16),
               label: Text('Solicitar Presupuesto', style: TextStyle(fontSize: 12)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
+                backgroundColor: AppColors.tipoComplementaria,
                 foregroundColor: Colors.white,
                 minimumSize: Size(double.infinity, 36),
               ),
@@ -249,7 +250,7 @@ class TransporteSection extends StatelessWidget {
   }
 }
 
-/// Sección de alojamiento (tarjeta + detalles)
+/// Secci�n de alojamiento (tarjeta + detalles)
 class AlojamientoSection extends StatelessWidget {
   final bool alojamientoReq;
   final bool isEditing;
@@ -321,10 +322,10 @@ class AlojamientoSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(isDark ? 0.05 : 0.6),
+        color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.teal.withOpacity(0.3),
+          color: Colors.teal.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -336,7 +337,7 @@ class AlojamientoSection extends StatelessWidget {
               Icon(Icons.hotel_rounded, size: 16, color: Colors.teal),
               SizedBox(width: 8),
               Text(
-                'Información del Alojamiento',
+                'Informaci�n del Alojamiento',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -356,7 +357,7 @@ class AlojamientoSection extends StatelessWidget {
                   labelText: 'Seleccionar alojamiento',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.8),
+                  fillColor: Colors.white.withValues(alpha: 0.8),
                 ),
                 items: alojamientosDisponibles.map((aloj) {
                   return DropdownMenuItem(
@@ -375,7 +376,7 @@ class AlojamientoSection extends StatelessWidget {
               icon: Icon(Icons.email_rounded, size: 16),
               label: Text('Solicitar Presupuesto', style: TextStyle(fontSize: 12)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
+                backgroundColor: AppColors.presupuestoAlojamiento,
                 foregroundColor: Colors.white,
                 minimumSize: Size(double.infinity, 36),
               ),
@@ -383,9 +384,9 @@ class AlojamientoSection extends StatelessWidget {
           ] else if (alojamiento != null) ...[
             _buildAlojamientoInfo('Nombre', alojamiento!.nombre),
             if (alojamiento!.direccion != null) 
-              _buildAlojamientoInfo('Dirección', alojamiento!.direccion!),
+              _buildAlojamientoInfo('Direcci�n', alojamiento!.direccion!),
             if (alojamiento!.telefono != null) 
-              _buildAlojamientoInfo('Teléfono', alojamiento!.telefono!),
+              _buildAlojamientoInfo('Tel�fono', alojamiento!.telefono!),
             if (alojamiento!.email != null) 
               _buildAlojamientoInfo('Email', alojamiento!.email!),
             if (alojamiento!.web != null) 
@@ -457,7 +458,7 @@ class CostoPorAlumnoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
+            color: Colors.orange.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: Offset(0, 4),
           ),
@@ -468,7 +469,7 @@ class CostoPorAlumnoCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -485,14 +486,14 @@ class CostoPorAlumnoCard extends StatelessWidget {
                 Text(
                   'Coste por Alumno',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: isWeb ? 11 : 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '${costoPorAlumno.toStringAsFixed(2)} €',
+                  '${costoPorAlumno.toStringAsFixed(2)} �',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: isWeb ? 20 : 24,

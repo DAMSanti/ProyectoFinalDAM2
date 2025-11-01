@@ -65,18 +65,18 @@ class BudgetCardWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withOpacity(0.9),
-            Colors.white.withOpacity(0.7),
+            Colors.white.withValues(alpha: 0.9),
+            Colors.white.withValues(alpha: 0.7),
           ],
         ),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
         border: Border.all(
-          color: color.withOpacity(0.4),
+          color: color.withValues(alpha: 0.4),
           width: isMobile ? 1 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             blurRadius: isMobile ? 6 : 12,
             offset: Offset(0, isMobile ? 2 : 4),
           ),
@@ -124,14 +124,14 @@ class BudgetCardWidget extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        color.withOpacity(0.8),
-                        color.withOpacity(0.6),
+                        color.withValues(alpha: 0.8),
+                        color.withValues(alpha: 0.6),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.3),
+                        color: color.withValues(alpha: 0.3),
                         blurRadius: 6,
                         offset: Offset(0, 2),
                       ),
@@ -163,8 +163,8 @@ class BudgetCardWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isEditing
-                    ? [Colors.green.withOpacity(0.2), Colors.green.withOpacity(0.1)]
-                    : [Colors.grey.withOpacity(0.2), Colors.grey.withOpacity(0.1)],
+                    ? [Colors.green.withValues(alpha: 0.2), Colors.green.withValues(alpha: 0.1)]
+                    : [Colors.grey.withValues(alpha: 0.2), Colors.grey.withValues(alpha: 0.1)],
               ),
               borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
             ),

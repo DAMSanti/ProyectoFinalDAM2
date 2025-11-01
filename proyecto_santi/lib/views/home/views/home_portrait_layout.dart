@@ -46,7 +46,7 @@ class _HomePortraitLayoutState extends State<HomePortraitLayout> with SingleTick
             borderRadius: BorderRadius.circular(12.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -61,7 +61,7 @@ class _HomePortraitLayoutState extends State<HomePortraitLayout> with SingleTick
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF1976d2).withOpacity(0.3),
+                  color: const Color(0xFF1976d2).withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -91,7 +91,7 @@ class _HomePortraitLayoutState extends State<HomePortraitLayout> with SingleTick
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

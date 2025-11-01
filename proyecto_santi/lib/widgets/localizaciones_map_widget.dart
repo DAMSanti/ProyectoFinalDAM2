@@ -149,7 +149,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     offset: Offset(0, 4),
                     blurRadius: 12,
                   ),
@@ -161,7 +161,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                   Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Color(0xFF1976d2).withOpacity(0.2),
+                      color: Color(0xFF1976d2).withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -263,7 +263,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                             shadows: [
                               Shadow(
                                 blurRadius: 10.0,
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 offset: Offset(0, 2),
                               ),
                             ],
@@ -375,13 +375,13 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.3),
+            color: Color(0xFF1976d2).withValues(alpha: 0.3),
             offset: Offset(0, 8),
             blurRadius: 24,
             spreadRadius: -4,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, 4),
             blurRadius: 12,
             spreadRadius: -2,
@@ -422,13 +422,13 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                         gradient: LinearGradient(
                           colors: [
                             tipoColor,
-                            tipoColor.withOpacity(0.7),
+                            tipoColor.withValues(alpha: 0.7),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: tipoColor.withOpacity(0.4),
+                            color: tipoColor.withValues(alpha: 0.4),
                             blurRadius: 8,
                             offset: Offset(0, 3),
                           ),
@@ -469,13 +469,13 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      tipoColor.withOpacity(0.2),
-                                      tipoColor.withOpacity(0.1),
+                                      tipoColor.withValues(alpha: 0.2),
+                                      tipoColor.withValues(alpha: 0.1),
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: tipoColor.withOpacity(0.3),
+                                    color: tipoColor.withValues(alpha: 0.3),
                                     width: 1,
                                   ),
                                 ),
@@ -493,7 +493,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
-                                        color: isDark ? tipoColor.withOpacity(0.9) : tipoColor,
+                                        color: isDark ? tipoColor.withValues(alpha: 0.9) : tipoColor,
                                       ),
                                     ),
                                   ],
@@ -506,13 +506,13 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.red.withOpacity(0.2),
-                                        Colors.red.withOpacity(0.1),
+                                        Colors.red.withValues(alpha: 0.2),
+                                        Colors.red.withValues(alpha: 0.1),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: Colors.red.withOpacity(0.3),
+                                      color: Colors.red.withValues(alpha: 0.3),
                                       width: 1,
                                     ),
                                   ),
@@ -530,7 +530,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: isDark ? Colors.red.withOpacity(0.9) : Colors.red,
+                                          color: isDark ? Colors.red.withValues(alpha: 0.9) : Colors.red,
                                           letterSpacing: 0.5,
                                         ),
                                       ),
@@ -546,8 +546,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                     Container(
                       decoration: BoxDecoration(
                         color: isDark 
-                          ? Colors.white.withOpacity(0.1) 
-                          : Colors.white.withOpacity(0.7),
+                          ? Colors.white.withValues(alpha: 0.1) 
+                          : Colors.white.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: IconButton(
@@ -577,7 +577,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                     gradient: LinearGradient(
                       colors: [
                         Colors.transparent,
-                        (isDark ? Colors.white : Color(0xFF1976d2)).withOpacity(0.2),
+                        (isDark ? Colors.white : Color(0xFF1976d2)).withValues(alpha: 0.2),
                         Colors.transparent,
                       ],
                     ),
@@ -591,13 +591,13 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isDark 
-                        ? Colors.white.withOpacity(0.05) 
-                        : Colors.white.withOpacity(0.6),
+                        ? Colors.white.withValues(alpha: 0.05) 
+                        : Colors.white.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isDark 
-                          ? Colors.white.withOpacity(0.1) 
-                          : Colors.white.withOpacity(0.5),
+                          ? Colors.white.withValues(alpha: 0.1) 
+                          : Colors.white.withValues(alpha: 0.5),
                         width: 1,
                       ),
                     ),
@@ -609,8 +609,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Color(0xFF1976d2).withOpacity(0.2),
-                                Color(0xFF1976d2).withOpacity(0.1),
+                                Color(0xFF1976d2).withValues(alpha: 0.2),
+                                Color(0xFF1976d2).withValues(alpha: 0.1),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(8),
@@ -649,17 +649,17 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                         end: Alignment.bottomRight,
                         colors: isDark
                           ? [
-                              Color(0xFF1976d2).withOpacity(0.15),
-                              Color(0xFF1976d2).withOpacity(0.08),
+                              Color(0xFF1976d2).withValues(alpha: 0.15),
+                              Color(0xFF1976d2).withValues(alpha: 0.08),
                             ]
                           : [
-                              Colors.white.withOpacity(0.8),
-                              Colors.white.withOpacity(0.6),
+                              Colors.white.withValues(alpha: 0.8),
+                              Colors.white.withValues(alpha: 0.6),
                             ],
                       ),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: Color(0xFF1976d2).withOpacity(0.2),
+                        color: Color(0xFF1976d2).withValues(alpha: 0.2),
                         width: 1,
                       ),
                     ),
@@ -671,7 +671,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                             Container(
                               padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: Color(0xFF1976d2).withOpacity(0.15),
+                                color: Color(0xFF1976d2).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Icon(
@@ -697,7 +697,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                           localizacion.descripcion!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? Colors.white.withOpacity(0.85) : Colors.black87,
+                            color: isDark ? Colors.white.withValues(alpha: 0.85) : Colors.black87,
                             height: 1.4,
                           ),
                           maxLines: 4,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/image_preview_widget.dart';
 import '../widgets/image_description_field.dart';
@@ -37,17 +38,17 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
               color: isDark 
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.5),
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.5),
               border: Border.all(
                 color: isDark 
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.white.withOpacity(0.6),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.6),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.1),
+                  color: AppColors.primaryOpacity10,
                   offset: Offset(0, 4),
                   blurRadius: 12,
                 ),

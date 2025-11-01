@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/services/localizacion_service.dart';
 import 'package:proyecto_santi/widgets/localizaciones_map_widget.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import '../dialogs/add_localizacion_dialog.dart';
 import '../dialogs/edit_localizacion_dialog.dart';
 
-/// Widget que maneja toda la sección de localizaciones de una actividad.
+/// Widget que maneja toda la secci�n de localizaciones de una actividad.
 /// 
 /// Responsabilidades:
 /// - Mostrar mapa interactivo con todas las localizaciones
 /// - Lista de localizaciones con cards detalladas
 /// - Permitir agregar, editar y eliminar localizaciones
-/// - Cargar íconos dinámicamente según tipo de localización
+/// - Cargar �conos din�micamente seg�n tipo de localizaci�n
 class ActivityLocationsSection extends StatefulWidget {
   final int actividadId;
   final bool isAdminOrSolicitante;
@@ -60,7 +61,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           .map((data) => Localizacion.fromJson(data))
           .toList();
 
-      // Cargar íconos para cada localización
+      // Cargar �conos para cada localizaci�n
       final iconos = <int, IconData>{};
       for (var loc in localizaciones) {
         if (loc.icono != null) {
@@ -83,15 +84,13 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
         setState(() {
           _loadingLocalizaciones = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar localizaciones: $e')),
-        );
+        SnackBarHelper.showError(context, 'Error al cargar localizaciones: $e');
       }
     }
   }
 
   IconData? _getIconFromString(String iconName) {
-    // Mapeo básico de nombres a íconos
+    // Mapeo b�sico de nombres a �conos
     final iconMap = <String, IconData>{
       'place': Icons.place,
       'restaurant': Icons.restaurant,
@@ -213,14 +212,14 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Color(0xFF1976d2).withOpacity(0.8),
-                            Color(0xFF1565c0).withOpacity(0.9),
+                            Color(0xFF1976d2).withValues(alpha: 0.8),
+                            Color(0xFF1565c0).withValues(alpha: 0.9),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xFF1976d2).withOpacity(0.3),
+                            color: Color(0xFF1976d2).withValues(alpha: 0.3),
                             blurRadius: 4,
                             offset: Offset(0, 2),
                           ),
@@ -242,14 +241,14 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFF1976d2).withOpacity(0.8),
-                        Color(0xFF1565c0).withOpacity(0.9),
+                        Color(0xFF1976d2).withValues(alpha: 0.8),
+                        Color(0xFF1565c0).withValues(alpha: 0.9),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFF1976d2).withOpacity(0.3),
+                        color: Color(0xFF1976d2).withValues(alpha: 0.3),
                         blurRadius: 6,
                         offset: Offset(0, 2),
                       ),
@@ -263,7 +262,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                         _showAddLocalizacionDialog(context);
                       },
                       child: Tooltip(
-                        message: 'Añadir localización',
+                        message: 'A�adir localizaci�n',
                         child: Padding(
                           padding: EdgeInsets.all(isMobile ? 10 : 12),
                           child: isMobile
@@ -282,7 +281,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                                     ),
                                     SizedBox(width: 6),
                                     Text(
-                                      'Añadir',
+                                      'A�adir',
                                       style: TextStyle(
                                         fontSize: isWeb ? 13 : 15.0,
                                         fontWeight: FontWeight.bold,
@@ -314,14 +313,14 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
               height: 600,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               clipBehavior: Clip.antiAlias,
               child: LocalizacionesMapWidget(
                 localizaciones: _localizaciones,
                 iconosLocalizaciones: _iconosLocalizaciones,
                 onLocalizacionTapped: (localizacion) {
-                  // Aquí se podría mostrar un diálogo de edición si es necesario
+                  // Aqu� se podr�a mostrar un di�logo de edici�n si es necesario
                   if (widget.isAdminOrSolicitante) {
                     _showEditLocalizacionDialog(context, localizacion);
                   }
@@ -352,19 +351,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
     if (result != null && result['success'] == true) {
       await _loadLocalizaciones();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Localización agregada correctamente'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        SnackBarHelper.showSuccess(context, 'Localizaci�n agregada correctamente');
       }
     }
   }
@@ -393,19 +380,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
     if (result != null && result['success'] == true) {
       await _loadLocalizaciones();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Localización actualizada correctamente'),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        SnackBarHelper.showSuccess(context, 'Localizaci�n actualizada correctamente');
       }
     }
   }
@@ -417,7 +392,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
         return AlertDialog(
           title: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              Icon(Icons.warning_amber_rounded, color: AppColors.estadoPendiente),
               SizedBox(width: 12),
               Text('Confirmar eliminación'),
             ],
@@ -433,7 +408,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.estadoRechazado,
                 foregroundColor: Colors.white,
               ),
               child: Text('Eliminar'),
@@ -450,28 +425,11 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
         _notifyChanges();
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text('Localización eliminada correctamente'),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          SnackBarHelper.showSuccess(context, 'Localizaci�n eliminada correctamente');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al eliminar localización: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackBarHelper.showError(context, 'Error al eliminar localizaci�n: $e');
         }
       }
     }

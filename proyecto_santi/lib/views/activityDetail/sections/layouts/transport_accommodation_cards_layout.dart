@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../models/alojamiento.dart';
 import '../../../../models/empresa_transporte.dart';
 import '../../widgets/budget/budget_card.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget que maneja el layout responsive de las tarjetas de transporte y alojamiento.
 /// 
@@ -90,7 +91,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
             titulo: 'Transporte',
             valor: precioTransporte,
             icono: Icons.directions_bus,
-            color: Colors.purple,
+            color: AppColors.tipoComplementaria,
             width: double.infinity,
             isWeb: isWeb,
             showEdit: true,
@@ -109,7 +110,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
             titulo: 'Alojamiento',
             valor: precioAlojamiento,
             icono: Icons.hotel,
-            color: Colors.teal,
+            color: AppColors.presupuestoAlojamiento,
             width: double.infinity,
             isWeb: isWeb,
             showEdit: true,
@@ -134,7 +135,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
             titulo: 'Transporte',
             valor: precioTransporte,
             icono: Icons.directions_bus,
-            color: Colors.purple,
+            color: AppColors.tipoComplementaria,
             width: double.infinity,
             isWeb: isWeb,
             showEdit: true,
@@ -153,7 +154,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
             titulo: 'Alojamiento',
             valor: precioAlojamiento,
             icono: Icons.hotel,
-            color: Colors.teal,
+            color: AppColors.presupuestoAlojamiento,
             width: double.infinity,
             isWeb: isWeb,
             showEdit: true,
@@ -181,7 +182,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
                 titulo: 'Transporte',
                 valor: precioTransporte,
                 icono: Icons.directions_bus,
-                color: Colors.purple,
+                color: AppColors.tipoComplementaria,
                 width: double.infinity,
                 isWeb: isWeb,
                 showEdit: true,
@@ -201,7 +202,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
                 titulo: 'Alojamiento',
                 valor: precioAlojamiento,
                 icono: Icons.hotel,
-                color: Colors.teal,
+                color: AppColors.presupuestoAlojamiento,
                 width: double.infinity,
                 isWeb: isWeb,
                 showEdit: true,

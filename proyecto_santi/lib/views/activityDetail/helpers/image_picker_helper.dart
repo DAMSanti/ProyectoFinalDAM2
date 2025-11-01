@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:image_picker/image_picker.dart';
 import '../dialogs/image_preview_dialog.dart';
 
-/// Helper para manejar la selección y gestión de imágenes
+/// Helper para manejar la selecci�n y gesti�n de im�genes
 class ImagePickerHelper {
-  /// Muestra el selector de imágenes con opciones de cámara o galería en móvil
+  /// Muestra el selector de im�genes con opciones de c�mara o galer�a en m�vil
   static Future<void> showImagePicker({
     required BuildContext context,
     required Function(XFile image, String description) onImageSelected,
   }) async {
     final ImagePicker picker = ImagePicker();
     
-    // Detectar si es móvil
+    // Detectar si es m�vil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
     XFile? image;
     
-    // En móvil, mostrar opciones de cámara o galería
+    // En m�vil, mostrar opciones de c�mara o galer�a
     if (isMobile) {
       final ImageSource? source = await _showImageSourceSelector(context);
       
-      // Si el usuario canceló, salir
+      // Si el usuario cancel�, salir
       if (source == null) return;
       
       // Obtener imagen de la fuente seleccionada
       image = await picker.pickImage(source: source);
     } else {
-      // En desktop, usar directamente la galería
+      // En desktop, usar directamente la galer�a
       image = await picker.pickImage(source: ImageSource.gallery);
     }
     
     if (image != null && context.mounted) {
-      // Mostrar diálogo de preview con descripción
+      // Mostrar di�logo de preview con descripci�n
       await _showImagePreviewDialog(
         context: context,
         image: image,
@@ -41,7 +42,7 @@ class ImagePickerHelper {
     }
   }
 
-  /// Muestra el diálogo para editar la descripción de una imagen
+  /// Muestra el di�logo para editar la descripci�n de una imagen
   static Future<void> editImageDescription({
     required BuildContext context,
     required XFile image,
@@ -61,7 +62,7 @@ class ImagePickerHelper {
     );
   }
 
-  /// Muestra el diálogo de confirmación para eliminar una imagen
+  /// Muestra el di�logo de confirmaci�n para eliminar una imagen
   static Future<bool> confirmImageDeletion(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -78,7 +79,7 @@ class ImagePickerHelper {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+              child: Text('Eliminar', style: TextStyle(color: AppColors.estadoRechazado)),
             ),
           ],
         );
@@ -88,9 +89,9 @@ class ImagePickerHelper {
     return confirmed == true;
   }
 
-  // ==================== MÉTODOS PRIVADOS ====================
+  // ==================== M�TODOS PRIVADOS ====================
 
-  /// Muestra el selector de fuente de imagen (cámara o galería)
+  /// Muestra el selector de fuente de imagen (c�mara o galer�a)
   static Future<ImageSource?> _showImageSourceSelector(BuildContext context) async {
     return await showModalBottomSheet<ImageSource>(
       context: context,
@@ -132,7 +133,7 @@ class ImagePickerHelper {
                   ),
                 ),
                 SizedBox(height: 20),
-                // Título
+                // T�tulo
                 Text(
                   'Seleccionar imagen',
                   style: TextStyle(
@@ -142,12 +143,12 @@ class ImagePickerHelper {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Opción: Tomar foto
+                // Opci�n: Tomar foto
                 ListTile(
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Color(0xFF1976d2).withOpacity(0.15),
+                      color: Color(0xFF1976d2).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -165,7 +166,7 @@ class ImagePickerHelper {
                     ),
                   ),
                   subtitle: Text(
-                    'Usa la cámara',
+                    'Usa la c�mara',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? Colors.white70 : Colors.black54,
@@ -173,22 +174,22 @@ class ImagePickerHelper {
                   ),
                   onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
-                // Opción: Galería
+                // Opci�n: Galer�a
                 ListTile(
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.15),
+                      color: AppColors.tipoComplementaria.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.photo_library_rounded,
-                      color: Colors.purple,
+                      color: AppColors.tipoComplementaria,
                       size: 24,
                     ),
                   ),
                   title: Text(
-                    'Galería',
+                    'Galer�a',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -205,7 +206,7 @@ class ImagePickerHelper {
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
                 SizedBox(height: 8),
-                // Botón cancelar
+                // Bot�n cancelar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: SizedBox(
@@ -215,8 +216,8 @@ class ImagePickerHelper {
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -240,7 +241,7 @@ class ImagePickerHelper {
     );
   }
 
-  /// Muestra el diálogo de preview de imagen con campo de descripción
+  /// Muestra el di�logo de preview de imagen con campo de descripci�n
   static Future<void> _showImagePreviewDialog({
     required BuildContext context,
     required XFile image,
@@ -252,7 +253,7 @@ class ImagePickerHelper {
         return ImagePreviewDialog(
           imageFile: image,
           onConfirm: (description) {
-            // Cerrar el diálogo
+            // Cerrar el di�logo
             Navigator.of(dialogContext).pop();
             // Ejecutar callback
             onConfirm(description);

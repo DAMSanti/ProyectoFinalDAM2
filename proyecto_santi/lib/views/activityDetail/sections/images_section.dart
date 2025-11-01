@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/photo.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import '../widgets/images/network_image_with_delete.dart';
 import '../widgets/images/image_with_delete.dart';
 import '../dialogs/image_preview_dialog.dart';
@@ -250,13 +251,7 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
       
       // Mostrar feedback
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Descripción actualizada (pendiente de guardar)'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
-          ),
-        );
+        SnackBarHelper.showInfo(context, 'Descripción actualizada (pendiente de guardar)');
       }
     }
   }
@@ -347,13 +342,13 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                 ),
                 borderRadius: BorderRadius.circular(isMobile ? 12.0 : 16.0),
                 border: Border.all(
-                  color: Color(0xFF1976d2).withOpacity(0.3),
+                  color: Color(0xFF1976d2).withValues(alpha: 0.3),
                   width: isMobile ? 1.5 : 2,
                   strokeAlign: BorderSide.strokeAlignInside,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFF1976d2).withOpacity(0.2),
+                    color: Color(0xFF1976d2).withValues(alpha: 0.2),
                     offset: Offset(0, isMobile ? 2 : 4),
                     blurRadius: isMobile ? 8 : 12,
                   ),
@@ -443,14 +438,14 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF1976d2).withOpacity(0.2),
-                Color(0xFF1976d2).withOpacity(0.1),
+                Color(0xFF1976d2).withValues(alpha: 0.2),
+                Color(0xFF1976d2).withValues(alpha: 0.1),
               ],
             ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.3),
+                color: Color(0xFF1976d2).withValues(alpha: 0.3),
                 offset: Offset(0, 2),
                 blurRadius: 8,
               ),
@@ -467,7 +462,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
           children: [
             Icon(
               Icons.add_circle_rounded,
-              color: Color(0xFF1976d2).withOpacity(0.7),
+              color: Color(0xFF1976d2).withValues(alpha: 0.7),
               size: 16,
             ),
             SizedBox(height: 4),
@@ -495,7 +490,7 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
         Container(
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Color(0xFF1976d2).withOpacity(0.15),
+            color: Color(0xFF1976d2).withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(

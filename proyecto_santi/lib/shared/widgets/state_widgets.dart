@@ -51,7 +51,7 @@ class ErrorState extends StatelessWidget {
             Icon(
               Icons.error_outline_rounded,
               size: 64,
-              color: Colors.red.withOpacity(0.7),
+              color: Colors.red.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 16),
             Text(
@@ -107,7 +107,7 @@ class EmptyState extends StatelessWidget {
             Icon(
               icon,
               size: 64,
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(

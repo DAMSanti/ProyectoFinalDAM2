@@ -379,7 +379,7 @@ class DesktopShellFrame extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w500,
-                                    color: isDark ? Colors.amber : const Color(0xFF1976d2).withOpacity(0.7),
+                                    color: isDark ? Colors.amber : const Color(0xFF1976d2).withValues(alpha: 0.7),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -452,7 +452,7 @@ class DesktopShellFrame extends StatelessWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 10,
                         spreadRadius: 0,
                         offset: Offset(3, 0),
@@ -517,7 +517,7 @@ class DesktopShellFrame extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.amber.withOpacity(0.2) : Color(0xFF1976d2).withOpacity(0.1),
+                            color: isDark ? Colors.amber.withValues(alpha: 0.2) : Color(0xFF1976d2).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -634,7 +634,7 @@ class DesktopShellFrame extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -746,7 +746,7 @@ class MenuDesktopStatic extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -785,8 +785,8 @@ class MenuDesktopStatic extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.05),
                 border: Border(
                   bottom: BorderSide(
                     color: isDark ? Colors.white12 : Colors.black12,
@@ -821,7 +821,7 @@ class MenuDesktopStatic extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? Colors.amber : const Color(0xFF1976d2).withOpacity(0.7),
+                            color: isDark ? Colors.amber : const Color(0xFF1976d2).withValues(alpha: 0.7),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1004,7 +1004,7 @@ class MenuDesktopStatic extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isDark ? Colors.white60 : const Color(0xFF1976d2).withOpacity(0.7),
+                  color: isDark ? Colors.white60 : const Color(0xFF1976d2).withValues(alpha: 0.7),
                   size: isCompact ? 18 : 20,
                 ),
                 SizedBox(width: isCompact ? 10 : 12),
@@ -1051,7 +1051,7 @@ class MenuDesktopStatic extends StatelessWidget {
         boxShadow: isCurrentRoute
             ? [
                 BoxShadow(
-                  color: (isDark ? Colors.blue : Colors.blue).withOpacity(0.3),
+                  color: (isDark ? Colors.blue : Colors.blue).withValues(alpha: 0.3),
                   offset: Offset(0, isCompact ? 2 : 4),
                   blurRadius: isCompact ? 4 : 8,
                 ),

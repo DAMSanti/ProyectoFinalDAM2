@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../widgets/budget/budget_card.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget que maneja el layout responsive de las tarjetas de presupuesto.
 /// 
@@ -73,7 +74,7 @@ class BudgetCardsLayout extends StatelessWidget {
           titulo: 'Coste por Alumno',
           valor: costoPorAlumno,
           icono: Icons.person,
-          color: Colors.orange,
+          color: AppColors.estadoPendiente,
           width: double.infinity,
           isWeb: isWeb,
         ),
@@ -111,7 +112,7 @@ class BudgetCardsLayout extends StatelessWidget {
           titulo: 'Coste por Alumno',
           valor: costoPorAlumno,
           icono: Icons.person,
-          color: Colors.orange,
+          color: AppColors.estadoPendiente,
           width: double.infinity,
           isWeb: isWeb,
         ),
@@ -166,7 +167,7 @@ class BudgetCardsLayout extends StatelessWidget {
                 titulo: 'Coste por Alumno',
                 valor: costoPorAlumno,
                 icono: Icons.person,
-                color: Colors.orange,
+                color: AppColors.estadoPendiente,
                 width: double.infinity,
                 isWeb: isWeb,
               ),

@@ -151,7 +151,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    color: Color(0xFF1976d2).withValues(alpha: 0.3),
                                     blurRadius: 6,
                                     offset: Offset(0, 3),
                                   ),
@@ -189,7 +189,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color(0xFF1976d2).withOpacity(0.3),
+                                    color: Color(0xFF1976d2).withValues(alpha: 0.3),
                                     offset: Offset(0, 2),
                                     blurRadius: 6,
                                   ),
@@ -261,7 +261,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
-                                        color: isDark ? Colors.amber : Color(0xFF1976d2).withOpacity(0.7),
+                                        color: isDark ? Colors.amber : Color(0xFF1976d2).withValues(alpha: 0.7),
                                         height: 1.2,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -274,7 +274,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                             Icon(
                               Icons.settings,
                               size: 18,
-                              color: isDark ? Colors.white70 : Color(0xFF1976d2).withOpacity(0.7),
+                              color: isDark ? Colors.white70 : Color(0xFF1976d2).withValues(alpha: 0.7),
                             ),
                           ],
                         ),
@@ -357,7 +357,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.amber.withOpacity(0.2) : Color(0xFF1976d2).withOpacity(0.1),
+                            color: isDark ? Colors.amber.withValues(alpha: 0.2) : Color(0xFF1976d2).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -474,7 +474,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -578,7 +578,7 @@ class MenuDesktop extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -746,7 +746,7 @@ class MenuDesktop extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isDark ? Colors.white60 : Color(0xFF1976d2).withOpacity(0.7),
+                  color: isDark ? Colors.white60 : Color(0xFF1976d2).withValues(alpha: 0.7),
                   size: 20,
                 ),
                 SizedBox(width: 12),
@@ -791,7 +791,7 @@ class MenuDesktop extends StatelessWidget {
         boxShadow: isCurrentRoute
             ? [
                 BoxShadow(
-                  color: (isDark ? Colors.blue : Colors.blue).withOpacity(0.3),
+                  color: (isDark ? Colors.blue : Colors.blue).withValues(alpha: 0.3),
                   offset: Offset(0, 4),
                   blurRadius: 8,
                 ),

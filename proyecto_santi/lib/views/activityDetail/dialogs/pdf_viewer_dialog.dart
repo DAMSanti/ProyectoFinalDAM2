@@ -5,6 +5,8 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart' as html;
+import 'package:proyecto_santi/tema/app_colors.dart';
+import 'package:proyecto_santi/config.dart';
 
 // Imports condicionales para plataforma
 import 'dart:io' if (dart.library.html) 'dart:html';
@@ -103,10 +105,10 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
       return url;
     }
     
-    // Si es una ruta relativa, construir la URL completa
+    // Si es una ruta relativa, construir la URL completa usando AppConfig
     // El backend devuelve URLs como '/uploads/folletos/filename.pdf'
-    final baseUrl = kIsWeb ? 'http://localhost:5000' : 
-                    (Platform.isAndroid ? 'http://192.168.1.42:5000' : 'http://localhost:5000');
+    // Obtener la base URL sin el /api
+    final baseUrl = AppConfig.apiBaseUrl.replaceAll('/api', '');
     
     // Asegurar que la URL no tenga doble barra
     final cleanUrl = url.startsWith('/') ? url : '/$url';
@@ -114,6 +116,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
     // Construir la URL completa y codificar caracteres especiales (espacios, etc.)
     final fullUrl = Uri.parse('$baseUrl$cleanUrl').toString();
     
+    print('[PdfViewerDialog] URL completa del PDF: $fullUrl');
     
     return fullUrl;
   }
@@ -133,10 +136,10 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
         anchorElement.click();
         
         if (mounted) {
-          // Usar un SnackBar dentro del diálogo no es posible, mostrar un mensaje simple
+          // Usar un SnackBar dentro del di�logo no es posible, mostrar un mensaje simple
         }
       } else {
-        // Para móvil/escritorio
+        // Para m�vil/escritorio
         await _downloadPdfNative(fullUrl);
       }
     } catch (e) {
@@ -187,7 +190,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: Offset(0, 10),
             ),
@@ -195,7 +198,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
         ),
         child: Column(
           children: [
-            // Header del diálogo
+            // Header del di�logo
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -234,7 +237,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                         Text(
                           widget.fileName,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: !isWeb ? 12.dg : 4.sp,
                           ),
                           maxLines: 1,
@@ -243,10 +246,10 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                       ],
                     ),
                   ),
-                  // Botón de descargar
+                  // Bot�n de descargar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: IconButton(
@@ -269,10 +272,10 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                     ),
                   ),
                   SizedBox(width: 8),
-                  // Botón de cerrar
+                  // Bot�n de cerrar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: IconButton(
@@ -325,7 +328,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                                     Icon(
                                       Icons.error_outline_rounded,
                                       size: 64,
-                                      color: Colors.red,
+                                      color: AppColors.estadoRechazado,
                                     ),
                                     SizedBox(height: 16),
                                     Text(
@@ -350,7 +353,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                               ? (kIsWeb && _blobUrl != null)
                                   // Para web: usar HtmlElementView con iframe
                                   ? _WebPdfViewer(blobUrl: _blobUrl!)
-                                  // Para móvil/desktop: usar SfPdfViewer.memory
+                                  // Para m�vil/desktop: usar SfPdfViewer.memory
                                   : SfPdfViewer.memory(
                                       _pdfBytes!,
                                       canShowScrollHead: true,
@@ -380,7 +383,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   }
 }
 
-/// Widget específico para mostrar PDFs en Flutter Web usando iframe
+/// Widget espec�fico para mostrar PDFs en Flutter Web usando iframe
 class _WebPdfViewer extends StatefulWidget {
   final String blobUrl;
 

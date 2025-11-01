@@ -92,10 +92,10 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: Color(0xFF1976d2).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -142,11 +142,11 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
   Widget _buildPrincipalCheckbox() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: esPrincipal
-            ? Colors.red.withOpacity(0.5)
+            ? Colors.red.withValues(alpha: 0.5)
             : Colors.transparent,
           width: esPrincipal ? 2 : 1,
         ),
@@ -183,7 +183,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
         SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(8),
           ),
           child: DropdownButtonFormField<String>(
@@ -231,7 +231,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
         SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(8),
           ),
           child: TextField(
@@ -272,7 +272,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(8),
             ),
             child: GridView.builder(
@@ -293,13 +293,13 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected 
-                        ? Color(0xFF1976d2).withOpacity(0.2)
-                        : Colors.white.withOpacity(0.5),
+                        ? Color(0xFF1976d2).withValues(alpha: 0.2)
+                        : Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         color: isSelected 
                           ? Color(0xFF1976d2)
-                          : Colors.grey.withOpacity(0.3),
+                          : Colors.grey.withValues(alpha: 0.3),
                         width: isSelected ? 2 : 1,
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 
 class DetailBar extends StatelessWidget {
@@ -20,7 +21,7 @@ class DetailBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: Icon(Icons.arrow_back, color: Color(0xFF1976d2)),
+            icon: Icon(Icons.arrow_back, color: AppColors.primary),
             onPressed: () {
               navigateBackFromDetail(context, '/home');
             },
@@ -34,8 +35,8 @@ class DetailBar extends StatelessWidget {
                   icon: Icon(Icons.undo),
                   label: Text('Revertir'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Color(0xFF1976d2),
-                    side: BorderSide(color: Color(0xFF1976d2)),
+                    foregroundColor: AppColors.primary,
+                    side: BorderSide(color: AppColors.primary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),
                     ),
@@ -47,7 +48,7 @@ class DetailBar extends StatelessWidget {
               ElevatedButton(
                 onPressed: isDataChanged ? onSaveChanges : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1976d2),
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),

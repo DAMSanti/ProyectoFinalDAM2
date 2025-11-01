@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
-/// SecciÃ³n de estado y tipo de actividad
+/// Sección de estado y tipo de actividad
 class ActivityStatusAndTypeSection extends StatelessWidget {
   final String estadoActividad;
   final String tipoActividad;
@@ -39,10 +40,10 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: AppColors.primaryOpacity30,
               width: 1,
             ),
           ),
@@ -54,7 +55,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
+                  color: AppColors.primary,
                 ),
               ),
               SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
@@ -66,7 +67,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                       groupValue: estadoActividad,
                       label: 'Pendiente',
                       icon: Icons.schedule_rounded,
-                      color: Colors.orange,
+                      color: AppColors.estadoPendiente,
                       onChanged: (value) => onEstadoChanged(value!),
                       isMobile: isMobile,
                       isMobileLandscape: isMobileLandscape,
@@ -79,7 +80,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                       groupValue: estadoActividad,
                       label: 'Aprobada',
                       icon: Icons.check_circle_rounded,
-                      color: Colors.green,
+                      color: AppColors.estadoAprobado,
                       onChanged: (value) => onEstadoChanged(value!),
                       isMobile: isMobile,
                       isMobileLandscape: isMobileLandscape,
@@ -92,7 +93,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                       groupValue: estadoActividad,
                       label: 'Cancelada',
                       icon: Icons.cancel_rounded,
-                      color: Colors.red,
+                      color: AppColors.estadoRechazado,
                       onChanged: (value) => onEstadoChanged(value!),
                       isMobile: isMobile,
                       isMobileLandscape: isMobileLandscape,
@@ -109,10 +110,10 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: AppColors.primaryOpacity30,
               width: 1,
             ),
           ),
@@ -124,7 +125,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1976d2),
+                  color: AppColors.primary,
                 ),
               ),
               SizedBox(height: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
@@ -136,7 +137,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                       groupValue: tipoActividad,
                       label: 'Complementaria',
                       icon: Icons.school_rounded,
-                      color: Color(0xFF1976d2),
+                      color: AppColors.primary,
                       onChanged: (value) => onTipoChanged(value!),
                       isMobile: isMobile,
                       isMobileLandscape: isMobileLandscape,
@@ -149,7 +150,7 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
                       groupValue: tipoActividad,
                       label: 'Extraescolar',
                       icon: Icons.sports_soccer_rounded,
-                      color: Colors.purple,
+                      color: AppColors.tipoComplementaria,
                       onChanged: (value) => onTipoChanged(value!),
                       isMobile: isMobile,
                       isMobileLandscape: isMobileLandscape,

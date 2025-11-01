@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Muestra diálogo para agregar un nuevo gasto personalizado
 Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
@@ -56,7 +57,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 offset: Offset(0, isMobileLandscape ? 6 : 10),
                 blurRadius: isMobileLandscape ? 20 : 30,
               ),
@@ -88,7 +89,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                         style: TextStyle(
                           fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Color(0xFF1976d2),
+                          color: AppColors.getTextColor(isDark),
                         ),
                       ),
                       SizedBox(height: isMobileLandscape ? 6 : 8),
@@ -101,28 +102,28 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                           ),
                           filled: true,
                           fillColor: isDark 
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.white.withOpacity(0.7),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.white.withValues(alpha: 0.7),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
                               color: isDark 
-                                  ? Colors.white.withOpacity(0.2)
-                                  : Color(0xFF1976d2).withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : AppColors.primaryOpacity30,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
                               color: isDark 
-                                  ? Colors.white.withOpacity(0.2)
-                                  : Color(0xFF1976d2).withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : AppColors.primaryOpacity30,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
-                              color: Color(0xFF1976d2),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -145,7 +146,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                         style: TextStyle(
                           fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : Color(0xFF1976d2),
+                          color: AppColors.getTextColor(isDark),
                         ),
                       ),
                       SizedBox(height: isMobileLandscape ? 6 : 8),
@@ -160,32 +161,32 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                           prefixStyle: TextStyle(
                             fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1976d2),
+                            color: AppColors.primary,
                           ),
                           filled: true,
                           fillColor: isDark 
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.white.withOpacity(0.7),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.white.withValues(alpha: 0.7),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
                               color: isDark 
-                                  ? Colors.white.withOpacity(0.2)
-                                  : Color(0xFF1976d2).withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : AppColors.primaryOpacity30,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
                               color: isDark 
-                                  ? Colors.white.withOpacity(0.2)
-                                  : Color(0xFF1976d2).withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : AppColors.primaryOpacity30,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             borderSide: BorderSide(
-                              color: Color(0xFF1976d2),
+                              color: AppColors.primary,
                               width: 2,
                             ),
                           ),
@@ -209,15 +210,15 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                 padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 decoration: BoxDecoration(
                   color: isDark 
-                      ? Colors.grey[850]!.withOpacity(0.9)
-                      : Colors.white.withOpacity(0.9),
+                      ? Colors.grey[850]!.withValues(alpha: 0.9)
+                      : Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                     bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       offset: Offset(0, -4),
                       blurRadius: 8,
                     ),
@@ -234,9 +235,9 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(false),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Color(0xFF1976d2),
+                            foregroundColor: AppColors.primary,
                             side: BorderSide(
-                              color: Color(0xFF1976d2),
+                              color: AppColors.primary,
                               width: isMobileLandscape ? 1.5 : 2,
                             ),
                             shape: RoundedRectangleBorder(
@@ -268,12 +269,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                             final cantidadStr = cantidadController.text.trim();
                             
                             if (concepto.isEmpty || cantidadStr.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Por favor completa todos los campos'),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
+                              SnackBarHelper.showWarning(context, 'Por favor completa todos los campos');
                               return;
                             }
                             
@@ -281,22 +277,17 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                             final textoLimpio = cantidadStr.replaceAll(',', '.');
                             final cantidad = double.tryParse(textoLimpio);
                             if (cantidad == null || cantidad <= 0) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Ingresa una cantidad válida'),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
+                              SnackBarHelper.showWarning(context, 'Ingresa una cantidad válida');
                               return;
                             }
                             
                             Navigator.of(context).pop(true);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF1976d2),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             elevation: 4,
-                            shadowColor: Color(0xFF1976d2).withOpacity(0.5),
+                            shadowColor: AppColors.primaryOpacity50,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             ),

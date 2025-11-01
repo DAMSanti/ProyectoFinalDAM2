@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Footer genérico para diálogos con botones de acción personalizables
 class DialogFooter extends StatelessWidget {
@@ -31,15 +32,15 @@ class DialogFooter extends StatelessWidget {
       padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 24)),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.grey[850]!.withOpacity(0.9)
-            : Colors.white.withOpacity(0.9),
+            ? Colors.grey[850]!.withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 16)),
           bottomRight: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 16)),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, -4),
             blurRadius: 8,
           ),
@@ -54,15 +55,12 @@ class DialogFooter extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.grey[400]!,
-                    Colors.grey[500]!,
-                  ],
+                  colors: AppColors.cancelGradient,
                 ),
                 borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
                     blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
                   ),
@@ -110,15 +108,12 @@ class DialogFooter extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF1976d2),
-                    Color(0xFF1565c0),
-                  ],
+                  colors: AppColors.primaryGradient,
                 ),
                 borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFF1976d2).withOpacity(0.4),
+                    color: AppColors.primaryOpacity40,
                     offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
                     blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
                   ),

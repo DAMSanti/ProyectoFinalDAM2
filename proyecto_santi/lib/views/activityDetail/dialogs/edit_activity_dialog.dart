@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_footer.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import '../widgets/forms/status_and_type_form.dart';
 import '../widgets/forms/basic_info_form.dart';
 import '../widgets/forms/datetime_form.dart';
@@ -131,12 +132,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       // Mostrar error al usuario
       if (mounted) {
         try {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al cargar datos: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackBarHelper.showError(context, 'Error al cargar datos: ${e.toString()}');
         } catch (e) {
           // Error silencioso
         }
@@ -197,9 +193,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
   void _handleSave() {
     // Validar campos
     if (_nombreController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El nombre es obligatorio')),
-      );
+      SnackBarHelper.showWarning(context, 'El nombre es obligatorio');
       return;
     }
     
@@ -257,14 +251,10 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
       hasChanges = true;
     }
     
-    // Comparar profesor - buscar por email en lugar de UUID
+    // Comparar profesor responsable - usar responsable en lugar de solicitante
     String? profesorOriginalId;
-    if (widget.actividad.solicitante != null && _profesores.isNotEmpty) {
-      final profesor = _profesores.firstWhere(
-        (p) => p.correo.toLowerCase() == widget.actividad.solicitante!.correo.toLowerCase(),
-        orElse: () => _profesores.first,
-      );
-      profesorOriginalId = profesor.uuid;
+    if (widget.actividad.responsable != null) {
+      profesorOriginalId = widget.actividad.responsable!.uuid;
     }
     if (_selectedProfesorId != profesorOriginalId) {
       hasChanges = true;
@@ -382,7 +372,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                       groupValue: _estadoActividad,
                       label: 'Pend.',
                       icon: Icons.schedule_rounded,
-                      color: Colors.orange,
+                      color: AppColors.estadoPendiente,
                       onChanged: (value) {
                         setState(() {
                           _estadoActividad = value!;
@@ -399,7 +389,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                       groupValue: _estadoActividad,
                       label: 'Aprob.',
                       icon: Icons.check_circle_rounded,
-                      color: Colors.green,
+                      color: AppColors.estadoAprobado,
                       onChanged: (value) {
                         setState(() {
                           _estadoActividad = value!;
@@ -416,7 +406,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                       groupValue: _estadoActividad,
                       label: 'Cancel.',
                       icon: Icons.cancel_rounded,
-                      color: Colors.red,
+                      color: AppColors.estadoRechazado,
                       onChanged: (value) {
                         setState(() {
                           _estadoActividad = value!;
@@ -458,7 +448,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
                       groupValue: _tipoActividad,
                       label: 'Extra.',
                       icon: Icons.sports_soccer_rounded,
-                      color: Colors.purple,
+                      color: AppColors.tipoComplementaria,
                       onChanged: (value) {
                         setState(() {
                           _tipoActividad = value!;

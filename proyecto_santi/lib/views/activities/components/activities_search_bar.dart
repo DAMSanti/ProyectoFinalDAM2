@@ -28,22 +28,22 @@ class ActivitiesSearchBar extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Colors.white.withOpacity(0.1) 
-                    : Colors.white.withOpacity(0.9),
+                    ? Colors.white.withValues(alpha: 0.1) 
+                    : Colors.white.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: isDark 
-                        ? Colors.black.withOpacity(0.4)
-                        : Colors.black.withOpacity(0.12),
+                        ? Colors.black.withValues(alpha: 0.4)
+                        : Colors.black.withValues(alpha: 0.12),
                     blurRadius: 12,
                     offset: Offset(0, 4),
                   ),
                   // Inner shadow para profundidad
                   BoxShadow(
                     color: isDark 
-                        ? Colors.black.withOpacity(0.2)
-                        : Colors.white.withOpacity(0.8),
+                        ? Colors.black.withValues(alpha: 0.2)
+                        : Colors.white.withValues(alpha: 0.8),
                     blurRadius: 6,
                     offset: Offset(0, -2),
                     spreadRadius: -2,
@@ -60,7 +60,7 @@ class ActivitiesSearchBar extends StatelessWidget {
                   hintText: 'Buscar actividades...',
                   hintStyle: TextStyle(
                     color: isDark 
-                        ? Colors.white.withOpacity(0.5)
+                        ? Colors.white.withValues(alpha: 0.5)
                         : Colors.black54,
                   ),
                   prefixIcon: Icon(
@@ -97,7 +97,7 @@ class ActivitiesSearchBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xFF1976d2).withOpacity(0.3),
+                      color: Color(0xFF1976d2).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     ),

@@ -28,7 +28,7 @@ class DialogDecorations {
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           offset: Offset(0, isMobileLandscape ? 6 : 10),
           blurRadius: isMobileLandscape ? 20 : 30,
         ),
@@ -61,7 +61,7 @@ class DialogDecorations {
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           offset: Offset(0, isMobileLandscape ? 6 : 10),
           blurRadius: isMobileLandscape ? 20 : 30,
         ),
@@ -119,7 +119,7 @@ class DialogDecorations {
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
         borderSide: BorderSide(
           color: isDark 
-              ? Colors.white.withOpacity(0.2)
+              ? Colors.white.withValues(alpha: 0.2)
               : AppColors.primaryOpacity30,
         ),
       ),
@@ -127,7 +127,7 @@ class DialogDecorations {
         borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
         borderSide: BorderSide(
           color: isDark 
-              ? Colors.white.withOpacity(0.2)
+              ? Colors.white.withValues(alpha: 0.2)
               : AppColors.primaryOpacity30,
         ),
       ),
@@ -153,8 +153,8 @@ class DialogDecorations {
   }) {
     return BoxDecoration(
       color: isDark 
-          ? Colors.white.withOpacity(0.05)
-          : Colors.white.withOpacity(0.7),
+          ? Colors.white.withValues(alpha: 0.05)
+          : Colors.white.withValues(alpha: 0.7),
       borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
       border: Border.all(
         color: AppColors.primaryOpacity30,

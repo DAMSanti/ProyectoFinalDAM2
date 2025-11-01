@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../dialogs/pdf_viewer_dialog.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Widget especializado para la gestión de folletos PDF en una actividad.
+/// Widget especializado para la gesti�n de folletos PDF en una actividad.
 /// 
 /// Responsabilidades:
 /// - Mostrar folleto actual (si existe)
@@ -14,6 +15,8 @@ import '../dialogs/pdf_viewer_dialog.dart';
 /// - Soportar modo compacto para header
 class FolletoUploadWidget extends StatefulWidget {
   final String? folletoUrl;
+  final String? initialFolletoFileName; // Nombre del folleto seleccionado desde el padre
+  final bool initialFolletoMarkedForDeletion; // Si está marcado para eliminación desde el padre
   final bool isAdminOrSolicitante;
   final Function(Map<String, dynamic>) onFolletoChanged;
   final bool compact; // Modo compacto para el header
@@ -22,6 +25,8 @@ class FolletoUploadWidget extends StatefulWidget {
   const FolletoUploadWidget({
     super.key,
     this.folletoUrl,
+    this.initialFolletoFileName,
+    this.initialFolletoMarkedForDeletion = false,
     required this.isAdminOrSolicitante,
     required this.onFolletoChanged,
     this.compact = false,
@@ -41,7 +46,14 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
+    // Inicializar desde los valores pasados por el padre
+    _folletoMarkedForDeletion = widget.initialFolletoMarkedForDeletion;
+    
+    if (widget.initialFolletoFileName != null) {
+      // Hay un nuevo folleto seleccionado desde el padre
+      _folletoFileName = widget.initialFolletoFileName;
+    } else if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
+      // Usar el folleto existente de la actividad
       _folletoFileName = _extractFileName(widget.folletoUrl!);
     }
   }
@@ -49,7 +61,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
   @override
   void didUpdateWidget(FolletoUploadWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si cambió el folletoUrl (por ejemplo, al revertir), actualizar el estado
+    // Si cambi� el folletoUrl (por ejemplo, al revertir), actualizar el estado
     if (widget.folletoUrl != oldWidget.folletoUrl) {
       setState(() {
         if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
@@ -104,7 +116,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al seleccionar el archivo: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.estadoRechazado,
           ),
         );
       }
@@ -132,7 +144,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.estadoRechazado,
                 foregroundColor: Colors.white,
               ),
               child: Text('Eliminar'),
@@ -181,7 +193,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       return _buildCompactMode(context, isDark, isWeb);
     }
 
-    // Modo completo: Si está marcado para eliminación y no hay nuevo folleto, no mostrar nada
+    // Modo completo: Si est� marcado para eliminaci�n y no hay nuevo folleto, no mostrar nada
     if (_folletoMarkedForDeletion && _folletoFileName == null) {
       return widget.isAdminOrSolicitante
           ? _buildUploadButton(isDark, isWeb)
@@ -322,7 +334,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
                   displayFileName,
                   style: TextStyle(
                     fontSize: widget.isMobile ? 12 : (isWeb ? 13 : 15.0),
-                    color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
+                    color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors.black87,
                     decoration: hasFolleto ? TextDecoration.underline : null,
                   ),
                   maxLines: 1,
@@ -353,7 +365,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
           SizedBox(width: widget.isMobile ? 6 : 8),
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFF1976d2).withOpacity(0.1),
+              color: Color(0xFF1976d2).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(widget.isMobile ? 6 : 8),
             ),
             child: IconButton(
@@ -370,7 +382,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
             SizedBox(width: widget.isMobile ? 3 : 4),
             Container(
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(widget.isMobile ? 6 : 8),
               ),
               child: IconButton(
@@ -393,8 +405,8 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFFf44336).withOpacity(0.8),
-            Color(0xFFe53935).withOpacity(0.9),
+            Color(0xFFf44336).withValues(alpha: 0.8),
+            Color(0xFFe53935).withValues(alpha: 0.9),
           ],
         ),
         borderRadius: BorderRadius.circular(12),

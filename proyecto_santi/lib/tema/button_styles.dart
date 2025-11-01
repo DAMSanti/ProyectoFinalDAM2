@@ -36,7 +36,7 @@ class ButtonStyles {
       borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
       boxShadow: [
         BoxShadow(
-          color: Colors.grey.withOpacity(0.3),
+          color: Colors.grey.withValues(alpha: 0.3),
           offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
           blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
         ),
@@ -56,7 +56,7 @@ class ButtonStyles {
       borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
       boxShadow: [
         BoxShadow(
-          color: Colors.red.withOpacity(0.4),
+          color: Colors.red.withValues(alpha: 0.4),
           offset: Offset(0, isMobileLandscape ? 2 : (isMobile ? 2 : 4)),
           blurRadius: isMobileLandscape ? 3 : (isMobile ? 4 : 8),
         ),

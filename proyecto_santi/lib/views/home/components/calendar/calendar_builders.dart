@@ -61,8 +61,8 @@ class CalendarBuilders {
                     : const Color.fromRGBO(244, 67, 54, 0.08))
             : hasActivities && isCurrentMonth
                 ? (isDark
-                    ? Color(0xFF1976D2).withOpacity(0.2)
-                    : Color(0xFF1976D2).withOpacity(0.1))
+                    ? Color(0xFF1976D2).withValues(alpha: 0.2)
+                    : Color(0xFF1976D2).withValues(alpha: 0.1))
                 : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         // Borde para día de hoy o días con actividades
@@ -78,7 +78,7 @@ class CalendarBuilders {
               )
             : hasActivities && isCurrentMonth && !isHoliday
                 ? Border.all(
-                    color: Color(0xFF1976D2).withOpacity(0.4),
+                    color: Color(0xFF1976D2).withValues(alpha: 0.4),
                     width: 1.5,
                   )
                 : null,

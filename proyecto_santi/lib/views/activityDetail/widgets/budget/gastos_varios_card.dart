@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../models/gasto_personalizado.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget reutilizable para mostrar la tarjeta de gastos personalizados
 class GastosVariosCardWidget extends StatelessWidget {
@@ -22,7 +23,7 @@ class GastosVariosCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Detectar si es móvil
+    // Detectar si es m�vil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
@@ -39,18 +40,18 @@ class GastosVariosCardWidget extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withOpacity(0.9),
-            Colors.white.withOpacity(0.7),
+            Colors.white.withValues(alpha: 0.9),
+            Colors.white.withValues(alpha: 0.7),
           ],
         ),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 14),
         border: Border.all(
-          color: Colors.amber.withOpacity(0.4),
+          color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.4),
           width: isMobile ? 1 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.amber.withOpacity(0.2),
+            color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.2),
             blurRadius: isMobile ? 6 : 12,
             offset: Offset(0, isMobile ? 2 : 4),
           ),
@@ -59,13 +60,13 @@ class GastosVariosCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado con título y botón agregar
+          // Encabezado con t�tulo y bot�n agregar
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  // Ocultar icono en móvil
+                  // Ocultar icono en m�vil
                   if (!isMobile)
                     Container(
                       padding: EdgeInsets.all(10),
@@ -74,14 +75,14 @@ class GastosVariosCardWidget extends StatelessWidget {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Colors.amber.withOpacity(0.8),
-                            Colors.amber.withOpacity(0.6),
+                            Colors.amber.withValues(alpha: 0.8),
+                            Colors.amber.withValues(alpha: 0.6),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.amber.withOpacity(0.3),
+                            color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.3),
                             blurRadius: 6,
                             offset: Offset(0, 2),
                           ),
@@ -102,16 +103,16 @@ class GastosVariosCardWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                           fontWeight: FontWeight.bold,
-                          color: Colors.amber[700],
+                          color: AppColors.presupuestoGastosVariosShade700,
                         ),
                       ),
                       if (totalGastos > 0)
                         Text(
-                          '${totalGastos.toStringAsFixed(2)} €',
+                          '${totalGastos.toStringAsFixed(2)} �',
                           style: TextStyle(
                             fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber[800],
+                            color: AppColors.presupuestoGastosVariosShade800,
                           ),
                         ),
                     ],
@@ -123,14 +124,14 @@ class GastosVariosCardWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.amber.withOpacity(0.8),
-                        Colors.amber.withOpacity(0.6),
+                        Colors.amber.withValues(alpha: 0.8),
+                        Colors.amber.withValues(alpha: 0.6),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(isMobile ? 6 : 10),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber.withOpacity(0.3),
+                        color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.3),
                         blurRadius: isMobile ? 4 : 6,
                         offset: Offset(0, isMobile ? 1 : 2),
                       ),
@@ -159,7 +160,7 @@ class GastosVariosCardWidget extends StatelessWidget {
             Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(color: Colors.amber),
+                child: CircularProgressIndicator(color: AppColors.presupuestoGastosVarios),
               ),
             )
           else if (gastos.isEmpty)
@@ -167,10 +168,10 @@ class GastosVariosCardWidget extends StatelessWidget {
               margin: EdgeInsets.only(top: 16),
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
+                color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.amber.withOpacity(0.2),
+                  color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -179,7 +180,7 @@ class GastosVariosCardWidget extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.receipt_long_outlined,
-                      color: Colors.amber.withOpacity(0.5),
+                      color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.5),
                       size: isWeb ? 40 : 44.0,
                     ),
                     SizedBox(height: 8),
@@ -217,27 +218,27 @@ class GastosVariosCardWidget extends StatelessWidget {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          Colors.amber.withOpacity(0.15),
-                          Colors.amber.withOpacity(0.05),
+                          Colors.amber.withValues(alpha: 0.15),
+                          Colors.amber.withValues(alpha: 0.05),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(isMobile ? 6 : 10),
                       border: Border.all(
-                        color: Colors.amber.withOpacity(0.3),
+                        color: AppColors.presupuestoGastosVarios.withValues(alpha: 0.3),
                         width: isMobile ? 0.5 : 1,
                       ),
                     ),
                     child: Row(
                       children: [
-                        // Ocultar icono en móvil
+                        // Ocultar icono en m�vil
                         if (!isMobile)
                           Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.amber.withOpacity(0.6),
-                                  Colors.amber.withOpacity(0.4),
+                                  Colors.amber.withValues(alpha: 0.6),
+                                  Colors.amber.withValues(alpha: 0.4),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -260,18 +261,18 @@ class GastosVariosCardWidget extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${gasto.cantidad.toStringAsFixed(2)} €',
+                          '${gasto.cantidad.toStringAsFixed(2)} �',
                           style: TextStyle(
                             fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber[800],
+                            color: AppColors.presupuestoGastosVariosShade800,
                           ),
                         ),
                         if (isAdminOrSolicitante) ...[
                           SizedBox(width: isMobile ? 4 : 8),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.1),
+                              color: Colors.red.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(isMobile ? 4 : 6),
                             ),
                             child: Material(
@@ -283,7 +284,7 @@ class GastosVariosCardWidget extends StatelessWidget {
                                   padding: EdgeInsets.all(isMobile ? 3 : 6),
                                   child: Icon(
                                     Icons.delete_rounded, 
-                                    color: Colors.red[700], 
+                                    color: AppColors.accionEliminar, 
                                     size: isMobile ? 14 : (isWeb ? 18 : 20.0)
                                   ),
                                 ),

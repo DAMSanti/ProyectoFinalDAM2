@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../models/actividad.dart';
 import '../../../../models/empresa_transporte.dart';
 import '../../../../models/alojamiento.dart';
 import '../../../../services/actividad_service.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Clase helper para manejar la edición de elementos del presupuesto
 class BudgetEditHandlers {
@@ -32,9 +33,7 @@ class BudgetEditHandlers {
         });
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Por favor, introduce un valor válido')),
-          );
+          SnackBarHelper.show(context, 'Por favor, introduce un valor válido');
         }
       }
     } else {
@@ -73,9 +72,7 @@ class BudgetEditHandlers {
         });
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Por favor, introduce un valor válido')),
-          );
+          SnackBarHelper.show(context, 'Por favor, introduce un valor válido');
         }
       }
     } else {
@@ -135,9 +132,7 @@ class BudgetEditHandlers {
         });
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Por favor, introduce un valor válido')),
-          );
+          SnackBarHelper.show(context, 'Por favor, introduce un valor válido');
         }
       }
     } else {

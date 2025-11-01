@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget que maneja el layout responsive de los botones de solicitar presupuestos.
 /// 
 /// Muestra botones para solicitar presupuestos de transporte y/o alojamiento
-/// según estén activados.
+/// seg�n est�n activados.
 /// 
 /// Layout:
 /// - Mobile landscape: columna vertical compacta
-/// - Mobile portrait: columna vertical con más espaciado
+/// - Mobile portrait: columna vertical con m�s espaciado
 /// - Desktop: fila horizontal con texto abreviado
 class BudgetRequestButtonsLayout extends StatelessWidget {
   final bool isMobile;
@@ -29,7 +30,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Si ninguno está activo, no mostrar nada
+    // Si ninguno est� activo, no mostrar nada
     if (!transporteReq && !alojamientoReq) {
       return SizedBox.shrink();
     }
@@ -43,14 +44,14 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
     }
   }
 
-  /// Layout para móvil en modo landscape (columna compacta)
+  /// Layout para m�vil en modo landscape (columna compacta)
   Widget _buildMobileLandscapeLayout() {
     return Column(
       children: [
         if (transporteReq) ...[
           _buildButton(
             onTap: onRequestTransporte,
-            color: Colors.purple,
+            color: AppColors.tipoComplementaria,
             text: 'Solicitar Presupuestos',
             iconSize: 14,
             fontSize: 13,
@@ -63,7 +64,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
         if (alojamientoReq)
           _buildButton(
             onTap: onRequestAlojamiento,
-            color: Colors.teal,
+            color: AppColors.presupuestoAlojamiento,
             text: 'Solicitar Presupuestos',
             iconSize: 14,
             fontSize: 13,
@@ -75,14 +76,14 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
     );
   }
 
-  /// Layout para móvil en modo portrait (columna con espaciado)
+  /// Layout para m�vil en modo portrait (columna con espaciado)
   Widget _buildMobilePortraitLayout() {
     return Column(
       children: [
         if (transporteReq) ...[
           _buildButton(
             onTap: onRequestTransporte,
-            color: Colors.purple,
+            color: AppColors.tipoComplementaria,
             text: 'Solicitar Presupuestos',
             iconSize: 16,
             fontSize: 14,
@@ -95,7 +96,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
         if (alojamientoReq)
           _buildButton(
             onTap: onRequestAlojamiento,
-            color: Colors.teal,
+            color: AppColors.presupuestoAlojamiento,
             text: 'Solicitar Presupuestos',
             iconSize: 16,
             fontSize: 14,
@@ -115,7 +116,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
           Expanded(
             child: _buildButton(
               onTap: onRequestTransporte,
-              color: Colors.purple,
+              color: AppColors.tipoComplementaria,
               text: 'Solicitar',
               iconSize: 18,
               fontSize: 14,
@@ -129,7 +130,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
           Expanded(
             child: _buildButton(
               onTap: onRequestAlojamiento,
-              color: Colors.teal,
+              color: AppColors.presupuestoAlojamiento,
               text: 'Solicitar',
               iconSize: 18,
               fontSize: 14,
@@ -142,7 +143,7 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
     );
   }
 
-  /// Construye un botón de solicitud con estilo gradiente
+  /// Construye un bot�n de solicitud con estilo gradiente
   Widget _buildButton({
     required VoidCallback onTap,
     required Color color,
@@ -167,14 +168,14 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.withOpacity(0.85),
-              color.withOpacity(0.65),
+              color.withValues(alpha: 0.85),
+              color.withValues(alpha: 0.65),
             ],
           ),
           borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.4),
+              color: color.withValues(alpha: 0.4),
               blurRadius: borderRadius == 10 ? 6 : 8,
               offset: Offset(0, borderRadius == 10 ? 2 : 3),
             ),

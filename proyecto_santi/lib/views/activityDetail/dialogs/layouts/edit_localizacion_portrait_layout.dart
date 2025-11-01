@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Layout portrait para el diálogo de edición de localización
+/// Layout portrait para el di�logo de edici�n de localizaci�n
 class EditLocalizacionPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -43,7 +44,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Info de la localización
+          // Info de la localizaci�n
           _buildLocationInfo(),
           SizedBox(height: isMobile ? 14 : 20),
           
@@ -52,11 +53,11 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
           
           SizedBox(height: puedeSerPrincipal ? (isMobile ? 14 : 20) : 0),
           
-          // Tipo de localización
+          // Tipo de localizaci�n
           _buildTypeSelector(),
           SizedBox(height: isMobile ? 14 : 20),
           
-          // Campo de descripción
+          // Campo de descripci�n
           _buildDescription(),
           SizedBox(height: isMobile ? 14 : 20),
           
@@ -71,15 +72,15 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isMobile ? 12 : 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: Color(0xFF1976d2).withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.1),
+            color: Color(0xFF1976d2).withValues(alpha: 0.1),
             offset: Offset(0, 2),
             blurRadius: 8,
           ),
@@ -138,11 +139,11 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
   Widget _buildPrincipalCheckbox() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: esPrincipal
-            ? Colors.red.withOpacity(0.5)
+            ? Colors.red.withValues(alpha: 0.5)
             : Colors.transparent,
           width: esPrincipal ? 2 : 1,
         ),
@@ -158,7 +159,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             SizedBox(width: isMobile ? 6 : 8),
             Expanded(
               child: Text(
-                isMobile ? 'Localización principal' : 'Marcar como localización principal',
+                isMobile ? 'Localizaci�n principal' : 'Marcar como localizaci�n principal',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: isMobile ? 13 : 14,
@@ -170,7 +171,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         subtitle: Padding(
           padding: EdgeInsets.only(left: isMobile ? 24 : 28, top: 4),
           child: Text(
-            isMobile ? 'Desmarcará la actual' : 'Desmarcará la localización principal actual',
+            isMobile ? 'Desmarcar� la actual' : 'Desmarcar� la localizaci�n principal actual',
             style: TextStyle(
               fontSize: isMobile ? 11 : 12,
               color: isDark ? Colors.white60 : Colors.black45,
@@ -179,7 +180,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         ),
         value: esPrincipal,
         onChanged: onEsPrincipalChanged,
-        activeColor: Colors.red,
+        activeColor: AppColors.estadoRechazado,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         ),
@@ -213,7 +214,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             ),
             SizedBox(width: isMobile ? 8 : 10),
             Text(
-              'Tipo de localización:',
+              'Tipo de localizaci�n:',
               style: TextStyle(
                 fontSize: isMobile ? 13 : 15,
                 fontWeight: FontWeight.bold,
@@ -225,15 +226,15 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         SizedBox(height: isMobile ? 10 : 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: Color(0xFF1976d2).withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: Color(0xFF1976d2).withValues(alpha: 0.1),
                 offset: Offset(0, 2),
                 blurRadius: 8,
               ),
@@ -324,7 +325,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             ),
             SizedBox(width: isMobile ? 8 : 10),
             Text(
-              'Descripción:',
+              'Descripci�n:',
               style: TextStyle(
                 fontSize: isMobile ? 13 : 15,
                 fontWeight: FontWeight.bold,
@@ -336,15 +337,15 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         SizedBox(height: isMobile ? 10 : 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: Color(0xFF1976d2).withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: Color(0xFF1976d2).withValues(alpha: 0.1),
                 offset: Offset(0, 2),
                 blurRadius: 8,
               ),
@@ -357,8 +358,8 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             style: TextStyle(fontSize: isMobile ? 13 : 14),
             decoration: InputDecoration(
               hintText: isMobile 
-                ? 'Añade un comentario...' 
-                : 'Añade un comentario o descripción sobre esta localización...',
+                ? 'A�ade un comentario...' 
+                : 'A�ade un comentario o descripci�n sobre esta localizaci�n...',
               hintStyle: TextStyle(fontSize: isMobile ? 13 : 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
@@ -409,15 +410,15 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         Container(
           height: isMobile ? 200 : 240,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
             border: Border.all(
-              color: Color(0xFF1976d2).withOpacity(0.3),
+              color: Color(0xFF1976d2).withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.1),
+                color: Color(0xFF1976d2).withValues(alpha: 0.1),
                 offset: Offset(0, 2),
                 blurRadius: 8,
               ),
@@ -445,25 +446,25 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
                       gradient: isSelected
                         ? LinearGradient(
                             colors: [
-                              Color(0xFF1976d2).withOpacity(0.3),
-                              Color(0xFF1565c0).withOpacity(0.2),
+                              Color(0xFF1976d2).withValues(alpha: 0.3),
+                              Color(0xFF1565c0).withValues(alpha: 0.2),
                             ],
                           )
                         : null,
                       color: isSelected 
                           ? null
-                          : Colors.white.withOpacity(0.5),
+                          : Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                       border: Border.all(
                         color: isSelected 
                             ? Color(0xFF1976d2)
-                            : Colors.grey.withOpacity(0.3),
+                            : Colors.grey.withValues(alpha: 0.3),
                         width: isSelected ? 2 : 1,
                       ),
                       boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: Color(0xFF1976d2).withOpacity(0.3),
+                              color: Color(0xFF1976d2).withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: Offset(0, 2),
                             ),

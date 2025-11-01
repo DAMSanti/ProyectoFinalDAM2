@@ -129,25 +129,25 @@ class ChatListViewState extends State<ChatListView> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  Colors.white.withOpacity(0.08),
-                  Colors.white.withOpacity(0.05),
+                  Colors.white.withValues(alpha: 0.08),
+                  Colors.white.withValues(alpha: 0.05),
                 ]
               : [
-                  Colors.white.withOpacity(0.9),
-                  Colors.white.withOpacity(0.7),
+                  Colors.white.withValues(alpha: 0.9),
+                  Colors.white.withValues(alpha: 0.7),
                 ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.12)
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.12)
+              : Colors.white.withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.black.withOpacity(0.1),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.1),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -169,8 +169,8 @@ class ChatListViewState extends State<ChatListView> {
           prefixIcon: Icon(
             Icons.search_rounded,
             color: isDark
-                ? Colors.white.withOpacity(0.5)
-                : const Color(0xFF1976d2).withOpacity(0.7),
+                ? Colors.white.withValues(alpha: 0.5)
+                : const Color(0xFF1976d2).withValues(alpha: 0.7),
             size: 24,
           ),
           suffixIcon: _searchController.text.isNotEmpty
@@ -231,7 +231,7 @@ class ChatListViewState extends State<ChatListView> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -272,8 +272,8 @@ class ChatListViewState extends State<ChatListView> {
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
-                        : const Color(0xFF1976d2).withOpacity(0.1),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : const Color(0xFF1976d2).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -282,8 +282,8 @@ class ChatListViewState extends State<ChatListView> {
                         : Icons.search_off_rounded,
                     size: 64,
                     color: isDark
-                        ? Colors.white.withOpacity(0.3)
-                        : const Color(0xFF1976d2).withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : const Color(0xFF1976d2).withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 24),

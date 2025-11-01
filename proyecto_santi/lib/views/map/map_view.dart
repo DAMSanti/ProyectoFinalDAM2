@@ -229,7 +229,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFF1976d2).withOpacity(0.3),
+                        color: Color(0xFF1976d2).withValues(alpha: 0.3),
                       ),
                     ),
                   Container(
@@ -253,7 +253,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       boxShadow: [
                         BoxShadow(
                           color: (isSelected ? Color(0xFF1976d2) : Colors.red)
-                              .withOpacity(0.6),
+                              .withValues(alpha: 0.6),
                           blurRadius: isSelected ? 20 : 15,
                           offset: Offset(0, 4),
                           spreadRadius: isSelected ? 2 : 0,
@@ -354,7 +354,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     height: 70,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFF1976d2).withOpacity(0.2),
+                      color: Color(0xFF1976d2).withValues(alpha: 0.2),
                     ),
                   ),
                 Container(
@@ -378,7 +378,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     boxShadow: [
                       BoxShadow(
                         color: (isPrincipal ? Color(0xFF1976d2) : Color(0xFF4CAF50))
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                         blurRadius: isPrincipal ? 20 : 15,
                         offset: Offset(0, 4),
                         spreadRadius: isPrincipal ? 2 : 0,
@@ -427,13 +427,13 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.3),
+                  color: Color(0xFF1976d2).withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: Offset(0, 4),
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: Offset(0, 2),
                 ),
@@ -447,8 +447,8 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Color(0xFF1976d2).withOpacity(0.1),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Color(0xFF1976d2).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -470,7 +470,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         hintText: 'Buscar actividades...',
                         hintStyle: TextStyle(
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
+                              ? Colors.white.withValues(alpha: 0.5)
                               : Colors.grey[500],
                         ),
                         border: InputBorder.none,
@@ -481,7 +481,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   if (_searchController.text.isNotEmpty)
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: IconButton(
@@ -523,7 +523,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: Offset(0, 4),
                   ),
@@ -538,8 +538,8 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   separatorBuilder: (context, index) => Divider(
                     height: 1,
                     color: isDark
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.05),
                   ),
                   itemBuilder: (context, index) {
                     final actividad = filteredActivities[index];
@@ -564,7 +564,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Color(0xFF1976d2).withOpacity(0.3),
+                                      color: Color(0xFF1976d2).withValues(alpha: 0.3),
                                       blurRadius: 8,
                                       offset: Offset(0, 2),
                                     ),
@@ -600,7 +600,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: isDark
-                                                ? Colors.white.withOpacity(0.6)
+                                                ? Colors.white.withValues(alpha: 0.6)
                                                 : Colors.grey[600],
                                           ),
                                           maxLines: 1,
@@ -635,7 +635,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: Offset(0, 4),
                   ),
@@ -718,13 +718,13 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF1976d2).withOpacity(0.4),
+                color: Color(0xFF1976d2).withValues(alpha: 0.4),
                 blurRadius: 30,
                 offset: Offset(0, 8),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 15,
                 offset: Offset(0, 4),
               ),
@@ -767,7 +767,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFF1976d2).withOpacity(0.4),
+                                color: Color(0xFF1976d2).withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: Offset(0, 4),
                               ),
@@ -798,7 +798,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFF4CAF50).withOpacity(0.2),
+                                  color: Color(0xFF4CAF50).withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: Color(0xFF4CAF50),
@@ -820,8 +820,8 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         Container(
                           decoration: BoxDecoration(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.black.withOpacity(0.05),
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
@@ -863,13 +863,13 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         padding: EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.black.withOpacity(0.03),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.03),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.black.withOpacity(0.05),
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : Colors.black.withValues(alpha: 0.05),
                           ),
                         ),
                         child: Row(
@@ -885,7 +885,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                 direccionCompleta,
                                 style: TextStyle(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.8)
+                                      ? Colors.white.withValues(alpha: 0.8)
                                       : Colors.grey[700],
                                   fontSize: 13,
                                 ),
@@ -904,13 +904,13 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         padding: EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.black.withOpacity(0.03),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.03),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
-                                : Colors.black.withOpacity(0.05),
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : Colors.black.withValues(alpha: 0.05),
                           ),
                         ),
                         child: Row(
@@ -927,7 +927,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                 _selectedActividad!.descripcion!,
                                 style: TextStyle(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.8)
+                                      ? Colors.white.withValues(alpha: 0.8)
                                       : Colors.grey[700],
                                   fontSize: 13,
                                 ),
@@ -954,7 +954,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Color(0xFF1976d2).withOpacity(0.4),
+                              color: Color(0xFF1976d2).withValues(alpha: 0.4),
                               blurRadius: 12,
                               offset: Offset(0, 4),
                             ),
@@ -1017,19 +1017,19 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Color(0xFF1976d2).withOpacity(0.5),
+              color: Color(0xFF1976d2).withValues(alpha: 0.5),
               blurRadius: 20,
               offset: Offset(0, 4),
               spreadRadius: 2,
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: Offset(0, 2),
             ),
           ],
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -1039,7 +1039,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -1058,7 +1058,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   Text(
                     'Viendo localizaciones de:',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1137,7 +1137,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             // Botón para ir a detalles completos de la actividad
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Material(
@@ -1185,7 +1185,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             // Botón de cerrar/volver
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Material(
@@ -1258,7 +1258,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFF1976d2).withOpacity(0.4),
+                                color: Color(0xFF1976d2).withValues(alpha: 0.4),
                                 blurRadius: 20,
                                 offset: Offset(0, 4),
                               ),
@@ -1333,7 +1333,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFF1976d2).withOpacity(0.4),
+                                color: Color(0xFF1976d2).withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: Offset(0, 4),
                               ),

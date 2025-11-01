@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -92,12 +93,32 @@ class SaveHandler {
       if (datosEditados['deleteFolleto'] == true) {
         success = success && await _deleteFolleto(actividadId);
       } else if (datosEditados.containsKey('folletoBytes')) {
+        // Caso Web: Los bytes vienen directamente del FilePicker
+        var folletoBytes = datosEditados['folletoBytes'];
+        if (folletoBytes is Uint8List) {
+          folletoBytes = folletoBytes.toList();
+        }
         success = success &&
             await _uploadFolleto(
               actividadId: actividadId,
-              folletoBytes: datosEditados['folletoBytes'],
+              folletoBytes: folletoBytes,
               folletoFileName: datosEditados['folletoFileName'],
             );
+      } else if (datosEditados.containsKey('folletoFilePath')) {
+        // Caso Desktop: Leer el archivo desde el path
+        try {
+          final file = File(datosEditados['folletoFilePath']);
+          final bytes = await file.readAsBytes();
+          success = success &&
+              await _uploadFolleto(
+                actividadId: actividadId,
+                folletoBytes: bytes.toList(),
+                folletoFileName: datosEditados['folletoFileName'],
+              );
+        } catch (e) {
+          print('❌ Error leyendo archivo folleto: $e');
+          success = false;
+        }
       }
     }
 
@@ -166,6 +187,24 @@ class SaveHandler {
       if (transporteReq == 1) costoRealCalculado += precioTransporte;
       if (alojamientoReq == 1) costoRealCalculado += precioAlojamiento;
 
+      // Preparar profesor responsable si ha cambiado
+      Profesor? responsableParaGuardar = actividadOriginal.responsable;
+      if (datosEditados.containsKey('profesorId') && datosEditados['profesorId'] != null) {
+        // Crear un objeto Profesor temporal solo con el UUID para el guardado
+        responsableParaGuardar = Profesor(
+          uuid: datosEditados['profesorId'],
+          dni: '',
+          nombre: '', // Se actualizará después con los datos completos
+          apellidos: '',
+          correo: '',
+          password: '',
+          rol: 'Profesor',
+          activo: 1,
+          esJefeDep: 0,
+        );
+        print('DEBUG: Preparando guardado con nuevo responsable UUID: ${datosEditados['profesorId']}');
+      }
+
       // Crear actividad para guardar
       final actividadParaGuardar = Actividad(
         id: actividadOriginal.id,
@@ -187,7 +226,7 @@ class SaveHandler {
         precioTransporte: datosEditados['precioTransporte'] ?? actividadOriginal.precioTransporte,
         precioAlojamiento: datosEditados['precioAlojamiento'] ?? actividadOriginal.precioAlojamiento,
         urlFolleto: actividadOriginal.urlFolleto,
-        responsable: actividadOriginal.responsable,
+        responsable: responsableParaGuardar,
         localizacion: actividadOriginal.localizacion,
         importePorAlumno: actividadOriginal.importePorAlumno,
         presupuestoEstimado: datosEditados['presupuestoEstimado'] ?? actividadOriginal.presupuestoEstimado,
@@ -294,13 +333,18 @@ class SaveHandler {
         if (p is Map<String, dynamic>) {
           return p['uuid'] as String;
         } else {
+          // Asumimos que es un objeto Profesor
           return (p as dynamic).uuid as String;
         }
       }).toList();
 
+      print('DEBUG: Guardando profesores participantes - IDs: $profesoresIds'); // DEBUG
       await profesorService.updateProfesoresParticipantes(actividadId, profesoresIds);
+      print('DEBUG: Profesores participantes guardados exitosamente'); // DEBUG
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR al guardar profesores participantes: $e'); // DEBUG
+      print('StackTrace: $stackTrace'); // DEBUG
       return false;
     }
   }
@@ -336,6 +380,7 @@ class SaveHandler {
       await actividadService.deleteFolleto(actividadId);
       return true;
     } catch (e) {
+      print('❌ Error al eliminar folleto: $e');
       return false;
     }
   }
@@ -353,6 +398,7 @@ class SaveHandler {
       );
       return true;
     } catch (e) {
+      print('❌ Error al subir folleto: $e');
       return false;
     }
   }

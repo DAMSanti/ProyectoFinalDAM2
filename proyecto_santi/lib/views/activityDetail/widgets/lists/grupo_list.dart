@@ -2,15 +2,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/grupo_participante.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
 /// Widget especializado para mostrar y gestionar la lista de grupos participantes.
 /// 
 /// Responsabilidades:
 /// - Renderizar lista de grupos con avatares
-/// - Mostrar número de alumnos participantes por grupo
-/// - Permitir editar inline el número de participantes
+/// - Mostrar n�mero de alumnos participantes por grupo
+/// - Permitir editar inline el n�mero de participantes
 /// - Permitir eliminar grupos (si isAdmin)
-/// - Botón para agregar nuevos grupos
+/// - Bot�n para agregar nuevos grupos
 /// - Mostrar total de alumnos participantes
 /// - Empty state cuando no hay grupos
 class GrupoListWidget extends StatefulWidget {
@@ -83,7 +84,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
+          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -102,7 +103,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con título y botón agregar
+                // Header con t�tulo y bot�n agregar
                 _buildHeader(context, isDark, isWeb),
                 SizedBox(height: 16),
                 // Lista de grupos o empty state
@@ -155,7 +156,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Color(0xFF1976d2).withOpacity(0.15),
+                            color: Color(0xFF1976d2).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -177,7 +178,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
         if (widget.isAdminOrSolicitante)
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFF1976d2).withOpacity(0.1),
+              color: Color(0xFF1976d2).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: IconButton(
@@ -203,7 +204,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
             Icon(
               Icons.school_outlined,
               size: 48,
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
             ),
             SizedBox(height: 8),
             Text(
@@ -240,13 +241,13 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.white.withOpacity(0.6),
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.white.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
       child: ListTile(
@@ -287,7 +288,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.3),
+            color: Color(0xFF1976d2).withValues(alpha: 0.3),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -320,7 +321,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
         padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
           color: widget.isAdminOrSolicitante
-              ? Color(0xFF1976d2).withOpacity(0.1)
+              ? Color(0xFF1976d2).withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
         ),
@@ -421,14 +422,14 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
     
     if (nuevoNumero == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor ingrese un número válido')),
+        SnackBar(content: Text('Por favor ingrese un n�mero v�lido')),
       );
       return;
     }
     
     if (nuevoNumero <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('El número debe ser mayor a 0')),
+        SnackBar(content: Text('El n�mero debe ser mayor a 0')),
       );
       return;
     }
@@ -437,7 +438,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'El número no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
+            'El n�mero no puede ser mayor a ${grupoParticipante.grupo.numeroAlumnos}',
           ),
         ),
       );
@@ -454,7 +455,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
   Widget _buildDeleteButton(BuildContext context, GrupoParticipante grupoParticipante) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+        color: Colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
@@ -486,7 +487,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
                   ElevatedButton(
                     onPressed: () => Navigator.of(dialogContext).pop(true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.estadoRechazado,
                       foregroundColor: Colors.white,
                     ),
                     child: Text('Eliminar'),

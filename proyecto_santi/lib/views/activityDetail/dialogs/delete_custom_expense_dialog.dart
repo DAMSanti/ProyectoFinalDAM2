@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Confirma eliminación de un gasto personalizado
+/// Confirma eliminaci�n de un gasto personalizado
 Future<bool> confirmarEliminarGasto(
   BuildContext context,
   GastoPersonalizado gasto,
@@ -55,7 +56,7 @@ Future<bool> confirmarEliminarGasto(
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 offset: Offset(0, isMobileLandscape ? 6 : 10),
                 blurRadius: isMobileLandscape ? 20 : 30,
               ),
@@ -77,7 +78,7 @@ Future<bool> confirmarEliminarGasto(
                       Icon(
                         Icons.delete_forever_rounded,
                         size: isMobileLandscape ? 48 : (isMobile ? 56 : 64),
-                        color: Colors.red[700],
+                        color: AppColors.accionEliminar,
                       ),
                       SizedBox(height: isMobileLandscape ? 12 : 16),
                       Text(
@@ -94,11 +95,11 @@ Future<bool> confirmarEliminarGasto(
                         padding: EdgeInsets.all(isMobileLandscape ? 10 : 12),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.white.withOpacity(0.7),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.white.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                           border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
+                            color: Colors.red.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -107,7 +108,7 @@ Future<bool> confirmarEliminarGasto(
                             Icon(
                               Icons.receipt_long_rounded,
                               size: isMobileLandscape ? 16 : (isMobile ? 18 : 20),
-                              color: Colors.red[700],
+                              color: AppColors.accionEliminar,
                             ),
                             SizedBox(width: 8),
                             Expanded(
@@ -127,7 +128,7 @@ Future<bool> confirmarEliminarGasto(
                       ),
                       SizedBox(height: isMobileLandscape ? 8 : 12),
                       Text(
-                        'Esta acción no se puede deshacer',
+                        'Esta acci�n no se puede deshacer',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 13),
@@ -145,15 +146,15 @@ Future<bool> confirmarEliminarGasto(
                 padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 decoration: BoxDecoration(
                   color: isDark 
-                      ? Colors.grey[850]!.withOpacity(0.9)
-                      : Colors.white.withOpacity(0.9),
+                      ? Colors.grey[850]!.withValues(alpha: 0.9)
+                      : Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                     bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       offset: Offset(0, -4),
                       blurRadius: 8,
                     ),
@@ -162,7 +163,7 @@ Future<bool> confirmarEliminarGasto(
                 child: Row(
                   mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
                   children: [
-                    // Botón Cancelar
+                    // Bot�n Cancelar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -193,7 +194,7 @@ Future<bool> confirmarEliminarGasto(
                       ),
                     ),
                     SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-                    // Botón Eliminar
+                    // Bot�n Eliminar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -201,10 +202,10 @@ Future<bool> confirmarEliminarGasto(
                         child: ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red[700],
+                            backgroundColor: AppColors.accionEliminar,
                             foregroundColor: Colors.white,
                             elevation: 4,
-                            shadowColor: Colors.red.withOpacity(0.5),
+                            shadowColor: Colors.red.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             ),
@@ -256,7 +257,7 @@ Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext c
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          Colors.red[700]!,
+          AppColors.accionEliminar!,
           Colors.red[800]!,
         ],
       ),
@@ -266,7 +267,7 @@ Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext c
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.red.withOpacity(0.3),
+          color: Colors.red.withValues(alpha: 0.3),
           offset: Offset(0, 4),
           blurRadius: 8,
         ),
@@ -277,7 +278,7 @@ Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext c
         Container(
           padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
           ),
           child: Icon(
@@ -289,7 +290,7 @@ Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext c
         SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
         Expanded(
           child: Text(
-            'Confirmar Eliminación',
+            'Confirmar Eliminaci�n',
             style: TextStyle(
               color: Colors.white,
               fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),

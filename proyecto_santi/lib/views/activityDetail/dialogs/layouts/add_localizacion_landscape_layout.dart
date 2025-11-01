@@ -120,7 +120,7 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: Color(0xFF1976d2).withOpacity(0.2),
+            color: Color(0xFF1976d2).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -139,12 +139,12 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
   Widget _buildLocationsList() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isDark 
-            ? Colors.white.withOpacity(0.1) 
-            : Colors.black.withOpacity(0.05),
+            ? Colors.white.withValues(alpha: 0.1) 
+            : Colors.black.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
@@ -179,7 +179,7 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
           Icon(
             Icons.location_off_rounded,
             size: 32,
-            color: Color(0xFF1976d2).withOpacity(0.5),
+            color: Color(0xFF1976d2).withValues(alpha: 0.5),
           ),
           SizedBox(height: 8),
           Text(

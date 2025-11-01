@@ -31,7 +31,7 @@ class ActivitiesSectionHeader extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   sectionColor,
-                  sectionColor.withOpacity(0.7),
+                  sectionColor.withValues(alpha: 0.7),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -39,7 +39,7 @@ class ActivitiesSectionHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: sectionColor.withOpacity(0.3),
+                  color: sectionColor.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: Offset(0, 2),
                 ),
@@ -79,7 +79,7 @@ class ActivitiesSectionHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     sectionColor,
-                    sectionColor.withOpacity(0.8),
+                    sectionColor.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -87,7 +87,7 @@ class ActivitiesSectionHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: sectionColor.withOpacity(0.3),
+                    color: sectionColor.withValues(alpha: 0.3),
                     blurRadius: 6,
                     offset: Offset(0, 2),
                   ),

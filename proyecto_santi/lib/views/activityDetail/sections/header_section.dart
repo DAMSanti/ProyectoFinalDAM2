@@ -7,26 +7,41 @@ import '../widgets/cards/info_card.dart';
 import '../widgets/cards/folleto_card.dart';
 import '../widgets/cards/estado_card.dart';
 import '../widgets/cards/departamento_card.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 class ActivityDetailHeader extends StatelessWidget {
   final Actividad actividad;
   final bool isAdminOrSolicitante;
-  final String? folletoFileName;
   final bool folletoMarkedForDeletion;
+  final String? newFolletoFileName; // Nombre del nuevo folleto seleccionado (antes de guardar)
   final VoidCallback onEditPressed;
-  final VoidCallback onSelectFolleto;
-  final VoidCallback onDeleteFolleto;
+  final Function(Map<String, dynamic>) onFolletoChanged;
 
   const ActivityDetailHeader({
     super.key,
     required this.actividad,
     required this.isAdminOrSolicitante,
-    required this.folletoFileName,
     required this.folletoMarkedForDeletion,
+    this.newFolletoFileName,
     required this.onEditPressed,
-    required this.onSelectFolleto,
-    required this.onDeleteFolleto,
+    required this.onFolletoChanged,
   });
+
+  static String _extractFileName(String url) {
+    final parts = url.split('/');
+    if (parts.isEmpty) return 'folleto.pdf';
+    
+    final fileName = parts.last;
+    
+    // Si el nombre tiene formato "timestamp_nombreOriginal.pdf", extraer solo el nombre original
+    final timestampPattern = RegExp(r'^\d+_(.+)$');
+    final match = timestampPattern.firstMatch(fileName);
+    if (match != null && match.groupCount >= 1) {
+      return match.group(1)!;
+    }
+    
+    return fileName;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +49,22 @@ class ActivityDetailHeader extends StatelessWidget {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
+    
+    // Determinar el nombre del folleto a mostrar
+    String? displayFolletoName;
+    String? displayFolletoUrl;
+    
+    if (!folletoMarkedForDeletion) {
+      if (newFolletoFileName != null) {
+        // Hay un nuevo folleto seleccionado
+        displayFolletoName = newFolletoFileName;
+        displayFolletoUrl = null;
+      } else if (actividad.urlFolleto != null && actividad.urlFolleto!.isNotEmpty) {
+        // Usar el folleto de la actividad
+        displayFolletoName = _extractFileName(actividad.urlFolleto!);
+        displayFolletoUrl = actividad.urlFolleto;
+      }
+    }
 
     // Parsear fechas y horas
     final DateTime fechaInicio = DateTime.parse(actividad.fini);
@@ -60,7 +91,7 @@ class ActivityDetailHeader extends StatelessWidget {
       horaFin = horaFin.substring(0, 5);
     }
     
-    // Construir texto según si es el mismo día o días diferentes
+    // Construir texto seg�n si es el mismo d�a o d�as diferentes
     final String dateText = fechaInicioSolo == fechaFinSolo
         ? '$formattedStartDate $horaInicio'
         : '$formattedStartDate $horaInicio - $formattedEndDate $horaFin';
@@ -124,7 +155,7 @@ class ActivityDetailHeader extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: actividad.tipo == 'Complementaria'
                         ? [
-                            Color(0xFF1976d2),
+                            AppColors.primary,
                             Color(0xFF42A5F5),
                             Color(0xFF64B5F6),
                           ]
@@ -137,7 +168,7 @@ class ActivityDetailHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              // Patrón decorativo de fondo
+              // Patr�n decorativo de fondo
               if (!isMobile)
                 Positioned(
                   right: -30,
@@ -147,7 +178,7 @@ class ActivityDetailHeader extends StatelessWidget {
                     child: Icon(
                       Icons.event_note_rounded,
                       size: 150,
-                      color: Color(0xFF1976d2),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -157,7 +188,7 @@ class ActivityDetailHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título con botón de editar
+                    // T�tulo con bot�n de editar
                     Row(
                       children: [
                         Container(
@@ -168,7 +199,7 @@ class ActivityDetailHeader extends StatelessWidget {
                           ),
                           child: Icon(
                             Icons.event_note_rounded,
-                            color: Color(0xFF1976d2),
+                            color: AppColors.primary,
                             size: isMobile ? 18 : (isWeb ? 20 : 22.0),
                           ),
                         ),
@@ -179,7 +210,7 @@ class ActivityDetailHeader extends StatelessWidget {
                             style: TextStyle(
                               fontSize: isMobile ? 16 : (isWeb ? 20 : 22.0),
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Color(0xFF1976d2),
+                              color: isDark ? Colors.white : AppColors.primary,
                               letterSpacing: -0.5,
                               height: 1.2,
                             ),
@@ -190,13 +221,13 @@ class ActivityDetailHeader extends StatelessWidget {
                         if (isAdminOrSolicitante)
                           Container(
                             decoration: BoxDecoration(
-                              color: Color(0xFF1976d2).withOpacity(0.1),
+                              color: AppColors.primaryOpacity10,
                               borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                             ),
                             child: IconButton(
                               icon: Icon(
                                 Icons.edit_rounded, 
-                                color: Color(0xFF1976d2),
+                                color: AppColors.primary,
                                 size: isMobile ? 18 : 24,
                               ),
                               onPressed: onEditPressed,
@@ -210,7 +241,7 @@ class ActivityDetailHeader extends StatelessWidget {
                     
                     SizedBox(height: isMobile ? 10 : 16),
                     
-                    // Descripción directamente debajo del título
+                    // Descripci�n directamente debajo del t�tulo
                     if (actividad.descripcion != null && actividad.descripcion!.isNotEmpty)
                       Padding(
                         padding: EdgeInsets.only(
@@ -222,7 +253,7 @@ class ActivityDetailHeader extends StatelessWidget {
                           actividad.descripcion!,
                           style: TextStyle(
                             fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
-                            color: isDark ? Colors.white.withOpacity(0.85) : Colors.black87,
+                            color: isDark ? Colors.white.withValues(alpha: 0.85) : Colors.black87,
                             height: 1.5,
                           ),
                           maxLines: isMobile ? 2 : 3,
@@ -249,9 +280,9 @@ class ActivityDetailHeader extends StatelessWidget {
                     
                     SizedBox(height: isMobile ? 8 : 12),
                     
-                    // Layout condicional: móvil = vertical, desktop = horizontal
+                    // Layout condicional: m�vil = vertical, desktop = horizontal
                     if (isMobile) ...[
-                      // MÓVIL: Layout vertical compacto
+                      // M�VIL: Layout vertical compacto
                       // Fila 1: Fecha y Estado
                       Row(
                         children: [
@@ -297,12 +328,11 @@ class ActivityDetailHeader extends StatelessWidget {
                       
                       // Fila 4: Folleto
                       FolletoCardWidget(
-                        folletoFileName: folletoFileName,
+                        folletoFileName: displayFolletoName,
                         folletoMarkedForDeletion: folletoMarkedForDeletion,
-                        actividadFolletoUrl: actividad.urlFolleto,
+                        actividadFolletoUrl: displayFolletoUrl,
                         isAdminOrSolicitante: isAdminOrSolicitante,
-                        onSelectFolleto: onSelectFolleto,
-                        onDeleteFolleto: onDeleteFolleto,
+                        onFolletoChanged: onFolletoChanged,
                         isMobile: true,
                       ),
                     ] else ...[
@@ -361,12 +391,11 @@ class ActivityDetailHeader extends StatelessWidget {
                           Expanded(
                             flex: 4,
                             child: FolletoCardWidget(
-                              folletoFileName: folletoFileName,
+                              folletoFileName: displayFolletoName,
                               folletoMarkedForDeletion: folletoMarkedForDeletion,
-                              actividadFolletoUrl: actividad.urlFolleto,
+                              actividadFolletoUrl: displayFolletoUrl,
                               isAdminOrSolicitante: isAdminOrSolicitante,
-                              onSelectFolleto: onSelectFolleto,
-                              onDeleteFolleto: onDeleteFolleto,
+                              onFolletoChanged: onFolletoChanged,
                             ),
                           ),
                         ],
@@ -378,7 +407,7 @@ class ActivityDetailHeader extends StatelessWidget {
             ],
           ),
         ),
-        // Etiqueta de tipo de actividad (lengüeta de carpeta) - Por encima de todo
+        // Etiqueta de tipo de actividad (leng�eta de carpeta) - Por encima de todo
         Positioned(
           top: 0,
           left: isMobile ? 20 : 40,
@@ -393,7 +422,7 @@ class ActivityDetailHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: actividad.tipo == 'Complementaria'
                     ? [
-                        Color(0xFF1976d2),
+                        AppColors.primary,
                         Color(0xFF42A5F5),
                       ]
                     : [
@@ -408,8 +437,8 @@ class ActivityDetailHeader extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: (actividad.tipo == 'Complementaria' 
-                        ? Color(0xFF1976d2) 
-                        : Color(0xFFE65100)).withOpacity(0.4),
+                        ? AppColors.primary 
+                        : Color(0xFFE65100)).withValues(alpha: 0.4),
                     offset: Offset(0, -2),
                     blurRadius: 8,
                   ),
@@ -462,13 +491,13 @@ class _ResponsableCard extends StatelessWidget {
       padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.white.withOpacity(0.05) 
-            : Colors.white.withOpacity(0.4),
+            ? Colors.white.withValues(alpha: 0.05) 
+            : Colors.white.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(
           color: isDark 
-              ? Colors.white.withOpacity(0.1) 
-              : Colors.white.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1) 
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -485,13 +514,13 @@ class _ResponsableCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF1976d2),
+                  AppColors.primary,
                   Color(0xFF42A5F5),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF1976d2).withOpacity(0.3),
+                  color: AppColors.primaryOpacity30,
                   offset: Offset(0, 2),
                   blurRadius: 6,
                 ),
@@ -511,7 +540,7 @@ class _ResponsableCard extends StatelessWidget {
           
           SizedBox(width: isMobile ? 10 : 12),
           
-          // Información del responsable
+          // Informaci�n del responsable
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +551,7 @@ class _ResponsableCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: isMobile ? 11 : (isWeb ? 11 : 13.0),
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                   ),
                 ),
                 SizedBox(height: isMobile ? 2 : 4),
@@ -530,7 +559,7 @@ class _ResponsableCard extends StatelessWidget {
                   nombre,
                   style: TextStyle(
                     fontSize: isMobile ? 13 : (isWeb ? 13 : 15.0),
-                    color: isDark ? Colors.white.withOpacity(0.9) : Colors.black87,
+                    color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors.black87,
                     height: 1.3,
                   ),
                   maxLines: 2,

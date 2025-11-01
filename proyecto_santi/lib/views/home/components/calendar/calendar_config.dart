@@ -117,7 +117,7 @@ class CalendarConfig {
   /// Obtiene el color de fondo de los días con actividades
   static Color getActivityColor(bool isDark) {
     return isDark
-        ? Color(0xFF1976D2).withOpacity(0.2)
-        : Color(0xFF1976D2).withOpacity(0.1);
+        ? Color(0xFF1976D2).withValues(alpha: 0.2)
+        : Color(0xFF1976D2).withValues(alpha: 0.1);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 class ImageDescriptionField extends StatelessWidget {
   final TextEditingController controller;
@@ -25,7 +26,7 @@ class ImageDescriptionField extends StatelessWidget {
             Icon(
               Icons.description_rounded,
               size: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
-              color: Color(0xFF1976d2),
+              color: AppColors.primary,
             ),
             SizedBox(width: 6),
             Text(
@@ -33,7 +34,7 @@ class ImageDescriptionField extends StatelessWidget {
               style: TextStyle(
                 fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
               ),
             ),
           ],
@@ -42,13 +43,13 @@ class ImageDescriptionField extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: isDark 
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.6),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.white.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
             border: Border.all(
               color: isDark 
-                  ? Colors.white.withOpacity(0.1)
-                  : Colors.white.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.5),
             ),
           ),
           child: TextField(

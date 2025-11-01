@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Header genérico para diálogos
 /// Permite personalizar el título y el icono
@@ -30,8 +31,8 @@ class DialogHeader extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF1976d2).withOpacity(0.9),
-            Color(0xFF1565c0).withOpacity(0.95),
+            AppColors.primaryOpacity90,
+            AppColors.primaryDarkOpacity95,
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -40,7 +41,7 @@ class DialogHeader extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.3),
+            color: AppColors.primaryOpacity30,
             blurRadius: 8,
             offset: Offset(0, 3),
           ),
@@ -51,7 +52,7 @@ class DialogHeader extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
             ),
             child: Icon(
@@ -74,7 +75,7 @@ class DialogHeader extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 8)),
             ),
             child: IconButton(

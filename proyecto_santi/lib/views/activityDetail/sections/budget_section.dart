@@ -1,6 +1,7 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import '../../../models/actividad.dart';
 import '../../../models/alojamiento.dart';
 import '../../../models/empresa_transporte.dart';
@@ -356,7 +357,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                 ),
                 child: Icon(
                   Icons.account_balance_wallet_rounded,
-                  color: Color(0xFF1976d2),
+                  color: AppColors.primary,
                   size: isWeb ? 18 : 20.0,
                 ),
               ),
@@ -367,7 +368,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
                   style: TextStyle(
                     fontSize: isWeb ? 14 : 16.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -526,7 +527,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoRechazado),
               child: Text('Eliminar'),
             ),
           ],

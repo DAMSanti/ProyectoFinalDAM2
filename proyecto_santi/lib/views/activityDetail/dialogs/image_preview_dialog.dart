@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -150,8 +151,8 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1976d2).withOpacity(0.9),
-            Color(0xFF1565c0).withOpacity(0.95),
+            AppColors.primaryOpacity90,
+            AppColors.primaryDarkOpacity95,
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -164,7 +165,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
           Container(
             padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
             ),
             child: Icon(
@@ -198,21 +199,21 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
   }
 
-  // Footer con botones de acción
+  // Footer con botones de acci�n
   Widget _buildFooter(BuildContext context, bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
       decoration: BoxDecoration(
         color: isDark 
-            ? Colors.grey[850]!.withOpacity(0.9)
-            : Colors.white.withOpacity(0.9),
+            ? Colors.grey[850]!.withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 24)),
           bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 24)),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, -2),
             blurRadius: 8,
           ),
@@ -220,20 +221,20 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       ),
       child: Row(
         children: [
-          // Botón Eliminar (solo en modo edición y móvil/tablet landscape)
+          // Bot�n Eliminar (solo en modo edici�n y m�vil/tablet landscape)
           if (widget.isEditing && (isMobile || isMobileLandscape)) ...[
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.red[700]!,
+                    AppColors.accionEliminar!,
                     Colors.red[800]!,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.red.withOpacity(0.3),
+                    color: Colors.red.withValues(alpha: 0.3),
                     offset: Offset(0, isMobileLandscape ? 2 : 4),
                     blurRadius: isMobileLandscape ? 6 : 8,
                   ),
@@ -254,13 +255,13 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
             SizedBox(width: isMobileLandscape ? 8 : 10),
           ],
           
-          // Botón Cancelar
+          // Bot�n Cancelar
           Expanded(
             child: Container(
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Colors.grey.withOpacity(0.3)
-                    : Colors.grey.withOpacity(0.2),
+                    ? Colors.grey.withValues(alpha: 0.3)
+                    : Colors.grey.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
               ),
               child: TextButton(
@@ -297,21 +298,21 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
           
           SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
           
-          // Botón Añadir/Guardar
+          // Bot�n A�adir/Guardar
           Expanded(
             flex: isMobileLandscape ? 2 : 1,
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF1976d2),
+                    AppColors.primary,
                     Color(0xFF42A5F5),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFF1976d2).withOpacity(0.4),
+                    color: AppColors.primaryOpacity40,
                     offset: Offset(0, isMobileLandscape ? 2 : 4),
                     blurRadius: isMobileLandscape ? 8 : 12,
                   ),
@@ -343,7 +344,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     Text(
                       widget.isEditing 
                           ? (isMobileLandscape ? 'Guardar' : (isMobile ? 'Guardar' : 'Guardar Cambios'))
-                          : (isMobileLandscape ? 'Añadir' : (isMobile ? 'Añadir' : 'Añadir Imagen')),
+                          : (isMobileLandscape ? 'A�adir' : (isMobile ? 'A�adir' : 'A�adir Imagen')),
                       style: TextStyle(
                         fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                         fontWeight: FontWeight.bold,
@@ -360,7 +361,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
   }
 
-  // Confirmación de eliminación
+  // Confirmaci�n de eliminaci�n
   Future<void> _showDeleteConfirmation(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
@@ -405,7 +406,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   offset: Offset(0, isMobileLandscape ? 6 : 10),
                   blurRadius: isMobileLandscape ? 20 : 30,
                 ),
@@ -423,7 +424,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.red[700]!,
+                        AppColors.accionEliminar!,
                         Colors.red[800]!,
                       ],
                     ),
@@ -433,7 +434,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.red.withOpacity(0.3),
+                        color: Colors.red.withValues(alpha: 0.3),
                         offset: Offset(0, 4),
                         blurRadius: 8,
                       ),
@@ -444,7 +445,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                       Container(
                         padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
                         ),
                         child: Icon(
@@ -456,7 +457,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                       SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                       Expanded(
                         child: Text(
-                          'Confirmar Eliminación',
+                          'Confirmar Eliminaci�n',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
@@ -477,7 +478,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                       Icon(
                         Icons.delete_forever_rounded,
                         size: isMobileLandscape ? 48 : (isMobile ? 56 : 64),
-                        color: Colors.red[700],
+                        color: AppColors.accionEliminar,
                       ),
                       SizedBox(height: isMobileLandscape ? 10 : 12),
                       Text(
@@ -508,15 +509,15 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                   padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 14 : 16)),
                   decoration: BoxDecoration(
                     color: isDark 
-                        ? Colors.grey[850]!.withOpacity(0.9)
-                        : Colors.white.withOpacity(0.9),
+                        ? Colors.grey[850]!.withValues(alpha: 0.9)
+                        : Colors.white.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                       bottomRight: Radius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         offset: Offset(0, -4),
                         blurRadius: 8,
                       ),
@@ -554,10 +555,10 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                         child: ElevatedButton(
                           onPressed: () => Navigator.of(dialogContext).pop(true),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red[700],
+                            backgroundColor: AppColors.accionEliminar,
                             foregroundColor: Colors.white,
                             elevation: 4,
-                            shadowColor: Colors.red.withOpacity(0.5),
+                            shadowColor: Colors.red.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : 8),
                             ),
@@ -596,7 +597,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
 
     if (result == true && context.mounted) {
-      // Cerrar el diálogo de edición y pasar resultado de eliminación
+      // Cerrar el di�logo de edici�n y pasar resultado de eliminaci�n
       Navigator.of(context).pop('delete');
     }
   }

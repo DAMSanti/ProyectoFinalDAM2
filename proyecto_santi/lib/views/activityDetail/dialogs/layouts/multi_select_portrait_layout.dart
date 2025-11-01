@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import '../widgets/multi_select_cursos_list.dart';
@@ -68,15 +69,15 @@ class MultiSelectPortraitLayout extends StatelessWidget {
   Widget _buildSearchField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFF1976d2).withOpacity(0.1),
+            color: AppColors.primaryOpacity10,
             offset: Offset(0, 2),
             blurRadius: 8,
           ),
@@ -88,7 +89,7 @@ class MultiSelectPortraitLayout extends StatelessWidget {
           hintStyle: TextStyle(fontSize: isMobile ? 14 : 16),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: Color(0xFF1976d2),
+            color: AppColors.primary,
             size: isMobile ? 20 : 24,
           ),
           border: OutlineInputBorder(
@@ -117,13 +118,13 @@ class MultiSelectPortraitLayout extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1976d2).withOpacity(0.2),
-            Color(0xFF1565c0).withOpacity(0.15),
+            AppColors.primaryOpacity20,
+            AppColors.primaryDarkOpacity15,
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Color(0xFF1976d2).withOpacity(0.3),
+          color: AppColors.primaryOpacity30,
           width: 1,
         ),
       ),
@@ -133,7 +134,7 @@ class MultiSelectPortraitLayout extends StatelessWidget {
             padding: EdgeInsets.all(isMobile ? 6 : 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                colors: AppColors.primaryGradient,
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -148,7 +149,7 @@ class MultiSelectPortraitLayout extends StatelessWidget {
             child: Text(
               '${selectedGrupos.length} grupo(s) seleccionado(s) para agregar',
               style: TextStyle(
-                color: Color(0xFF1976d2),
+                color: AppColors.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: isMobile ? 13 : 14,
               ),

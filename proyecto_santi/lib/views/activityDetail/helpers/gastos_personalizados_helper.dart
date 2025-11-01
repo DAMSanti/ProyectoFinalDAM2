@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../models/gasto_personalizado.dart';
 import '../services/budget_state_service.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Helper para gestionar gastos personalizados
 class GastosPersonalizadosHelper {
@@ -50,17 +51,13 @@ class GastosPersonalizadosHelper {
                 final cantidadStr = cantidadController.text.trim();
                 
                 if (concepto.isEmpty || cantidadStr.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Por favor completa todos los campos')),
-                  );
+                  SnackBarHelper.show(context, 'Por favor completa todos los campos');
                   return;
                 }
                 
                 final cantidad = double.tryParse(cantidadStr);
                 if (cantidad == null || cantidad <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('La cantidad debe ser un número válido mayor a 0')),
-                  );
+                  SnackBarHelper.show(context, 'La cantidad debe ser un número válido mayor a 0');
                   return;
                 }
                 
@@ -97,16 +94,12 @@ class GastosPersonalizadosHelper {
         onUpdate();
 
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gasto agregado correctamente')),
-          );
+          SnackBarHelper.showSuccess(context, 'Gasto agregado correctamente');
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al agregar gasto: $e')),
-        );
+        SnackBarHelper.showError(context, 'Error al agregar gasto: $e');
       }
     }
   }
@@ -130,7 +123,7 @@ class GastosPersonalizadosHelper {
               onPressed: () => Navigator.of(context).pop(false),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoRechazado),
               child: Text('Eliminar'),
               onPressed: () => Navigator.of(context).pop(true),
             ),
@@ -149,15 +142,11 @@ class GastosPersonalizadosHelper {
       onUpdate();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gasto eliminado correctamente')),
-        );
+        SnackBarHelper.showSuccess(context, 'Gasto eliminado correctamente');
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar gasto: $e')),
-        );
+        SnackBarHelper.showError(context, 'Error al eliminar gasto: $e');
       }
     }
   }
@@ -165,16 +154,12 @@ class GastosPersonalizadosHelper {
   /// Muestra diálogo para solicitar presupuestos de transporte
   static void mostrarDialogoSolicitarPresupuestosTransporte(BuildContext context) {
     // TODO: Implementar lógica de solicitud de presupuestos
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Funcionalidad en desarrollo')),
-    );
+    SnackBarHelper.show(context, 'Funcionalidad en desarrollo');
   }
 
   /// Muestra diálogo para solicitar presupuestos de alojamiento
   static void mostrarDialogoSolicitarPresupuestosAlojamiento(BuildContext context) {
     // TODO: Implementar lógica de solicitud de presupuestos
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Funcionalidad en desarrollo')),
-    );
+    SnackBarHelper.show(context, 'Funcionalidad en desarrollo');
   }
 }

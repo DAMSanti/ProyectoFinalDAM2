@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
+import 'package:proyecto_santi/tema/tema.dart';
 
 /// Widget para mostrar la lista de cursos y sus grupos en el multi-select
 class MultiSelectCursosList extends StatelessWidget {
@@ -43,12 +44,12 @@ class MultiSelectCursosList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark 
-            ? Colors.white.withOpacity(0.1) 
-            : Colors.black.withOpacity(0.05),
+            ? Colors.white.withValues(alpha: 0.1) 
+            : Colors.black.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
@@ -70,13 +71,13 @@ class MultiSelectCursosList extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(isCompact ? 12 : (isMobile ? 16 : 20)),
             decoration: BoxDecoration(
-              color: Color(0xFF1976d2).withOpacity(0.1),
+              color: AppColors.primaryOpacity10,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.search_off_rounded,
               size: isCompact ? 32 : (isMobile ? 40 : 48),
-              color: Color(0xFF1976d2).withOpacity(0.5),
+              color: AppColors.primaryOpacity50,
             ),
           ),
           SizedBox(height: isCompact ? 10 : (isMobile ? 12 : 16)),
@@ -91,7 +92,7 @@ class MultiSelectCursosList extends StatelessWidget {
           if (!isCompact) ...[
             SizedBox(height: 8),
             Text(
-              'Intenta con otros tÃ©rminos de bÃºsqueda',
+              'Intenta con otros términos de búsqueda',
               style: TextStyle(
                 fontSize: isMobile ? 12 : 13,
                 color: isDark ? Colors.white54 : Colors.black38,
@@ -116,11 +117,11 @@ class MultiSelectCursosList extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: isCompact ? 6 : 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(isCompact ? 10 : 12),
         border: Border.all(
           color: algunoSeleccionado
-            ? Color(0xFF1976d2).withOpacity(0.5)
+            ? AppColors.primaryOpacity50
             : Colors.transparent,
           width: algunoSeleccionado ? 2 : 1,
         ),
@@ -144,8 +145,8 @@ class MultiSelectCursosList extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1976d2).withOpacity(0.15),
-            Color(0xFF1565c0).withOpacity(0.1),
+            AppColors.primaryOpacity15,
+            AppColors.primaryDarkOpacity10,
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -174,7 +175,7 @@ class MultiSelectCursosList extends StatelessWidget {
                   child: Checkbox(
                     value: todosGruposSeleccionados,
                     tristate: true,
-                    activeColor: Color(0xFF1976d2),
+                    activeColor: AppColors.primary,
                     onChanged: (value) => onToggleCurso(curso.id),
                   ),
                 ),
@@ -182,7 +183,7 @@ class MultiSelectCursosList extends StatelessWidget {
                   padding: EdgeInsets.all(isCompact ? 6 : (isMobile ? 8 : 10)),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                      colors: AppColors.primaryGradient,
                     ),
                     borderRadius: BorderRadius.circular(isCompact ? 6 : 8),
                   ),
@@ -202,7 +203,7 @@ class MultiSelectCursosList extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: isCompact ? 13 : (isMobile ? 14 : 15),
-                          color: Color(0xFF1976d2),
+                          color: AppColors.primary,
                         ),
                       ),
                       SizedBox(height: 2),
@@ -219,14 +220,14 @@ class MultiSelectCursosList extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(isCompact ? 4 : 6),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1976d2).withOpacity(0.1),
+                    color: AppColors.primaryOpacity10,
                     borderRadius: BorderRadius.circular(isCompact ? 6 : 8),
                   ),
                   child: Icon(
                     isExpanded 
                       ? Icons.expand_less_rounded 
                       : Icons.expand_more_rounded,
-                    color: Color(0xFF1976d2),
+                    color: AppColors.primary,
                     size: isCompact ? 20 : 24,
                   ),
                 ),
@@ -255,16 +256,16 @@ class MultiSelectCursosList extends StatelessWidget {
             margin: EdgeInsets.only(top: isCompact ? 6 : 8),
             decoration: BoxDecoration(
               color: yaParticipante 
-                ? Colors.grey.withOpacity(0.1)
+                ? Colors.grey.withValues(alpha: 0.1)
                 : isSelected
-                  ? Color(0xFF1976d2).withOpacity(0.1)
-                  : Colors.white.withOpacity(0.5),
+                  ? AppColors.primaryOpacity10
+                  : Colors.white.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(isCompact ? 8 : 10),
               border: Border.all(
                 color: yaParticipante
-                  ? Colors.grey.withOpacity(0.3)
+                  ? Colors.grey.withValues(alpha: 0.3)
                   : isSelected
-                    ? Color(0xFF1976d2).withOpacity(0.4)
+                    ? AppColors.primaryOpacity40
                     : Colors.transparent,
                 width: isSelected ? 1.5 : 1,
               ),
@@ -285,7 +286,7 @@ class MultiSelectCursosList extends StatelessWidget {
                               colors: [Colors.grey[400]!, Colors.grey[500]!],
                             )
                           : LinearGradient(
-                              colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                              colors: AppColors.primaryGradient,
                             ),
                         borderRadius: BorderRadius.circular(isCompact ? 4 : 6),
                       ),
@@ -309,10 +310,10 @@ class MultiSelectCursosList extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.2),
+                          color: AppColors.estadoPendiente.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: AppColors.estadoPendiente.withValues(alpha: 0.5),
                             width: 1,
                           ),
                         ),
@@ -322,7 +323,7 @@ class MultiSelectCursosList extends StatelessWidget {
                             Icon(
                               Icons.check_circle_rounded,
                               size: isCompact ? 8 : 10,
-                              color: Colors.orange,
+                              color: AppColors.estadoPendiente,
                             ),
                             SizedBox(width: isCompact ? 2 : 3),
                             Flexible(
@@ -330,7 +331,7 @@ class MultiSelectCursosList extends StatelessWidget {
                                 'Ya participa',
                                 style: TextStyle(
                                   fontSize: isCompact ? 9 : 10,
-                                  color: Colors.orange,
+                                  color: AppColors.estadoPendiente,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -365,7 +366,7 @@ class MultiSelectCursosList extends StatelessWidget {
               ),
               value: isSelected,
               enabled: !yaParticipante,
-              activeColor: Color(0xFF1976d2),
+              activeColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(isCompact ? 8 : 10),
               ),

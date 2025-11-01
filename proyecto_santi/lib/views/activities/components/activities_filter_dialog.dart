@@ -165,13 +165,13 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                           ),
                           decoration: BoxDecoration(
                             color: isDark 
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.grey.withOpacity(0.1),
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.grey.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                             border: Border.all(
                               color: isDark 
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.grey.withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : Colors.grey.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
@@ -244,7 +244,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                               horizontal: isMobileLandscape ? 4 : (isMobile ? 6 : 8),
                               vertical: isMobileLandscape ? 0 : (isMobile ? 2 : 4),
                             ),
-                            selectedColor: Color(0xFF1976d2).withOpacity(0.2),
+                            selectedColor: Color(0xFF1976d2).withValues(alpha: 0.2),
                             checkmarkColor: Color(0xFF1976d2),
                             labelStyle: TextStyle(
                               color: isSelected 
@@ -287,7 +287,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                               horizontal: isMobileLandscape ? 4 : (isMobile ? 6 : 8),
                               vertical: isMobileLandscape ? 0 : (isMobile ? 2 : 4),
                             ),
-                            selectedColor: Color(0xFF1976d2).withOpacity(0.2),
+                            selectedColor: Color(0xFF1976d2).withValues(alpha: 0.2),
                             checkmarkColor: Color(0xFF1976d2),
                             labelStyle: TextStyle(
                               color: isSelected 
@@ -331,13 +331,13 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                               ),
                               decoration: BoxDecoration(
                                 color: isDark 
-                                    ? Colors.white.withOpacity(0.05)
-                                    : Colors.grey.withOpacity(0.1),
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : Colors.grey.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
                                 border: Border.all(
                                   color: isDark 
-                                      ? Colors.white.withOpacity(0.1)
-                                      : Colors.grey.withOpacity(0.3),
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.grey.withValues(alpha: 0.3),
                                 ),
                               ),
                               child: DropdownButtonHideUnderline(
@@ -403,8 +403,8 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
               padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
               decoration: BoxDecoration(
                 color: isDark 
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(isMobileLandscape ? 12 : 16),
                   bottomRight: Radius.circular(isMobileLandscape ? 12 : 16),

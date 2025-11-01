@@ -106,7 +106,7 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
                   onTap: widget.onDelete,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                      color: Colors.red.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     padding: EdgeInsets.all(6),

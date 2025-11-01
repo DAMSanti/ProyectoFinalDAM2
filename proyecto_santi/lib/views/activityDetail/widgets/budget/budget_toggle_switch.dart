@@ -37,22 +37,22 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: value 
             ? [
-                color.withOpacity(0.25),
-                color.withOpacity(0.15),
+                color.withValues(alpha: 0.25),
+                color.withValues(alpha: 0.15),
               ]
             : [
-                Colors.white.withOpacity(0.3),
-                Colors.white.withOpacity(0.1),
+                Colors.white.withValues(alpha: 0.3),
+                Colors.white.withValues(alpha: 0.1),
               ],
         ),
         borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
         border: Border.all(
-          color: value ? color.withOpacity(0.5) : Colors.white.withOpacity(0.3),
+          color: value ? color.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.3),
           width: isMobile ? 1 : 2,
         ),
         boxShadow: value ? [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: isMobile ? 4 : 8,
             offset: Offset(0, isMobile ? 1 : 3),
           ),
@@ -73,14 +73,14 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
                       gradient: value
                         ? LinearGradient(
                             colors: [
-                              color.withOpacity(0.8),
-                              color.withOpacity(0.6),
+                              color.withValues(alpha: 0.8),
+                              color.withValues(alpha: 0.6),
                             ],
                           )
                         : LinearGradient(
                             colors: [
-                              Colors.grey.withOpacity(0.3),
-                              Colors.grey.withOpacity(0.2),
+                              Colors.grey.withValues(alpha: 0.3),
+                              Colors.grey.withValues(alpha: 0.2),
                             ],
                           ),
                       borderRadius: BorderRadius.circular(8),
@@ -112,7 +112,7 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
               value: value,
               onChanged: onChanged,
               activeColor: color,
-              activeTrackColor: color.withOpacity(0.5),
+              activeTrackColor: color.withValues(alpha: 0.5),
               inactiveThumbColor: Colors.grey[400],
               inactiveTrackColor: Colors.grey[300],
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
