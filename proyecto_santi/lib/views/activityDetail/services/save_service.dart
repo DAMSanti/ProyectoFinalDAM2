@@ -133,11 +133,17 @@ class SaveHandler {
 
     // 8. Guardar localizaciones
     if (datosEditados != null && datosEditados.containsKey('localizaciones')) {
+      print('DEBUG: Intentando guardar localizaciones - ${datosEditados['localizaciones']?.length ?? 0} localizaciones');
       success = success &&
           await _saveLocalizaciones(
             actividadId: actividadId,
             localizaciones: datosEditados['localizaciones'],
           );
+    } else {
+      print('DEBUG: No hay cambios en localizaciones o datosEditados es null');
+      if (datosEditados != null) {
+        print('DEBUG: Claves en datosEditados: ${datosEditados.keys.toList()}');
+      }
     }
 
     // 9. Guardar descripciones de fotos
@@ -329,13 +335,25 @@ class SaveHandler {
     required List<dynamic> profesoresParticipantes,
   }) async {
     try {
+      print('DEBUG: Profesores participantes recibidos: ${profesoresParticipantes.length}');
+      print('DEBUG: Tipo del primer elemento: ${profesoresParticipantes.isNotEmpty ? profesoresParticipantes.first.runtimeType : "lista vacía"}');
+      
       final profesoresIds = profesoresParticipantes.map((p) {
+        String? uuid;
         if (p is Map<String, dynamic>) {
-          return p['uuid'] as String;
+          uuid = p['uuid'] as String?;
+          print('DEBUG: Extrayendo UUID de Map: $uuid');
         } else {
           // Asumimos que es un objeto Profesor
-          return (p as dynamic).uuid as String;
+          uuid = (p as dynamic).uuid as String?;
+          print('DEBUG: Extrayendo UUID de objeto: $uuid');
         }
+        
+        if (uuid == null || uuid.isEmpty) {
+          throw Exception('UUID nulo o vacío encontrado en profesor: $p');
+        }
+        
+        return uuid;
       }).toList();
 
       print('DEBUG: Guardando profesores participantes - IDs: $profesoresIds'); // DEBUG
@@ -354,23 +372,53 @@ class SaveHandler {
     required List<dynamic> gruposParticipantes,
   }) async {
     try {
+      print('DEBUG: Grupos participantes recibidos: ${gruposParticipantes.length}');
+      print('DEBUG: Tipo del primer elemento: ${gruposParticipantes.isNotEmpty ? gruposParticipantes.first.runtimeType : "lista vacía"}');
+      
       final gruposMapped = gruposParticipantes.map((g) {
+        int? id;
+        int? numeroParticipantes;
+        
         if (g is Map<String, dynamic>) {
-          return {
-            'id': g['id'] as int,
-            'numeroAlumnos': g['numeroAlumnos'] ?? 0,
-          };
+          // Si es un Map, puede venir de diferentes formas
+          if (g.containsKey('grupo')) {
+            // Formato: { grupo: { id: X }, numeroParticipantes: Y }
+            final grupoData = g['grupo'];
+            id = grupoData is Map ? grupoData['id'] as int? : (grupoData as dynamic).id as int?;
+            numeroParticipantes = g['numeroParticipantes'] as int?;
+          } else {
+            // Formato: { id: X, numeroAlumnos: Y }
+            id = g['id'] as int?;
+            numeroParticipantes = g['numeroAlumnos'] as int? ?? g['numeroParticipantes'] as int?;
+          }
+          print('DEBUG: Extrayendo de Map - ID: $id, NumeroParticipantes: $numeroParticipantes');
         } else {
-          return {
-            'id': (g as dynamic).id as int,
-            'numeroAlumnos': (g as dynamic).numeroAlumnos ?? 0,
-          };
+          // Es un objeto GrupoParticipante
+          id = (g as dynamic).grupo.id as int?;
+          numeroParticipantes = (g as dynamic).numeroParticipantes as int?;
+          print('DEBUG: Extrayendo de objeto GrupoParticipante - ID: $id, NumeroParticipantes: $numeroParticipantes');
         }
+        
+        if (id == null) {
+          throw Exception('ID de grupo nulo encontrado en: $g');
+        }
+        if (numeroParticipantes == null || numeroParticipantes <= 0) {
+          throw Exception('Número de participantes inválido para grupo $id: $numeroParticipantes');
+        }
+        
+        return {
+          'grupoId': id,  // Cambiado de 'id' a 'grupoId' para coincidir con el DTO del backend
+          'numeroParticipantes': numeroParticipantes,  // Cambiado de 'numeroAlumnos' a 'numeroParticipantes'
+        };
       }).toList();
 
+      print('DEBUG: Guardando grupos participantes - Datos: $gruposMapped');
       await catalogoService.updateGruposParticipantes(actividadId, gruposMapped);
+      print('DEBUG: Grupos participantes guardados exitosamente');
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR al guardar grupos participantes: $e');
+      print('StackTrace: $stackTrace');
       return false;
     }
   }
@@ -408,26 +456,40 @@ class SaveHandler {
     required List<GastoPersonalizado> gastos,
   }) async {
     try {
+      print('DEBUG: Guardando gastos personalizados - Total: ${gastos.length}');
+      
       final gastosOriginales = await gastoService.fetchGastosByActividad(actividadId);
+      print('DEBUG: Gastos originales en BD: ${gastosOriginales.length}');
+      
       final gastosOriginalesIds = gastosOriginales.map((g) => g.id).toSet();
       final gastosNuevosIds = gastos.where((g) => g.id != null).map((g) => g.id!).toSet();
 
       // Eliminar gastos
       final gastosAEliminar = gastosOriginalesIds.difference(gastosNuevosIds);
+      print('DEBUG: Gastos a eliminar: ${gastosAEliminar.length} -> $gastosAEliminar');
       for (final gastoId in gastosAEliminar) {
         if (gastoId != null) {
+          print('DEBUG: Eliminando gasto ID: $gastoId');
           await gastoService.deleteGasto(gastoId);
         }
       }
 
       // Crear gastos nuevos
       final gastosACrear = gastos.where((g) => g.id == null).toList();
+      print('DEBUG: Gastos a crear: ${gastosACrear.length}');
       for (final gasto in gastosACrear) {
-        await gastoService.createGasto(gasto);
+        print('DEBUG: Creando gasto: ${gasto.concepto} - ${gasto.cantidad}€');
+        final gastoCreado = await gastoService.createGasto(gasto);
+        if (gastoCreado != null) {
+          print('DEBUG: Gasto creado con ID: ${gastoCreado.id}');
+        }
       }
 
+      print('DEBUG: Gastos personalizados guardados exitosamente');
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR al guardar gastos personalizados: $e');
+      print('StackTrace: $stackTrace');
       return false;
     }
   }
@@ -437,11 +499,115 @@ class SaveHandler {
     required List<dynamic> localizaciones,
   }) async {
     try {
-      // Las localizaciones se gestionan individualmente mediante add/remove/update
-      // No hay endpoint batch, así que retornamos true
-      // El sistema actual ya maneja las localizaciones correctamente
+      print('DEBUG: Guardando localizaciones - Total: ${localizaciones.length}');
+      
+      // Obtener las localizaciones actuales de la BD
+      final localizacionesOriginales = await localizacionService.fetchLocalizaciones(actividadId);
+      print('DEBUG: Localizaciones originales en BD: ${localizacionesOriginales.length}');
+      
+      // Procesar cada localización
+      for (var loc in localizaciones) {
+        // Convertir a Map si es un objeto Localizacion
+        Map<String, dynamic> locData;
+        if (loc is Map<String, dynamic>) {
+          locData = loc;
+        } else {
+          // Es un objeto Localizacion, usar toJson()
+          locData = (loc as dynamic).toJson() as Map<String, dynamic>;
+        }
+        
+        int? locId = locData['id'] as int?;
+        bool esPrincipal = locData['esPrincipal'] as bool? ?? false;
+        String? icono = locData['icono'] as String?;
+        String? descripcion = locData['descripcion'] as String?;
+        String? tipoLocalizacion = locData['tipoLocalizacion'] as String?;
+        
+        print('DEBUG: Procesando localización ID: $locId, nombre: ${locData['nombre']}, esPrincipal: $esPrincipal');
+        
+        // Si el ID es null o negativo (temporal), necesitamos crear la localización primero
+        if (locId == null || locId < 0) {
+          print('DEBUG: Localización con ID temporal ($locId), necesita ser creada primero');
+          
+          String? nombre = locData['nombre'] as String?;
+          String? direccion = locData['direccion'] as String?;
+          String? ciudad = locData['ciudad'] as String?;
+          String? provincia = locData['provincia'] as String?;
+          String? codigoPostal = locData['codigoPostal'] as String?;
+          double? latitud = (locData['latitud'] as num?)?.toDouble();
+          double? longitud = (locData['longitud'] as num?)?.toDouble();
+          
+          if (nombre == null || latitud == null || longitud == null) {
+            print('DEBUG: Localización sin datos mínimos requeridos (nombre: $nombre, lat: $latitud, lon: $longitud), omitiendo');
+            continue;
+          }
+          
+          // Crear la localización en la BD
+          print('DEBUG: Creando nueva localización: $nombre en ($latitud, $longitud)');
+          final locCreada = await localizacionService.createLocalizacion(
+            nombre: nombre,
+            direccion: direccion,
+            ciudad: ciudad,
+            provincia: provincia,
+            codigoPostal: codigoPostal,
+            latitud: latitud,
+            longitud: longitud,
+          );
+          
+          if (locCreada != null && locCreada['id'] != null) {
+            locId = locCreada['id'] as int;
+            print('DEBUG: Localización creada exitosamente con ID: $locId');
+          } else {
+            print('DEBUG: ERROR - No se pudo crear la localización, locCreada: $locCreada');
+            continue;
+          }
+        }
+        
+        // Ahora agregar o actualizar la relación con la actividad
+        final yaExiste = localizacionesOriginales.any((l) => l['id'] == locId);
+        
+        if (yaExiste) {
+          print('DEBUG: Actualizando localización $locId en actividad $actividadId');
+          await localizacionService.updateLocalizacion(
+            actividadId,
+            locId!,
+            esPrincipal: esPrincipal,
+            icono: icono,
+            descripcion: descripcion,
+            tipoLocalizacion: tipoLocalizacion,
+          );
+        } else {
+          print('DEBUG: Agregando localización $locId a actividad $actividadId');
+          final resultado = await localizacionService.addLocalizacion(
+            actividadId,
+            locId!,
+            esPrincipal: esPrincipal,
+            icono: icono,
+            descripcion: descripcion,
+            tipoLocalizacion: tipoLocalizacion,
+          );
+          print('DEBUG: Resultado de agregar localización: $resultado');
+        }
+      }
+      
+      // Eliminar localizaciones que ya no están en la lista
+      final localizacionesActualesIds = localizaciones
+          .map((l) => l is Map ? l['id'] as int? : (l as dynamic).id as int?)
+          .where((id) => id != null && id > 0)
+          .toSet();
+      
+      for (var locOriginal in localizacionesOriginales) {
+        final locOriginalId = locOriginal['id'] as int?;
+        if (locOriginalId != null && !localizacionesActualesIds.contains(locOriginalId)) {
+          print('DEBUG: Eliminando localización $locOriginalId de actividad $actividadId');
+          await localizacionService.removeLocalizacion(actividadId, locOriginalId);
+        }
+      }
+      
+      print('DEBUG: Localizaciones guardadas exitosamente');
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('ERROR al guardar localizaciones: $e');
+      print('StackTrace: $stackTrace');
       return false;
     }
   }

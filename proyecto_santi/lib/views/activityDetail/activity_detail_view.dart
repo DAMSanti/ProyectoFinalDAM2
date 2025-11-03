@@ -265,8 +265,20 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       _datosEditados = {};
     }
     
+    // DEBUG: Ver qué datos se están actualizando
+    print('DEBUG [activity_detail_view]: updatedData keys: ${updatedData.keys.toList()}');
+    if (updatedData.containsKey('localizaciones')) {
+      print('DEBUG [activity_detail_view]: localizaciones count: ${updatedData['localizaciones']?.length ?? 0}');
+    }
+    
     // Fusionar los datos actualizados con los existentes
     _datosEditados!.addAll(updatedData);
+    
+    // DEBUG: Ver qué hay en _datosEditados después del addAll
+    print('DEBUG [activity_detail_view]: _datosEditados keys después de addAll: ${_datosEditados!.keys.toList()}');
+    if (_datosEditados!.containsKey('localizaciones')) {
+      print('DEBUG [activity_detail_view]: localizaciones en _datosEditados: ${_datosEditados!['localizaciones']?.length ?? 0}');
+    }
     
 
 
@@ -278,6 +290,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     
     // Si hay cambios en localizaciones, marcar como cambio
     if (updatedData.containsKey('localizaciones_changed') && updatedData['localizaciones_changed'] == true) {
+      // Asegurarse de que las localizaciones estén en _datosEditados para que se guarden
+      if (updatedData.containsKey('localizaciones')) {
+        _datosEditados!['localizaciones'] = updatedData['localizaciones'];
+      }
+      
       setState(() {
         isDataChanged = true;
       });

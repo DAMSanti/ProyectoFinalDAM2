@@ -158,22 +158,14 @@ class BudgetCardsLayout extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16),
-        // Fila inferior: Coste por Alumno centrado
-        Row(
-          children: [
-            Spacer(),
-            Expanded(
-              child: BudgetCardWidget(
-                titulo: 'Coste por Alumno',
-                valor: costoPorAlumno,
-                icono: Icons.person,
-                color: AppColors.estadoPendiente,
-                width: double.infinity,
-                isWeb: isWeb,
-              ),
-            ),
-            Spacer(),
-          ],
+        // Fila inferior: Coste por Alumno ocupa todo el ancho
+        BudgetCardWidget(
+          titulo: 'Coste por Alumno',
+          valor: costoPorAlumno,
+          icono: Icons.person,
+          color: AppColors.estadoPendiente,
+          width: double.infinity,
+          isWeb: isWeb,
         ),
       ],
     );

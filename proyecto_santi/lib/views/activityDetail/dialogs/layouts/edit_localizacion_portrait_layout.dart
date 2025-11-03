@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Layout portrait para el di�logo de edici�n de localizaci�n
+/// Layout portrait para el diálogo de edición de localización
 class EditLocalizacionPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -44,7 +44,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Info de la localizaci�n
+          // Info de la localización
           _buildLocationInfo(),
           SizedBox(height: isMobile ? 14 : 20),
           
@@ -53,11 +53,11 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
           
           SizedBox(height: puedeSerPrincipal ? (isMobile ? 14 : 20) : 0),
           
-          // Tipo de localizaci�n
+          // Tipo de localización
           _buildTypeSelector(),
           SizedBox(height: isMobile ? 14 : 20),
           
-          // Campo de descripci�n
+          // Campo de descripción
           _buildDescription(),
           SizedBox(height: isMobile ? 14 : 20),
           
@@ -159,7 +159,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             SizedBox(width: isMobile ? 6 : 8),
             Expanded(
               child: Text(
-                isMobile ? 'Localizaci�n principal' : 'Marcar como localizaci�n principal',
+                isMobile ? 'Localización principal' : 'Marcar como localización principal',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: isMobile ? 13 : 14,
@@ -171,7 +171,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
         subtitle: Padding(
           padding: EdgeInsets.only(left: isMobile ? 24 : 28, top: 4),
           child: Text(
-            isMobile ? 'Desmarcar� la actual' : 'Desmarcar� la localizaci�n principal actual',
+            isMobile ? 'Desmarcará la actual' : 'Desmarcará la localización principal actual',
             style: TextStyle(
               fontSize: isMobile ? 11 : 12,
               color: isDark ? Colors.white60 : Colors.black45,
@@ -214,7 +214,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             ),
             SizedBox(width: isMobile ? 8 : 10),
             Text(
-              'Tipo de localizaci�n:',
+              'Tipo de localización:',
               style: TextStyle(
                 fontSize: isMobile ? 13 : 15,
                 fontWeight: FontWeight.bold,
@@ -325,7 +325,7 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             ),
             SizedBox(width: isMobile ? 8 : 10),
             Text(
-              'Descripci�n:',
+              'Descripción:',
               style: TextStyle(
                 fontSize: isMobile ? 13 : 15,
                 fontWeight: FontWeight.bold,
@@ -358,8 +358,8 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             style: TextStyle(fontSize: isMobile ? 13 : 14),
             decoration: InputDecoration(
               hintText: isMobile 
-                ? 'A�ade un comentario...' 
-                : 'A�ade un comentario o descripci�n sobre esta localizaci�n...',
+                ? 'Añade un comentario...' 
+                : 'Añade un comentario o descripción sobre esta localización...',
               hintStyle: TextStyle(fontSize: isMobile ? 13 : 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(isMobile ? 10 : 12),

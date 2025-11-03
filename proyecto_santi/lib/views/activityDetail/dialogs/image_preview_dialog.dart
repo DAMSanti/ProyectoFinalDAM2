@@ -199,7 +199,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
   }
 
-  // Footer con botones de acci�n
+  // Footer con botones de acción
   Widget _buildFooter(BuildContext context, bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
@@ -221,7 +221,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       ),
       child: Row(
         children: [
-          // Bot�n Eliminar (solo en modo edici�n y m�vil/tablet landscape)
+          // Botón Eliminar (solo en modo edición y móvil/tablet landscape)
           if (widget.isEditing && (isMobile || isMobileLandscape)) ...[
             Container(
               decoration: BoxDecoration(
@@ -255,7 +255,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
             SizedBox(width: isMobileLandscape ? 8 : 10),
           ],
           
-          // Bot�n Cancelar
+          // Botón Cancelar
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -298,7 +298,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
           
           SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
           
-          // Bot�n A�adir/Guardar
+          // Botón Añadir/Guardar
           Expanded(
             flex: isMobileLandscape ? 2 : 1,
             child: Container(
@@ -344,7 +344,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     Text(
                       widget.isEditing 
                           ? (isMobileLandscape ? 'Guardar' : (isMobile ? 'Guardar' : 'Guardar Cambios'))
-                          : (isMobileLandscape ? 'A�adir' : (isMobile ? 'A�adir' : 'A�adir Imagen')),
+                          : (isMobileLandscape ? 'Añadir' : (isMobile ? 'Añadir' : 'Añadir Imagen')),
                       style: TextStyle(
                         fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 14),
                         fontWeight: FontWeight.bold,
@@ -361,7 +361,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
   }
 
-  // Confirmaci�n de eliminaci�n
+  // Confirmación de eliminación
   Future<void> _showDeleteConfirmation(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
@@ -457,7 +457,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                       SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
                       Expanded(
                         child: Text(
-                          'Confirmar Eliminaci�n',
+                          'Confirmar Eliminación',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
@@ -597,7 +597,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     );
 
     if (result == true && context.mounted) {
-      // Cerrar el di�logo de edici�n y pasar resultado de eliminaci�n
+      // Cerrar el diálogo de edición y pasar resultado de eliminación
       Navigator.of(context).pop('delete');
     }
   }

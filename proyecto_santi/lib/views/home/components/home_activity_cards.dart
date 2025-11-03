@@ -82,78 +82,84 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
               ),
               child: Material(
                 color: Colors.transparent,
-                child: ClipRRect(
+                child: InkWell(
+                  onTap: () {
+                    navigateToActivityDetailInShell(
+                      context,
+                      {'activity': widget.actividad},
+                    );
+                  },
                   borderRadius: BorderRadius.circular(20.0),
-                  child: Stack(
-                    children: [
-                    // Gradiente superior decorativo
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 4,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: widget.actividad.tipo == 'Complementaria'
-                              ? [
-                                  Color(0xFF1976d2), // Azul oscuro
-                                  Color(0xFF42A5F5), // Azul medio
-                                  Color(0xFF64B5F6), // Azul claro
-                                ]
-                              : [
-                                  Color(0xFFE65100), // Naranja oscuro
-                                  Color(0xFFFF6F00), // Naranja medio
-                                  Color(0xFFFF9800), // Naranja claro
-                                ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Efecto de brillo en hover
-                    if (_isHovered)
-                      Positioned.fill(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            gradient: RadialGradient(
-                              center: Alignment.topRight,
-                              radius: 1.5,
-                              colors: [
-                                Color.fromRGBO(25, 118, 210, 0.08),
-                                Colors.transparent,
-                              ],
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Stack(
+                      children: [
+                      // Gradiente superior decorativo
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: Container(
+                            height: 4,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: widget.actividad.tipo == 'Complementaria'
+                                  ? [
+                                      Color(0xFF1976d2), // Azul oscuro
+                                      Color(0xFF42A5F5), // Azul medio
+                                      Color(0xFF64B5F6), // Azul claro
+                                    ]
+                                  : [
+                                      Color(0xFFE65100), // Naranja oscuro
+                                      Color(0xFFFF6F00), // Naranja medio
+                                      Color(0xFFFF9800), // Naranja claro
+                                    ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    // Patrón de puntos decorativos
-                    Positioned(
-                      right: -20,
-                      bottom: -20,
-                      child: Opacity(
-                        opacity: isDark ? 0.03 : 0.02,
-                        child: Icon(
-                          Icons.calendar_month_rounded,
-                          size: 120,
-                          color: Color(0xFF1976d2),
+                      // Efecto de brillo en hover
+                      if (_isHovered)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                gradient: RadialGradient(
+                                  center: Alignment.topRight,
+                                  radius: 1.5,
+                                  colors: [
+                                    Color.fromRGBO(25, 118, 210, 0.08),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      // Patrón de puntos decorativos
+                      Positioned(
+                        right: -20,
+                        bottom: -20,
+                        child: IgnorePointer(
+                          child: Opacity(
+                            opacity: isDark ? 0.03 : 0.02,
+                            child: Icon(
+                              Icons.calendar_month_rounded,
+                              size: 120,
+                              color: Color(0xFF1976d2),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        navigateToActivityDetailInShell(
-                          context,
-                          {'activity': widget.actividad},
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: ActivityInfo(
+                      ActivityInfo(
                         actividad: widget.actividad,
                         isHovered: _isHovered,
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                  ),
                 ),
               ),
             ),

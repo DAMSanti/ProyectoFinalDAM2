@@ -341,17 +341,31 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           actividadId: widget.actividadId,
           localizacionesExistentes: _localizaciones,
           onLocalizacionAdded: () {
-            _loadLocalizaciones();
-            _notifyChanges();
+            // Este callback se llama desde el diálogo cuando hay cambios
           },
         );
       },
     );
 
-    if (result != null && result['success'] == true) {
-      await _loadLocalizaciones();
-      if (mounted) {
-        SnackBarHelper.showSuccess(context, 'Localizaci�n agregada correctamente');
+    // El diálogo devuelve las localizaciones modificadas, iconos y un flag de cambios
+    if (result != null && result['hasChanges'] == true) {
+      final localizacionesModificadas = result['localizaciones'] as List<Localizacion>?;
+      final iconosModificados = result['iconos'] as Map<int, IconData>?;
+      
+      if (localizacionesModificadas != null) {
+        setState(() {
+          _localizaciones = localizacionesModificadas;
+          if (iconosModificados != null) {
+            _iconosLocalizaciones = iconosModificados;
+          }
+        });
+        
+        // Notificar cambios al padre para activar botón guardar
+        _notifyChanges();
+        
+        if (mounted) {
+          SnackBarHelper.showSuccess(context, 'Localizaciones modificadas (pendientes de guardar)');
+        }
       }
     }
   }

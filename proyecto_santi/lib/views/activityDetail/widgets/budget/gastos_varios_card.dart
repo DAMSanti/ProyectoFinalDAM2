@@ -23,7 +23,7 @@ class GastosVariosCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Detectar si es m�vil
+    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
@@ -60,13 +60,13 @@ class GastosVariosCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado con t�tulo y bot�n agregar
+          // Encabezado con título y botón agregar
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  // Ocultar icono en m�vil
+                  // Ocultar icono en móvil
                   if (!isMobile)
                     Container(
                       padding: EdgeInsets.all(10),
@@ -108,7 +108,7 @@ class GastosVariosCardWidget extends StatelessWidget {
                       ),
                       if (totalGastos > 0)
                         Text(
-                          '${totalGastos.toStringAsFixed(2)} �',
+                          '${totalGastos.toStringAsFixed(2)} €',
                           style: TextStyle(
                             fontSize: isMobile ? 14 : (isWeb ? 16 : 18.0),
                             fontWeight: FontWeight.bold,
@@ -230,7 +230,7 @@ class GastosVariosCardWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        // Ocultar icono en m�vil
+                        // Ocultar icono en móvil
                         if (!isMobile)
                           Container(
                             padding: EdgeInsets.all(8),
@@ -261,7 +261,7 @@ class GastosVariosCardWidget extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${gasto.cantidad.toStringAsFixed(2)} �',
+                          '${gasto.cantidad.toStringAsFixed(2)} €',
                           style: TextStyle(
                             fontSize: isMobile ? 13 : (isWeb ? 14 : 16.0),
                             fontWeight: FontWeight.bold,

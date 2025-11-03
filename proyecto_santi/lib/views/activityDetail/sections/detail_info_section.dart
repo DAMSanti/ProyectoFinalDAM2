@@ -220,11 +220,19 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   
   void _notifyChanges() {
     if (widget.onActivityDataChanged != null) {
-      // Solo notificar participantes, no sobrescribir otros datos
-      widget.onActivityDataChanged!({
+      // Notificar todos los cambios incluyendo localizaciones
+      final Map<String, dynamic> changes = {
         'profesoresParticipantes': _profesoresParticipantes,
         'gruposParticipantes': _gruposParticipantes,
-      });
+      };
+      
+      // Agregar localizaciones si hay cambios
+      if (_localizaciones.isNotEmpty) {
+        changes['localizaciones'] = _localizaciones;
+        changes['localizaciones_changed'] = true;
+      }
+      
+      widget.onActivityDataChanged!(changes);
     }
   }
   

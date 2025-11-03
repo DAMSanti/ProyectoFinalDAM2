@@ -31,6 +31,14 @@ class ChangeDetectionHelper {
       }
     }
 
+    // Verificar si hay cambios en localizaciones
+    if (datosEditados != null) {
+      if (datosEditados.containsKey('localizaciones') ||
+          datosEditados.containsKey('localizaciones_changed')) {
+        return true;
+      }
+    }
+
     // Verificar si se seleccionó o cambió un folleto (archivo PDF)
     if (datosEditados != null) {
       if (datosEditados.containsKey('folletoFileName') ||
@@ -73,6 +81,12 @@ class ChangeDetectionHelper {
     
     // Verificar cambios en estado aprobada
     if (_hasAprobadaChanged(datosEditados, actividadOriginal)) return true;
+    
+    // Verificar cambios en estado
+    if (_hasEstadoChanged(datosEditados, actividadOriginal)) return true;
+    
+    // Verificar cambios en tipo de actividad
+    if (_hasTipoActividadChanged(datosEditados, actividadOriginal)) return true;
     
     // Verificar cambios en profesor
     if (_hasProfesorChanged(datosEditados, actividadOriginal)) return true;
@@ -220,13 +234,58 @@ class ChangeDetectionHelper {
     return false;
   }
 
+  static bool _hasEstadoChanged(Map<String, dynamic> datos, Actividad original) {
+    final estado = datos['estado'] as String?;
+    if (estado != null) {
+      // Normalizar estados para comparar (capitalizar primera letra)
+      final estadoNuevo = _normalizeEstado(estado);
+      final estadoOriginal = _normalizeEstado(original.estado);
+      if (estadoNuevo != estadoOriginal) return true;
+    }
+    return false;
+  }
+
+  static bool _hasTipoActividadChanged(Map<String, dynamic> datos, Actividad original) {
+    final tipo = datos['tipoActividad'] as String?;
+    if (tipo != null) {
+      // Normalizar tipos para comparar (capitalizar primera letra)
+      final tipoNuevo = _normalizeTipo(tipo);
+      final tipoOriginal = _normalizeTipo(original.tipo);
+      if (tipoNuevo != tipoOriginal) return true;
+    }
+    return false;
+  }
+
   static bool _hasProfesorChanged(Map<String, dynamic> datos, Actividad original) {
     final profesorId = datos['profesorId'] as String?;
     if (profesorId != null) {
-      final profesorOriginalId = original.solicitante?.uuid;
+      // Comparar con el responsable (no con solicitante)
+      final profesorOriginalId = original.responsable?.uuid;
       if (profesorId != profesorOriginalId) return true;
     }
     return false;
+  }
+
+  // Métodos auxiliares para normalizar strings
+  static String _normalizeEstado(String estado) {
+    if (estado.isEmpty) return '';
+    final estadoLower = estado.toLowerCase().trim();
+    if (estadoLower == 'pendiente') return 'Pendiente';
+    if (estadoLower == 'aprobada') return 'Aprobada';
+    if (estadoLower == 'cancelada') return 'Cancelada';
+    // Si no coincide con ninguno, capitalizar primera letra
+    if (estado.length == 1) return estado.toUpperCase();
+    return estado[0].toUpperCase() + estado.substring(1).toLowerCase();
+  }
+
+  static String _normalizeTipo(String tipo) {
+    if (tipo.isEmpty) return '';
+    final tipoLower = tipo.toLowerCase().trim();
+    if (tipoLower == 'complementaria') return 'Complementaria';
+    if (tipoLower == 'extraescolar') return 'Extraescolar';
+    // Si no coincide con ninguno, capitalizar primera letra
+    if (tipo.length == 1) return tipo.toUpperCase();
+    return tipo[0].toUpperCase() + tipo.substring(1).toLowerCase();
   }
 
   static bool _hasTransporteReqChanged(Map<String, dynamic> datos, Actividad original) {

@@ -11,8 +11,8 @@ import 'layouts/add_localizacion_landscape_layout.dart';
 import 'layouts/add_localizacion_portrait_layout.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 
-/// Di·logo para gestionar las localizaciones de una actividad
-/// Permite buscar, aÒadir, editar y eliminar localizaciones
+/// Di√°logo para gestionar las localizaciones de una actividad
+/// Permite buscar, a√±adir, editar y eliminar localizaciones
 class AddLocalizacionDialog extends StatefulWidget {
   final int actividadId;
   final List<Localizacion> localizacionesExistentes;
@@ -79,10 +79,10 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
   }
 
   void _onSearchChanged() {
-    // Cancelar b˙squeda anterior
+    // Cancelar b√∫squeda anterior
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     
-    // Esperar 500ms despuÈs de que el usuario deje de escribir
+    // Esperar 500ms despu√©s de que el usuario deje de escribir
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _searchController.text.trim();
       if (query.isNotEmpty) {
@@ -111,13 +111,13 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
         _isSearching = false;
       });
       if (mounted) {
-        SnackBarHelper.showError(context, 'Error al buscar direcciÛn: $e');
+        SnackBarHelper.showError(context, 'Error al buscar direcci√≥n: $e');
       }
     }
   }
 
   Future<void> _addLocalizacionFromSearch(GeocodingResult result) async {
-    // Verificar si ya existe una localizaciÛn en las mismas coordenadas
+    // Verificar si ya existe una localizaci√≥n en las mismas coordenadas
     final yaExiste = _localizacionesActuales.any((loc) =>
       (loc.latitud != null && loc.longitud != null) &&
       (loc.latitud! - result.lat).abs() < 0.001 &&
@@ -126,12 +126,12 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
 
     if (yaExiste) {
       if (mounted) {
-        SnackBarHelper.show(context, 'Esta localizaciÛn ya est· aÒadida');
+        SnackBarHelper.show(context, 'Esta localizaci√≥n ya est√° a√±adida');
       }
       return;
     }
 
-    // Crear la localizaciÛn solo en memoria (con ID temporal negativo)
+    // Crear la localizaci√≥n solo en memoria (con ID temporal negativo)
     final tempId = _nextTempId--;
     final orden = _localizacionesActuales.length + 1;
     final esPrincipal = _localizacionesActuales.isEmpty;
@@ -157,12 +157,12 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
     });
     
     if (mounted) {
-      SnackBarHelper.show(context, 'LocalizaciÛn aÒadida (pendiente de guardar)');
+      SnackBarHelper.show(context, 'Localizaci√≥n a√±adida (pendiente de guardar)');
     }
   }
 
   Future<void> _editLocalizacion(Localizacion loc) async {
-    // Mostrar di·logo de ediciÛn
+    // Mostrar di√°logo de edici√≥n
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => EditLocalizacionDialog(
@@ -180,7 +180,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       final nuevoTipo = result['tipoLocalizacion'] as String?;
       String? nuevoIconoNombre;
       
-      // Actualizar icono si se seleccionÛ uno y convertirlo a nombre string
+      // Actualizar icono si se seleccion√≥ uno y convertirlo a nombre string
       if (nuevoIcono != null) {
         nuevoIconoNombre = IconHelper.getIconName(nuevoIcono);
         setState(() {
@@ -193,7 +193,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       
       setState(() {
         _localizacionesActuales = _localizacionesActuales.map((l) {
-          // Si esta localizaciÛn se marca como principal, desmarcar las dem·s
+          // Si esta localizaci√≥n se marca como principal, desmarcar las dem√°s
           if (nuevoPrincipal && !loc.esPrincipal && l.esPrincipal) {
             cambioRealizado = true;
             return Localizacion(
@@ -212,7 +212,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
             );
           }
           
-          // Actualizar la localizaciÛn editada
+          // Actualizar la localizaci√≥n editada
           if (l.id == loc.id) {
             final iconoCambio = nuevoIconoNombre != null && nuevoIconoNombre != l.icono;
             final principalCambio = nuevoPrincipal != l.esPrincipal;
@@ -256,8 +256,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Eliminar localizaciÛn'),
-        content: Text('øDeseas eliminar "${loc.nombre}"?\n(Los cambios se guardar·n al pulsar Guardar en la actividad)'),
+        title: Text('Eliminar localizaci√≥n'),
+        content: Text('¬øDeseas eliminar "${loc.nombre}"?\n(Los cambios se guardar√°n al pulsar Guardar en la actividad)'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -280,7 +280,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       });
       
       if (mounted) {
-        SnackBarHelper.show(context, 'EliminaciÛn pendiente de guardar');
+        SnackBarHelper.show(context, 'Eliminaci√≥n pendiente de guardar');
       }
     }
   }
@@ -455,8 +455,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: Text('øSalir sin guardar?'),
-                            content: Text('Tienes cambios pendientes. øDeseas salir sin guardarlos?'),
+                            title: Text('¬øSalir sin guardar?'),
+                            content: Text('Tienes cambios pendientes. ¬øDeseas salir sin guardarlos?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx),
@@ -546,7 +546,7 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               child: Row(
                 mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.end,
                 children: [
-                  // BotÛn Guardar
+                  // Bot√≥n Guardar
                   Flexible(
                     child: Container(
                       constraints: isMobile ? BoxConstraints(minWidth: double.infinity) : BoxConstraints(),

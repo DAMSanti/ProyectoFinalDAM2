@@ -5,7 +5,7 @@ import 'dart:io';
 import '../dialogs/pdf_viewer_dialog.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 
-/// Widget especializado para la gesti�n de folletos PDF en una actividad.
+/// Widget especializado para la gestión de folletos PDF en una actividad.
 /// 
 /// Responsabilidades:
 /// - Mostrar folleto actual (si existe)
@@ -61,7 +61,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
   @override
   void didUpdateWidget(FolletoUploadWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si cambi� el folletoUrl (por ejemplo, al revertir), actualizar el estado
+    // Si cambió el folletoUrl (por ejemplo, al revertir), actualizar el estado
     if (widget.folletoUrl != oldWidget.folletoUrl) {
       setState(() {
         if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
@@ -193,7 +193,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       return _buildCompactMode(context, isDark, isWeb);
     }
 
-    // Modo completo: Si est� marcado para eliminaci�n y no hay nuevo folleto, no mostrar nada
+    // Modo completo: Si está marcado para eliminación y no hay nuevo folleto, no mostrar nada
     if (_folletoMarkedForDeletion && _folletoFileName == null) {
       return widget.isAdminOrSolicitante
           ? _buildUploadButton(isDark, isWeb)

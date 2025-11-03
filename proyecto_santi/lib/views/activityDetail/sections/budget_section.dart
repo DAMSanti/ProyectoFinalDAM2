@@ -493,7 +493,7 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
       context,
       (concepto, cantidad) {
         final nuevoGasto = GastoPersonalizado(
-          id: -(DateTime.now().millisecondsSinceEpoch),
+          id: null,  // null indica que es un gasto nuevo que debe crearse
           actividadId: widget.actividad.id,
           concepto: concepto,
           cantidad: cantidad,

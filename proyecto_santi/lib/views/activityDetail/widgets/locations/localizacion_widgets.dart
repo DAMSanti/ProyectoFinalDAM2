@@ -3,9 +3,9 @@ import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/services/geocoding_service.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 
-/// Widgets reutilizables para el diálogo de localizaciones
+/// Widgets reutilizables para el diÃ¡logo de localizaciones
 
-/// Campo de búsqueda de direcciones
+/// Campo de bÃºsqueda de direcciones
 class SearchAddressField extends StatelessWidget {
   final TextEditingController controller;
   final bool isSearching;
@@ -39,7 +39,7 @@ class SearchAddressField extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: 'Buscar y añadir dirección',
+          labelText: 'Buscar y aÃ±adir direcciÃ³n',
           hintText: 'Ej: Calle Mayor 1, Torrelavega',
           prefixIcon: Icon(
             Icons.search_rounded,
@@ -76,7 +76,7 @@ class SearchAddressField extends StatelessWidget {
   }
 }
 
-/// Lista de resultados de búsqueda
+/// Lista de resultados de bÃºsqueda
 class SearchResultsList extends StatelessWidget {
   final List<GeocodingResult> results;
   final Function(GeocodingResult) onResultTap;
@@ -113,12 +113,16 @@ class SearchResultsList extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            Text(
-              'Resultados de búsqueda - Haz clic para añadir',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+            Expanded(
+              child: Text(
+                'Resultados de bÃºsqueda - Haz clic para aÃ±adir',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
           ],
@@ -203,7 +207,7 @@ class SearchResultsList extends StatelessWidget {
   }
 }
 
-/// Título de sección con icono y contador
+/// TÃ­tulo de secciÃ³n con icono y contador
 class SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -275,7 +279,7 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-/// Mensaje de lista vacía
+/// Mensaje de lista vacÃ­a
 class EmptyLocalizacionesMessage extends StatelessWidget {
   final bool isDark;
 
@@ -306,7 +310,7 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              'No hay localizaciones añadidas',
+              'No hay localizaciones aÃ±adidas',
               style: TextStyle(
                 fontSize: 14,
                 color: isDark ? Colors.white70 : Colors.black54,
@@ -315,7 +319,7 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Busca y añade direcciones usando el campo superior',
+              'Busca y aÃ±ade direcciones usando el campo superior',
               style: TextStyle(
                 fontSize: 12,
                 color: isDark ? Colors.white54 : Colors.black38,
@@ -329,7 +333,7 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
   }
 }
 
-/// Card de localización individual
+/// Card de localizaciÃ³n individual
 class LocalizacionCard extends StatelessWidget {
   final Localizacion localizacion;
   final IconData icon;
@@ -385,7 +389,7 @@ class LocalizacionCard extends StatelessWidget {
           padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: Row(
             children: [
-              // Icono de la localización
+              // Icono de la localizaciï¿½n
               Container(
                 padding: EdgeInsets.all(isMobile ? 6 : 10),
                 decoration: BoxDecoration(
@@ -412,7 +416,7 @@ class LocalizacionCard extends StatelessWidget {
               ),
               SizedBox(width: isMobile ? 8 : 12),
               
-              // Información de la localización
+              // InformaciÃ³n de la localizaciÃ³n
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,7 +483,7 @@ class LocalizacionCard extends StatelessWidget {
                 ),
               ),
               
-              // Botones de acción
+              // Botones de acciÃ³n
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
