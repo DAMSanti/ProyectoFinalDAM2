@@ -325,6 +325,9 @@ class ChatListViewState extends State<ChatListView> {
             itemCount: _filteredActividades.length,
             itemBuilder: (context, index) {
               final actividad = _filteredActividades[index];
+              final auth = Provider.of<Auth>(context, listen: false);
+              final userName = auth.currentUser?.nombre ?? 'Usuario';
+              
               return ActividadCard(
                 actividad: actividad,
                 isDark: isDark,
@@ -333,7 +336,7 @@ class ChatListViewState extends State<ChatListView> {
                   // Navegar usando el shell en lugar de Navigator.push
                   navigateToChatInShell(context, {
                     'activityId': actividad.id.toString(),
-                    'displayName': actividad.titulo,
+                    'displayName': userName, // Nombre del usuario, no de la actividad
                   });
                 },
               );

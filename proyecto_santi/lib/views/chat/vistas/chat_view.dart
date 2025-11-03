@@ -11,6 +11,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
+import '../widgets/audio_recorder_widget.dart';
+import '../widgets/audio_player_widget.dart';
 
 class ChatView extends StatefulWidget {
   final String activityId;
@@ -39,15 +41,26 @@ class _ChatViewState extends State<ChatView> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _imagePicker = ImagePicker();
+  final ValueNotifier<bool> _hasTextNotifier = ValueNotifier<bool>(false);
   
   bool _isUploading = false;
   double _uploadProgress = 0.0;
+  bool _isRecordingAudio = false;
 
   @override
   void initState() {
     super.initState();
     // Configurar español para timeago
     timeago.setLocaleMessages('es', timeago.EsMessages());
+    
+    // Listener optimizado para cambiar botón de enviar/micrófono
+    // Usa ValueNotifier para no reconstruir toda la vista
+    _messageController.addListener(() {
+      final hasText = _messageController.text.trim().isNotEmpty;
+      if (hasText != _hasTextNotifier.value) {
+        _hasTextNotifier.value = hasText;
+      }
+    });
     
     // PresenceService deshabilitado para Windows (Realtime Database no soportado)
     // En Android/iOS funcionará correctamente
@@ -64,6 +77,7 @@ class _ChatViewState extends State<ChatView> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _hasTextNotifier.dispose();
     // _presenceService?.setUserOffline(widget.userId);
     super.dispose();
   }
@@ -155,6 +169,88 @@ class _ChatViewState extends State<ChatView> {
         _uploadProgress = 0.0;
       });
       _showError('Error al subir imagen: $e');
+    }
+  }
+
+  void _startRecordingAudio() {
+    setState(() => _isRecordingAudio = true);
+  }
+
+  void _cancelRecordingAudio() {
+    setState(() => _isRecordingAudio = false);
+  }
+
+  void _sendAudio(String audioPath, int duration) async {
+    setState(() => _isRecordingAudio = false);
+
+    try {
+      setState(() {
+        _isUploading = true;
+        _uploadProgress = 0.0;
+      });
+
+      String audioUrl;
+      
+      if (kIsWeb) {
+        // Web: leer bytes del archivo
+        final file = File(audioPath);
+        final bytes = await file.readAsBytes();
+        audioUrl = await _storageService.uploadAudio(
+          actividadId: widget.activityId,
+          userId: widget.userId,
+          audioFile: bytes,
+          fileName: 'audio_${DateTime.now().millisecondsSinceEpoch}.m4a',
+          onProgress: (progress) {
+            setState(() => _uploadProgress = progress);
+          },
+        );
+      } else {
+        // Mobile/Desktop: usar File
+        final file = File(audioPath);
+        audioUrl = await _storageService.uploadAudio(
+          actividadId: widget.activityId,
+          userId: widget.userId,
+          audioFile: file,
+          fileName: 'audio_${DateTime.now().millisecondsSinceEpoch}.m4a',
+          onProgress: (progress) {
+            setState(() => _uploadProgress = progress);
+          },
+        );
+      }
+
+      // Enviar mensaje con el audio
+      await _chatService.sendMediaMessage(
+        actividadId: widget.activityId,
+        senderId: widget.userId,
+        senderName: widget.displayName,
+        message: '🎵 Audio',
+        type: MessageType.audio,
+        mediaUrl: audioUrl,
+        duration: duration,
+      );
+
+      setState(() {
+        _isUploading = false;
+        _uploadProgress = 0.0;
+      });
+
+      _scrollToBottom();
+
+      // Eliminar archivo temporal
+      try {
+        final file = File(audioPath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+      } catch (e) {
+        print('Error al eliminar archivo temporal: $e');
+      }
+    } catch (e) {
+      setState(() {
+        _isUploading = false;
+        _uploadProgress = 0.0;
+      });
+      _showError('Error al subir audio: $e');
     }
   }
 
@@ -275,77 +371,93 @@ class _ChatViewState extends State<ChatView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Column(
                     children: [
-                      Text('Subiendo imagen... ${(_uploadProgress * 100).toInt()}%'),
+                      Text('Subiendo... ${(_uploadProgress * 100).toInt()}%'),
                       const SizedBox(height: 4),
                       LinearProgressIndicator(value: _uploadProgress),
                     ],
                   ),
                 ),
 
-              // Input de mensaje
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: widget.isDarkTheme
-                      ? const Color(0xFF1A1F3A)
-                      : Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Botón de imagen
-                    IconButton(
-                      icon: const Icon(Icons.image, color: Color(0xFF1976d2)),
-                      onPressed: _isUploading ? null : _sendImage,
-                      tooltip: 'Enviar imagen',
-                    ),
-                    // Campo de texto
-                    Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        decoration: InputDecoration(
-                          hintText: 'Escribe un mensaje...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: widget.isDarkTheme
-                              ? const Color(0xFF2A2F4A)
-                              : const Color(0xFFF5F5F5),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        onSubmitted: (_) => _sendMessage(),
-                        textInputAction: TextInputAction.send,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Botón de enviar
-                    Container(
+              // Input de mensaje o grabador de audio
+              _isRecordingAudio
+                  ? AudioRecorderWidget(
+                      onRecordingComplete: _sendAudio,
+                      onCancel: _cancelRecordingAudio,
+                    )
+                  : Container(
+                      padding: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
-                        ),
-                        shape: BoxShape.circle,
+                        color: widget.isDarkTheme
+                            ? const Color(0xFF1A1F3A)
+                            : Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, -2),
+                          ),
+                        ],
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.send, color: Colors.white),
-                        onPressed: _sendMessage,
-                        tooltip: 'Enviar mensaje',
+                      child: Row(
+                        children: [
+                          // Botón de imagen
+                          IconButton(
+                            icon: const Icon(Icons.image, color: Color(0xFF1976d2)),
+                            onPressed: _isUploading ? null : _sendImage,
+                            tooltip: 'Enviar imagen',
+                          ),
+                          // Campo de texto
+                          Expanded(
+                            child: TextField(
+                              controller: _messageController,
+                              decoration: InputDecoration(
+                                hintText: 'Escribe un mensaje...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: widget.isDarkTheme
+                                    ? const Color(0xFF2A2F4A)
+                                    : const Color(0xFFF5F5F5),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                              onSubmitted: (_) => _sendMessage(),
+                              textInputAction: TextInputAction.send,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Botón de micrófono o enviar - ValueListenableBuilder para evitar reconstruir toda la vista
+                          ValueListenableBuilder<bool>(
+                            valueListenable: _hasTextNotifier,
+                            builder: (context, hasText, child) {
+                              return hasText
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFF1976d2), Color(0xFF1565c0)],
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.send, color: Colors.white),
+                                        onPressed: _sendMessage,
+                                        tooltip: 'Enviar mensaje',
+                                      ),
+                                    )
+                                  : IconButton(
+                                      icon: const Icon(Icons.mic, color: Color(0xFF1976d2)),
+                                      onPressed: _isUploading ? null : _startRecordingAudio,
+                                      tooltip: 'Grabar audio',
+                                    );
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
             ],
           ),
           // Flecha de volver (posicionada en la esquina superior izquierda)
@@ -420,19 +532,20 @@ class _ChatViewState extends State<ChatView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Nombre del remitente (si no es el usuario actual)
-            if (!isMe)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  message.senderName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: Color(0xFF1976d2),
-                  ),
+            // Nombre del remitente (siempre visible)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                message.senderName,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: isMe
+                      ? Colors.white.withOpacity(0.9)
+                      : const Color(0xFF1976d2),
                 ),
               ),
+            ),
 
             // Contenido del mensaje
             if (message.type == MessageType.image && message.mediaUrl != null)
@@ -455,6 +568,12 @@ class _ChatViewState extends State<ChatView> {
                     child: const Icon(Icons.error),
                   ),
                 ),
+              )
+            else if (message.type == MessageType.audio && message.mediaUrl != null)
+              AudioPlayerWidget(
+                audioUrl: message.mediaUrl!,
+                duration: message.duration ?? 0,
+                isMine: isMe,
               )
             else
               Text(
