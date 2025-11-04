@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/models/chat/chat_message.dart';
 import 'package:proyecto_santi/models/chat/message_type.dart';

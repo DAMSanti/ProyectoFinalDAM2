@@ -14,14 +14,14 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
   final TextEditingController descriptionController;
 
   const ImagePreviewPortraitLayout({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.isMobile,
     required this.isMobileLandscape,
     this.imageFile,
     this.imageUrl,
     required this.descriptionController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -19,14 +19,14 @@ class BasicInfoSection extends StatelessWidget {
   final Widget Function(String title, IconData icon, bool isMobile, bool isMobileLandscape) buildSectionTitle;
 
   const BasicInfoSection({
-    Key? key,
+    super.key,
     required this.nombreController,
     required this.descripcionController,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.buildTextField,
     required this.buildSectionTitle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

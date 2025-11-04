@@ -49,7 +49,7 @@ class SaveHandler {
       final result = await _saveActivityChanges(
         actividadOriginal: actividadOriginal,
         actividadId: actividadId,
-        datosEditados: datosEditados!,
+        datosEditados: datosEditados,
       );
       success = result.success;
       actividadActualizada = result.actividad;
@@ -569,7 +569,7 @@ class SaveHandler {
           print('DEBUG: Actualizando localización $locId en actividad $actividadId');
           await localizacionService.updateLocalizacion(
             actividadId,
-            locId!,
+            locId,
             esPrincipal: esPrincipal,
             icono: icono,
             descripcion: descripcion,
@@ -579,7 +579,7 @@ class SaveHandler {
           print('DEBUG: Agregando localización $locId a actividad $actividadId');
           final resultado = await localizacionService.addLocalizacion(
             actividadId,
-            locId!,
+            locId,
             esPrincipal: esPrincipal,
             icono: icono,
             descripcion: descripcion,

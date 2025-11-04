@@ -12,14 +12,14 @@ class GastosVariosCardWidget extends StatelessWidget {
   final Function(GastoPersonalizado) onDeleteGasto;
 
   const GastosVariosCardWidget({
-    Key? key,
+    super.key,
     required this.gastos,
     required this.isAdminOrSolicitante,
     required this.isLoading,
     required this.isWeb,
     required this.onAddGasto,
     required this.onDeleteGasto,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

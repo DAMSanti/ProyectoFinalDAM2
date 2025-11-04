@@ -296,7 +296,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
                 ? _extractFileName(widget.folletoUrl!)
                 : 'Sin folleto'));
 
-    void _openPdfViewer() {
+    void openPdfViewer() {
       if (hasFolleto && widget.folletoUrl != null) {
         showDialog(
           context: context,
@@ -316,7 +316,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: hasFolleto ? _openPdfViewer : null,
+            onTap: hasFolleto ? openPdfViewer : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
@@ -347,7 +347,7 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         ),
         SizedBox(width: widget.isMobile ? 8 : 10),
         GestureDetector(
-          onTap: hasFolleto ? _openPdfViewer : null,
+          onTap: hasFolleto ? openPdfViewer : null,
           child: Container(
             padding: EdgeInsets.all(widget.isMobile ? 5 : 6),
             decoration: BoxDecoration(

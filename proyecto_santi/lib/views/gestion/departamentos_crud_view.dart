@@ -11,7 +11,7 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 
 /// Vista CRUD para gestionar Departamentos
 class DepartamentosCrudView extends StatefulWidget {
-  const DepartamentosCrudView({Key? key}) : super(key: key);
+  const DepartamentosCrudView({super.key});
 
   @override
   State<DepartamentosCrudView> createState() => _DepartamentosCrudViewState();
@@ -33,7 +33,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
   Future<void> _loadDepartamentos() async {
     setState(() => _isLoading = true);
     try {
-      final response = await _apiService.getData('${AppConfig.departamentosEndpoint}');
+      final response = await _apiService.getData(AppConfig.departamentosEndpoint);
       // La respuesta de Dio tiene la propiedad data
       List<dynamic> data;
       if (response.data is List) {

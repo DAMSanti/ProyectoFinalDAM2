@@ -329,7 +329,7 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
           content: SingleChildScrollView(
-            child: Container(
+            child: SizedBox(
               width: 400,
               child: Column(
                 mainAxisSize: MainAxisSize.min,

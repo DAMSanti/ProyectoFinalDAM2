@@ -22,7 +22,7 @@ class BudgetSummaryCards extends StatelessWidget {
   final VoidCallback? onCancel;
 
   const BudgetSummaryCards({
-    Key? key,
+    super.key,
     required this.presupuesto,
     required this.costoReal,
     required this.isEditing,
@@ -33,7 +33,7 @@ class BudgetSummaryCards extends StatelessWidget {
     this.onEdit,
     this.onSave,
     this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class TransporteSection extends StatelessWidget {
   final VoidCallback? onSolicitarPresupuesto;
 
   const TransporteSection({
-    Key? key,
+    super.key,
     required this.transporteReq,
     required this.isEditing,
     required this.isAdmin,
@@ -107,7 +107,7 @@ class TransporteSection extends StatelessWidget {
     this.onCancel,
     this.onEmpresaChanged,
     this.onSolicitarPresupuesto,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +174,7 @@ class TransporteSection extends StatelessWidget {
               Center(child: CircularProgressIndicator())
             else
               DropdownButtonFormField<EmpresaTransporte>(
-                value: empresa,
+                initialValue: empresa,
                 decoration: InputDecoration(
                   labelText: 'Seleccionar empresa',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -205,7 +205,7 @@ class TransporteSection extends StatelessWidget {
             ),
           ] else if (empresa != null) ...[
             _buildEmpresaInfo('Nombre', empresa!.nombre),
-            if (empresa!.cif != null) _buildEmpresaInfo('CIF', empresa!.cif!),
+            _buildEmpresaInfo('CIF', empresa!.cif!),
             if (empresa!.contacto != null) _buildEmpresaInfo('Contacto', empresa!.contacto!),
           ] else
             Text(
@@ -269,7 +269,7 @@ class AlojamientoSection extends StatelessWidget {
   final VoidCallback? onSolicitarPresupuesto;
 
   const AlojamientoSection({
-    Key? key,
+    super.key,
     required this.alojamientoReq,
     required this.isEditing,
     required this.isAdmin,
@@ -285,7 +285,7 @@ class AlojamientoSection extends StatelessWidget {
     this.onCancel,
     this.onAlojamientoChanged,
     this.onSolicitarPresupuesto,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +352,7 @@ class AlojamientoSection extends StatelessWidget {
               Center(child: CircularProgressIndicator())
             else
               DropdownButtonFormField<Alojamiento>(
-                value: alojamiento,
+                initialValue: alojamiento,
                 decoration: InputDecoration(
                   labelText: 'Seleccionar alojamiento',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -441,11 +441,11 @@ class CostoPorAlumnoCard extends StatelessWidget {
   final bool isDark;
 
   const CostoPorAlumnoCard({
-    Key? key,
+    super.key,
     required this.costoPorAlumno,
     required this.isWeb,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

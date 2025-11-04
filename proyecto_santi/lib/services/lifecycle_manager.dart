@@ -73,7 +73,7 @@ class LifecycleManager with WidgetsBindingObserver {
   /// Se ejecuta cuando la app pasa a segundo plano
   void _onAppPaused() {
     _pausedTime = DateTime.now();
-    print('[LifecycleManager] ⏸️  App pausada (segundo plano) - ${_pausedTime}');
+    print('[LifecycleManager] ⏸️  App pausada (segundo plano) - $_pausedTime');
     
     // Aquí puedes agregar lógica adicional como:
     // - Pausar timers

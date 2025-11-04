@@ -230,7 +230,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                     // Botón Cancelar
                     Expanded(
                       flex: isMobile ? 1 : 0,
-                      child: Container(
+                      child: SizedBox(
                         height: isMobileLandscape ? 38 : (isMobile ? 42 : 44),
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(false),
@@ -261,7 +261,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                     // Botón Agregar
                     Expanded(
                       flex: isMobile ? 1 : 0,
-                      child: Container(
+                      child: SizedBox(
                         height: isMobileLandscape ? 38 : (isMobile ? 42 : 44),
                         child: ElevatedButton(
                           onPressed: () {

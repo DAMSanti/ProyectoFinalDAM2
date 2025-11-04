@@ -8,8 +8,6 @@ import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/utils/icon_helper.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
-import 'dart:io';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MapView extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -401,7 +399,6 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
 
   Widget _buildSearchBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Positioned(
       top: 16,
@@ -671,7 +668,6 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     if (_activityDetailMode || _selectedActividad == null) return SizedBox.shrink();
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final localizaciones = actividadLocalizaciones[_selectedActividad!.id] ?? [];
     final locPrincipal = localizaciones.firstWhere(
       (loc) => loc.esPrincipal,
@@ -997,7 +993,6 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
 
   Widget _buildDetailModeBanner() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     
     return Positioned(
       top: 90, // Debajo de la barra de búsqueda

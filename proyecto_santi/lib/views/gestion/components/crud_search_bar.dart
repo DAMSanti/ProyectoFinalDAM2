@@ -10,12 +10,12 @@ class CrudSearchBar extends StatefulWidget {
   final String? addButtonText;
 
   const CrudSearchBar({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.onSearch,
     this.onAdd,
     this.addButtonText,
-  }) : super(key: key);
+  });
 
   @override
   State<CrudSearchBar> createState() => _CrudSearchBarState();

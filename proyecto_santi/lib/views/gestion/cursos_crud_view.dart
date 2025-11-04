@@ -9,7 +9,7 @@ import '../gestion/components/crud_delete_dialog.dart';
 import '../gestion/components/crud_search_bar.dart';
 
 class CursosCrudView extends StatefulWidget {
-  const CursosCrudView({Key? key}) : super(key: key);
+  const CursosCrudView({super.key});
 
   @override
   State<CursosCrudView> createState() => _CursosCrudViewState();

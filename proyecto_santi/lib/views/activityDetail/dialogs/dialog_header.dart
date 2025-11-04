@@ -10,13 +10,13 @@ class DialogHeader extends StatelessWidget {
   final IconData icon;
 
   const DialogHeader({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.onClose,
     required this.title,
     this.icon = Icons.edit_rounded,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -99,11 +99,11 @@ class EditDialogHeader extends StatelessWidget {
   final VoidCallback onClose;
 
   const EditDialogHeader({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

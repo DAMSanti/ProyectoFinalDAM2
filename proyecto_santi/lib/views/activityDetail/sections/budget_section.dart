@@ -37,13 +37,13 @@ class ActivityBudgetSection extends StatefulWidget {
   final ActividadService actividadService;
 
   const ActivityBudgetSection({
-    Key? key,
+    super.key,
     required this.actividad,
     required this.isAdminOrSolicitante,
     required this.totalAlumnosParticipantes,
     required this.actividadService,
     this.onBudgetChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<ActivityBudgetSection> createState() => _ActivityBudgetSectionState();
@@ -102,14 +102,12 @@ class _ActivityBudgetSectionState extends State<ActivityBudgetSection> {
 
   /// Carga los gastos personalizados de la actividad
   Future<void> _cargarGastos() async {
-    if (widget.actividad.id == null) return;
-    
     setState(() {
       _cargandoGastos = true;
     });
     
     try {
-      final gastos = await _gastoService.fetchGastosByActividad(widget.actividad.id!);
+      final gastos = await _gastoService.fetchGastosByActividad(widget.actividad.id);
       if (mounted) {
         setState(() {
           _gastosPersonalizados = gastos;

@@ -1,10 +1,10 @@
 // Archivo específico para web
-import 'dart:ui' as ui;
+// ignore_for_file: avoid_web_libraries_in_flutter
+import 'dart:ui_web' as ui_web;
 import 'package:universal_html/html.dart' as html;
 
 void registerWebPdfView(String blobUrl) {
-  // ignore: undefined_prefixed_name
-  ui.platformViewRegistry.registerViewFactory(
+  ui_web.platformViewRegistry.registerViewFactory(
     'pdf-viewer-${blobUrl.hashCode}',
     (int viewId) {
       final iframe = html.IFrameElement()

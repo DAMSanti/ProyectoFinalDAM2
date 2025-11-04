@@ -19,7 +19,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
   final ValueChanged<IconData> onIconoSelected;
 
   const EditLocalizacionLandscapeLayout({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.isMobile,
     required this.isMobileLandscape,
@@ -34,7 +34,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
     required this.iconosDisponibles,
     required this.iconoSeleccionado,
     required this.onIconoSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +187,7 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: DropdownButtonFormField<String>(
-            value: tipoSeleccionado,
+            initialValue: tipoSeleccionado,
             decoration: InputDecoration(
               hintText: 'Tipo',
               hintStyle: TextStyle(fontSize: 11),

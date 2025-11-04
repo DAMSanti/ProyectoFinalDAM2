@@ -10,7 +10,7 @@ import '../gestion/components/crud_delete_dialog.dart';
 import '../gestion/components/crud_search_bar.dart';
 
 class GruposCrudView extends StatefulWidget {
-  const GruposCrudView({Key? key}) : super(key: key);
+  const GruposCrudView({super.key});
 
   @override
   State<GruposCrudView> createState() => _GruposCrudViewState();

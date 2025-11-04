@@ -126,6 +126,12 @@ builder.Services.AddCors(options =>
     {
         var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "*" };
         
+        // TEMPORAL: Permitir cualquier origen para testing con Flutter Web
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+              
+        /* Código original comentado para restaurar después:
         if (builder.Environment.IsDevelopment() || 
             builder.Environment.EnvironmentName == "Trabajo" || 
             builder.Environment.EnvironmentName == "Casa")
@@ -143,6 +149,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader()
                   .AllowCredentials();
         }
+        */
     });
 });
 

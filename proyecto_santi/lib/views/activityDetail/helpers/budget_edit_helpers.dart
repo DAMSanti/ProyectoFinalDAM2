@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import '../../../../models/actividad.dart';
 import '../../../../models/empresa_transporte.dart';
 import '../../../../models/alojamiento.dart';
 import '../../../../services/actividad_service.dart';

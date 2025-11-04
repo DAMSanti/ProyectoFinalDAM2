@@ -42,7 +42,7 @@ class FolletoCardWidget extends StatelessWidget {
         ),
       ),
       child: FolletoUploadWidget(
-        key: ValueKey('${actividadFolletoUrl ?? 'no_folleto'}_${folletoFileName ?? 'none'}_${folletoMarkedForDeletion}'), // Key para forzar recreación al revertir
+        key: ValueKey('${actividadFolletoUrl ?? 'no_folleto'}_${folletoFileName ?? 'none'}_$folletoMarkedForDeletion'), // Key para forzar recreación al revertir
         folletoUrl: actividadFolletoUrl,
         initialFolletoFileName: folletoFileName,
         initialFolletoMarkedForDeletion: folletoMarkedForDeletion,

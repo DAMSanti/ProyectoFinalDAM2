@@ -21,7 +21,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
   final Function(bool) onAlojamientoChanged;
 
   const BudgetSwitchesLayout({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isPortrait,
     required this.isWeb,
@@ -29,7 +29,7 @@ class BudgetSwitchesLayout extends StatelessWidget {
     required this.alojamientoReq,
     required this.onTransporteChanged,
     required this.onAlojamientoChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

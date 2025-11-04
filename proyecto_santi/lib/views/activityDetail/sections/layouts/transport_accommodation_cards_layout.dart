@@ -42,7 +42,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
   final bool cargandoAlojamientos;
 
   const TransportAccommodationCardsLayout({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.isWeb,
@@ -64,7 +64,7 @@ class TransportAccommodationCardsLayout extends StatelessWidget {
     required this.onEditAlojamiento,
     required this.onAlojamientoChanged,
     required this.cargandoAlojamientos,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

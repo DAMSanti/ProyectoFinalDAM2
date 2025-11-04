@@ -11,11 +11,11 @@ class MultiSelectGrupoDialog extends StatefulWidget {
   final List<Grupo> gruposYaSeleccionados;
 
   const MultiSelectGrupoDialog({
-    Key? key,
+    super.key,
     required this.cursos,
     required this.grupos,
     required this.gruposYaSeleccionados,
-  }) : super(key: key);
+  });
 
   @override
   State<MultiSelectGrupoDialog> createState() => _MultiSelectGrupoDialogState();
@@ -376,7 +376,7 @@ class _MultiSelectGrupoDialogState extends State<MultiSelectGrupoDialog> {
                                   ),
                                   SizedBox(width: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
                                   Text(
-                                    'Agregar' + (_selectedGrupos.isEmpty ? '' : ' (${_selectedGrupos.length})'),
+                                    'Agregar${_selectedGrupos.isEmpty ? '' : ' (${_selectedGrupos.length})'}',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,

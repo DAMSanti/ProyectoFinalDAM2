@@ -45,8 +45,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
   }
 
   Future<void> _loadLocalizaciones() async {
-    if (widget.actividadId == null) return;
-
     setState(() {
       _loadingLocalizaciones = true;
     });

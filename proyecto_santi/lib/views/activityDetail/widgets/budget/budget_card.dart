@@ -26,7 +26,7 @@ class BudgetCardWidget extends StatelessWidget {
   final Function(String)? onSubmitted;
 
   const BudgetCardWidget({
-    Key? key,
+    super.key,
     required this.titulo,
     required this.valor,
     required this.icono,
@@ -46,7 +46,7 @@ class BudgetCardWidget extends StatelessWidget {
     this.cargandoAlojamientos = false,
     this.controller,
     this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +421,7 @@ class BudgetCardWidget extends StatelessWidget {
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
         onChanged: onAlojamientoChanged,
       ),

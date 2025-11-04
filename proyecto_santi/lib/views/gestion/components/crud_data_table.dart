@@ -13,7 +13,7 @@ class CrudDataTable<T> extends StatefulWidget {
   final String emptyMessage;
 
   const CrudDataTable({
-    Key? key,
+    super.key,
     required this.items,
     required this.columns,
     required this.buildCells,
@@ -21,7 +21,7 @@ class CrudDataTable<T> extends StatefulWidget {
     this.onDelete,
     this.isLoading = false,
     this.emptyMessage = 'No hay datos disponibles',
-  }) : super(key: key);
+  });
 
   @override
   State<CrudDataTable<T>> createState() => _CrudDataTableState<T>();

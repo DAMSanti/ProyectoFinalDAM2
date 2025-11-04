@@ -11,7 +11,7 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 
 /// Vista CRUD para gestionar Profesores
 class ProfesoresCrudView extends StatefulWidget {
-  const ProfesoresCrudView({Key? key}) : super(key: key);
+  const ProfesoresCrudView({super.key});
 
   @override
   State<ProfesoresCrudView> createState() => _ProfesoresCrudViewState();

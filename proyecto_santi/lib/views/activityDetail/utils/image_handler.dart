@@ -1,6 +1,5 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/views/activityDetail/state/activity_detail_state.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 

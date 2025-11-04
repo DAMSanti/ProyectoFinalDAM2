@@ -9,11 +9,11 @@ class CrudDeleteDialog extends StatelessWidget {
   final VoidCallback onConfirm;
 
   const CrudDeleteDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     required this.onConfirm,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

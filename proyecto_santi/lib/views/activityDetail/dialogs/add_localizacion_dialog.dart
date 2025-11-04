@@ -19,11 +19,11 @@ class AddLocalizacionDialog extends StatefulWidget {
   final VoidCallback onLocalizacionAdded;
 
   const AddLocalizacionDialog({
-    Key? key,
+    super.key,
     required this.actividadId,
     required this.localizacionesExistentes,
     required this.onLocalizacionAdded,
-  }) : super(key: key);
+  });
 
   @override
   AddLocalizacionDialogState createState() => AddLocalizacionDialogState();
@@ -265,8 +265,8 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Eliminar'),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoRechazado),
+            child: Text('Eliminar'),
           ),
         ],
       ),

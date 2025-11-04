@@ -21,7 +21,7 @@ class BudgetCardsLayout extends StatelessWidget {
   final VoidCallback onEditPresupuesto;
 
   const BudgetCardsLayout({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.isWeb,
@@ -31,7 +31,7 @@ class BudgetCardsLayout extends StatelessWidget {
     required this.editandoPresupuesto,
     required this.presupuestoController,
     required this.onEditPresupuesto,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

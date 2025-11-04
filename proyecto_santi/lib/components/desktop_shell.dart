@@ -489,7 +489,7 @@ class DesktopShellFrame extends StatelessWidget {
             ],
           ),
           content: SingleChildScrollView(
-            child: Container(
+            child: SizedBox(
               width: 400,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -993,7 +993,7 @@ class MenuDesktopStatic extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(isCompact ? 6 : 8),
           onTap: () {
-            this.onNavigate(routeName);
+            onNavigate(routeName);
           },
           child: Padding(
             padding: EdgeInsets.symmetric(

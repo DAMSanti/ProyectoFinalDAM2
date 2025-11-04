@@ -12,11 +12,11 @@ class SearchAddressField extends StatelessWidget {
   final VoidCallback onClear;
 
   const SearchAddressField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.isSearching,
     required this.onClear,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,11 +83,11 @@ class SearchResultsList extends StatelessWidget {
   final bool isDark;
 
   const SearchResultsList({
-    Key? key,
+    super.key,
     required this.results,
     required this.onResultTap,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -214,11 +214,11 @@ class SectionHeader extends StatelessWidget {
   final int? count;
 
   const SectionHeader({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     this.count,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -284,9 +284,9 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
   final bool isDark;
 
   const EmptyLocalizacionesMessage({
-    Key? key,
+    super.key,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -343,14 +343,14 @@ class LocalizacionCard extends StatelessWidget {
   final bool isMobile;
 
   const LocalizacionCard({
-    Key? key,
+    super.key,
     required this.localizacion,
     required this.icon,
     required this.isDark,
     required this.onEdit,
     required this.onRemove,
     this.isMobile = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -516,7 +516,7 @@ class LocalizacionCard extends StatelessWidget {
 
 /// Divisor decorativo
 class DecorativeDivider extends StatelessWidget {
-  const DecorativeDivider({Key? key}) : super(key: key);
+  const DecorativeDivider({super.key});
 
   @override
   Widget build(BuildContext context) {

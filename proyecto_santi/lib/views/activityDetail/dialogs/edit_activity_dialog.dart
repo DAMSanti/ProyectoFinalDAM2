@@ -17,10 +17,10 @@ class EditActivityDialog extends StatefulWidget {
   final Function(Map<String, dynamic>) onSave;
 
   const EditActivityDialog({
-    Key? key,
+    super.key,
     required this.actividad,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   State<EditActivityDialog> createState() => _EditActivityDialogState();
@@ -124,7 +124,7 @@ class _EditActivityDialogState extends State<EditActivityDialog> {
         _isLoading = false;
       });
       
-    } catch (e, stackTrace) {
+    } catch (e) {
       setState(() {
         _isLoading = false;
       });

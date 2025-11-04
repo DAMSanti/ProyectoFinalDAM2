@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
-import 'dart:io';
 
 /// Widget para grabar mensajes de audio
 class AudioRecorderWidget extends StatefulWidget {

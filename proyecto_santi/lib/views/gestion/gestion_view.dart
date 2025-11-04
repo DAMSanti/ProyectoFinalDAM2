@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Vista principal de Gestión con navegación a todas las entidades CRUD
 class GestionView extends StatelessWidget {
-  const GestionView({Key? key}) : super(key: key);
+  const GestionView({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -382,7 +382,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                                           ),
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                   ],
                                   onChanged: (value) {
                                     setState(() {

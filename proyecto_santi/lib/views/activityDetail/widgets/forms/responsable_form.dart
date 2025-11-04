@@ -20,7 +20,7 @@ class ResponsableSection extends StatelessWidget {
   }) buildDropdown;
 
   const ResponsableSection({
-    Key? key,
+    super.key,
     required this.selectedProfesorId,
     required this.profesores,
     required this.onChanged,
@@ -28,7 +28,7 @@ class ResponsableSection extends StatelessWidget {
     required this.isMobileLandscape,
     required this.buildSectionTitle,
     required this.buildDropdown,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class ResponsableSection extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               );
-            }).toList(),
+            }),
           ],
           onChanged: onChanged,
           isMobile: isMobile,

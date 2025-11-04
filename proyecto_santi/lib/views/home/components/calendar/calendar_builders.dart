@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../../shared/constants/app_theme_constants.dart';
-import '../../../activityDetail/activity_detail_view.dart';
 import '../../../../models/actividad.dart';
 import '../../../../services/holidays_service.dart';
 import '../../../../components/desktop_shell.dart';

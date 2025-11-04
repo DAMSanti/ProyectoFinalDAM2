@@ -7,7 +7,6 @@ import '../../../../shared/constants/app_theme_constants.dart';
 import 'calendar_view_buttons.dart';
 import 'calendar_data_source.dart';
 import 'calendar_builders.dart';
-import 'calendar_config.dart';
 
 class ModernSyncfusionCalendar extends StatefulWidget {
   final List<Actividad> activities;

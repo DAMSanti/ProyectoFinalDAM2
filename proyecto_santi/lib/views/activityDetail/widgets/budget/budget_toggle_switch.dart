@@ -11,14 +11,14 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
   final Function(bool) onChanged;
 
   const BudgetToggleSwitchWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     required this.color,
     required this.value,
     required this.isWeb,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: color,
+              activeThumbColor: color,
               activeTrackColor: color.withValues(alpha: 0.5),
               inactiveThumbColor: Colors.grey[400],
               inactiveTrackColor: Colors.grey[300],

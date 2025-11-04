@@ -2,15 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart' as html;
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/config.dart';
-
-// Imports condicionales para plataforma
-import 'dart:io' if (dart.library.html) 'dart:html';
-import 'package:path_provider/path_provider.dart' if (dart.library.html) 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart';
+// Import específico para File de dart:io
+import 'dart:io' as io show File;
 
 // Import condicional para el helper de web
 import '../helpers/pdf_helpers/web_pdf_helper_stub.dart' if (dart.library.html) '../helpers/pdf_helpers/web_pdf_helper.dart';
@@ -160,7 +158,8 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
       
       if (response.statusCode == 200) {
         final dir = await getApplicationDocumentsDirectory();
-        final file = File('${dir.path}/${widget.fileName}');
+        final filePath = '${dir.path}/${widget.fileName}';
+        final file = io.File(filePath);
         await file.writeAsBytes(response.bodyBytes);
         
         if (mounted) {
@@ -174,7 +173,6 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -218,7 +216,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                   Icon(
                     Icons.picture_as_pdf_rounded,
                     color: Colors.white,
-                    size: !isWeb ? 24.dg : 7.sp,
+                    size: kIsWeb ? 7.sp : 24.dg,
                   ),
                   SizedBox(width: 12),
                   Expanded(
@@ -229,7 +227,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                           'Vista Previa del Folleto',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: !isWeb ? 16.dg : 5.5.sp,
+                            fontSize: kIsWeb ? 5.5.sp : 16.dg,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -238,7 +236,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                           widget.fileName,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: !isWeb ? 12.dg : 4.sp,
+                            fontSize: kIsWeb ? 4.sp : 12.dg,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -265,7 +263,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                           : Icon(
                               Icons.download_rounded,
                               color: Colors.white,
-                              size: !isWeb ? 24.dg : 7.sp,
+                              size: kIsWeb ? 7.sp : 24.dg,
                             ),
                       onPressed: _isDownloading ? null : _downloadPdf,
                       tooltip: 'Descargar PDF',
@@ -282,7 +280,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                       icon: Icon(
                         Icons.close_rounded,
                         color: Colors.white,
-                        size: !isWeb ? 24.dg : 7.sp,
+                        size: kIsWeb ? 7.sp : 24.dg,
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: 'Cerrar',
@@ -312,7 +310,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                                 'Cargando PDF...',
                                 style: TextStyle(
                                   color: isDark ? Colors.white70 : Colors.black54,
-                                  fontSize: !isWeb ? 14.dg : 4.5.sp,
+                                  fontSize: kIsWeb ? 4.5.sp : 14.dg,
                                 ),
                               ),
                             ],
@@ -336,7 +334,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: isDark ? Colors.white70 : Colors.black54,
-                                        fontSize: !isWeb ? 14.dg : 4.5.sp,
+                                        fontSize: kIsWeb ? 4.5.sp : 14.dg,
                                       ),
                                     ),
                                     SizedBox(height: 24),

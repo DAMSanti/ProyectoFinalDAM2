@@ -159,7 +159,7 @@ class DialogFormHelpers {
         ),
       ),
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         style: TextStyle(fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 16), color: Colors.black87),
         decoration: InputDecoration(
           labelText: label,

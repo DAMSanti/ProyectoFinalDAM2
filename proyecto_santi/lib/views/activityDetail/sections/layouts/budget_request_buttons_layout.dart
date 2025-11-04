@@ -19,14 +19,14 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
   final VoidCallback onRequestAlojamiento;
 
   const BudgetRequestButtonsLayout({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.transporteReq,
     required this.alojamientoReq,
     required this.onRequestTransporte,
     required this.onRequestAlojamiento,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

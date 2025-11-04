@@ -166,7 +166,7 @@ Future<bool> confirmarEliminarGasto(
                     // Bot�n Cancelar
                     Expanded(
                       flex: isMobile ? 1 : 0,
-                      child: Container(
+                      child: SizedBox(
                         height: isMobileLandscape ? 38 : (isMobile ? 42 : 44),
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(false),
@@ -197,7 +197,7 @@ Future<bool> confirmarEliminarGasto(
                     // Bot�n Eliminar
                     Expanded(
                       flex: isMobile ? 1 : 0,
-                      child: Container(
+                      child: SizedBox(
                         height: isMobileLandscape ? 38 : (isMobile ? 42 : 44),
                         child: ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true),
@@ -257,7 +257,7 @@ Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext c
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [
-          AppColors.accionEliminar!,
+          AppColors.accionEliminar,
           Colors.red[800]!,
         ],
       ),

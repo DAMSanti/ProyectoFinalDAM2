@@ -20,7 +20,7 @@ class MultiSelectPortraitLayout extends StatelessWidget {
   final Function(Grupo, bool) onSelectGrupo;
 
   const MultiSelectPortraitLayout({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.isMobile,
     required this.isMobileLandscape,
@@ -33,7 +33,7 @@ class MultiSelectPortraitLayout extends StatelessWidget {
     required this.onToggleCurso,
     required this.onExpandCurso,
     required this.onSelectGrupo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

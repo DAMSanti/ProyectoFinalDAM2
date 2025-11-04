@@ -9,7 +9,7 @@ import '../gestion/components/crud_delete_dialog.dart';
 import '../gestion/components/crud_search_bar.dart';
 
 class EmpresasTransporteCrudView extends StatefulWidget {
-  const EmpresasTransporteCrudView({Key? key}) : super(key: key);
+  const EmpresasTransporteCrudView({super.key});
 
   @override
   State<EmpresasTransporteCrudView> createState() => _EmpresasTransporteCrudViewState();

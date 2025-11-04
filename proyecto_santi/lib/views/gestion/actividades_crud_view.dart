@@ -11,7 +11,7 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 
 /// Vista CRUD para gestionar Actividades
 class ActividadesCrudView extends StatefulWidget {
-  const ActividadesCrudView({Key? key}) : super(key: key);
+  const ActividadesCrudView({super.key});
 
   @override
   State<ActividadesCrudView> createState() => _ActividadesCrudViewState();

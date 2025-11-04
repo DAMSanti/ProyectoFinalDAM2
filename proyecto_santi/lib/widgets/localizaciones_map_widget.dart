@@ -10,11 +10,11 @@ class LocalizacionesMapWidget extends StatefulWidget {
   final Function(Localizacion)? onLocalizacionTapped;
 
   const LocalizacionesMapWidget({
-    Key? key,
+    super.key,
     required this.localizaciones,
     this.iconosLocalizaciones = const {},
     this.onLocalizacionTapped,
-  }) : super(key: key);
+  });
 
   @override
   State<LocalizacionesMapWidget> createState() => _LocalizacionesMapWidgetState();

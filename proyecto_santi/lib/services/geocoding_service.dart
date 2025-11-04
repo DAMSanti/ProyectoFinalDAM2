@@ -100,7 +100,7 @@ class GeocodingService {
       }
       
       return [];
-    } catch (e, stackTrace) {
+    } catch (e) {
       print('[GeocodingService ERROR] searchAddress: $e');
       return [];
     }

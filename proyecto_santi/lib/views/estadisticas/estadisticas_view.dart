@@ -8,7 +8,7 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 
 class EstadisticasView extends StatefulWidget {
-  const EstadisticasView({Key? key}) : super(key: key);
+  const EstadisticasView({super.key});
 
   @override
   State<EstadisticasView> createState() => _EstadisticasViewState();

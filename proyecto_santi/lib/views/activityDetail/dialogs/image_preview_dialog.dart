@@ -227,7 +227,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.accionEliminar!,
+                    AppColors.accionEliminar,
                     Colors.red[800]!,
                   ],
                 ),
@@ -424,7 +424,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accionEliminar!,
+                        AppColors.accionEliminar,
                         Colors.red[800]!,
                       ],
                     ),

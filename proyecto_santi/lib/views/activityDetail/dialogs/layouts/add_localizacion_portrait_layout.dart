@@ -19,7 +19,7 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
   final Function(Localizacion) onRemove;
 
   const AddLocalizacionPortraitLayout({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.isMobile,
     required this.searchController,
@@ -31,7 +31,7 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
     required this.onResultTap,
     required this.onEdit,
     required this.onRemove,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

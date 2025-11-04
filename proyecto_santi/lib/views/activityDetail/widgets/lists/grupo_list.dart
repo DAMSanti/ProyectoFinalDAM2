@@ -368,7 +368,7 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
+        SizedBox(
           width: 40,
           child: TextField(
             controller: controller,

@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/services.dart';
-import 'package:proyecto_santi/views/chat/vistas/chat_view.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 

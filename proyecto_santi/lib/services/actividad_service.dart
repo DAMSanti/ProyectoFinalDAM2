@@ -199,9 +199,9 @@ class ActividadService {
       
       // Imprimir todo el contenido del FormData
       print('[ActividadService] ========== FORMDATA COMPLETO ==========');
-      formData.fields.forEach((field) {
+      for (var field in formData.fields) {
         print('[ActividadService] ${field.key}: ${field.value}');
-      });
+      }
       print('[ActividadService] ==========================================');
       
       final response = await _apiService.dio.put(

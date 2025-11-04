@@ -13,7 +13,7 @@ class DialogFooter extends StatelessWidget {
   final IconData saveIcon;
 
   const DialogFooter({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.isDark,
@@ -23,7 +23,7 @@ class DialogFooter extends StatelessWidget {
     this.saveText = 'Guardar',
     this.cancelIcon = Icons.close_rounded,
     this.saveIcon = Icons.save_rounded,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -174,13 +174,13 @@ class EditDialogFooter extends StatelessWidget {
   final VoidCallback onSave;
 
   const EditDialogFooter({
-    Key? key,
+    super.key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.isDark,
     required this.onCancel,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

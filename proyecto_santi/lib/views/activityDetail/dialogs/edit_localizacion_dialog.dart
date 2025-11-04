@@ -13,12 +13,12 @@ class EditLocalizacionDialog extends StatefulWidget {
   final bool puedeSerPrincipal;
 
   const EditLocalizacionDialog({
-    Key? key,
+    super.key,
     required this.localizacion,
     required this.iconosDisponibles,
     this.iconoActual,
     required this.puedeSerPrincipal,
-  }) : super(key: key);
+  });
 
   @override
   EditLocalizacionDialogState createState() => EditLocalizacionDialogState();

@@ -61,6 +61,12 @@ class UserAvatar extends StatelessWidget {
           ? Color(0xFF1976d2).withValues(alpha: 0.3)
           : Color(0xFF1976d2).withValues(alpha: 0.2),
       backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+      onBackgroundImageError: photoUrl != null
+          ? (exception, stackTrace) {
+              // Si falla la carga de la imagen, se mostrará el child (iniciales)
+              print('[UserAvatar] Error cargando foto: $exception');
+            }
+          : null,
       child: photoUrl == null
           ? Text(
               _getInitials(),
@@ -70,12 +76,6 @@ class UserAvatar extends StatelessWidget {
                 color: isDark ? Colors.white : Color(0xFF1976d2),
               ),
             )
-          : null,
-      onBackgroundImageError: photoUrl != null
-          ? (exception, stackTrace) {
-              // Si falla la carga de la imagen, se mostrará el child (iniciales)
-              print('[UserAvatar] Error cargando foto: $exception');
-            }
           : null,
     );
   }

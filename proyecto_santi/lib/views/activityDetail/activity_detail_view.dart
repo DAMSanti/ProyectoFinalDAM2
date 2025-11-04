@@ -261,9 +261,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     });
     
     // Si _datosEditados es null, inicializarlo
-    if (_datosEditados == null) {
-      _datosEditados = {};
-    }
+    _datosEditados ??= {};
     
     // DEBUG: Ver qué datos se están actualizando
     print('DEBUG [activity_detail_view]: updatedData keys: ${updatedData.keys.toList()}');

@@ -141,12 +141,8 @@ class Actividad {
     }
     
     // Si no se pudo parsear, usar fecha actual
-    if (fechaInicio == null) {
-      fechaInicio = DateTime.now();
-    }
-    if (fechaFin == null) {
-      fechaFin = fechaInicio; // Si no hay fecha fin, usar la de inicio (actividad de un día)
-    }
+    fechaInicio ??= DateTime.now();
+    fechaFin ??= fechaInicio;
     
     // Extraer solo la parte de fecha (sin hora) en formato ISO
     final fechaInicioStr = '${fechaInicio.year.toString().padLeft(4, '0')}-'

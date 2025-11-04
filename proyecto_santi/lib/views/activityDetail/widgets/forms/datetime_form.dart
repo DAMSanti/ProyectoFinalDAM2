@@ -21,7 +21,7 @@ class DateTimeSection extends StatelessWidget {
   }) buildDateTimeButton;
 
   const DateTimeSection({
-    Key? key,
+    super.key,
     required this.fechaInicio,
     required this.fechaFin,
     required this.horaInicio,
@@ -32,7 +32,7 @@ class DateTimeSection extends StatelessWidget {
     required this.isMobileLandscape,
     required this.buildSectionTitle,
     required this.buildDateTimeButton,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

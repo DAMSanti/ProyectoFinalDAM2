@@ -12,12 +12,12 @@ class ImageWithDeleteButton extends StatefulWidget {
   final VoidCallback? onTap;
 
   const ImageWithDeleteButton({
-    Key? key,
+    super.key,
     required this.image,
     required this.maxHeight,
     required this.onDelete,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   ImageWithDeleteButtonState createState() => ImageWithDeleteButtonState();

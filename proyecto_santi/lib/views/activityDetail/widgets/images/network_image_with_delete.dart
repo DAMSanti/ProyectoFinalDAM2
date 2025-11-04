@@ -10,13 +10,13 @@ class NetworkImageWithDelete extends StatefulWidget {
   final VoidCallback? onTap;
 
   const NetworkImageWithDelete({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.maxHeight,
     required this.showDeleteButton,
     this.onDelete,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   NetworkImageWithDeleteState createState() => NetworkImageWithDeleteState();
@@ -51,7 +51,7 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
                     if (loadingProgress == null) {
                       return child;
                     }
-                    return Container(
+                    return SizedBox(
                       width: widget.maxHeight,
                       child: Center(
                         child: CircularProgressIndicator(
