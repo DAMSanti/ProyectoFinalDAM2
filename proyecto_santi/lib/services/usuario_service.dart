@@ -90,8 +90,7 @@ class UsuarioService {
   Future<bool> toggleUsuarioActivo(String id, bool activo) async {
     try {
       final response = await _apiService.dio.patch(
-        '/Usuarios/$id/estado',
-        data: {'activo': activo},
+        '/Usuarios/$id/toggle-activo',
       );
       
       return response.statusCode == 200 || response.statusCode == 204;

@@ -7,6 +7,7 @@ import 'package:proyecto_santi/services/usuario_service.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/usuario_detail_dialog.dart';
 import 'package:intl/intl.dart';
 
 /// Vista CRUD de Usuarios siguiendo el patrón coherente de la app
@@ -268,156 +269,150 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _showUsuarioDialog(usuario: usuario),
-            child: Padding(
-              padding: EdgeInsets.all(16.dg),
-              child: Column(
+        child: Padding(
+          padding: EdgeInsets.all(16.dg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header con avatar, nombre y menú
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header con avatar, nombre y menú
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Avatar con inicial
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
-                        child: Text(
-                          usuario.nombreUsuario[0].toUpperCase(),
-                          style: TextStyle(
-                            color: _getRolColor(usuario.rol),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.sp,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Nombre del usuario y profesor
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              usuario.nombreUsuario,
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : AppColors.primary,
-                                height: 1.3,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            if (usuario.profesorNombreCompleto != null && 
-                                usuario.profesorNombreCompleto!.isNotEmpty) ...[
-                              SizedBox(height: 2.h),
-                              Text(
-                                usuario.profesorNombreCompleto!,
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: isDark ? Colors.white70 : Colors.grey[600],
-                                  height: 1.2,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      // Menú de 3 puntos
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? Colors.white70 : Colors.grey[600],
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            _showUsuarioDialog(usuario: usuario);
-                          } else if (value == 'toggle') {
-                            _toggleActivo(usuario);
-                          } else if (value == 'delete') {
-                            _deleteUsuario(usuario);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                                SizedBox(width: 12),
-                                Text('Editar'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'toggle',
-                            child: Row(
-                              children: [
-                                Icon(
-                                  usuario.activo ? Icons.block : Icons.check_circle,
-                                  size: 20,
-                                  color: usuario.activo ? Colors.orange : Colors.green,
-                                ),
-                                SizedBox(width: 12),
-                                Text(usuario.activo ? 'Desactivar' : 'Activar'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
-                                SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-                  // Divider sutil con gradiente
-                  Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          isDark ? Colors.white12 : Colors.grey[300]!,
-                          Colors.transparent,
-                        ],
+                  // Avatar con inicial
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
+                    child: Text(
+                      usuario.nombreUsuario[0].toUpperCase(),
+                      style: TextStyle(
+                        color: _getRolColor(usuario.rol),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.sp,
                       ),
                     ),
                   ),
-                  SizedBox(height: 12.h),
-                  // Email
-                  _buildInfoRow(
-                    icon: Icons.email_rounded,
-                    label: usuario.email,
-                    isDark: isDark,
+                  SizedBox(width: 12.w),
+                  // Nombre del usuario y profesor
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          usuario.nombreUsuario,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppColors.primary,
+                            height: 1.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (usuario.profesorNombreCompleto != null && 
+                            usuario.profesorNombreCompleto!.isNotEmpty) ...[
+                          SizedBox(height: 2.h),
+                          Text(
+                            usuario.profesorNombreCompleto!,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: isDark ? Colors.white70 : Colors.grey[600],
+                              height: 1.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 12.h),
-                  // Chips de rol y estado
-                  Row(
-                    children: [
-                      Flexible(child: _buildRolChip(usuario.rol)),
-                      SizedBox(width: 8.w),
-                      Flexible(child: _buildStatusChip(usuario.activo)),
+                  // Menú de 3 puntos
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: isDark ? Colors.white70 : Colors.grey[600],
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        _showUsuarioDialog(usuario: usuario);
+                      } else if (value == 'toggle') {
+                        _toggleActivo(usuario);
+                      } else if (value == 'delete') {
+                        _deleteUsuario(usuario);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                            SizedBox(width: 12),
+                            Text('Editar'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'toggle',
+                        child: Row(
+                          children: [
+                            Icon(
+                              usuario.activo ? Icons.block : Icons.check_circle,
+                              size: 20,
+                              color: usuario.activo ? Colors.orange : Colors.green,
+                            ),
+                            SizedBox(width: 12),
+                            Text(usuario.activo ? 'Desactivar' : 'Activar'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                            SizedBox(width: 12),
+                            Text('Eliminar', style: TextStyle(color: Colors.red)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ],
               ),
-            ),
+              SizedBox(height: 12.h),
+              // Divider sutil con gradiente
+              Container(
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      isDark ? Colors.white12 : Colors.grey[300]!,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.h),
+              // Email
+              _buildInfoRow(
+                icon: Icons.email_rounded,
+                label: usuario.email,
+                isDark: isDark,
+              ),
+              SizedBox(height: 12.h),
+              // Chips de rol y estado
+              Row(
+                children: [
+                  Flexible(child: _buildRolChip(usuario.rol)),
+                  SizedBox(width: 8.w),
+                  Flexible(child: _buildStatusChip(usuario.activo)),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -500,34 +495,9 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
   void _showUsuarioDialog({Usuario? usuario}) {
     showDialog(
       context: context,
-      builder: (context) => _UsuarioDialog(
+      builder: (context) => UsuarioDetailDialog(
         usuario: usuario,
-        onSave: (usuarioData) async {
-          try {
-            if (usuario == null) {
-              await _usuarioService.createUsuario(usuarioData);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Usuario creado correctamente')),
-                );
-              }
-            } else {
-              await _usuarioService.updateUsuario(usuario.id, usuarioData);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Usuario actualizado correctamente')),
-                );
-              }
-            }
-            await _loadUsuarios();
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: $e')),
-              );
-            }
-          }
-        },
+        onSaved: _loadUsuarios,
       ),
     );
   }
@@ -587,158 +557,5 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
         );
       }
     }
-  }
-}
-
-// Dialog para crear/editar usuario
-class _UsuarioDialog extends StatefulWidget {
-  final Usuario? usuario;
-  final Function(Map<String, dynamic>) onSave;
-
-  const _UsuarioDialog({required this.usuario, required this.onSave});
-
-  @override
-  State<_UsuarioDialog> createState() => _UsuarioDialogState();
-}
-
-class _UsuarioDialogState extends State<_UsuarioDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nombreController;
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
-  String _selectedRol = 'Usuario';
-  bool _activo = true;
-
-  final List<String> _roles = ['Admin', 'Coordinador', 'Profesor', 'Usuario'];
-
-  @override
-  void initState() {
-    super.initState();
-    _nombreController = TextEditingController(text: widget.usuario?.nombreUsuario ?? '');
-    _emailController = TextEditingController(text: widget.usuario?.email ?? '');
-    _passwordController = TextEditingController();
-    _selectedRol = widget.usuario?.rol ?? 'Usuario';
-    _activo = widget.usuario?.activo ?? true;
-  }
-
-  @override
-  void dispose() {
-    _nombreController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isEdit = widget.usuario != null;
-
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        constraints: BoxConstraints(maxWidth: 500),
-        padding: EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                isEdit ? 'Editar Usuario' : 'Nuevo Usuario',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              SizedBox(height: 24),
-              TextFormField(
-                controller: _nombreController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre de Usuario',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                validator: (value) => value?.isEmpty == true ? 'Campo requerido' : null,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: isEdit ? 'Nueva Contraseña (opcional)' : 'Contraseña',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                validator: (value) {
-                  if (!isEdit && (value?.isEmpty == true)) {
-                    return 'Campo requerido';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedRol,
-                decoration: InputDecoration(
-                  labelText: 'Rol',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                items: _roles.map((rol) => DropdownMenuItem(value: rol, child: Text(rol))).toList(),
-                onChanged: (value) => setState(() => _selectedRol = value!),
-              ),
-              SizedBox(height: 16),
-              SwitchListTile(
-                title: Text('Usuario Activo'),
-                value: _activo,
-                onChanged: (value) => setState(() => _activo = value),
-                activeColor: AppColors.primary,
-              ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancelar'),
-                  ),
-                  SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        final data = {
-                          'nombreUsuario': _nombreController.text,
-                          'rol': _selectedRol,
-                          'activo': _activo,
-                        };
-                        if (_emailController.text.isNotEmpty) {
-                          data['email'] = _emailController.text;
-                        }
-                        if (_passwordController.text.isNotEmpty) {
-                          data['password'] = _passwordController.text;
-                        }
-                        widget.onSave(data);
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
-                    child: Text(isEdit ? 'Guardar' : 'Crear'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -42,6 +42,7 @@ public class UsuariosController : ControllerBase
                     u.Rol,
                     u.Activo,
                     u.FechaCreacion,
+                    u.ProfesorUuid,
                     UltimoAcceso = (DateTime?)null, // Puedes agregar este campo al modelo si lo necesitas
                     ProfesorNombre = u.Profesor != null ? u.Profesor.Nombre : null,
                     ProfesorApellidos = u.Profesor != null ? u.Profesor.Apellidos : null,
