@@ -42,7 +42,10 @@ public class UsuariosController : ControllerBase
                     u.Rol,
                     u.Activo,
                     u.FechaCreacion,
-                    UltimoAcceso = (DateTime?)null // Puedes agregar este campo al modelo si lo necesitas
+                    UltimoAcceso = (DateTime?)null, // Puedes agregar este campo al modelo si lo necesitas
+                    ProfesorNombre = u.Profesor != null ? u.Profesor.Nombre : null,
+                    ProfesorApellidos = u.Profesor != null ? u.Profesor.Apellidos : null,
+                    ProfesorNombreCompleto = u.Profesor != null ? u.Profesor.Nombre + " " + u.Profesor.Apellidos : null
                 })
                 .ToListAsync();
 
@@ -72,7 +75,10 @@ public class UsuariosController : ControllerBase
                     u.Rol,
                     u.Activo,
                     u.FechaCreacion,
-                    u.ProfesorUuid
+                    u.ProfesorUuid,
+                    ProfesorNombre = u.Profesor != null ? u.Profesor.Nombre : null,
+                    ProfesorApellidos = u.Profesor != null ? u.Profesor.Apellidos : null,
+                    ProfesorNombreCompleto = u.Profesor != null ? u.Profesor.Nombre + " " + u.Profesor.Apellidos : null
                 })
                 .FirstOrDefaultAsync();
 

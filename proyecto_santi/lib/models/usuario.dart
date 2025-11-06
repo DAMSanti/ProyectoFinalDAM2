@@ -7,6 +7,7 @@ class Usuario {
   final bool activo;
   final DateTime? fechaCreacion;
   final DateTime? ultimoAcceso;
+  final String? profesorNombreCompleto;
 
   Usuario({
     required this.id,
@@ -16,6 +17,7 @@ class Usuario {
     this.activo = true,
     this.fechaCreacion,
     this.ultimoAcceso,
+    this.profesorNombreCompleto,
   });
 
   factory Usuario.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class Usuario {
       ultimoAcceso: json['ultimoAcceso'] != null
           ? DateTime.tryParse(json['ultimoAcceso'].toString())
           : null,
+      profesorNombreCompleto: json['profesorNombreCompleto']?.toString(),
     );
   }
 
@@ -43,6 +46,7 @@ class Usuario {
       'activo': activo,
       'fechaCreacion': fechaCreacion?.toIso8601String(),
       'ultimoAcceso': ultimoAcceso?.toIso8601String(),
+      'profesorNombreCompleto': profesorNombreCompleto,
     };
   }
 
@@ -54,6 +58,7 @@ class Usuario {
     bool? activo,
     DateTime? fechaCreacion,
     DateTime? ultimoAcceso,
+    String? profesorNombreCompleto,
   }) {
     return Usuario(
       id: id ?? this.id,
@@ -63,6 +68,7 @@ class Usuario {
       activo: activo ?? this.activo,
       fechaCreacion: fechaCreacion ?? this.fechaCreacion,
       ultimoAcceso: ultimoAcceso ?? this.ultimoAcceso,
+      profesorNombreCompleto: profesorNombreCompleto ?? this.profesorNombreCompleto,
     );
   }
 

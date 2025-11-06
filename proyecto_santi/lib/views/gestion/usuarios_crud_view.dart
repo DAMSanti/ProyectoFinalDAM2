@@ -157,7 +157,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
 
                 SizedBox(height: 16),
 
-                // Lista/Tabla
+                // Lista de usuarios
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -166,13 +166,12 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                               child: Text(
                                 'No se encontraron usuarios',
                                 style: TextStyle(
+                                  fontSize: 16.sp,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
                             )
-                          : isMobile
-                              ? _buildMobileList(isDark)
-                              : _buildDesktopTable(isDark),
+                          : _buildUsuariosList(isDark, isMobile),
                 ),
               ],
             ),
@@ -189,168 +188,277 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
     );
   }
 
-  Widget _buildMobileList(bool isDark) {
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: _filteredUsuarios.length,
-      itemBuilder: (context, index) {
-        final usuario = _filteredUsuarios[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          color: isDark ? Colors.grey[850] : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildUsuariosList(bool isDark, bool isMobile) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  Color(0xFF1a1a2e).withOpacity(0.6),
+                  Color(0xFF16213e).withOpacity(0.6),
+                ]
+              : [
+                  Colors.white.withOpacity(0.95),
+                  Colors.white.withOpacity(0.85),
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.1)
+              : Colors.black.withOpacity(0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
           ),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
-              child: Text(
-                usuario.nombreUsuario[0].toUpperCase(),
-                style: TextStyle(
-                  color: _getRolColor(usuario.rol),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            title: Text(
-              usuario.nombreUsuario,
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 4),
-                Text(usuario.email),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    _buildRolChip(usuario.rol),
-                    SizedBox(width: 8),
-                    _buildStatusChip(usuario.activo),
-                  ],
-                ),
-              ],
-            ),
-            trailing: PopupMenuButton(
-              icon: Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  child: ListTile(
-                    leading: Icon(Icons.edit, size: 20),
-                    title: Text('Editar'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onTap: () => Future.delayed(
-                    Duration(milliseconds: 100),
-                    () => _showUsuarioDialog(usuario: usuario),
-                  ),
-                ),
-                PopupMenuItem(
-                  child: ListTile(
-                    leading: Icon(
-                      usuario.activo ? Icons.block : Icons.check_circle,
-                      size: 20,
-                    ),
-                    title: Text(usuario.activo ? 'Desactivar' : 'Activar'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onTap: () => Future.delayed(
-                    Duration(milliseconds: 100),
-                    () => _toggleActivo(usuario),
-                  ),
-                ),
-                PopupMenuItem(
-                  child: ListTile(
-                    leading: Icon(Icons.delete, size: 20, color: Colors.red),
-                    title: Text('Eliminar', style: TextStyle(color: Colors.red)),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onTap: () => Future.delayed(
-                    Duration(milliseconds: 100),
-                    () => _deleteUsuario(usuario),
-                  ),
-                ),
-              ],
-            ),
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.white.withOpacity(0.8),
+            blurRadius: 8,
+            offset: Offset(0, -2),
+            spreadRadius: -4,
           ),
-        );
-      },
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: ListView.builder(
+          padding: EdgeInsets.all(16.dg),
+          itemCount: _filteredUsuarios.length,
+          itemBuilder: (context, index) {
+            final usuario = _filteredUsuarios[index];
+            return _buildUsuarioCard(usuario, isDark);
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildDesktopTable(bool isDark) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Card(
-        color: isDark ? Colors.grey[850] : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+  Widget _buildUsuarioCard(Usuario usuario, bool isDark) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.20),
+                  Color.fromRGBO(21, 101, 192, 0.15),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.75),
+                  Color.fromRGBO(144, 202, 249, 0.65),
+                ],
         ),
-        child: DataTable(
-          headingRowColor: MaterialStateProperty.all(
-            isDark ? Colors.grey[800] : Colors.grey[100],
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.35) 
+                : const Color.fromRGBO(0, 0, 0, 0.12),
+            offset: const Offset(2, 3),
+            blurRadius: 10.0,
+            spreadRadius: -1,
           ),
-          columns: [
-            DataColumn(label: Text('Usuario', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('Email', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('Rol', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('Estado', style: TextStyle(fontWeight: FontWeight.bold))),
-            DataColumn(label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold))),
-          ],
-          rows: _filteredUsuarios.map((usuario) {
-            return DataRow(
-              cells: [
-                DataCell(
+        ],
+        border: Border.all(
+          color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.08) 
+              : const Color.fromRGBO(0, 0, 0, 0.04),
+          width: 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _showUsuarioDialog(usuario: usuario),
+            child: Padding(
+              padding: EdgeInsets.all(16.dg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header con avatar, nombre y menú
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Avatar con inicial
                       CircleAvatar(
+                        radius: 24,
                         backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
                         child: Text(
                           usuario.nombreUsuario[0].toUpperCase(),
                           style: TextStyle(
                             color: _getRolColor(usuario.rol),
                             fontWeight: FontWeight.bold,
+                            fontSize: 20.sp,
                           ),
                         ),
                       ),
-                      SizedBox(width: 12),
-                      Text(usuario.nombreUsuario),
-                    ],
-                  ),
-                ),
-                DataCell(Text(usuario.email)),
-                DataCell(_buildRolChip(usuario.rol)),
-                DataCell(_buildStatusChip(usuario.activo)),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 20),
-                        color: AppColors.primary,
-                        onPressed: () => _showUsuarioDialog(usuario: usuario),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          usuario.activo ? Icons.block : Icons.check_circle,
-                          size: 20,
+                      SizedBox(width: 12.w),
+                      // Nombre del usuario y profesor
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              usuario.nombreUsuario,
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : AppColors.primary,
+                                height: 1.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (usuario.profesorNombreCompleto != null && 
+                                usuario.profesorNombreCompleto!.isNotEmpty) ...[
+                              SizedBox(height: 2.h),
+                              Text(
+                                usuario.profesorNombreCompleto!,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: isDark ? Colors.white70 : Colors.grey[600],
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
                         ),
-                        color: usuario.activo ? Colors.orange : Colors.green,
-                        onPressed: () => _toggleActivo(usuario),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete, size: 20),
-                        color: Colors.red,
-                        onPressed: () => _deleteUsuario(usuario),
+                      // Menú de 3 puntos
+                      PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          color: isDark ? Colors.white70 : Colors.grey[600],
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _showUsuarioDialog(usuario: usuario);
+                          } else if (value == 'toggle') {
+                            _toggleActivo(usuario);
+                          } else if (value == 'delete') {
+                            _deleteUsuario(usuario);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                                SizedBox(width: 12),
+                                Text('Editar'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'toggle',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  usuario.activo ? Icons.block : Icons.check_circle,
+                                  size: 20,
+                                  color: usuario.activo ? Colors.orange : Colors.green,
+                                ),
+                                SizedBox(width: 12),
+                                Text(usuario.activo ? 'Desactivar' : 'Activar'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                                SizedBox(width: 12),
+                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
-            );
-          }).toList(),
+                  SizedBox(height: 12.h),
+                  // Divider sutil con gradiente
+                  Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          isDark ? Colors.white12 : Colors.grey[300]!,
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  // Email
+                  _buildInfoRow(
+                    icon: Icons.email_rounded,
+                    label: usuario.email,
+                    isDark: isDark,
+                  ),
+                  SizedBox(height: 12.h),
+                  // Chips de rol y estado
+                  Row(
+                    children: [
+                      Flexible(child: _buildRolChip(usuario.rol)),
+                      SizedBox(width: 8.w),
+                      Flexible(child: _buildStatusChip(usuario.activo)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow({required IconData icon, required String label, required bool isDark}) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: isDark ? Colors.white70 : Colors.grey[600],
+        ),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: isDark ? Colors.white70 : Colors.grey[700],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 

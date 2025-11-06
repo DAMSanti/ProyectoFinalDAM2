@@ -15,6 +15,12 @@ class UsuarioService {
       
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;
+        
+        // DEBUG: Ver qué campos vienen del backend
+        if (data.isNotEmpty) {
+          print('🔍 DEBUG Usuario sample: ${data.first}');
+        }
+        
         return data.map((json) => Usuario.fromJson(json as Map<String, dynamic>)).toList();
       } else {
         throw Exception('Error al cargar usuarios: ${response.statusCode}');

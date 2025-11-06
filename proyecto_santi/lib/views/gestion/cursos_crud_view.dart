@@ -1,12 +1,9 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
-import '../gestion/components/crud_data_table.dart';
-import '../gestion/components/crud_delete_dialog.dart';
-import '../gestion/components/crud_search_bar.dart';
 
 class CursosCrudView extends StatefulWidget {
   const CursosCrudView({Key? key}) : super(key: key);
@@ -80,145 +77,402 @@ class _CursosCrudViewState extends State<CursosCrudView> {
   }
 
   Future<void> _deleteCurso(Curso curso) async {
-    await CrudDeleteDialog.show(
+    final confirmed = await showDialog<bool>(
       context: context,
-      title: 'Eliminar Curso',
-      content: '¿Estás seguro de que deseas eliminar el curso "${curso.nombre}"?',
-      onConfirm: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Funcionalidad de eliminar curso en desarrollo')),
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Curso'),
+        content: Text('¿Estás seguro de que deseas eliminar el curso "${curso.nombre}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
     );
-  }
 
-  Color _getActivoColor(bool activo) {
-    return activo ? Colors.green : Colors.red;
+    if (confirmed == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Funcionalidad de eliminar curso en desarrollo')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     return Stack(
       children: [
-        // Fondo con degradado
         isDark 
           ? GradientBackgroundDark(child: Container()) 
           : GradientBackgroundLight(child: Container()),
-        // Contenido
         Scaffold(
           backgroundColor: Colors.transparent,
-          body: Column(
-            children: [
-              CrudSearchBar(
-                hintText: 'Buscar por nombre o nivel...',
-                onSearch: _filterCursos,
-                onAdd: _addCurso,
-                addButtonText: 'Nuevo Curso',
-              ),
-              Expanded(
-                child: Container(
-                  margin: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Botón crear solo en desktop
+                if (!isMobile)
+                  Padding(
+                    padding: EdgeInsets.all(16.dg),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _addCurso,
+                          icon: Icon(Icons.add, size: 20),
+                          label: Text('Nuevo Curso'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(kIsWeb ? 4.sp : 16.dg),
-                    child: CrudDataTable<Curso>(
-                      items: _filteredCursos,
-                      isLoading: _isLoading,
-                      emptyMessage: _searchQuery.isEmpty
-                          ? 'No hay cursos disponibles'
-                          : 'No se encontraron cursos que coincidan con "$_searchQuery"',
-                      columns: [
-                        DataColumn(
-                          label: Text(
-                            'ID',
-                            style: TextStyle(
-                              fontSize: kIsWeb ? 4.sp : 14.dg,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Nombre',
-                            style: TextStyle(
-                              fontSize: kIsWeb ? 4.sp : 14.dg,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Nivel',
-                            style: TextStyle(
-                              fontSize: kIsWeb ? 4.sp : 14.dg,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Text(
-                            'Estado',
-                            style: TextStyle(
-                              fontSize: kIsWeb ? 4.sp : 14.dg,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                      buildCells: (curso) => [
-                        DataCell(Text(
-                          curso.id.toString(),
-                          style: TextStyle(fontSize: kIsWeb ? 3.5.sp : 12.dg),
-                        )),
-                        DataCell(Text(
-                          curso.nombre,
-                          style: TextStyle(fontSize: kIsWeb ? 3.5.sp : 12.dg),
-                        )),
-                        DataCell(Text(
-                          curso.nivel ?? 'N/A',
-                          style: TextStyle(fontSize: kIsWeb ? 3.5.sp : 12.dg),
-                        )),
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getActivoColor(curso.activo).withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _getActivoColor(curso.activo),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              curso.activo ? 'Activo' : 'Inactivo',
-                              style: TextStyle(
-                                color: _getActivoColor(curso.activo),
-                                fontSize: kIsWeb ? 3.sp : 11.dg,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      onEdit: _editCurso,
-                      onDelete: _deleteCurso,
+                // Barra de búsqueda
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: TextField(
+                    onChanged: _filterCursos,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar por nombre o nivel...',
+                      prefixIcon: Icon(Icons.search),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[800] : Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 16.h),
+                // Lista de cursos
+                Expanded(
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _filteredCursos.isEmpty
+                          ? Center(
+                              child: Text(
+                                _searchQuery.isEmpty
+                                    ? 'No hay cursos disponibles'
+                                    : 'No se encontraron cursos',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  color: isDark ? Colors.white70 : AppColors.textLight,
+                                ),
+                              ),
+                            )
+                          : _buildCursosList(isDark, isMobile),
+                ),
+              ],
+            ),
           ),
+          floatingActionButton: isMobile
+              ? FloatingActionButton(
+                  onPressed: _addCurso,
+                  child: Icon(Icons.add),
+                  backgroundColor: AppColors.primary,
+                )
+              : null,
         ),
       ],
+    );
+  }
+
+  Widget _buildCursosList(bool isDark, bool isMobile) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  Color(0xFF1a1a2e).withOpacity(0.6),
+                  Color(0xFF16213e).withOpacity(0.6),
+                ]
+              : [
+                  Colors.white.withOpacity(0.95),
+                  Colors.white.withOpacity(0.85),
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.1)
+              : Colors.black.withOpacity(0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.white.withOpacity(0.8),
+            blurRadius: 8,
+            offset: Offset(0, -2),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: ListView.builder(
+          padding: EdgeInsets.all(16.dg),
+          itemCount: _filteredCursos.length,
+          itemBuilder: (context, index) {
+            final curso = _filteredCursos[index];
+            return _buildCursoCard(curso, isDark);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCursoCard(Curso curso, bool isDark) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: isDark
+              ? const [
+                  Color.fromRGBO(25, 118, 210, 0.20),
+                  Color.fromRGBO(21, 101, 192, 0.15),
+                ]
+              : const [
+                  Color.fromRGBO(187, 222, 251, 0.75),
+                  Color.fromRGBO(144, 202, 249, 0.65),
+                ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color.fromRGBO(0, 0, 0, 0.35) 
+                : const Color.fromRGBO(0, 0, 0, 0.12),
+            offset: const Offset(2, 3),
+            blurRadius: 10.0,
+            spreadRadius: -1,
+          ),
+        ],
+        border: Border.all(
+          color: isDark 
+              ? const Color.fromRGBO(255, 255, 255, 0.08) 
+              : const Color.fromRGBO(0, 0, 0, 0.04),
+          width: 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _editCurso(curso),
+            child: Padding(
+              padding: EdgeInsets.all(16.dg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header con icono, nombre y menú
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Icono de curso
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.school_rounded,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      // Nombre del curso
+                      Expanded(
+                        child: Text(
+                          curso.nombre,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppColors.primary,
+                            height: 1.3,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Menú de 3 puntos
+                      PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          color: isDark ? Colors.white70 : Colors.grey[600],
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _editCurso(curso);
+                          } else if (value == 'delete') {
+                            _deleteCurso(curso);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                                SizedBox(width: 12),
+                                Text('Editar'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                                SizedBox(width: 12),
+                                Text('Eliminar', style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (curso.nivel != null || !curso.activo) ...[
+                    SizedBox(height: 12.h),
+                    // Divider sutil con gradiente
+                    Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            isDark ? Colors.white12 : Colors.grey[300]!,
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    // Información del curso (nivel y estado)
+                    Row(
+                      children: [
+                        // Chip de nivel
+                        if (curso.nivel != null)
+                          Flexible(
+                            child: _buildInfoChip(
+                              icon: Icons.grade_rounded,
+                              label: curso.nivel!,
+                              isDark: isDark,
+                            ),
+                          ),
+                        if (curso.nivel != null && !curso.activo)
+                          SizedBox(width: 8.w),
+                        // Chip de estado
+                        if (!curso.activo)
+                          Flexible(
+                            child: _buildStatusChip(
+                              label: 'Inactivo',
+                              isActive: false,
+                              isDark: isDark,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({required IconData icon, required String label, required bool isDark}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppColors.primary),
+          SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip({required String label, required bool isActive, required bool isDark}) {
+    final color = isActive ? Colors.green : Colors.red;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isActive ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            size: 16,
+            color: color,
+          ),
+          SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
