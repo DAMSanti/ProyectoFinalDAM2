@@ -120,6 +120,18 @@ public class UsuariosController : ControllerBase
                 return BadRequest(new { message = "Ya existe un usuario con ese nombre de usuario" });
             }
 
+            // Verificar si el profesor ya está asociado a otro usuario
+            if (request.ProfesorUuid.HasValue)
+            {
+                var profesorYaAsignado = await _context.Usuarios
+                    .AnyAsync(u => u.ProfesorUuid == request.ProfesorUuid.Value);
+                
+                if (profesorYaAsignado)
+                {
+                    return BadRequest(new { message = "Este profesor ya está asociado a otro usuario" });
+                }
+            }
+
             // Crear nuevo usuario
             var usuario = new Usuario
             {
@@ -192,6 +204,15 @@ public class UsuariosController : ControllerBase
 
             if (request.ProfesorUuid.HasValue)
             {
+                // Verificar si el profesor ya está asociado a otro usuario (excepto este)
+                var profesorYaAsignado = await _context.Usuarios
+                    .AnyAsync(u => u.ProfesorUuid == request.ProfesorUuid.Value && u.Id != id);
+                
+                if (profesorYaAsignado)
+                {
+                    return BadRequest(new { message = "Este profesor ya está asociado a otro usuario" });
+                }
+                
                 usuario.ProfesorUuid = request.ProfesorUuid.Value;
             }
 

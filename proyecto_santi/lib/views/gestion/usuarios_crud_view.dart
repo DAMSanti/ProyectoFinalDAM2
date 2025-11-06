@@ -93,39 +93,25 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Header simple
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () => Navigator.pop(context),
-                        color: isDark ? Colors.white : AppColors.primary,
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Usuarios',
-                          style: TextStyle(
-                            fontSize: isMobile ? 24.sp : 28,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.primary,
-                          ),
-                        ),
-                      ),
-                      if (!isMobile)
+                // Botón crear solo en desktop
+                if (!isMobile)
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                         ElevatedButton.icon(
                           onPressed: () => _showUsuarioDialog(),
                           icon: Icon(Icons.add, size: 20),
-                          label: Text('Nuevo'),
+                          label: Text('Nuevo Usuario'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                           ),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
                 // Barra de búsqueda
                 Padding(
