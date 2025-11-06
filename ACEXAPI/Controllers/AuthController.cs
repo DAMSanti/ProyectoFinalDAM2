@@ -93,7 +93,8 @@ public class AuthController : ControllerBase
             {
                 usuario.Id,
                 NombreUsuario = usuario.NombreUsuario,
-                usuario.Rol
+                usuario.Rol,
+                usuario.ProfesorUuid
             }
         });
     }

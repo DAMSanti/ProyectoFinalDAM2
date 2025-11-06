@@ -14,6 +14,8 @@ class AuthService {
   /// Puede usar nombreUsuario o correo del profesor asociado
   Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
+      print('[Auth] Intentando login con: $email');
+      
       final response = await _apiService.postData(
         '${AppConfig.authEndpoint}/login',
         {
@@ -22,16 +24,22 @@ class AuthService {
         },
       );
       
+      print('[Auth] Response status: ${response.statusCode}');
+      print('[Auth] Response data: ${response.data}');
+      
       if (response.statusCode == 200 && response.data != null) {
         final token = response.data['token'];
         if (token != null) {
           _apiService.setToken(token);
+          print('[Auth] Token establecido correctamente');
           return response.data;
         }
       }
+      print('[Auth] Login falló - no hay token en la respuesta');
       return null;
     } catch (e) {
       print('[Auth Error] Login failed: $e');
+      print('[Auth Error] Error type: ${e.runtimeType}');
       return null;
     }
   }

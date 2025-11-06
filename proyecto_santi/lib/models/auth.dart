@@ -27,6 +27,9 @@ class Auth extends ChangeNotifier {
   /// Inicia sesión con email y contraseña
   Future<bool> login(String email, String password) async {
     try {
+      // Limpiar sesión anterior antes de iniciar nueva sesión
+      await _clearSession();
+      
       // La API C# de ACEX valida email y password
       final loginResult = await _authService.login(email, password);
       
@@ -51,10 +54,17 @@ class Auth extends ChangeNotifier {
           nombre: userNombre,
         );
         
+        // Obtener el profesorUuid del usuario
+        final profesorUuid = usuario?['profesorUuid']?.toString();
+        
+        print('[Auth] Usuario ID: ${usuario?['id']}');
+        print('[Auth] Profesor UUID: $profesorUuid');
+        print('[Auth] Rol: $userRol');
+        
         // Creamos un objeto Profesor temporal con los datos del usuario
-        // Esto es para mantener compatibilidad con el resto de la app
+        // Si tiene profesorUuid, usar ese; si no, usar el ID del usuario
         _currentUser = Profesor(
-          uuid: usuario?['id']?.toString() ?? '',
+          uuid: profesorUuid ?? usuario?['id']?.toString() ?? '',
           dni: '',
           nombre: usuario?['nombreUsuario']?.toString() ?? 'Usuario',
           apellidos: '',
@@ -103,6 +113,13 @@ class Auth extends ChangeNotifier {
     await NotificationService().unsubscribeFromTopic('all_users');
     await NotificationService().unsubscribeFromTopic('profesores');
     
+    await _clearSession();
+    
+    notifyListeners();
+  }
+
+  /// Limpia la sesión sin notificar (usado internamente)
+  Future<void> _clearSession() async {
     _isAuthenticated = false;
     _currentUser = null;
     _jwtToken = null;
@@ -110,8 +127,6 @@ class Auth extends ChangeNotifier {
     
     // Limpia las credenciales almacenadas
     await SecureStorageConfig.clearUserCredentials();
-    
-    notifyListeners();
   }
 
   /// ✅ MEJORADO: Verifica si hay una sesión activa al iniciar la app y la restaura

@@ -105,7 +105,7 @@ class UsuarioService {
     try {
       final response = await _apiService.dio.post(
         '/Usuarios/$id/cambiar-password',
-        data: {'password': newPassword},
+        data: {'nuevaPassword': newPassword},
       );
       
       return response.statusCode == 200 || response.statusCode == 204;
