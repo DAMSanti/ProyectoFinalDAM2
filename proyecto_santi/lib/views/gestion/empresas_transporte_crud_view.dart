@@ -4,6 +4,7 @@ import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/empresa_transporte_detail_dialog.dart';
 
 class EmpresasTransporteCrudView extends StatefulWidget {
   const EmpresasTransporteCrudView({Key? key}) : super(key: key);
@@ -58,23 +59,30 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
         _filteredEmpresas = _empresas.where((empresa) {
           final searchLower = query.toLowerCase();
           return empresa.nombre.toLowerCase().contains(searchLower) ||
-                 empresa.cif.toLowerCase().contains(searchLower) ||
-                 (empresa.localidad?.toLowerCase().contains(searchLower) ?? false);
+                 (empresa.cif?.toLowerCase().contains(searchLower) ?? false) ||
+                 (empresa.telefono?.toLowerCase().contains(searchLower) ?? false) ||
+                 (empresa.email?.toLowerCase().contains(searchLower) ?? false);
         }).toList();
       }
     });
   }
 
-  void _addEmpresa() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad de añadir empresa en desarrollo')),
+  void _showEmpresaDialog({EmpresaTransporte? empresa}) {
+    showDialog(
+      context: context,
+      builder: (context) => EmpresaTransporteDetailDialog(
+        empresa: empresa,
+        onSaved: _loadEmpresas,
+      ),
     );
   }
 
+  void _addEmpresa() {
+    _showEmpresaDialog();
+  }
+
   void _editEmpresa(EmpresaTransporte empresa) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Editar empresa: ${empresa.nombre}')),
-    );
+    _showEmpresaDialog(empresa: empresa);
   }
 
   Future<void> _deleteEmpresa(EmpresaTransporte empresa) async {
@@ -145,7 +153,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                   child: TextField(
                     onChanged: _filterEmpresas,
                     decoration: InputDecoration(
-                      hintText: 'Buscar por nombre, CIF o localidad...',
+                      hintText: 'Buscar por nombre, CIF, teléfono o email...',
                       prefixIcon: Icon(Icons.search),
                       filled: true,
                       fillColor: isDark ? Colors.grey[800] : Colors.white,
@@ -282,131 +290,132 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
           width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _editEmpresa(empresa),
-            child: Padding(
-              padding: EdgeInsets.all(16.dg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header con icono, nombre y menú
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Icono de empresa de transporte
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.directions_bus_rounded,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Nombre de la empresa
-                      Expanded(
-                        child: Text(
-                          empresa.nombre,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.primary,
-                            height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // Menú de 3 puntos
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? Colors.white70 : Colors.grey[600],
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            _editEmpresa(empresa);
-                          } else if (value == 'delete') {
-                            _deleteEmpresa(empresa);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                                SizedBox(width: 12),
-                                Text('Editar'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
-                                SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+      child: Padding(
+        padding: EdgeInsets.all(16.dg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono, nombre y menú
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icono de empresa de transporte
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  SizedBox(height: 12.h),
-                  // Divider sutil con gradiente
-                  Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          isDark ? Colors.white12 : Colors.grey[300]!,
-                          Colors.transparent,
+                  child: Icon(
+                    Icons.directions_bus_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Nombre de la empresa
+                Expanded(
+                  child: Text(
+                    empresa.nombre,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.primary,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Menú de 3 puntos
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: isDark ? Colors.white70 : Colors.grey[600],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _editEmpresa(empresa);
+                    } else if (value == 'delete') {
+                      _deleteEmpresa(empresa);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                          SizedBox(width: 12),
+                          Text('Editar'),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12.h),
-                  // Información de la empresa
-                  _buildInfoRow(
-                    icon: Icons.badge_rounded,
-                    label: 'CIF: ${empresa.cif}',
-                    isDark: isDark,
-                  ),
-                  if (empresa.direccion != null && empresa.direccion!.isNotEmpty) ...[
-                    SizedBox(height: 8.h),
-                    _buildInfoRow(
-                      icon: Icons.place_rounded,
-                      label: empresa.direccion!,
-                      isDark: isDark,
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                          SizedBox(width: 12),
+                          Text('Eliminar', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
                     ),
                   ],
-                  if (empresa.contacto != null && empresa.contacto!.isNotEmpty) ...[
-                    SizedBox(height: 8.h),
-                    _buildInfoRow(
-                      icon: Icons.phone_rounded,
-                      label: empresa.contacto!,
-                      isDark: isDark,
-                    ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            // Divider sutil con gradiente
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    isDark ? Colors.white12 : Colors.grey[300]!,
+                    Colors.transparent,
                   ],
-                ],
+                ),
               ),
             ),
-          ),
+            SizedBox(height: 12.h),
+            // Información de la empresa
+            if (empresa.cif != null && empresa.cif!.isNotEmpty) ...[
+              _buildInfoRow(
+                icon: Icons.badge_rounded,
+                label: 'CIF: ${empresa.cif}',
+                isDark: isDark,
+              ),
+              SizedBox(height: 8.h),
+            ],
+            if (empresa.telefono != null && empresa.telefono!.isNotEmpty) ...[
+              _buildInfoRow(
+                icon: Icons.phone_rounded,
+                label: empresa.telefono!,
+                isDark: isDark,
+              ),
+              SizedBox(height: 8.h),
+            ],
+            if (empresa.email != null && empresa.email!.isNotEmpty) ...[
+              _buildInfoRow(
+                icon: Icons.email_rounded,
+                label: empresa.email!,
+                isDark: isDark,
+              ),
+              SizedBox(height: 8.h),
+            ],
+            if (empresa.direccion != null && empresa.direccion!.isNotEmpty) ...[
+              _buildInfoRow(
+                icon: Icons.place_rounded,
+                label: empresa.direccion!,
+                isDark: isDark,
+              ),
+            ],
+          ],
         ),
       ),
     );

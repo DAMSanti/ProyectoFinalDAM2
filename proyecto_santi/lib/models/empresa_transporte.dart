@@ -1,31 +1,28 @@
 class EmpresaTransporte {
   final int id;
   final String nombre;
-  final String cif;
+  final String? cif;
+  final String? telefono;
+  final String? email;
   final String? direccion;
-  final String? cp;
-  final String? localidad;
-  final String? contacto;
 
   EmpresaTransporte({
     required this.id,
     required this.nombre,
-    required this.cif,
+    this.cif,
+    this.telefono,
+    this.email,
     this.direccion,
-    this.cp,
-    this.localidad,
-    this.contacto,
   });
 
   factory EmpresaTransporte.fromJson(Map<String, dynamic> json) {
     return EmpresaTransporte(
       id: json['id'] ?? 0,
       nombre: json['nombre']?.toString() ?? '',
-      cif: json['cif']?.toString() ?? '',
+      cif: json['cif']?.toString(),
+      telefono: json['telefono']?.toString(),
+      email: json['email']?.toString(),
       direccion: json['direccion']?.toString(),
-      cp: json['cp']?.toString(),
-      localidad: json['localidad']?.toString(),
-      contacto: json['contacto']?.toString(),
     );
   }
 
@@ -34,10 +31,9 @@ class EmpresaTransporte {
       'id': id,
       'nombre': nombre,
       'cif': cif,
+      'telefono': telefono,
+      'email': email,
       'direccion': direccion,
-      'cp': cp,
-      'localidad': localidad,
-      'contacto': contacto,
     };
   }
 

@@ -24,6 +24,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
   List<Usuario> _filteredUsuarios = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  String? _selectedRolFilter; // null = todos los roles
   
   bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
@@ -62,17 +63,24 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
 
   void _filterUsuarios(String query) {
     setState(() {
-      if (query.isEmpty) {
-        _filteredUsuarios = _usuarios;
-      } else {
-        final queryLower = query.toLowerCase();
-        _filteredUsuarios = _usuarios.where((usuario) {
-          return usuario.nombreUsuario.toLowerCase().contains(queryLower) ||
-              usuario.email.toLowerCase().contains(queryLower) ||
-              usuario.rol.toLowerCase().contains(queryLower);
-        }).toList();
-      }
+      _filteredUsuarios = _usuarios.where((usuario) {
+        // Filtro por texto de búsqueda
+        final matchesSearch = query.isEmpty || 
+            usuario.nombreUsuario.toLowerCase().contains(query.toLowerCase()) ||
+            usuario.email.toLowerCase().contains(query.toLowerCase()) ||
+            usuario.rol.toLowerCase().contains(query.toLowerCase());
+        
+        // Filtro por rol seleccionado
+        final matchesRol = _selectedRolFilter == null || 
+            usuario.rol.toLowerCase() == _selectedRolFilter!.toLowerCase();
+        
+        return matchesSearch && matchesRol;
+      }).toList();
     });
+  }
+
+  void _applyFilters() {
+    _filterUsuarios(_searchController.text);
   }
 
   @override
@@ -114,35 +122,130 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                     ),
                   ),
 
-                // Barra de búsqueda
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _filterUsuarios,
-                    decoration: InputDecoration(
-                      hintText: 'Buscar usuarios...',
-                      prefixIcon: Icon(Icons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                _filterUsuarios('');
-                              },
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: isDark ? Colors.grey[800] : Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                // Barra de búsqueda y filtro
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  child: Row(
+                    children: [
+                      // Barra de búsqueda expandible
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isDark 
+                                ? Colors.white.withOpacity(0.1) 
+                                : Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark 
+                                    ? Colors.black.withOpacity(0.4)
+                                    : Colors.black.withOpacity(0.12),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                              BoxShadow(
+                                color: isDark 
+                                    ? Colors.black.withOpacity(0.2)
+                                    : Colors.white.withOpacity(0.8),
+                                blurRadius: 6,
+                                offset: Offset(0, -2),
+                                spreadRadius: -2,
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _filterUsuarios,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black87,
+                              fontSize: 15,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Buscar usuarios...',
+                              hintStyle: TextStyle(
+                                color: isDark 
+                                    ? Colors.white.withOpacity(0.5)
+                                    : Colors.black54,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search_rounded,
+                                color: isDark ? Colors.white70 : AppColors.primary,
+                                size: 22,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      
+                      SizedBox(width: 12),
+                      
+                      // Botón de filtros con indicador
+                      Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? [AppColors.primary, AppColors.primary.withOpacity(0.8)]
+                                    : [AppColors.primary, AppColors.primary.withOpacity(0.9)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () => _showRolFilterDialog(isDark),
+                                child: Container(
+                                  padding: EdgeInsets.all(14),
+                                  child: Icon(
+                                    Icons.tune_rounded,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Indicador de filtros activos
+                          if (_selectedRolFilter != null)
+                            Positioned(
+                              right: 4,
+                              top: 4,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.amber,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isDark ? Colors.black : Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-
-                SizedBox(height: 16),
 
                 // Lista de usuarios
                 Expanded(
@@ -556,6 +659,279 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
           SnackBar(content: Text('Error al cambiar estado')),
         );
       }
+    }
+  }
+
+  void _showRolFilterDialog(bool isDark) {
+    final roles = ['Administrador', 'Coordinador', 'Profesor', 'Usuario'];
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isMobile = screenWidth < 600;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isMobileLandscape = isMobile && !isPortrait;
+    
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(isMobileLandscape ? 12 : 16),
+        ),
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: isMobileLandscape ? 20 : (isMobile ? 16 : 40),
+          vertical: isMobileLandscape ? 12 : (isMobile ? 20 : 24),
+        ),
+        child: Container(
+          width: isMobile ? double.infinity : 500,
+          constraints: BoxConstraints(
+            maxHeight: isMobileLandscape 
+                ? screenHeight * 0.9 
+                : (isMobile ? screenHeight * 0.85 : 700),
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(isMobileLandscape ? 12 : 16),
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [Color(0xFF1a1a2e), Color(0xFF16213e)]
+                  : [Colors.white, Color(0xFFf5f5f5)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
+                  vertical: isMobileLandscape ? 8 : (isMobile ? 12 : 16),
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [AppColors.primary, AppColors.primary.withOpacity(0.8)]
+                        : [AppColors.primary, AppColors.primary.withOpacity(0.9)],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(isMobileLandscape ? 12 : 16),
+                    topRight: Radius.circular(isMobileLandscape ? 12 : 16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.filter_alt_rounded,
+                      color: Colors.white,
+                      size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
+                    ),
+                    SizedBox(width: isMobileLandscape ? 6 : 8),
+                    Expanded(
+                      child: Text(
+                        'Filtrar por Rol',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close, 
+                        color: Colors.white, 
+                        size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.all(isMobileLandscape ? 2 : 4),
+                      constraints: BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Contenido
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Filtro por rol usando FilterChips
+                      Wrap(
+                        spacing: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
+                        runSpacing: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
+                        children: [
+                          // Opción "Todos"
+                          FilterChip(
+                            label: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.people_rounded,
+                                  size: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
+                                  color: _selectedRolFilter == null ? AppColors.primary : Colors.grey,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Todos',
+                                  style: TextStyle(fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 14)),
+                                ),
+                              ],
+                            ),
+                            selected: _selectedRolFilter == null,
+                            onSelected: (selected) {
+                              setState(() => _selectedRolFilter = null);
+                              _applyFilters();
+                              Navigator.pop(context);
+                            },
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
+                              vertical: isMobileLandscape ? 2 : (isMobile ? 4 : 6),
+                            ),
+                            selectedColor: AppColors.primary.withOpacity(0.2),
+                            checkmarkColor: AppColors.primary,
+                            labelStyle: TextStyle(
+                              color: _selectedRolFilter == null 
+                                  ? AppColors.primary
+                                  : (isDark ? Colors.white70 : Colors.black87),
+                              fontWeight: _selectedRolFilter == null ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                          // Opciones de roles
+                          ...roles.map((rol) {
+                            final isSelected = _selectedRolFilter == rol;
+                            final color = _getRolColor(rol);
+                            return FilterChip(
+                              label: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _getRolIconData(rol),
+                                    size: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
+                                    color: isSelected ? color : (isDark ? Colors.white70 : Colors.black54),
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    rol,
+                                    style: TextStyle(fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 14)),
+                                  ),
+                                ],
+                              ),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() => _selectedRolFilter = selected ? rol : null);
+                                _applyFilters();
+                                Navigator.pop(context);
+                              },
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
+                                vertical: isMobileLandscape ? 2 : (isMobile ? 4 : 6),
+                              ),
+                              selectedColor: color.withOpacity(0.2),
+                              checkmarkColor: color,
+                              labelStyle: TextStyle(
+                                color: isSelected 
+                                    ? color
+                                    : (isDark ? Colors.white70 : Colors.black87),
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer con botones
+              Container(
+                padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
+                decoration: BoxDecoration(
+                  color: isDark 
+                      ? Colors.white.withOpacity(0.05)
+                      : Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(isMobileLandscape ? 12 : 16),
+                    bottomRight: Radius.circular(isMobileLandscape ? 12 : 16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Botón limpiar
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() => _selectedRolFilter = null);
+                          _applyFilters();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 14),
+                          ),
+                          side: BorderSide(
+                            color: isDark ? Colors.white30 : AppColors.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
+                          ),
+                        ),
+                        child: Text(
+                          'Limpiar',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : AppColors.primary,
+                            fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 15),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
+                    // Botón cerrar
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 14),
+                          ),
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isMobileLandscape ? 8 : 10),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: Text(
+                          'Cerrar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: isMobileLandscape ? 12 : (isMobile ? 13 : 15),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getRolIconData(String rol) {
+    switch (rol.toLowerCase()) {
+      case 'admin':
+      case 'administrador':
+        return Icons.admin_panel_settings_rounded;
+      case 'coordinador':
+        return Icons.supervisor_account_rounded;
+      case 'profesor':
+        return Icons.school_rounded;
+      default:
+        return Icons.person_rounded;
     }
   }
 }

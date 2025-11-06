@@ -5,6 +5,7 @@ import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/grupo_detail_dialog.dart';
 
 class GruposCrudView extends StatefulWidget {
   const GruposCrudView({Key? key}) : super(key: key);
@@ -80,16 +81,23 @@ class _GruposCrudViewState extends State<GruposCrudView> {
     });
   }
 
-  void _addGrupo() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad de añadir grupo en desarrollo')),
+  void _showGrupoDialog({Grupo? grupo}) {
+    showDialog(
+      context: context,
+      builder: (context) => GrupoDetailDialog(
+        grupo: grupo,
+        cursos: _cursos,
+        onSaved: _loadGrupos,
+      ),
     );
   }
 
+  void _addGrupo() {
+    _showGrupoDialog();
+  }
+
   void _editGrupo(Grupo grupo) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Editar grupo: ${grupo.nombre}')),
-    );
+    _showGrupoDialog(grupo: grupo);
   }
 
   Future<void> _deleteGrupo(Grupo grupo) async {
@@ -297,131 +305,122 @@ class _GruposCrudViewState extends State<GruposCrudView> {
           width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _editGrupo(grupo),
-            child: Padding(
-              padding: EdgeInsets.all(16.dg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header con icono, nombre y menú
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Icono de grupo
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.group_rounded,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Nombre del grupo
-                      Expanded(
-                        child: Text(
-                          grupo.nombre,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.primary,
-                            height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // Menú de 3 puntos
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? Colors.white70 : Colors.grey[600],
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            _editGrupo(grupo);
-                          } else if (value == 'delete') {
-                            _deleteGrupo(grupo);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                                SizedBox(width: 12),
-                                Text('Editar'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
-                                SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+      child: Padding(
+        padding: EdgeInsets.all(16.dg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono, nombre y menú
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icono de grupo
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  SizedBox(height: 12.h),
-                  // Divider sutil con gradiente
-                  Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          isDark ? Colors.white12 : Colors.grey[300]!,
-                          Colors.transparent,
+                  child: Icon(
+                    Icons.group_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Nombre del grupo
+                Expanded(
+                  child: Text(
+                    grupo.nombre,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.primary,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Menú de 3 puntos
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: isDark ? Colors.white70 : Colors.grey[600],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _editGrupo(grupo);
+                    } else if (value == 'delete') {
+                      _deleteGrupo(grupo);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                          SizedBox(width: 12),
+                          Text('Editar'),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12.h),
-                  // Información del grupo (curso y alumnos)
-                  Row(
-                    children: [
-                      // Chip de curso
-                      Flexible(
-                        child: _buildInfoChip(
-                          icon: Icons.school_rounded,
-                          label: grupo.curso?.nombre ?? 'Sin curso',
-                          isDark: isDark,
-                        ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                          SizedBox(width: 12),
+                          Text('Eliminar', style: TextStyle(color: Colors.red)),
+                        ],
                       ),
-                      SizedBox(width: 8.w),
-                      // Chip de alumnos
-                      Flexible(
-                        child: _buildInfoChip(
-                          icon: Icons.people_rounded,
-                          label: '${grupo.numeroAlumnos} alumnos',
-                          isDark: isDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            // Divider sutil con gradiente
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    isDark ? Colors.white12 : Colors.grey[300]!,
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-          ),
+            SizedBox(height: 12.h),
+            // Información del grupo (curso y alumnos)
+            Row(
+              children: [
+                // Chip de curso
+                Flexible(
+                  child: _buildInfoChip(
+                    icon: Icons.school_rounded,
+                    label: grupo.curso?.titulo ?? 'Sin curso',
+                    isDark: isDark,
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                // Chip de alumnos
+                Flexible(
+                  child: _buildInfoChip(
+                    icon: Icons.people_rounded,
+                    label: '${grupo.numeroAlumnos} alumnos',
+                    isDark: isDark,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

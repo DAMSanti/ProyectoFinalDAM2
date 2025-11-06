@@ -357,6 +357,46 @@ class ActividadService {
     }
   }
 
+  /// Crea una nueva empresa de transporte
+  Future<EmpresaTransporte> createEmpresaTransporte(Map<String, dynamic> data) async {
+    try {
+      print('[ActividadService] Creating empresa de transporte');
+      print('[ActividadService] Data: $data');
+      
+      final response = await _apiService.postData('/EmpTransporte', data);
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return EmpresaTransporte.fromJson(response.data);
+      }
+      throw ApiException('Error al crear empresa de transporte', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] createEmpresaTransporte: $e');
+      rethrow;
+    }
+  }
+
+  /// Actualiza una empresa de transporte existente
+  Future<EmpresaTransporte> updateEmpresaTransporte(int id, Map<String, dynamic> data) async {
+    try {
+      print('[ActividadService] Updating empresa de transporte $id');
+      print('[ActividadService] Data: $data');
+      
+      final response = await _apiService.putData('/EmpTransporte/$id', data);
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        return EmpresaTransporte.fromJson(response.data);
+      }
+      throw ApiException('Error al actualizar empresa de transporte', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] updateEmpresaTransporte: $e');
+      rethrow;
+    }
+  }
+
   /// Obtiene todos los alojamientos activos
   Future<List<Alojamiento>> fetchAlojamientos() async {
     try {
@@ -388,6 +428,46 @@ class ActividadService {
         print('[ActividadService ERROR] Response: ${e.response?.data}');
         print('[ActividadService ERROR] Status: ${e.response?.statusCode}');
       }
+      rethrow;
+    }
+  }
+
+  /// Crea un nuevo alojamiento
+  Future<Alojamiento> createAlojamiento(Map<String, dynamic> data) async {
+    try {
+      print('[ActividadService] Creating alojamiento');
+      print('[ActividadService] Data: $data');
+      
+      final response = await _apiService.postData('/Alojamiento', data);
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Alojamiento.fromJson(response.data);
+      }
+      throw ApiException('Error al crear alojamiento', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] createAlojamiento: $e');
+      rethrow;
+    }
+  }
+
+  /// Actualiza un alojamiento existente
+  Future<Alojamiento> updateAlojamiento(int id, Map<String, dynamic> data) async {
+    try {
+      print('[ActividadService] Updating alojamiento $id');
+      print('[ActividadService] Data: $data');
+      
+      final response = await _apiService.putData('/Alojamiento/$id', data);
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        return Alojamiento.fromJson(response.data);
+      }
+      throw ApiException('Error al actualizar alojamiento', statusCode: response.statusCode);
+    } catch (e) {
+      print('[ActividadService ERROR] updateAlojamiento: $e');
       rethrow;
     }
   }

@@ -4,6 +4,7 @@ import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/curso_detail_dialog.dart';
 
 class CursosCrudView extends StatefulWidget {
   const CursosCrudView({Key? key}) : super(key: key);
@@ -58,22 +59,31 @@ class _CursosCrudViewState extends State<CursosCrudView> {
         _filteredCursos = _cursos.where((curso) {
           final searchLower = query.toLowerCase();
           return curso.nombre.toLowerCase().contains(searchLower) ||
-                 (curso.nivel?.toLowerCase().contains(searchLower) ?? false);
+                 curso.codCurso.toLowerCase().contains(searchLower) ||
+                 curso.titulo.toLowerCase().contains(searchLower) ||
+                 curso.etapa.toLowerCase().contains(searchLower) ||
+                 curso.nivel.toLowerCase().contains(searchLower);
         }).toList();
       }
     });
   }
 
-  void _addCurso() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad de añadir curso en desarrollo')),
+  void _showCursoDialog({Curso? curso}) {
+    showDialog(
+      context: context,
+      builder: (context) => CursoDetailDialog(
+        curso: curso,
+        onSaved: _loadCursos,
+      ),
     );
   }
 
+  void _addCurso() {
+    _showCursoDialog();
+  }
+
   void _editCurso(Curso curso) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Editar curso: ${curso.nombre}')),
-    );
+    _showCursoDialog(curso: curso);
   }
 
   Future<void> _deleteCurso(Curso curso) async {
@@ -144,7 +154,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                   child: TextField(
                     onChanged: _filterCursos,
                     decoration: InputDecoration(
-                      hintText: 'Buscar por nombre o nivel...',
+                      hintText: 'Buscar por código, título, etapa o nivel...',
                       prefixIcon: Icon(Icons.search),
                       filled: true,
                       fillColor: isDark ? Colors.grey[800] : Colors.white,
@@ -281,136 +291,147 @@ class _CursosCrudViewState extends State<CursosCrudView> {
           width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _editCurso(curso),
-            child: Padding(
-              padding: EdgeInsets.all(16.dg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header con icono, nombre y menú
-                  Row(
+      child: Padding(
+        padding: EdgeInsets.all(16.dg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono, nombre y menú
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icono de curso
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.school_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Código y título del curso
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Icono de curso
                       Container(
-                        padding: EdgeInsets.all(10),
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primary.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
-                          Icons.school_rounded,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      // Nombre del curso
-                      Expanded(
                         child: Text(
-                          curso.nombre,
+                          curso.codCurso,
                           style: TextStyle(
-                            fontSize: 18.sp,
+                            fontSize: 12.sp,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.primary,
-                            height: 1.3,
+                            letterSpacing: 0.5,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // Menú de 3 puntos
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? Colors.white70 : Colors.grey[600],
+                      SizedBox(height: 6.h),
+                      Text(
+                        curso.titulo,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : AppColors.primary,
+                          height: 1.3,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            _editCurso(curso);
-                          } else if (value == 'delete') {
-                            _deleteCurso(curso);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                                SizedBox(width: 12),
-                                Text('Editar'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
-                                SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                  if (curso.nivel != null || !curso.activo) ...[
-                    SizedBox(height: 12.h),
-                    // Divider sutil con gradiente
-                    Container(
-                      height: 1,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            isDark ? Colors.white12 : Colors.grey[300]!,
-                            Colors.transparent,
-                          ],
-                        ),
+                ),
+                // Menú de 3 puntos
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: isDark ? Colors.white70 : Colors.grey[600],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _editCurso(curso);
+                    } else if (value == 'delete') {
+                      _deleteCurso(curso);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                          SizedBox(width: 12),
+                          Text('Editar'),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 12.h),
-                    // Información del curso (nivel y estado)
-                    Row(
-                      children: [
-                        // Chip de nivel
-                        if (curso.nivel != null)
-                          Flexible(
-                            child: _buildInfoChip(
-                              icon: Icons.grade_rounded,
-                              label: curso.nivel!,
-                              isDark: isDark,
-                            ),
-                          ),
-                        if (curso.nivel != null && !curso.activo)
-                          SizedBox(width: 8.w),
-                        // Chip de estado
-                        if (!curso.activo)
-                          Flexible(
-                            child: _buildStatusChip(
-                              label: 'Inactivo',
-                              isActive: false,
-                              isDark: isDark,
-                            ),
-                          ),
-                      ],
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                          SizedBox(width: 12),
+                          Text('Eliminar', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
                     ),
                   ],
-                ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            // Divider sutil con gradiente
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    isDark ? Colors.white12 : Colors.grey[300]!,
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-          ),
+            SizedBox(height: 12.h),
+            // Información del curso (etapa, nivel y estado)
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children: [
+                // Chip de etapa
+                _buildInfoChip(
+                  icon: Icons.stairs_rounded,
+                  label: curso.etapaDescripcion,
+                  isDark: isDark,
+                ),
+                // Chip de nivel
+                _buildInfoChip(
+                  icon: Icons.looks_one_rounded,
+                  label: 'Nivel ${curso.nivel}',
+                  isDark: isDark,
+                ),
+                // Chip de estado
+                _buildStatusChip(
+                  label: curso.activo ? 'Activo' : 'Inactivo',
+                  isActive: curso.activo,
+                  isDark: isDark,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

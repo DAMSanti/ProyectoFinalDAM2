@@ -8,10 +8,16 @@ class Alojamiento {
   final String? telefono;
   final String? email;
   final String? web;
+  final String? tipoAlojamiento;
+  final int? numeroHabitaciones;
   final int? capacidadTotal;
+  final double? precioPorNoche;
+  final String? servicios;
   final String? observaciones;
   final bool activo;
   final DateTime fechaCreacion;
+  final double? latitud;
+  final double? longitud;
 
   Alojamiento({
     required this.id,
@@ -23,10 +29,16 @@ class Alojamiento {
     this.telefono,
     this.email,
     this.web,
+    this.tipoAlojamiento,
+    this.numeroHabitaciones,
     this.capacidadTotal,
+    this.precioPorNoche,
+    this.servicios,
     this.observaciones,
     required this.activo,
     required this.fechaCreacion,
+    this.latitud,
+    this.longitud,
   });
 
   factory Alojamiento.fromJson(Map<String, dynamic> json) {
@@ -40,10 +52,16 @@ class Alojamiento {
       telefono: json['telefono'] as String?,
       email: json['email'] as String?,
       web: json['web'] as String?,
+      tipoAlojamiento: json['tipoAlojamiento'] as String?,
+      numeroHabitaciones: json['numeroHabitaciones'] as int?,
       capacidadTotal: json['capacidadTotal'] as int?,
+      precioPorNoche: (json['precioPorNoche'] as num?)?.toDouble(),
+      servicios: json['servicios'] as String?,
       observaciones: json['observaciones'] as String?,
       activo: json['activo'] as bool? ?? true,
       fechaCreacion: DateTime.parse(json['fechaCreacion'] as String),
+      latitud: (json['latitud'] as num?)?.toDouble(),
+      longitud: (json['longitud'] as num?)?.toDouble(),
     );
   }
 
@@ -58,10 +76,16 @@ class Alojamiento {
       'telefono': telefono,
       'email': email,
       'web': web,
+      'tipoAlojamiento': tipoAlojamiento,
+      'numeroHabitaciones': numeroHabitaciones,
       'capacidadTotal': capacidadTotal,
+      'precioPorNoche': precioPorNoche,
+      'servicios': servicios,
       'observaciones': observaciones,
       'activo': activo,
       'fechaCreacion': fechaCreacion.toIso8601String(),
+      'latitud': latitud,
+      'longitud': longitud,
     };
   }
 
@@ -75,10 +99,16 @@ class Alojamiento {
     String? telefono,
     String? email,
     String? web,
+    String? tipoAlojamiento,
+    int? numeroHabitaciones,
     int? capacidadTotal,
+    double? precioPorNoche,
+    String? servicios,
     String? observaciones,
     bool? activo,
     DateTime? fechaCreacion,
+    double? latitud,
+    double? longitud,
   }) {
     return Alojamiento(
       id: id ?? this.id,
@@ -90,10 +120,16 @@ class Alojamiento {
       telefono: telefono ?? this.telefono,
       email: email ?? this.email,
       web: web ?? this.web,
+      tipoAlojamiento: tipoAlojamiento ?? this.tipoAlojamiento,
+      numeroHabitaciones: numeroHabitaciones ?? this.numeroHabitaciones,
       capacidadTotal: capacidadTotal ?? this.capacidadTotal,
+      precioPorNoche: precioPorNoche ?? this.precioPorNoche,
+      servicios: servicios ?? this.servicios,
       observaciones: observaciones ?? this.observaciones,
       activo: activo ?? this.activo,
       fechaCreacion: fechaCreacion ?? this.fechaCreacion,
+      latitud: latitud ?? this.latitud,
+      longitud: longitud ?? this.longitud,
     );
   }
 

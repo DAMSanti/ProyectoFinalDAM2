@@ -7,6 +7,7 @@ import 'package:proyecto_santi/services/profesor_service.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/profesor_detail_dialog.dart';
 
 /// Vista CRUD moderna para gestionar Profesores
 class ProfesoresCrudView extends StatefulWidget {
@@ -74,11 +75,21 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
     });
   }
 
+  void _addProfesor() {
+    showDialog(
+      context: context,
+      builder: (context) => ProfesorDetailDialog(
+        onSaved: _loadProfesores,
+      ),
+    );
+  }
+
   void _editProfesor(Profesor profesor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Funcionalidad de edición próximamente disponible'),
-        backgroundColor: Colors.orange,
+    showDialog(
+      context: context,
+      builder: (context) => ProfesorDetailDialog(
+        profesor: profesor,
+        onSaved: _loadProfesores,
       ),
     );
   }
@@ -152,14 +163,7 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Funcionalidad de creación próximamente disponible'),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                          },
+                          onPressed: _addProfesor,
                           icon: Icon(Icons.add, size: 20),
                           label: Text('Nuevo'),
                           style: ElevatedButton.styleFrom(
@@ -221,14 +225,7 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
           ),
           floatingActionButton: isMobile
               ? FloatingActionButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Funcionalidad de creación próximamente disponible'),
-                        backgroundColor: Colors.orange,
-                      ),
-                    );
-                  },
+                  onPressed: _addProfesor,
                   child: Icon(Icons.add),
                   backgroundColor: AppColors.primary,
                 )
@@ -323,17 +320,11 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                   width: 1,
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _editProfesor(profesor),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                           // Header con nombre y menú
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,10 +440,7 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                         ],
                       ),
                     ),
-                  ),
-                ),
-              ),
-            );
+                  );
           },
         ),
       ),

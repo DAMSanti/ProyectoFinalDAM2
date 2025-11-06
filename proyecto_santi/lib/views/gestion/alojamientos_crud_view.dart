@@ -4,6 +4,7 @@ import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/alojamiento_detail_dialog.dart';
 
 class AlojamientosCrudView extends StatefulWidget {
   const AlojamientosCrudView({Key? key}) : super(key: key);
@@ -65,16 +66,22 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
     });
   }
 
-  void _addAlojamiento() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funcionalidad de añadir alojamiento en desarrollo')),
+  void _showAlojamientoDialog({Alojamiento? alojamiento}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlojamientoDetailDialog(
+        alojamiento: alojamiento,
+        onSaved: _loadAlojamientos,
+      ),
     );
   }
 
+  void _addAlojamiento() {
+    _showAlojamientoDialog();
+  }
+
   void _editAlojamiento(Alojamiento alojamiento) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Editar alojamiento: ${alojamiento.nombre}')),
-    );
+    _showAlojamientoDialog(alojamiento: alojamiento);
   }
 
   Future<void> _deleteAlojamiento(Alojamiento alojamiento) async {
@@ -282,131 +289,161 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
           width: 1,
         ),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _editAlojamiento(alojamiento),
-            child: Padding(
-              padding: EdgeInsets.all(16.dg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header con icono, nombre y menú
-                  Row(
+      child: Padding(
+        padding: EdgeInsets.all(16.dg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono, nombre y menú
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icono de alojamiento
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.hotel_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                // Nombre del alojamiento
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Icono de alojamiento
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                      Text(
+                        alojamiento.nombre,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : AppColors.primary,
+                          height: 1.3,
                         ),
-                        child: Icon(
-                          Icons.hotel_rounded,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(width: 12.w),
-                      // Nombre del alojamiento
-                      Expanded(
-                        child: Text(
-                          alojamiento.nombre,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.primary,
-                            height: 1.3,
+                      if (alojamiento.tipoAlojamiento != null) ...[
+                        SizedBox(height: 4.h),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // Menú de 3 puntos
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? Colors.white70 : Colors.grey[600],
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            _editAlojamiento(alojamiento);
-                          } else if (value == 'delete') {
-                            _deleteAlojamiento(alojamiento);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
-                                SizedBox(width: 12),
-                                Text('Editar'),
-                              ],
+                          child: Text(
+                            alojamiento.tipoAlojamiento!,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded, size: 20, color: Colors.red),
-                                SizedBox(width: 12),
-                                Text('Eliminar', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ],
                   ),
-                  SizedBox(height: 12.h),
-                  // Divider sutil con gradiente
-                  Container(
-                    height: 1,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          isDark ? Colors.white12 : Colors.grey[300]!,
-                          Colors.transparent,
+                ),
+                // Menú de 3 puntos
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    color: isDark ? Colors.white70 : Colors.grey[600],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _editAlojamiento(alojamiento);
+                    } else if (value == 'delete') {
+                      _deleteAlojamiento(alojamiento);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 20, color: AppColors.primary),
+                          SizedBox(width: 12),
+                          Text('Editar'),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12.h),
-                  // Información del alojamiento
-                  _buildInfoRow(
-                    icon: Icons.location_city_rounded,
-                    label: '${alojamiento.ciudad ?? 'N/A'}, ${alojamiento.provincia ?? 'N/A'}',
-                    isDark: isDark,
-                  ),
-                  if (alojamiento.direccion != null && alojamiento.direccion!.isNotEmpty) ...[
-                    SizedBox(height: 8.h),
-                    _buildInfoRow(
-                      icon: Icons.place_rounded,
-                      label: alojamiento.direccion!,
-                      isDark: isDark,
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_rounded, size: 20, color: Colors.red),
+                          SizedBox(width: 12),
+                          Text('Eliminar', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
                     ),
                   ],
-                  if (alojamiento.email != null && alojamiento.email!.isNotEmpty) ...[
-                    SizedBox(height: 8.h),
-                    _buildInfoRow(
-                      icon: Icons.email_rounded,
-                      label: alojamiento.email!,
-                      isDark: isDark,
-                    ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            // Divider sutil con gradiente
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    isDark ? Colors.white12 : Colors.grey[300]!,
+                    Colors.transparent,
                   ],
-                ],
+                ),
               ),
             ),
-          ),
+            SizedBox(height: 12.h),
+            // Información del alojamiento
+            _buildInfoRow(
+              icon: Icons.location_city_rounded,
+              label: '${alojamiento.ciudad ?? 'N/A'}, ${alojamiento.provincia ?? 'N/A'}',
+              isDark: isDark,
+            ),
+            if (alojamiento.direccion != null && alojamiento.direccion!.isNotEmpty) ...[
+              SizedBox(height: 8.h),
+              _buildInfoRow(
+                icon: Icons.place_rounded,
+                label: alojamiento.direccion!,
+                isDark: isDark,
+              ),
+            ],
+            if (alojamiento.telefono != null && alojamiento.telefono!.isNotEmpty) ...[
+              SizedBox(height: 8.h),
+              _buildInfoRow(
+                icon: Icons.phone_rounded,
+                label: alojamiento.telefono!,
+                isDark: isDark,
+              ),
+            ],
+            if (alojamiento.email != null && alojamiento.email!.isNotEmpty) ...[
+              SizedBox(height: 8.h),
+              _buildInfoRow(
+                icon: Icons.email_rounded,
+                label: alojamiento.email!,
+                isDark: isDark,
+              ),
+            ],
+            if (alojamiento.precioPorNoche != null) ...[
+              SizedBox(height: 8.h),
+              _buildInfoRow(
+                icon: Icons.euro_rounded,
+                label: '${alojamiento.precioPorNoche!.toStringAsFixed(2)}€ / noche',
+                isDark: isDark,
+              ),
+            ],
+          ],
         ),
       ),
     );

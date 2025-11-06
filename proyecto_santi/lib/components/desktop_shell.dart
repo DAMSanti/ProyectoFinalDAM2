@@ -80,6 +80,8 @@ class _DesktopShellState extends State<DesktopShell> {
         return _chatViewArgs?['displayName'] ?? 'Chat';
       case '/mapa':
         return 'Mapa';
+      case '/solicitar-actividad':
+        return 'Solicitar Actividad';
       case '/estadisticas':
         return 'Estadísticas';
       case '/activityDetail':
@@ -163,6 +165,13 @@ class _DesktopShellState extends State<DesktopShell> {
         return MapView(
           onToggleTheme: widget.onToggleTheme,
           isDarkTheme: Theme.of(context).brightness == Brightness.dark,
+        );
+      case '/solicitar-actividad':
+        return Center(
+          child: Text(
+            'Vista de Solicitar Actividad - Próximamente',
+            style: TextStyle(fontSize: 24),
+          ),
         );
       case '/estadisticas':
         return EstadisticasView();
@@ -878,6 +887,14 @@ class MenuDesktopStatic extends StatelessWidget {
                 SizedBox(height: isMobileLandscape ? 4 : 8),
                 _buildDrawerItem(
                   context,
+                  icon: Icons.add_circle_outline_rounded,
+                  text: 'Solicitar actividad',
+                  routeName: '/solicitar-actividad',
+                  isCompact: isMobileLandscape,
+                ),
+                SizedBox(height: isMobileLandscape ? 4 : 8),
+                _buildDrawerItem(
+                  context,
                   icon: Icons.bar_chart_rounded,
                   text: 'Estadísticas',
                   routeName: '/estadisticas',
@@ -971,7 +988,6 @@ class MenuDesktopStatic extends StatelessWidget {
         iconColor: isDark ? Colors.white70 : const Color(0xFF1976d2),
         collapsedIconColor: isDark ? Colors.white70 : const Color(0xFF1976d2),
         children: [
-          _buildSubMenuItem(context, isDark, Icons.event, 'Actividades', '/gestion/actividades', isCompact: isCompact),
           _buildSubMenuItem(context, isDark, Icons.person, 'Profesores', '/gestion/profesores', isCompact: isCompact),
           _buildSubMenuItem(context, isDark, Icons.business, 'Departamentos', '/gestion/departamentos', isCompact: isCompact),
           _buildSubMenuItem(context, isDark, Icons.group, 'Grupos', '/gestion/grupos', isCompact: isCompact),

@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/services/api_service.dart';
+import 'package:proyecto_santi/services/catalogo_service.dart';
 import 'package:proyecto_santi/config.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
+import 'package:proyecto_santi/views/gestion/dialogs/departamento_detail_dialog.dart';
 
 /// Vista CRUD moderna para gestionar Departamentos
 class DepartamentosCrudView extends StatefulWidget {
@@ -81,11 +83,21 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
     });
   }
 
+  void _addDepartamento() {
+    showDialog(
+      context: context,
+      builder: (context) => DepartamentoDetailDialog(
+        onSaved: _loadDepartamentos,
+      ),
+    );
+  }
+
   void _editDepartamento(Departamento departamento) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Funcionalidad de edición próximamente disponible'),
-        backgroundColor: Colors.orange,
+    showDialog(
+      context: context,
+      builder: (context) => DepartamentoDetailDialog(
+        departamento: departamento,
+        onSaved: _loadDepartamentos,
       ),
     );
   }
@@ -159,14 +171,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Funcionalidad de creación próximamente disponible'),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                          },
+                          onPressed: _addDepartamento,
                           icon: Icon(Icons.add, size: 20),
                           label: Text('Nuevo'),
                           style: ElevatedButton.styleFrom(
@@ -228,14 +233,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
           ),
           floatingActionButton: isMobile
               ? FloatingActionButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Funcionalidad de creación próximamente disponible'),
-                        backgroundColor: Colors.orange,
-                      ),
-                    );
-                  },
+                  onPressed: _addDepartamento,
                   child: Icon(Icons.add),
                   backgroundColor: AppColors.primary,
                 )
@@ -330,17 +328,11 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                   width: 1,
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _editDepartamento(departamento),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                           // Header con nombre y menú
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,10 +434,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                         ],
                       ),
                     ),
-                  ),
-                ),
-              ),
-            );
+                  );
           },
         ),
       ),

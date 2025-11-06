@@ -81,12 +81,6 @@ class GestionView extends StatelessWidget {
   Widget _buildEntityGrid(BuildContext context, bool isMobile, bool isTablet, bool isDesktop, bool isDark) {
     final entities = [
       {
-        'name': 'Actividades',
-        'icon': Icons.event,
-        'route': '/gestion/actividades',
-        'color': AppColors.primary,
-      },
-      {
         'name': 'Usuarios',
         'icon': Icons.account_circle,
         'route': '/gestion/usuarios',

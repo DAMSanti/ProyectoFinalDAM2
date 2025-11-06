@@ -185,7 +185,7 @@ class TransporteSection extends StatelessWidget {
                   return DropdownMenuItem(
                     value: emp,
                     child: Text(
-                      '${emp.nombre} - ${emp.contacto ?? "Sin contacto"}',
+                      '${emp.nombre}${emp.telefono != null ? " - ${emp.telefono}" : ""}',
                       style: TextStyle(fontSize: 12),
                     ),
                   );
@@ -206,7 +206,9 @@ class TransporteSection extends StatelessWidget {
           ] else if (empresa != null) ...[
             _buildEmpresaInfo('Nombre', empresa!.nombre),
             if (empresa!.cif != null) _buildEmpresaInfo('CIF', empresa!.cif!),
-            if (empresa!.contacto != null) _buildEmpresaInfo('Contacto', empresa!.contacto!),
+            if (empresa!.telefono != null) _buildEmpresaInfo('Teléfono', empresa!.telefono!),
+            if (empresa!.email != null) _buildEmpresaInfo('Email', empresa!.email!),
+            if (empresa!.direccion != null) _buildEmpresaInfo('Dirección', empresa!.direccion!),
           ] else
             Text(
               'No hay empresa seleccionada',
