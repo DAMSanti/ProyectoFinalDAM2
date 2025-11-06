@@ -7,9 +7,6 @@ public class Departamento
     [Key]
     public int Id { get; set; }
 
-    [MaxLength(3)]
-    public string? Codigo { get; set; }
-
     [Required]
     [MaxLength(200)]
     public string Nombre { get; set; } = string.Empty;

@@ -32,25 +32,6 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configurar mapeo de tabla Departamento
-        modelBuilder.Entity<Departamento>()
-            .ToTable("departamentos");
-        
-        modelBuilder.Entity<Departamento>()
-            .Property(d => d.Id)
-            .HasColumnName("id_depar");
-        
-        modelBuilder.Entity<Departamento>()
-            .Property(d => d.Codigo)
-            .HasColumnName("codigo")
-            .HasMaxLength(3);
-        
-        modelBuilder.Entity<Departamento>()
-            .Property(d => d.Nombre)
-            .HasColumnName("nombre")
-            .HasMaxLength(200)
-            .IsRequired();
-
         // Configurar precisión de decimales para Actividad
         modelBuilder.Entity<Actividad>()
             .Property(a => a.PresupuestoEstimado)
@@ -81,11 +62,7 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         // Configurar índices únicos
-        // Configurar mapeo de tabla Profesor
-        modelBuilder.Entity<Profesor>()
-            .Property(p => p.DepartamentoId)
-            .HasColumnName("depart_id");
-
+        // Configurar índices únicos
         modelBuilder.Entity<Profesor>()
             .HasIndex(p => p.Dni)
             .IsUnique();
@@ -206,9 +183,12 @@ public class ApplicationDbContext : DbContext
 
     private void SeedData(ModelBuilder modelBuilder)
     {
-        // Los departamentos ya existen en la BD, no necesitamos seed data
-        // Si los necesitáramos, incluirían el campo Codigo:
-        // new Departamento { Id = 1, Codigo = "INF", Nombre = "Informática", Descripcion = "Departamento de Informática" }
+        // Datos iniciales de ejemplo
+        modelBuilder.Entity<Departamento>().HasData(
+            new Departamento { Id = 1, Nombre = "Informática", Descripcion = "Departamento de Informática" },
+            new Departamento { Id = 2, Nombre = "Matemáticas", Descripcion = "Departamento de Matemáticas" },
+            new Departamento { Id = 3, Nombre = "Lengua", Descripcion = "Departamento de Lengua y Literatura" }
+        );
 
         modelBuilder.Entity<Curso>().HasData(
             new Curso { Id = 1, Nombre = "1º ESO", Nivel = "ESO", Activo = true },

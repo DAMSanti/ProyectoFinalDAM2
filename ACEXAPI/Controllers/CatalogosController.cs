@@ -26,7 +26,6 @@ public class DepartamentoController : ControllerBase
             .Select(d => new DepartamentoDto
             {
                 Id = d.Id,
-                Codigo = d.Codigo,
                 Nombre = d.Nombre,
                 Descripcion = d.Descripcion
             })
@@ -45,7 +44,6 @@ public class DepartamentoController : ControllerBase
         return Ok(new DepartamentoDto
         {
             Id = departamento.Id,
-            Codigo = departamento.Codigo,
             Nombre = departamento.Nombre,
             Descripcion = departamento.Descripcion
         });
@@ -57,7 +55,6 @@ public class DepartamentoController : ControllerBase
     {
         var departamento = new Departamento
         {
-            Codigo = dto.Codigo,
             Nombre = dto.Nombre,
             Descripcion = dto.Descripcion
         };
@@ -77,7 +74,6 @@ public class DepartamentoController : ControllerBase
         if (departamento == null)
             return NotFound();
 
-        departamento.Codigo = dto.Codigo;
         departamento.Nombre = dto.Nombre;
         departamento.Descripcion = dto.Descripcion;
 
