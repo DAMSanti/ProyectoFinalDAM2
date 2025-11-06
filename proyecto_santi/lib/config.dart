@@ -92,6 +92,8 @@ class SecureStorageConfig {
   static const String _keyUserUuid = 'userUuid';
   static const String _keyJwtToken = 'jwtToken'; // ✅ NUEVO: Guardar token JWT
   static const String _keyTokenExpiry = 'tokenExpiry'; // ✅ NUEVO: Timestamp de expiración
+  static const String _keyUserRol = 'userRol'; // ✅ NUEVO: Guardar rol del usuario
+  static const String _keyUserNombre = 'userNombre'; // ✅ NUEVO: Guardar nombre del usuario
 
   /// Guarda la configuraciÃ³n de Firebase
   static Future<void> storeFirebaseConfig() async {
@@ -118,7 +120,16 @@ class SecureStorageConfig {
   }
 
   /// Guarda las credenciales del usuario
-  static Future<void> storeUserCredentials(String email, String uuid, {String? jwtToken, DateTime? tokenExpiry}) async {
+  static Future<void> storeUserCredentials(
+    String email, 
+    String uuid, 
+    {
+      String? jwtToken, 
+      DateTime? tokenExpiry,
+      String? rol,
+      String? nombre,
+    }
+  ) async {
     await _secureStorage.write(key: _keyUserEmail, value: email);
     await _secureStorage.write(key: _keyUserUuid, value: uuid);
     
@@ -129,6 +140,13 @@ class SecureStorageConfig {
     if (tokenExpiry != null) {
       await _secureStorage.write(key: _keyTokenExpiry, value: tokenExpiry.toIso8601String());
     }
+    // ✅ NUEVO: Guardar rol y nombre
+    if (rol != null) {
+      await _secureStorage.write(key: _keyUserRol, value: rol);
+    }
+    if (nombre != null) {
+      await _secureStorage.write(key: _keyUserNombre, value: nombre);
+    }
   }
 
   /// Recupera las credenciales del usuario
@@ -138,6 +156,8 @@ class SecureStorageConfig {
       'uuid': await _secureStorage.read(key: _keyUserUuid),
       'jwtToken': await _secureStorage.read(key: _keyJwtToken), // ✅ NUEVO
       'tokenExpiry': await _secureStorage.read(key: _keyTokenExpiry), // ✅ NUEVO
+      'rol': await _secureStorage.read(key: _keyUserRol), // ✅ NUEVO
+      'nombre': await _secureStorage.read(key: _keyUserNombre), // ✅ NUEVO
     };
   }
   
@@ -160,6 +180,8 @@ class SecureStorageConfig {
     await _secureStorage.delete(key: _keyUserUuid);
     await _secureStorage.delete(key: _keyJwtToken); // ✅ NUEVO
     await _secureStorage.delete(key: _keyTokenExpiry); // ✅ NUEVO
+    await _secureStorage.delete(key: _keyUserRol); // ✅ NUEVO
+    await _secureStorage.delete(key: _keyUserNombre); // ✅ NUEVO
   }
 
   /// Limpia toda la informaciÃ³n almacenada

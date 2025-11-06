@@ -38,12 +38,17 @@ class Auth extends ChangeNotifier {
         // ✅ MEJORADO: Calcular expiración del token (24 horas por defecto)
         final tokenExpiry = DateTime.now().add(Duration(hours: 24));
         
-        // Guardamos el token, email y expiración en almacenamiento seguro
+        final userRol = usuario?['rol']?.toString() ?? 'Usuario';
+        final userNombre = usuario?['nombreUsuario']?.toString() ?? 'Usuario';
+        
+        // Guardamos el token, email, rol, nombre y expiración en almacenamiento seguro
         await SecureStorageConfig.storeUserCredentials(
           email,
           usuario?['id']?.toString() ?? '',
           jwtToken: _jwtToken,
           tokenExpiry: tokenExpiry,
+          rol: userRol,
+          nombre: userNombre,
         );
         
         // Creamos un objeto Profesor temporal con los datos del usuario
@@ -151,19 +156,27 @@ class Auth extends ChangeNotifier {
           } catch (e) {
             print('[Auth] ⚠️ Error obteniendo datos de usuario, usando datos guardados: $e');
             
+            // ✅ FIXED: Usar rol y nombre guardados en lugar de valores por defecto
+            final savedRol = credentials['rol'] ?? 'Usuario';
+            final savedNombre = credentials['nombre'] ?? email ?? 'Usuario';
+            
             // Crear usuario temporal con datos guardados
             _currentUser = Profesor(
               uuid: userId ?? '',
               dni: '',
-              nombre: email ?? 'Usuario',
+              nombre: savedNombre,
               apellidos: '',
               correo: email ?? '',
               password: '',
-              rol: 'Usuario',
+              rol: savedRol, // ✅ AQUÍ ESTABA EL BUG - ahora usa el rol guardado
               activo: 1,
               urlFoto: null,
               esJefeDep: 0,
-              depart: Departamento(id: 0, codigo: 'USR', nombre: 'Usuario'),
+              depart: Departamento(
+                id: 0, 
+                codigo: savedRol.substring(0, 3).toUpperCase(), 
+                nombre: savedRol
+              ),
             );
             _isAuthenticated = true;
           }

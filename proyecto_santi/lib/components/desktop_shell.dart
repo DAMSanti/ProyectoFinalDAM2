@@ -13,6 +13,7 @@ import 'package:proyecto_santi/views/gestion/grupos_crud_view.dart';
 import 'package:proyecto_santi/views/gestion/cursos_crud_view.dart';
 import 'package:proyecto_santi/views/gestion/alojamientos_crud_view.dart';
 import 'package:proyecto_santi/views/gestion/empresas_transporte_crud_view.dart';
+import 'package:proyecto_santi/views/gestion/usuarios_crud_view.dart';
 import 'package:proyecto_santi/views/estadisticas/estadisticas_view.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:provider/provider.dart';
@@ -97,6 +98,8 @@ class _DesktopShellState extends State<DesktopShell> {
         return 'Gestión de Alojamientos';
       case '/gestion/empresas-transporte':
         return 'Gestión de Empresas de Transporte';
+      case '/gestion/usuarios':
+        return 'Gestión de Usuarios';
       default:
         return 'Próximas Actividades';
     }
@@ -186,6 +189,8 @@ class _DesktopShellState extends State<DesktopShell> {
         return AlojamientosCrudView();
       case '/gestion/empresas-transporte':
         return EmpresasTransporteCrudView();
+      case '/gestion/usuarios':
+        return UsuariosCrudView();
       default:
         return HomeView(onToggleTheme: widget.onToggleTheme);
     }
@@ -973,6 +978,7 @@ class MenuDesktopStatic extends StatelessWidget {
           _buildSubMenuItem(context, isDark, Icons.school, 'Cursos', '/gestion/cursos', isCompact: isCompact),
           _buildSubMenuItem(context, isDark, Icons.hotel, 'Alojamientos', '/gestion/alojamientos', isCompact: isCompact),
           _buildSubMenuItem(context, isDark, Icons.directions_bus, 'Empresas de Transporte', '/gestion/empresas-transporte', isCompact: isCompact),
+          _buildSubMenuItem(context, isDark, Icons.account_circle, 'Usuarios', '/gestion/usuarios', isCompact: isCompact),
         ],
       ),
     );

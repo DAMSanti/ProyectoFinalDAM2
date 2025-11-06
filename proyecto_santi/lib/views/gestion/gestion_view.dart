@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 /// Vista principal de Gestión con navegación a todas las entidades CRUD
 class GestionView extends StatelessWidget {
@@ -8,15 +9,19 @@ class GestionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Gestión',
-          style: TextStyle(fontSize: kIsWeb ? 20 : 20),
+          style: TextStyle(fontSize: isMobile ? 18.sp : 20),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(kIsWeb ? 20 : 24),
+        padding: EdgeInsets.all(isMobile ? 12 : 20),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 1200),
@@ -26,23 +31,23 @@ class GestionView extends StatelessWidget {
                 Text(
                   'Panel de Administración',
                   style: TextStyle(
-                    fontSize: kIsWeb ? 24 : 28,
+                    fontSize: isMobile ? 20.sp : 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1976d2),
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: kIsWeb ? 12 : 16),
+                SizedBox(height: isMobile ? 8 : 12),
                 Text(
                   'Selecciona una entidad para gestionar',
                   style: TextStyle(
-                    fontSize: kIsWeb ? 14 : 16,
+                    fontSize: isMobile ? 12.sp : 16,
                     color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: kIsWeb ? 24 : 32),
-                _buildEntityGrid(context),
+                SizedBox(height: isMobile ? 16 : 24),
+                _buildEntityGrid(context, isMobile, isDesktop),
               ],
             ),
           ),
@@ -51,13 +56,19 @@ class GestionView extends StatelessWidget {
     );
   }
 
-  Widget _buildEntityGrid(BuildContext context) {
+  Widget _buildEntityGrid(BuildContext context, bool isMobile, bool isDesktop) {
     final entities = [
       {
         'name': 'Actividades',
         'icon': Icons.event,
         'route': '/gestion/actividades',
         'color': Colors.blue,
+      },
+      {
+        'name': 'Usuarios',
+        'icon': Icons.account_circle,
+        'route': '/gestion/usuarios',
+        'color': Colors.deepPurple,
       },
       {
         'name': 'Profesores',
@@ -97,14 +108,29 @@ class GestionView extends StatelessWidget {
       },
     ];
 
+    // Determinar número de columnas basado en el ancho de pantalla
+    int crossAxisCount;
+    double childAspectRatio;
+    
+    if (isMobile) {
+      crossAxisCount = 2;
+      childAspectRatio = 1.0; // Más cuadrado en móvil
+    } else if (isDesktop) {
+      crossAxisCount = 4;
+      childAspectRatio = 1.2;
+    } else {
+      crossAxisCount = 3; // Tablet
+      childAspectRatio = 1.1;
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: kIsWeb ? 4 : 2,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: kIsWeb ? 12 : 16,
-        mainAxisSpacing: kIsWeb ? 12 : 16,
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: childAspectRatio,
+        crossAxisSpacing: isMobile ? 8 : 12,
+        mainAxisSpacing: isMobile ? 8 : 12,
       ),
       itemCount: entities.length,
       itemBuilder: (context, index) {
@@ -115,6 +141,7 @@ class GestionView extends StatelessWidget {
           icon: entity['icon'] as IconData,
           route: entity['route'] as String,
           color: entity['color'] as Color,
+          isMobile: isMobile,
         );
       },
     );
@@ -126,6 +153,7 @@ class GestionView extends StatelessWidget {
     required IconData icon,
     required String route,
     required Color color,
+    required bool isMobile,
   }) {
     return Card(
       elevation: 2,
@@ -136,24 +164,28 @@ class GestionView extends StatelessWidget {
         onTap: () => Navigator.pushNamed(context, route),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: EdgeInsets.all(kIsWeb ? 12 : 16),
+          padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
-                size: kIsWeb ? 40 : 48,
+                size: isMobile ? 32.sp : 40,
                 color: color,
               ),
-              SizedBox(height: kIsWeb ? 8 : 12),
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: kIsWeb ? 14 : 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              SizedBox(height: isMobile ? 6 : 8),
+              Flexible(
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: isMobile ? 11.sp : 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
