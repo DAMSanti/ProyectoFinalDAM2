@@ -32,6 +32,25 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configurar mapeo de tabla Departamento
+        modelBuilder.Entity<Departamento>()
+            .ToTable("departamentos");
+        
+        modelBuilder.Entity<Departamento>()
+            .Property(d => d.Id)
+            .HasColumnName("id_depar");
+        
+        modelBuilder.Entity<Departamento>()
+            .Property(d => d.Codigo)
+            .HasColumnName("codigo")
+            .HasMaxLength(3);
+        
+        modelBuilder.Entity<Departamento>()
+            .Property(d => d.Nombre)
+            .HasColumnName("nombre")
+            .HasMaxLength(200)
+            .IsRequired();
+
         // Configurar precisión de decimales para Actividad
         modelBuilder.Entity<Actividad>()
             .Property(a => a.PresupuestoEstimado)
