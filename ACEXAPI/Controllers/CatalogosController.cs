@@ -238,7 +238,14 @@ public class GrupoController : ControllerBase
                 Nombre = g.Nombre,
                 NumeroAlumnos = g.NumeroAlumnos,
                 CursoId = g.CursoId,
-                CursoNombre = g.Curso.Nombre
+                CursoNombre = g.Curso.Nombre,
+                Curso = g.Curso != null ? new CursoDto
+                {
+                    Id = g.Curso.Id,
+                    Nombre = g.Curso.Nombre,
+                    Nivel = g.Curso.Nivel,
+                    Activo = g.Curso.Activo
+                } : null
             })
             .ToListAsync();
 
@@ -261,7 +268,14 @@ public class GrupoController : ControllerBase
             Nombre = grupo.Nombre,
             NumeroAlumnos = grupo.NumeroAlumnos,
             CursoId = grupo.CursoId,
-            CursoNombre = grupo.Curso.Nombre
+            CursoNombre = grupo.Curso.Nombre,
+            Curso = grupo.Curso != null ? new CursoDto
+            {
+                Id = grupo.Curso.Id,
+                Nombre = grupo.Curso.Nombre,
+                Nivel = grupo.Curso.Nivel,
+                Activo = grupo.Curso.Activo
+            } : null
         });
     }
 

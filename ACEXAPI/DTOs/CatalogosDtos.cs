@@ -23,6 +23,7 @@ public class GrupoDto
     public int NumeroAlumnos { get; set; }
     public int CursoId { get; set; }
     public string? CursoNombre { get; set; }
+    public CursoDto? Curso { get; set; }
 }
 
 public class EmpTransporteDto
