@@ -11,6 +11,9 @@ public class Departamento
     [MaxLength(200)]
     public string Nombre { get; set; } = string.Empty;
 
+    [MaxLength(10)]
+    public string? Codigo { get; set; }
+
     [MaxLength(500)]
     public string? Descripcion { get; set; }
 

@@ -27,6 +27,7 @@ public class DepartamentoController : ControllerBase
             {
                 Id = d.Id,
                 Nombre = d.Nombre,
+                Codigo = d.Codigo,
                 Descripcion = d.Descripcion
             })
             .ToListAsync();
@@ -45,6 +46,7 @@ public class DepartamentoController : ControllerBase
         {
             Id = departamento.Id,
             Nombre = departamento.Nombre,
+            Codigo = departamento.Codigo,
             Descripcion = departamento.Descripcion
         });
     }
@@ -56,6 +58,7 @@ public class DepartamentoController : ControllerBase
         var departamento = new Departamento
         {
             Nombre = dto.Nombre,
+            Codigo = dto.Codigo,
             Descripcion = dto.Descripcion
         };
 
@@ -75,6 +78,7 @@ public class DepartamentoController : ControllerBase
             return NotFound();
 
         departamento.Nombre = dto.Nombre;
+        departamento.Codigo = dto.Codigo;
         departamento.Descripcion = dto.Descripcion;
 
         await _context.SaveChangesAsync();
