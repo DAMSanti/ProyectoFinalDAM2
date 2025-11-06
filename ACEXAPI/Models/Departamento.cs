@@ -10,10 +10,9 @@ public class Departamento
     [Column("id_depar")]
     public int Id { get; set; }
 
-    [Required]
     [MaxLength(3)]
     [Column("codigo")]
-    public string Codigo { get; set; } = string.Empty;
+    public string? Codigo { get; set; }
 
     [Required]
     [MaxLength(200)]

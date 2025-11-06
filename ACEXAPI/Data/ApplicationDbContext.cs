@@ -182,17 +182,14 @@ public class ApplicationDbContext : DbContext
 
     private void SeedData(ModelBuilder modelBuilder)
     {
-        // Datos iniciales de ejemplo
-        modelBuilder.Entity<Departamento>().HasData(
-            new Departamento { Id = 1, Nombre = "Inform�tica", Descripcion = "Departamento de Inform�tica" },
-            new Departamento { Id = 2, Nombre = "Matem�ticas", Descripcion = "Departamento de Matem�ticas" },
-            new Departamento { Id = 3, Nombre = "Lengua", Descripcion = "Departamento de Lengua y Literatura" }
-        );
+        // Los departamentos ya existen en la BD, no necesitamos seed data
+        // Si los necesitáramos, incluirían el campo Codigo:
+        // new Departamento { Id = 1, Codigo = "INF", Nombre = "Informática", Descripcion = "Departamento de Informática" }
 
         modelBuilder.Entity<Curso>().HasData(
-            new Curso { Id = 1, Nombre = "1� ESO", Nivel = "ESO", Activo = true },
-            new Curso { Id = 2, Nombre = "2� ESO", Nivel = "ESO", Activo = true },
-            new Curso { Id = 3, Nombre = "1� Bach", Nivel = "BACH", Activo = true }
+            new Curso { Id = 1, Nombre = "1º ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 2, Nombre = "2º ESO", Nivel = "ESO", Activo = true },
+            new Curso { Id = 3, Nombre = "1º Bach", Nivel = "BACH", Activo = true }
         );
     }
 }
