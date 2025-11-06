@@ -6,9 +6,10 @@ import 'package:proyecto_santi/models/usuario.dart';
 import 'package:proyecto_santi/services/usuario_service.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
+import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:intl/intl.dart';
 
-/// Vista CRUD para gestionar Usuarios del sistema
+/// Vista CRUD de Usuarios siguiendo el patrón coherente de la app
 class UsuariosCrudView extends StatefulWidget {
   const UsuariosCrudView({Key? key}) : super(key: key);
 
@@ -21,9 +22,9 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
   List<Usuario> _usuarios = [];
   List<Usuario> _filteredUsuarios = [];
   bool _isLoading = true;
-  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
   
-  final isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+  bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
   @override
   void initState() {
@@ -31,20 +32,28 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
     _loadUsuarios();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadUsuarios() async {
     setState(() => _isLoading = true);
     try {
       final usuarios = await _usuarioService.fetchUsuarios();
-      setState(() {
-        _usuarios = usuarios;
-        _filteredUsuarios = usuarios;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() {
+          _usuarios = usuarios;
+          _filteredUsuarios = usuarios;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cargar usuarios: $e')),
+          SnackBar(content: Text('Error al cargar usuarios')),
         );
       }
     }
@@ -52,21 +61,346 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
 
   void _filterUsuarios(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredUsuarios = _usuarios;
       } else {
+        final queryLower = query.toLowerCase();
         _filteredUsuarios = _usuarios.where((usuario) {
-          final nombreLower = usuario.nombreUsuario.toLowerCase();
-          final emailLower = usuario.email.toLowerCase();
-          final rolLower = usuario.rol.toLowerCase();
-          final queryLower = query.toLowerCase();
-          return nombreLower.contains(queryLower) ||
-              emailLower.contains(queryLower) ||
-              rolLower.contains(queryLower);
+          return usuario.nombreUsuario.toLowerCase().contains(queryLower) ||
+              usuario.email.toLowerCase().contains(queryLower) ||
+              usuario.rol.toLowerCase().contains(queryLower);
         }).toList();
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
+    return Stack(
+      children: [
+        // Fondo consistente
+        isDark 
+            ? GradientBackgroundDark(child: Container()) 
+            : GradientBackgroundLight(child: Container()),
+        
+        // Contenido
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Header simple
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                        color: isDark ? Colors.white : AppColors.primary,
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Usuarios',
+                          style: TextStyle(
+                            fontSize: isMobile ? 24.sp : 28,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      if (!isMobile)
+                        ElevatedButton.icon(
+                          onPressed: () => _showUsuarioDialog(),
+                          icon: Icon(Icons.add, size: 20),
+                          label: Text('Nuevo'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+                // Barra de búsqueda
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _filterUsuarios,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar usuarios...',
+                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                _filterUsuarios('');
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[800] : Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 16),
+
+                // Lista/Tabla
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _filteredUsuarios.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No se encontraron usuarios',
+                                style: TextStyle(
+                                  color: isDark ? Colors.white70 : AppColors.textLight,
+                                ),
+                              ),
+                            )
+                          : isMobile
+                              ? _buildMobileList(isDark)
+                              : _buildDesktopTable(isDark),
+                ),
+              ],
+            ),
+          ),
+          floatingActionButton: isMobile
+              ? FloatingActionButton(
+                  onPressed: () => _showUsuarioDialog(),
+                  child: Icon(Icons.add),
+                  backgroundColor: AppColors.primary,
+                )
+              : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileList(bool isDark) {
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: _filteredUsuarios.length,
+      itemBuilder: (context, index) {
+        final usuario = _filteredUsuarios[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          color: isDark ? Colors.grey[850] : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
+              child: Text(
+                usuario.nombreUsuario[0].toUpperCase(),
+                style: TextStyle(
+                  color: _getRolColor(usuario.rol),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            title: Text(
+              usuario.nombreUsuario,
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 4),
+                Text(usuario.email),
+                SizedBox(height: 4),
+                Row(
+                  children: [
+                    _buildRolChip(usuario.rol),
+                    SizedBox(width: 8),
+                    _buildStatusChip(usuario.activo),
+                  ],
+                ),
+              ],
+            ),
+            trailing: PopupMenuButton(
+              icon: Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: ListTile(
+                    leading: Icon(Icons.edit, size: 20),
+                    title: Text('Editar'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onTap: () => Future.delayed(
+                    Duration(milliseconds: 100),
+                    () => _showUsuarioDialog(usuario: usuario),
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    leading: Icon(
+                      usuario.activo ? Icons.block : Icons.check_circle,
+                      size: 20,
+                    ),
+                    title: Text(usuario.activo ? 'Desactivar' : 'Activar'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onTap: () => Future.delayed(
+                    Duration(milliseconds: 100),
+                    () => _toggleActivo(usuario),
+                  ),
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    leading: Icon(Icons.delete, size: 20, color: Colors.red),
+                    title: Text('Eliminar', style: TextStyle(color: Colors.red)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onTap: () => Future.delayed(
+                    Duration(milliseconds: 100),
+                    () => _deleteUsuario(usuario),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDesktopTable(bool isDark) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Card(
+        color: isDark ? Colors.grey[850] : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: DataTable(
+          headingRowColor: MaterialStateProperty.all(
+            isDark ? Colors.grey[800] : Colors.grey[100],
+          ),
+          columns: [
+            DataColumn(label: Text('Usuario', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text('Email', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text('Rol', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text('Estado', style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold))),
+          ],
+          rows: _filteredUsuarios.map((usuario) {
+            return DataRow(
+              cells: [
+                DataCell(
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
+                        child: Text(
+                          usuario.nombreUsuario[0].toUpperCase(),
+                          style: TextStyle(
+                            color: _getRolColor(usuario.rol),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text(usuario.nombreUsuario),
+                    ],
+                  ),
+                ),
+                DataCell(Text(usuario.email)),
+                DataCell(_buildRolChip(usuario.rol)),
+                DataCell(_buildStatusChip(usuario.activo)),
+                DataCell(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 20),
+                        color: AppColors.primary,
+                        onPressed: () => _showUsuarioDialog(usuario: usuario),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          usuario.activo ? Icons.block : Icons.check_circle,
+                          size: 20,
+                        ),
+                        color: usuario.activo ? Colors.orange : Colors.green,
+                        onPressed: () => _toggleActivo(usuario),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, size: 20),
+                        color: Colors.red,
+                        onPressed: () => _deleteUsuario(usuario),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRolChip(String rol) {
+    final color = _getRolColor(rol);
+    return Chip(
+      label: Text(
+        rol,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: color.withOpacity(0.1),
+      side: BorderSide(color: color, width: 1),
+      padding: EdgeInsets.zero,
+      labelPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+    );
+  }
+
+  Widget _buildStatusChip(bool activo) {
+    return Chip(
+      label: Text(
+        activo ? 'Activo' : 'Inactivo',
+        style: TextStyle(
+          color: activo ? Colors.green : Colors.red,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: activo ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+      side: BorderSide(color: activo ? Colors.green : Colors.red, width: 1),
+      padding: EdgeInsets.zero,
+      labelPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+    );
+  }
+
+  Color _getRolColor(String rol) {
+    switch (rol.toLowerCase()) {
+      case 'admin':
+      case 'administrador':
+        return Colors.red;
+      case 'coordinador':
+        return AppColors.primary;
+      case 'profesor':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
   void _showUsuarioDialog({Usuario? usuario}) {
@@ -109,15 +443,15 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Confirmar eliminación'),
-        content: Text('¿Está seguro de que desea eliminar al usuario "${usuario.nombreUsuario}"?'),
+        content: Text('¿Eliminar al usuario "${usuario.nombreUsuario}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancelar'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text('Eliminar'),
           ),
         ],
@@ -136,7 +470,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al eliminar usuario: $e')),
+            SnackBar(content: Text('Error al eliminar usuario')),
           );
         }
       }
@@ -148,336 +482,16 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       await _usuarioService.toggleUsuarioActivo(usuario.id, !usuario.activo);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(usuario.activo ? 'Usuario desactivado' : 'Usuario activado'),
-          ),
+          SnackBar(content: Text(usuario.activo ? 'Usuario desactivado' : 'Usuario activado')),
         );
       }
       await _loadUsuarios();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cambiar estado: $e')),
+          SnackBar(content: Text('Error al cambiar estado')),
         );
       }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          isDark 
-            ? GradientBackgroundDark(child: Container()) 
-            : GradientBackgroundLight(child: Container()),
-          SafeArea(
-            child: Column(
-              children: [
-                // Header
-                Container(
-                  padding: EdgeInsets.all(isMobile ? 12 : 16),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[900] : Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Gestión de Usuarios',
-                              style: TextStyle(
-                                fontSize: isMobile ? 18.sp : 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          if (!isMobile)
-                            ElevatedButton.icon(
-                              onPressed: () => _showUsuarioDialog(),
-                              icon: Icon(Icons.add),
-                              label: Text('Nuevo Usuario'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF1976d2),
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: 12),
-                      // Barra de búsqueda
-                      TextField(
-                        onChanged: _filterUsuarios,
-                        decoration: InputDecoration(
-                          hintText: 'Buscar usuarios...',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: isMobile ? 8 : 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Content
-                Expanded(
-                  child: _isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : _filteredUsuarios.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    _searchQuery.isEmpty
-                                        ? 'No hay usuarios registrados'
-                                        : 'No se encontraron usuarios',
-                                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : isMobile
-                              ? _buildMobileList()
-                              : _buildDesktopTable(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: isMobile
-          ? FloatingActionButton(
-              onPressed: () => _showUsuarioDialog(),
-              backgroundColor: Color(0xFF1976d2),
-              child: Icon(Icons.add),
-            )
-          : null,
-    );
-  }
-
-  Widget _buildMobileList() {
-    return ListView.builder(
-      padding: EdgeInsets.all(12),
-      itemCount: _filteredUsuarios.length,
-      itemBuilder: (context, index) {
-        final usuario = _filteredUsuarios[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: _getRolColor(usuario.rol),
-              child: Icon(
-                usuario.activo ? Icons.person : Icons.person_off,
-                color: Colors.white,
-              ),
-            ),
-            title: Text(
-              usuario.nombreUsuario,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(usuario.email),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    _buildRolChip(usuario.rol),
-                    SizedBox(width: 8),
-                    _buildStatusChip(usuario.activo),
-                  ],
-                ),
-              ],
-            ),
-            trailing: PopupMenuButton(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 20),
-                      SizedBox(width: 8),
-                      Text('Editar'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'toggle',
-                  child: Row(
-                    children: [
-                      Icon(
-                        usuario.activo ? Icons.block : Icons.check_circle,
-                        size: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text(usuario.activo ? 'Desactivar' : 'Activar'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, size: 20, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Eliminar', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
-              onSelected: (value) {
-                switch (value) {
-                  case 'edit':
-                    _showUsuarioDialog(usuario: usuario);
-                    break;
-                  case 'toggle':
-                    _toggleActivo(usuario);
-                    break;
-                  case 'delete':
-                    _deleteUsuario(usuario);
-                    break;
-                }
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDesktopTable() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
-      child: Card(
-        child: DataTable(
-          columns: [
-            DataColumn(label: Text('Usuario')),
-            DataColumn(label: Text('Email')),
-            DataColumn(label: Text('Rol')),
-            DataColumn(label: Text('Estado')),
-            DataColumn(label: Text('Último acceso')),
-            DataColumn(label: Text('Acciones')),
-          ],
-          rows: _filteredUsuarios.map((usuario) {
-            return DataRow(
-              cells: [
-                DataCell(Text(usuario.nombreUsuario)),
-                DataCell(Text(usuario.email)),
-                DataCell(_buildRolChip(usuario.rol)),
-                DataCell(_buildStatusChip(usuario.activo)),
-                DataCell(Text(
-                  usuario.ultimoAcceso != null
-                      ? DateFormat('dd/MM/yyyy HH:mm').format(usuario.ultimoAcceso!)
-                      : 'Nunca',
-                )),
-                DataCell(
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 20),
-                        onPressed: () => _showUsuarioDialog(usuario: usuario),
-                        tooltip: 'Editar',
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          usuario.activo ? Icons.block : Icons.check_circle,
-                          size: 20,
-                          color: usuario.activo ? Colors.orange : Colors.green,
-                        ),
-                        onPressed: () => _toggleActivo(usuario),
-                        tooltip: usuario.activo ? 'Desactivar' : 'Activar',
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete, size: 20, color: Colors.red),
-                        onPressed: () => _deleteUsuario(usuario),
-                        tooltip: 'Eliminar',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRolChip(String rol) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: _getRolColor(rol).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _getRolColor(rol)),
-      ),
-      child: Text(
-        rol,
-        style: TextStyle(
-          color: _getRolColor(rol),
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusChip(bool activo) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: activo ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: activo ? Colors.green : Colors.red),
-      ),
-      child: Text(
-        activo ? 'Activo' : 'Inactivo',
-        style: TextStyle(
-          color: activo ? Colors.green : Colors.red,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Color _getRolColor(String rol) {
-    switch (rol.toLowerCase()) {
-      case 'admin':
-      case 'administrador':
-        return Colors.red;
-      case 'coordinador':
-        return Colors.blue;
-      case 'profesor':
-        return Colors.green;
-      default:
-        return Colors.grey;
     }
   }
 }
@@ -487,10 +501,7 @@ class _UsuarioDialog extends StatefulWidget {
   final Usuario? usuario;
   final Function(Map<String, dynamic>) onSave;
 
-  const _UsuarioDialog({
-    this.usuario,
-    required this.onSave,
-  });
+  const _UsuarioDialog({required this.usuario, required this.onSave});
 
   @override
   State<_UsuarioDialog> createState() => _UsuarioDialogState();
@@ -526,64 +537,55 @@ class _UsuarioDialogState extends State<_UsuarioDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final isEdit = widget.usuario != null;
 
-    return AlertDialog(
-      title: Text(widget.usuario == null ? 'Nuevo Usuario' : 'Editar Usuario'),
-      content: SingleChildScrollView(
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        constraints: BoxConstraints(maxWidth: 500),
+        padding: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                isEdit ? 'Editar Usuario' : 'Nuevo Usuario',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(height: 24),
               TextFormField(
                 controller: _nombreController,
                 decoration: InputDecoration(
-                  labelText: 'Nombre de usuario',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+                  labelText: 'Nombre de Usuario',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese un nombre de usuario';
-                  }
-                  return null;
-                },
+                validator: (value) => value?.isEmpty == true ? 'Campo requerido' : null,
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese un email';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Ingrese un email válido';
-                  }
-                  return null;
-                },
               ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: widget.usuario == null ? 'Contraseña' : 'Nueva contraseña (opcional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
                 obscureText: true,
+                decoration: InputDecoration(
+                  labelText: isEdit ? 'Nueva Contraseña (opcional)' : 'Contraseña',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                ),
                 validator: (value) {
-                  if (widget.usuario == null && (value == null || value.isEmpty)) {
-                    return 'Ingrese una contraseña';
-                  }
-                  if (value != null && value.isNotEmpty && value.length < 6) {
-                    return 'La contraseña debe tener al menos 6 caracteres';
+                  if (!isEdit && (value?.isEmpty == true)) {
+                    return 'Campo requerido';
                   }
                   return null;
                 },
@@ -593,61 +595,56 @@ class _UsuarioDialogState extends State<_UsuarioDialog> {
                 value: _selectedRol,
                 decoration: InputDecoration(
                   labelText: 'Rol',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.badge),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                items: _roles.map((rol) {
-                  return DropdownMenuItem(
-                    value: rol,
-                    child: Text(rol),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() => _selectedRol = value!);
-                },
+                items: _roles.map((rol) => DropdownMenuItem(value: rol, child: Text(rol))).toList(),
+                onChanged: (value) => setState(() => _selectedRol = value!),
               ),
               SizedBox(height: 16),
               SwitchListTile(
-                title: Text('Usuario activo'),
+                title: Text('Usuario Activo'),
                 value: _activo,
-                onChanged: (value) {
-                  setState(() => _activo = value);
-                },
+                onChanged: (value) => setState(() => _activo = value),
+                activeColor: AppColors.primary,
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Cancelar'),
+                  ),
+                  SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        final data = {
+                          'nombreUsuario': _nombreController.text,
+                          'rol': _selectedRol,
+                          'activo': _activo,
+                        };
+                        if (_emailController.text.isNotEmpty) {
+                          data['email'] = _emailController.text;
+                        }
+                        if (_passwordController.text.isNotEmpty) {
+                          data['password'] = _passwordController.text;
+                        }
+                        widget.onSave(data);
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: Text(isEdit ? 'Guardar' : 'Crear'),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              final data = {
-                'nombreUsuario': _nombreController.text,
-                'email': _emailController.text,
-                'rol': _selectedRol,
-                'activo': _activo,
-              };
-
-              if (_passwordController.text.isNotEmpty) {
-                data['password'] = _passwordController.text;
-              }
-
-              widget.onSave(data);
-              Navigator.pop(context);
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF1976d2),
-            foregroundColor: Colors.white,
-          ),
-          child: Text(widget.usuario == null ? 'Crear' : 'Guardar'),
-        ),
-      ],
     );
   }
 }
