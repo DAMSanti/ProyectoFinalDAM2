@@ -87,7 +87,10 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.system;
+  // En Android, usar tema claro por defecto. En otras plataformas, usar el del sistema
+  ThemeMode _themeMode = (!kIsWeb && Platform.isAndroid) 
+      ? ThemeMode.light 
+      : ThemeMode.system;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   LifecycleManager? _lifecycleManager; // ✅ NUEVO
 
