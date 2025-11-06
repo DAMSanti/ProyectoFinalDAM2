@@ -81,6 +81,11 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         // Configurar índices únicos
+        // Configurar mapeo de tabla Profesor
+        modelBuilder.Entity<Profesor>()
+            .Property(p => p.DepartamentoId)
+            .HasColumnName("depart_id");
+
         modelBuilder.Entity<Profesor>()
             .HasIndex(p => p.Dni)
             .IsUnique();
