@@ -45,6 +45,7 @@ public class ActividadService : IActividadService
         var query = _context.Actividades
             .Include(a => a.Responsable!)
                 .ThenInclude(r => r.Departamento)
+            .Include(a => a.ProfesoresParticipantes)
             .AsQueryable();
 
         // B�squeda
@@ -99,7 +100,8 @@ public class ActividadService : IActividadService
                     FotoUrl = a.Responsable.FotoUrl,
                     DepartamentoId = a.Responsable.DepartamentoId,
                     DepartamentoNombre = a.Responsable.Departamento != null ? a.Responsable.Departamento.Nombre : null
-                } : null
+                } : null,
+                ProfesoresParticipantesIds = a.ProfesoresParticipantes.Select(pp => pp.ProfesorUuid).ToList()
             })
             .ToListAsync();
 

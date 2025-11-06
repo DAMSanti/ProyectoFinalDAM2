@@ -97,6 +97,9 @@ public class ActividadListDto
     
     // Información del profesor solicitante (mantener por compatibilidad)
     public ProfesorSimpleDto? Solicitante { get; set; }
+    
+    // Lista de profesores participantes
+    public List<Guid> ProfesoresParticipantesIds { get; set; } = new List<Guid>();
 }
 
 public class LocalizacionDto

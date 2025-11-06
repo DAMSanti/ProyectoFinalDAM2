@@ -33,6 +33,7 @@ class Actividad {
   final double? importePorAlumno;
   final double? presupuestoEstimado;
   final double? costoReal;
+  final List<String> profesoresParticipantesIds;
 
   Actividad({
     required this.id,
@@ -64,6 +65,7 @@ class Actividad {
     this.importePorAlumno,
     this.presupuestoEstimado,
     this.costoReal,
+    this.profesoresParticipantesIds = const [],
   });
 
   factory Actividad.fromJson(Map<String, dynamic> json) {
@@ -194,6 +196,9 @@ class Actividad {
       importePorAlumno: (json['presupuestoEstimado'] as num?)?.toDouble() ?? (json['importePorAlumno'] as num?)?.toDouble(),
       presupuestoEstimado: (json['presupuestoEstimado'] as num?)?.toDouble(),
       costoReal: (json['costoReal'] as num?)?.toDouble(),
+      profesoresParticipantesIds: json['profesoresParticipantesIds'] != null
+          ? List<String>.from(json['profesoresParticipantesIds'].map((x) => x.toString()))
+          : [],
     );
   }
 

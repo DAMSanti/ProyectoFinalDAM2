@@ -61,13 +61,16 @@ class HomeViewState extends State<HomeView> {
         // Es responsable
         final esResponsable = actividad.responsable?.uuid == profesorUuid;
         
+        // Es participante
+        final esParticipante = actividad.profesoresParticipantesIds.contains(profesorUuid);
+        
         print('[HomeView] Actividad ${actividad.id} - ${actividad.titulo}');
         print('[HomeView]   Responsable UUID: ${actividad.responsable?.uuid}');
         print('[HomeView]   Es responsable: $esResponsable');
+        print('[HomeView]   Participantes: ${actividad.profesoresParticipantesIds}');
+        print('[HomeView]   Es participante: $esParticipante');
         
-        // Es participante (cuando implementemos la lista de participantes)
-        // Por ahora solo filtramos por responsable
-        return esResponsable;
+        return esResponsable || esParticipante;
       }).toList();
       
       print('[HomeView] Actividades filtradas: ${actividadesFiltradas.length}');
