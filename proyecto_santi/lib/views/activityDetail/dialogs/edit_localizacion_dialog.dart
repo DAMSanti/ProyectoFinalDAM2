@@ -66,16 +66,16 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape
-          ? EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+          ? EdgeInsets.symmetric(horizontal: 12, vertical: 8)
           : (isMobile 
-              ? EdgeInsets.symmetric(horizontal: 16, vertical: 40)
+              ? EdgeInsets.symmetric(horizontal: 12, vertical: 24)
               : EdgeInsets.symmetric(horizontal: 40, vertical: 24)),
       child: Container(
         width: isMobile ? double.infinity : 550,
         constraints: BoxConstraints(
           maxHeight: isMobileLandscape
               ? screenHeight * 0.95
-              : (isMobile ? screenHeight * 0.88 : screenHeight * 0.85)),
+              : (isMobile ? screenHeight * 0.90 : screenHeight * 0.85)),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -90,7 +90,7 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                   Color.fromRGBO(144, 202, 249, 0.85),
                 ],
           ),
-          borderRadius: BorderRadius.circular(isMobileLandscape ? 16 : (isMobile ? 20 : 20)),
+          borderRadius: BorderRadius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
           border: Border.all(
             color: isDark 
               ? const Color.fromRGBO(255, 255, 255, 0.1) 
@@ -100,8 +100,8 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
-              offset: Offset(0, isMobileLandscape ? 6 : (isMobile ? 6 : 10)),
-              blurRadius: isMobileLandscape ? 20 : (isMobile ? 20 : 30),
+              offset: Offset(0, isMobileLandscape ? 4 : (isMobile ? 4 : 10)),
+              blurRadius: isMobileLandscape ? 16 : (isMobile ? 16 : 30),
             ),
           ],
         ),
@@ -111,53 +111,53 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
             // Header
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: isMobileLandscape ? 12 : (isMobile ? 14 : 20),
-                vertical: isMobileLandscape ? 10 : (isMobile ? 14 : 20),
+                horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
+                vertical: isMobileLandscape ? 8 : (isMobile ? 10 : 20),
               ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: AppColors.primaryGradient,
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(isMobileLandscape ? 16 : 20),
-                  topRight: Radius.circular(isMobileLandscape ? 16 : 20),
+                  topLeft: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
+                  topRight: Radius.circular(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primaryOpacity30,
-                    offset: Offset(0, 4),
-                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                    blurRadius: 6,
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                    padding: EdgeInsets.all(isMobileLandscape ? 5 : (isMobile ? 6 : 10)),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(isMobileLandscape ? 6 : (isMobile ? 8 : 10)),
+                      borderRadius: BorderRadius.circular(isMobileLandscape ? 5 : (isMobile ? 6 : 10)),
                     ),
                     child: Icon(
                       Icons.edit_location_rounded,
                       color: Colors.white,
-                      size: isMobileLandscape ? 18 : (isMobile ? 20 : 24),
+                      size: isMobileLandscape ? 16 : (isMobile ? 18 : 24),
                     ),
                   ),
-                  SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
+                  SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
                   Expanded(
                     child: Text(
-                      isMobile ? 'Editar' : 'Editar Localización',
+                      'Editar',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: isMobileLandscape ? 14 : (isMobile ? 16 : 18),
+                        fontSize: isMobileLandscape ? 13 : (isMobile ? 14 : 18),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close_rounded, color: Colors.white, size: isMobileLandscape ? 18 : (isMobile ? 22 : 24)),
-                    padding: EdgeInsets.all(isMobileLandscape ? 4 : (isMobile ? 4 : 8)),
+                    icon: Icon(Icons.close_rounded, color: Colors.white, size: isMobileLandscape ? 16 : (isMobile ? 20 : 24)),
+                    padding: EdgeInsets.all(isMobileLandscape ? 3 : (isMobile ? 3 : 8)),
                     constraints: BoxConstraints(),
                     onPressed: () => Navigator.of(context).pop(),
                     tooltip: 'Cerrar',

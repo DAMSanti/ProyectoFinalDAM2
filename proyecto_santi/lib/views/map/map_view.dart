@@ -672,6 +672,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isMobile = MediaQuery.of(context).size.width < 600;
     final localizaciones = actividadLocalizaciones[_selectedActividad!.id] ?? [];
     final locPrincipal = localizaciones.firstWhere(
       (loc) => loc.esPrincipal,
@@ -694,9 +695,9 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     }
     
     return Positioned(
-      bottom: 16,
-      left: 16,
-      right: 16,
+      bottom: isMobile ? 12 : 16,
+      left: isMobile ? 12 : 16,
+      right: isMobile ? 12 : 16,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Container(
@@ -715,17 +716,17 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       Color.fromRGBO(255, 255, 255, 0.95),
                     ],
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             boxShadow: [
               BoxShadow(
                 color: Color(0xFF1976d2).withValues(alpha: 0.4),
-                blurRadius: 30,
-                offset: Offset(0, 8),
+                blurRadius: isMobile ? 20 : 30,
+                offset: Offset(0, isMobile ? 6 : 8),
                 spreadRadius: 0,
               ),
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 15,
+                blurRadius: isMobile ? 10 : 15,
                 offset: Offset(0, 4),
               ),
             ],
@@ -733,21 +734,22 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           child: Stack(
             children: [
               // Patrón decorativo de fondo
-              Positioned(
-                right: -30,
-                top: -30,
-                child: Opacity(
-                  opacity: isDark ? 0.05 : 0.03,
-                  child: Icon(
-                    Icons.event_rounded,
-                    size: 150,
-                    color: Color(0xFF1976d2),
+              if (!isMobile)
+                Positioned(
+                  right: -30,
+                  top: -30,
+                  child: Opacity(
+                    opacity: isDark ? 0.05 : 0.03,
+                    child: Icon(
+                      Icons.event_rounded,
+                      size: 150,
+                      color: Color(0xFF1976d2),
+                    ),
                   ),
                 ),
-              ),
               // Contenido
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(isMobile ? 14 : 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -756,7 +758,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(10),
+                          padding: EdgeInsets.all(isMobile ? 8 : 10),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
@@ -764,22 +766,22 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                 Color(0xFF42A5F5),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                             boxShadow: [
                               BoxShadow(
                                 color: Color(0xFF1976d2).withValues(alpha: 0.4),
-                                blurRadius: 12,
-                                offset: Offset(0, 4),
+                                blurRadius: isMobile ? 8 : 12,
+                                offset: Offset(0, 3),
                               ),
                             ],
                           ),
                           child: Icon(
                             Icons.event_rounded,
                             color: Colors.white,
-                            size: 28,
+                            size: isMobile ? 22 : 28,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: isMobile ? 10 : 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -787,28 +789,28 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               Text(
                                 _selectedActividad!.titulo,
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: isMobile ? 15 : 18,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(height: 4),
+                              SizedBox(height: 3),
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: Color(0xFF4CAF50).withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                                   border: Border.all(
                                     color: Color(0xFF4CAF50),
                                     width: 1,
                                   ),
                                 ),
                                 child: Text(
-                                  'Localización Principal',
+                                  'Principal',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: isMobile ? 10 : 11,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF4CAF50),
                                   ),
@@ -822,14 +824,16 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.black.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
                           ),
                           child: IconButton(
                             icon: Icon(
                               Icons.close_rounded,
                               color: isDark ? Colors.white : Colors.black87,
-                              size: 24,
+                              size: isMobile ? 20 : 24,
                             ),
+                            padding: EdgeInsets.all(isMobile ? 6 : 8),
+                            constraints: BoxConstraints(),
                             onPressed: () {
                               setState(() {
                                 _selectedActividad = null;
@@ -841,10 +845,10 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: isMobile ? 12 : 16),
                     // Divider con gradiente
                     Container(
-                      height: 2,
+                      height: isMobile ? 1.5 : 2,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -856,16 +860,16 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: isMobile ? 12 : 16),
                     // Dirección (solo si existe)
                     if (hasDireccion)
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: EdgeInsets.all(isMobile ? 10 : 12),
                         decoration: BoxDecoration(
                           color: isDark
                               ? Colors.white.withValues(alpha: 0.05)
                               : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                           border: Border.all(
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.1)
@@ -876,10 +880,10 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           children: [
                             Icon(
                               Icons.location_on_rounded,
-                              size: 20,
+                              size: isMobile ? 18 : 20,
                               color: Colors.red,
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: isMobile ? 6 : 8),
                             Expanded(
                               child: Text(
                                 direccionCompleta,
@@ -887,7 +891,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                   color: isDark
                                       ? Colors.white.withValues(alpha: 0.8)
                                       : Colors.grey[700],
-                                  fontSize: 13,
+                                  fontSize: isMobile ? 12 : 13,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -899,14 +903,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     // Descripción de la actividad
                     if (_selectedActividad!.descripcion != null &&
                         _selectedActividad!.descripcion!.isNotEmpty) ...[
-                      SizedBox(height: 12),
+                      SizedBox(height: isMobile ? 10 : 12),
                       Container(
-                        padding: EdgeInsets.all(12),
+                        padding: EdgeInsets.all(isMobile ? 10 : 12),
                         decoration: BoxDecoration(
                           color: isDark
                               ? Colors.white.withValues(alpha: 0.05)
                               : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                           border: Border.all(
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.1)
@@ -918,10 +922,10 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           children: [
                             Icon(
                               Icons.description_outlined,
-                              size: 20,
+                              size: isMobile ? 18 : 20,
                               color: Color(0xFF1976d2),
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: isMobile ? 6 : 8),
                             Expanded(
                               child: Text(
                                 _selectedActividad!.descripcion!,
@@ -929,9 +933,9 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                                   color: isDark
                                       ? Colors.white.withValues(alpha: 0.8)
                                       : Colors.grey[700],
-                                  fontSize: 13,
+                                  fontSize: isMobile ? 12 : 13,
                                 ),
-                                maxLines: 3,
+                                maxLines: isMobile ? 2 : 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -939,7 +943,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         ),
                       ),
                     ],
-                    SizedBox(height: 16),
+                    SizedBox(height: isMobile ? 12 : 16),
                     // Botón ver detalles
                     SizedBox(
                       width: double.infinity,
@@ -951,12 +955,12 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               Color(0xFF42A5F5),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                           boxShadow: [
                             BoxShadow(
                               color: Color(0xFF1976d2).withValues(alpha: 0.4),
-                              blurRadius: 12,
-                              offset: Offset(0, 4),
+                              blurRadius: isMobile ? 8 : 12,
+                              offset: Offset(0, 3),
                             ),
                           ],
                         ),
@@ -964,12 +968,12 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           onPressed: () => _showActivityDetails(_selectedActividad!),
                           icon: Icon(
                             Icons.visibility_rounded,
-                            size: 20,
+                            size: isMobile ? 18 : 20,
                           ),
                           label: Text(
                             'Ver Detalles',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: isMobile ? 14 : 15,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -977,9 +981,9 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                             backgroundColor: Colors.transparent,
                             foregroundColor: Colors.white,
                             shadowColor: Colors.transparent,
-                            padding: EdgeInsets.symmetric(vertical: 14),
+                            padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                             ),
                           ),
                         ),
@@ -998,13 +1002,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
   Widget _buildDetailModeBanner() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isMobile = MediaQuery.of(context).size.width < 600;
     
     return Positioned(
-      top: 90, // Debajo de la barra de búsqueda
-      left: 16,
-      right: 16,
+      top: isMobile ? 80 : 90, // Debajo de la barra de búsqueda
+      left: isMobile ? 12 : 16,
+      right: isMobile ? 12 : 16,
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 12 : 16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -1014,17 +1019,17 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               Color(0xFF42A5F5),
             ],
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
           boxShadow: [
             BoxShadow(
               color: Color(0xFF1976d2).withValues(alpha: 0.5),
-              blurRadius: 20,
-              offset: Offset(0, 4),
-              spreadRadius: 2,
+              blurRadius: isMobile ? 16 : 20,
+              offset: Offset(0, 3),
+              spreadRadius: isMobile ? 1 : 2,
             ),
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
+              blurRadius: isMobile ? 8 : 10,
               offset: Offset(0, 2),
             ),
           ],
@@ -1037,18 +1042,18 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           children: [
             // Icono de información
             Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(isMobile ? 6 : 8),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
               ),
               child: Icon(
                 Icons.info_outline_rounded,
                 color: Colors.white,
-                size: 28,
+                size: isMobile ? 22 : 28,
               ),
             ),
-            SizedBox(width: 12),
+            SizedBox(width: isMobile ? 10 : 12),
             // Texto informativo
             Expanded(
               child: Column(
@@ -1056,10 +1061,10 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Viendo localizaciones de:',
+                    isMobile ? 'Viendo:' : 'Viendo localizaciones de:',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 12,
+                      fontSize: isMobile ? 11 : 12,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1068,77 +1073,79 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     _activityInDetailMode!.titulo,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
+                      fontSize: isMobile ? 13 : 15,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF1976d2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Principal',
-                              style: TextStyle(
+                  if (!isMobile) ...[
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF1976d2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
                                 color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4),
+                              Text(
+                                'Principal',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 8),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF4CAF50),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Secundaria',
-                              style: TextStyle(
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF4CAF50),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
                                 color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4),
+                              Text(
+                                'Secundaria',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
-            SizedBox(width: 12),
+            SizedBox(width: isMobile ? 8 : 12),
             // Botón para ir a detalles completos de la actividad
             Container(
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -1155,23 +1162,23 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       });
                     }
                   },
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                   child: Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.info_outline_rounded,
                           color: Colors.white,
-                          size: 28,
+                          size: isMobile ? 22 : 28,
                         ),
                         SizedBox(height: 2),
                         Text(
                           'Info',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: isMobile ? 10 : 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1181,34 +1188,34 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: isMobile ? 6 : 8),
             // Botón de cerrar/volver
             Container(
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _exitDetailMode,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                   child: Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.close_rounded,
                           color: Colors.white,
-                          size: 28,
+                          size: isMobile ? 22 : 28,
                         ),
                         SizedBox(height: 2),
                         Text(
                           'Volver',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: isMobile ? 10 : 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1318,49 +1325,54 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       // Info card de actividad seleccionada
                       _buildActivityInfoCard(),
                       // Botón centrar mapa
-                      Positioned(
-                        bottom: _selectedActividad != null ? 240 : 24,
-                        right: 16,
-                        child: AnimatedContainer(
-                          duration: Duration(milliseconds: 300),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color(0xFF1976d2),
-                                Color(0xFF42A5F5),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF1976d2).withValues(alpha: 0.4),
-                                blurRadius: 12,
-                                offset: Offset(0, 4),
+                      Builder(
+                        builder: (context) {
+                          final isMobile = MediaQuery.of(context).size.width < 600;
+                          return Positioned(
+                            bottom: _selectedActividad != null ? (isMobile ? 200 : 240) : (isMobile ? 16 : 24),
+                            right: isMobile ? 12 : 16,
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 300),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFF1976d2),
+                                    Color(0xFF42A5F5),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF1976d2).withValues(alpha: 0.4),
+                                    blurRadius: isMobile ? 10 : 12,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                _mapController.move(_center, 10.0);
-                                setState(() {
-                                  _selectedActividad = null;
-                                  _animationController.reverse();
-                                });
-                              },
-                              borderRadius: BorderRadius.circular(16),
-                              child: Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Icon(
-                                  Icons.my_location_rounded,
-                                  color: Colors.white,
-                                  size: 28,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    _mapController.move(_center, 10.0);
+                                    setState(() {
+                                      _selectedActividad = null;
+                                      _animationController.reverse();
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(isMobile ? 14 : 16),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(isMobile ? 12 : 16),
+                                    child: Icon(
+                                      Icons.my_location_rounded,
+                                      color: Colors.white,
+                                      size: isMobile ? 24 : 28,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),

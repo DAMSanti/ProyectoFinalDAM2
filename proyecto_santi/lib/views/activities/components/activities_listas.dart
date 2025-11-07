@@ -164,9 +164,11 @@ class OtrasActividadesState extends State<OtrasActividades> {
   }
 
   Future<void> _filterActivities() async {
-    // Obtener el UUID del usuario actual desde Auth
+    // Obtener el UUID y rol del usuario actual desde Auth
     final auth = Provider.of<Auth>(context, listen: false);
-    final currentUserUuid = auth.currentUser?.uuid;
+    final currentUser = auth.currentUser;
+    final currentUserUuid = currentUser?.uuid;
+    final rol = currentUser?.rol;
     
     if (currentUserUuid == null) {
       print('[OtrasActividades] ⚠️ No hay usuario autenticado');
@@ -179,7 +181,10 @@ class OtrasActividadesState extends State<OtrasActividades> {
       return;
     }
     
-    print('[OtrasActividades] 🔍 Filtrando actividades para usuario: $currentUserUuid');
+    print('[OtrasActividades] 🔍 Filtrando actividades para usuario: $currentUserUuid (Rol: $rol)');
+    
+    // Administradores y Coordinadores ven TODAS las actividades
+    final isAdminOrCoord = rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED';
     
     List<Actividad> filtered = [];
     
@@ -213,23 +218,28 @@ class OtrasActividadesState extends State<OtrasActividades> {
       }
       if (!matchesCourse) continue;
       
-      // ✅ FILTRO OBLIGATORIO: Solo actividades donde el usuario es responsable o participante
-      bool isUserActivity = false;
-      try {
-        // Verificar si es el responsable
-        bool isResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
-        
-        // Verificar si es participante
-        bool isParticipante = actividad.profesoresParticipantesIds
-            .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
-        
-        isUserActivity = isResponsable || isParticipante;
-        
-        print('[OtrasActividades] Actividad ${actividad.id} "${actividad.titulo}": '
-            'Responsable=$isResponsable, Participante=$isParticipante → ${isUserActivity ? "✅ INCLUIR" : "❌ EXCLUIR"}');
-      } catch (e) {
-        print('[ERROR] Error verificando participación en actividad ${actividad.id}: $e');
+      // ✅ FILTRO POR ROL: Admin/Coordinador ven todas, Profesores solo las suyas
+      bool isUserActivity = true; // Por defecto true para admin/coordinador
+      
+      if (!isAdminOrCoord) {
+        // Solo para profesores: verificar si es responsable o participante
         isUserActivity = false;
+        try {
+          // Verificar si es el responsable
+          bool isResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
+          
+          // Verificar si es participante
+          bool isParticipante = actividad.profesoresParticipantesIds
+              .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
+          
+          isUserActivity = isResponsable || isParticipante;
+          
+          print('[OtrasActividades] Actividad ${actividad.id} "${actividad.titulo}": '
+              'Responsable=$isResponsable, Participante=$isParticipante → ${isUserActivity ? "✅ INCLUIR" : "❌ EXCLUIR"}');
+        } catch (e) {
+          print('[ERROR] Error verificando participación en actividad ${actividad.id}: $e');
+          isUserActivity = false;
+        }
       }
       
       if (!isUserActivity) continue;
@@ -248,7 +258,7 @@ class OtrasActividadesState extends State<OtrasActividades> {
       }
     });
     
-    print('[OtrasActividades] ✅ Total actividades del usuario: ${filtered.length}');
+    print('[OtrasActividades] ✅ Total actividades filtradas: ${filtered.length} ${isAdminOrCoord ? "(Admin/Coord - Todas)" : "(Profesor - Solo las suyas)"}');
     
     setState(() {
       _filteredOtrasActividades = filtered;

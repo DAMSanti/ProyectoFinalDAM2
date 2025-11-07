@@ -320,7 +320,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                 localizaciones: _localizaciones,
                 iconosLocalizaciones: _iconosLocalizaciones,
                 onLocalizacionTapped: (localizacion) {
-                  // Aqu� se podr�a mostrar un di�logo de edici�n si es necesario
+                  // Abrir diálogo de edición si es administrador o solicitante
                   if (widget.isAdminOrSolicitante) {
                     _showEditLocalizacionDialog(context, localizacion);
                   }

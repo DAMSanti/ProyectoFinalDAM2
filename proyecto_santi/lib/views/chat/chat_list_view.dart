@@ -41,23 +41,43 @@ class ChatListViewState extends State<ChatListView> {
     _loadActivities();
   }
 
-  /// ✅ NUEVO: Cargar solo actividades donde el usuario es participante o responsable
+  /// ✅ NUEVO: Cargar actividades según el rol del usuario
   Future<List<Actividad>> _loadUserActivities() async {
     try {
       final auth = Provider.of<Auth>(context, listen: false);
-      final currentUserUuid = auth.currentUser?.uuid;
+      final currentUser = auth.currentUser;
+      final currentUserUuid = currentUser?.uuid;
+      final rol = currentUser?.rol;
       
       if (currentUserUuid == null) {
         print('[ChatListView] ⚠️ No hay usuario autenticado');
         return [];
       }
       
-      print('[ChatListView] 🔍 Cargando actividades para usuario: $currentUserUuid');
+      print('[ChatListView] 🔍 Cargando actividades para usuario: $currentUserUuid (Rol: $rol)');
       
       // Cargar TODAS las actividades (no solo futuras)
       final todasActividades = await _actividadService.fetchActivities(pageSize: 100);
       
-      // Filtrar solo las actividades donde el usuario es responsable o participante
+      // Administradores y Coordinadores ven TODAS las actividades
+      if (rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED') {
+        print('[ChatListView] ✅ Admin/Coordinador - Mostrando todas las actividades: ${todasActividades.length}');
+        
+        // Ordenar por fecha (más recientes primero)
+        todasActividades.sort((a, b) {
+          try {
+            final dateA = DateTime.parse(a.fini);
+            final dateB = DateTime.parse(b.fini);
+            return dateB.compareTo(dateA);
+          } catch (e) {
+            return 0;
+          }
+        });
+        
+        return todasActividades;
+      }
+      
+      // Profesores solo ven actividades donde son responsables o participantes
       final actividadesUsuario = todasActividades.where((actividad) {
         final esResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
         final esParticipante = actividad.profesoresParticipantesIds

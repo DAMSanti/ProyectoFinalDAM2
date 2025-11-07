@@ -721,6 +721,9 @@ class MenuDesktopStatic extends StatelessWidget {
     final currentUser = auth.currentUser;
     final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
                     currentUser?.rol.toLowerCase() == 'administrador';
+    final isAdminOrCoord = isAdmin || 
+                           currentUser?.rol.toLowerCase() == 'coordinador' ||
+                           currentUser?.rol.toLowerCase() == 'ed';
 
     return Container(
       decoration: BoxDecoration(
@@ -892,14 +895,17 @@ class MenuDesktopStatic extends StatelessWidget {
                   routeName: '/solicitar-actividad',
                   isCompact: isMobileLandscape,
                 ),
-                SizedBox(height: isMobileLandscape ? 4 : 8),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.bar_chart_rounded,
-                  text: 'Estadísticas',
-                  routeName: '/estadisticas',
-                  isCompact: isMobileLandscape,
-                ),
+                // Estadísticas solo para administradores y coordinadores
+                if (isAdminOrCoord) ...[
+                  SizedBox(height: isMobileLandscape ? 4 : 8),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.bar_chart_rounded,
+                    text: 'Estadísticas',
+                    routeName: '/estadisticas',
+                    isCompact: isMobileLandscape,
+                  ),
+                ],
                 // Menú de Gestión solo para administradores
                 if (isAdmin) ...[
                   SizedBox(height: isMobileLandscape ? 4 : 8),

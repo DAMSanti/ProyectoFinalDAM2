@@ -297,13 +297,20 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             ),
           ),
         ),
-        // Info card cuando hay selección - Diseño moderno
+        // Info card cuando hay selección - Diseño moderno con scroll
         if (_selectedLocalizacion != null)
           Positioned(
             bottom: 16,
             left: 16,
             right: 16,
-            child: _buildLocalizacionInfoCard(_selectedLocalizacion!),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.4, // Máximo 40% de la altura de pantalla
+              ),
+              child: SingleChildScrollView(
+                child: _buildLocalizacionInfoCard(_selectedLocalizacion!),
+              ),
+            ),
           ),
       ],
     );
@@ -411,9 +418,9 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header con nombre y botón cerrar
+                // Header compacto: Icono + Nombre + Botón cerrar (1 línea)
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Icono del tipo de localización
                     Container(
@@ -441,107 +448,21 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                       ),
                     ),
                     SizedBox(width: 12),
-                    // Nombre y badges
+                    // Nombre
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            localizacion.nombre,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Color(0xFF1976d2),
-                              height: 1.2,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 6),
-                          // Badges de tipo y principal
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 4,
-                            children: [
-                              // Badge del tipo
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      tipoColor.withValues(alpha: 0.2),
-                                      tipoColor.withValues(alpha: 0.1),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: tipoColor.withValues(alpha: 0.3),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      tipoIcono,
-                                      size: 14,
-                                      color: tipoColor,
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      tipoTexto,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: isDark ? tipoColor.withValues(alpha: 0.9) : tipoColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Badge de principal si aplica
-                              if (localizacion.esPrincipal)
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.red.withValues(alpha: 0.2),
-                                        Colors.red.withValues(alpha: 0.1),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.red.withValues(alpha: 0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.star_rounded,
-                                        size: 14,
-                                        color: Colors.red,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'PRINCIPAL',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDark ? Colors.red.withValues(alpha: 0.9) : Colors.red,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
+                      child: Text(
+                        localizacion.nombre,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Color(0xFF1976d2),
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    SizedBox(width: 8),
                     // Botón cerrar
                     Container(
                       decoration: BoxDecoration(
@@ -567,6 +488,92 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 8),
+                
+                // Badges de tipo y principal (2da línea, sin repetir icono ni X)
+                Padding(
+                  padding: EdgeInsets.only(left: 56), // Alineado con el texto del nombre
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      // Badge del tipo
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              tipoColor.withValues(alpha: 0.2),
+                              tipoColor.withValues(alpha: 0.1),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: tipoColor.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              tipoIcono,
+                              size: 12,
+                              color: tipoColor,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              tipoTexto,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? tipoColor.withValues(alpha: 0.9) : tipoColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Badge de principal si aplica
+                      if (localizacion.esPrincipal)
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.red.withValues(alpha: 0.2),
+                                Colors.red.withValues(alpha: 0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.red.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                size: 12,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'PRINCIPAL',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.red.withValues(alpha: 0.9) : Colors.red,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 12),
                 

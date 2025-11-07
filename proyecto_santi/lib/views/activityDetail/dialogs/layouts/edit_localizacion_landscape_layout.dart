@@ -38,52 +38,57 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Columna izquierda: Info + Checkbox + Tipo
-          Expanded(
-            flex: 2,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Info compacta
-                  _buildLocationInfo(),
-                  SizedBox(height: 10),
-                  
-                  // Checkbox compacto
-                  if (puedeSerPrincipal) _buildPrincipalCheckbox(),
-                  
-                  if (puedeSerPrincipal) SizedBox(height: 10),
-                  
-                  // Tipo compacto
-                  _buildTypeSelector(),
-                ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Columna izquierda: Info + Checkbox + Tipo
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Info compacta
+                    _buildLocationInfo(),
+                    SizedBox(height: 10),
+                    
+                    // Checkbox compacto
+                    if (puedeSerPrincipal) _buildPrincipalCheckbox(),
+                    
+                    if (puedeSerPrincipal) SizedBox(height: 10),
+                    
+                    // Tipo compacto
+                    _buildTypeSelector(),
+                  ],
+                ),
               ),
-            ),
+              
+              SizedBox(width: 12),
+              
+              // Columna derecha: Descripción + Iconos
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Descripción compacta
+                    _buildDescription(),
+                    SizedBox(height: 10),
+                    
+                    // Iconos compactos (altura fija)
+                    SizedBox(
+                      height: 200,
+                      child: _buildIconSelector(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          
-          SizedBox(width: 12),
-          
-          // Columna derecha: Descripción + Iconos
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Descripción compacta
-                _buildDescription(),
-                SizedBox(height: 10),
-                
-                // Iconos compactos
-                _buildIconSelector(),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -269,51 +274,51 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
           ),
         ),
         SizedBox(height: 6),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.7),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: GridView.builder(
+            padding: EdgeInsets.all(8),
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 6,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
             ),
-            child: GridView.builder(
-              padding: EdgeInsets.all(8),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
-              ),
-              itemCount: iconosDisponibles.length,
-              itemBuilder: (context, index) {
-                final icono = iconosDisponibles[index];
-                final isSelected = iconoSeleccionado == icono;
-                
-                return InkWell(
-                  onTap: () => onIconoSelected(icono),
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    decoration: BoxDecoration(
+            itemCount: iconosDisponibles.length,
+            itemBuilder: (context, index) {
+              final icono = iconosDisponibles[index];
+              final isSelected = iconoSeleccionado == icono;
+              
+              return InkWell(
+                onTap: () => onIconoSelected(icono),
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSelected 
+                      ? Color(0xFF1976d2).withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
                       color: isSelected 
-                        ? Color(0xFF1976d2).withValues(alpha: 0.2)
-                        : Colors.white.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: isSelected 
-                          ? Color(0xFF1976d2)
-                          : Colors.grey.withValues(alpha: 0.3),
-                        width: isSelected ? 2 : 1,
-                      ),
-                    ),
-                    child: Icon(
-                      icono,
-                      size: 20,
-                      color: isSelected 
-                        ? Color(0xFF1976d2) 
-                        : Colors.grey[600],
+                        ? Color(0xFF1976d2)
+                        : Colors.grey.withValues(alpha: 0.3),
+                      width: isSelected ? 2 : 1,
                     ),
                   ),
-                );
-              },
-            ),
+                  child: Icon(
+                    icono,
+                    size: 20,
+                    color: isSelected 
+                      ? Color(0xFF1976d2) 
+                      : Colors.grey[600],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
