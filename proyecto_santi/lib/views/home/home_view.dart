@@ -33,15 +33,26 @@ class HomeViewState extends State<HomeView> {
     _futureActivities = _loadAndFilterActivities();
   }
 
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Recargar actividades al hacer hot reload/restart
+    setState(() {
+      _futureActivities = _loadAndFilterActivities();
+    });
+  }
+
   Future<List<Actividad>> _loadAndFilterActivities() async {
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final rol = currentUser?.rol;
     final profesorUuid = currentUser?.uuid;
 
+    print('[HomeView] ========================================');
     print('[HomeView] Usuario actual: ${currentUser?.nombre}');
     print('[HomeView] Rol: $rol');
     print('[HomeView] ProfesorUuid: $profesorUuid');
+    print('[HomeView] ========================================');
 
     // Cargar todas las actividades
     final actividades = await _actividadService.fetchFutureActivities();
@@ -64,16 +75,20 @@ class HomeViewState extends State<HomeView> {
         // Es participante
         final esParticipante = actividad.profesoresParticipantesIds.contains(profesorUuid);
         
-        print('[HomeView] Actividad ${actividad.id} - ${actividad.titulo}');
-        print('[HomeView]   Responsable UUID: ${actividad.responsable?.uuid}');
-        print('[HomeView]   Es responsable: $esResponsable');
-        print('[HomeView]   Participantes: ${actividad.profesoresParticipantesIds}');
-        print('[HomeView]   Es participante: $esParticipante');
+        final cumpleFiltro = esResponsable || esParticipante;
         
-        return esResponsable || esParticipante;
+        // LOG TODAS LAS ACTIVIDADES PARA DEBUG
+        print('[HomeView] ${cumpleFiltro ? "✅" : "❌"} Actividad ${actividad.id} - ${actividad.titulo}');
+        print('[HomeView]    Responsable: ${actividad.responsable?.uuid}');
+        print('[HomeView]    Participantes (${actividad.profesoresParticipantesIds.length}): ${actividad.profesoresParticipantesIds}');
+        print('[HomeView]    Cumple filtro: $cumpleFiltro (responsable: $esResponsable, participante: $esParticipante)');
+        
+        return cumpleFiltro;
       }).toList();
       
+      print('[HomeView] ========================================');
       print('[HomeView] Actividades filtradas: ${actividadesFiltradas.length}');
+      print('[HomeView] ========================================');
       return actividadesFiltradas;
     } else {
       // Otros roles no ven actividades

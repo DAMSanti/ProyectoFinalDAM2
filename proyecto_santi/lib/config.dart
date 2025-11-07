@@ -128,6 +128,7 @@ class SecureStorageConfig {
       DateTime? tokenExpiry,
       String? rol,
       String? nombre,
+      String? profesorUuid,
     }
   ) async {
     await _secureStorage.write(key: _keyUserEmail, value: email);
@@ -147,6 +148,10 @@ class SecureStorageConfig {
     if (nombre != null) {
       await _secureStorage.write(key: _keyUserNombre, value: nombre);
     }
+    // ✅ FIX HOT RESTART: Guardar profesorUuid
+    if (profesorUuid != null) {
+      await _secureStorage.write(key: 'profesorUuid', value: profesorUuid);
+    }
   }
 
   /// Recupera las credenciales del usuario
@@ -158,6 +163,7 @@ class SecureStorageConfig {
       'tokenExpiry': await _secureStorage.read(key: _keyTokenExpiry), // ✅ NUEVO
       'rol': await _secureStorage.read(key: _keyUserRol), // ✅ NUEVO
       'nombre': await _secureStorage.read(key: _keyUserNombre), // ✅ NUEVO
+      'profesorUuid': await _secureStorage.read(key: 'profesorUuid'), // ✅ FIX HOT RESTART
     };
   }
   

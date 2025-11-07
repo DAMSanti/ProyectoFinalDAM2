@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/config.dart';
 import 'package:proyecto_santi/services/services.dart';
@@ -44,7 +45,10 @@ class Auth extends ChangeNotifier {
         final userRol = usuario?['rol']?.toString() ?? 'Usuario';
         final userNombre = usuario?['nombreUsuario']?.toString() ?? 'Usuario';
         
-        // Guardamos el token, email, rol, nombre y expiración en almacenamiento seguro
+        // Obtener el profesorUuid del usuario PRIMERO
+        final profesorUuid = usuario?['profesorUuid']?.toString();
+        
+        // Guardamos el token, email, rol, nombre, profesorUuid y expiración en almacenamiento seguro
         await SecureStorageConfig.storeUserCredentials(
           email,
           usuario?['id']?.toString() ?? '',
@@ -52,10 +56,8 @@ class Auth extends ChangeNotifier {
           tokenExpiry: tokenExpiry,
           rol: userRol,
           nombre: userNombre,
+          profesorUuid: profesorUuid, // ✅ FIX HOT RESTART: Guardar profesorUuid
         );
-        
-        // Obtener el profesorUuid del usuario
-        final profesorUuid = usuario?['profesorUuid']?.toString();
         
         print('[Auth] Usuario ID: ${usuario?['id']}');
         print('[Auth] Profesor UUID: $profesorUuid');
@@ -135,6 +137,7 @@ class Auth extends ChangeNotifier {
       final credentials = await SecureStorageConfig.getUserCredentials();
       final email = credentials['email'];
       final userId = credentials['uuid'];
+      final profesorUuid = credentials['profesorUuid']; // ✅ FIX HOT RESTART: Leer profesorUuid guardado
       final savedToken = credentials['jwtToken'];
       
       // Verificar si tenemos token guardado
@@ -145,6 +148,7 @@ class Auth extends ChangeNotifier {
         if (!isExpired) {
           // ✅ Token válido - Restaurar sesión automáticamente
           print('[Auth] 🔄 Restaurando sesión desde token guardado...');
+          print('[Auth] 🔑 Profesor UUID restaurado: $profesorUuid');
           
           _jwtToken = savedToken;
           _apiService.setToken(savedToken);
@@ -160,8 +164,9 @@ class Auth extends ChangeNotifier {
             _currentUser = profesor;
             _isAuthenticated = true;
             
-            // Reconfigurar notificaciones
-            await NotificationService().sendTokenToBackend(userId ?? '');
+            // Reconfigurar notificaciones - usar profesorUuid si está disponible
+            final notificationId = profesorUuid ?? userId ?? '';
+            await NotificationService().sendTokenToBackend(notificationId);
             await NotificationService().subscribeToTopic('all_users');
             if (profesor.rol == 'Profesor' || profesor.rol == 'Coordinador') {
               await NotificationService().subscribeToTopic('profesores');
@@ -175,15 +180,52 @@ class Auth extends ChangeNotifier {
             final savedRol = credentials['rol'] ?? 'Usuario';
             final savedNombre = credentials['nombre'] ?? email ?? 'Usuario';
             
-            // Crear usuario temporal con datos guardados
+            // Si no tenemos profesorUuid guardado, intentar obtenerlo del endpoint de usuarios
+            String? finalProfesorUuid = profesorUuid;
+            if (finalProfesorUuid == null && savedRol == 'Profesor') {
+              try {
+                print('[Auth] 🔍 Intentando obtener profesorUuid del backend...');
+                final response = await _apiService.dio.get('/Usuarios');
+                if (response.statusCode == 200) {
+                  final usuarios = response.data as List;
+                  final usuario = usuarios.firstWhere(
+                    (u) => u['email']?.toString().toLowerCase() == email?.toLowerCase(),
+                    orElse: () => null,
+                  );
+                  if (usuario != null) {
+                    finalProfesorUuid = usuario['profesorUuid']?.toString();
+                    print('[Auth] ✅ ProfesorUuid obtenido del backend: $finalProfesorUuid');
+                    
+                    // Guardarlo para la próxima vez
+                    if (finalProfesorUuid != null) {
+                      await SecureStorageConfig.storeUserCredentials(
+                        email ?? '',
+                        userId ?? '',
+                        jwtToken: savedToken,
+                        tokenExpiry: credentials['tokenExpiry'] != null 
+                          ? DateTime.parse(credentials['tokenExpiry']!) 
+                          : null,
+                        rol: savedRol,
+                        nombre: savedNombre,
+                        profesorUuid: finalProfesorUuid,
+                      );
+                    }
+                  }
+                }
+              } catch (backendError) {
+                print('[Auth] ⚠️ No se pudo obtener profesorUuid del backend: $backendError');
+              }
+            }
+            
+            // Crear usuario temporal con datos guardados - USAR PROFESORUUID
             _currentUser = Profesor(
-              uuid: userId ?? '',
+              uuid: finalProfesorUuid ?? userId ?? '', // ✅ FIX HOT RESTART: Priorizar profesorUuid sobre userId
               dni: '',
               nombre: savedNombre,
               apellidos: '',
               correo: email ?? '',
               password: '',
-              rol: savedRol, // ✅ AQUÍ ESTABA EL BUG - ahora usa el rol guardado
+              rol: savedRol,
               activo: 1,
               urlFoto: null,
               esJefeDep: 0,

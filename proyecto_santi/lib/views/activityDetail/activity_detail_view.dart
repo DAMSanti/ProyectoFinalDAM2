@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/models/profesor.dart';
@@ -85,6 +87,10 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       localizacionService: _localizacionService,
       gastoService: GastoPersonalizadoService(_apiService),
     );
+    
+    // Calcular permisos de edición
+    _calculatePermissions();
+    
     _loadActivityDetails();
     _futurePhotos = _photoService.fetchPhotosByActivityId(widget.actividad.id);
     _futurePhotos.then((photos) {
@@ -92,6 +98,30 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         imagesActividad = photos;
       });
     });
+  }
+  
+  void _calculatePermissions() {
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUser = auth.currentUser;
+    final rol = currentUser?.rol;
+    final profesorUuid = currentUser?.uuid;
+    
+    // Es admin o coordinador
+    final esAdmin = rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED';
+    
+    // Es el responsable de la actividad
+    final esResponsable = widget.actividad.responsable?.uuid == profesorUuid;
+    
+    setState(() {
+      isAdminOrSolicitante = esAdmin || esResponsable;
+    });
+    
+    print('[ActivityDetail] Usuario: ${currentUser?.nombre}');
+    print('[ActivityDetail] Rol: $rol');
+    print('[ActivityDetail] UUID: $profesorUuid');
+    print('[ActivityDetail] Es Admin/Coordinador: $esAdmin');
+    print('[ActivityDetail] Es Responsable: $esResponsable');
+    print('[ActivityDetail] Puede Editar: $isAdminOrSolicitante');
   }
   
   Future<void> _loadActivityDetails() async {

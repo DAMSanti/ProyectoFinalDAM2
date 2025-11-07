@@ -37,8 +37,52 @@ class ChatListViewState extends State<ChatListView> {
     super.initState();
     _apiService = ApiService();
     _actividadService = ActividadService(_apiService);
-    _futureActivities = _actividadService.fetchFutureActivities();
+    _futureActivities = _loadUserActivities(); // ✅ Cargar solo actividades del usuario
     _loadActivities();
+  }
+
+  /// ✅ NUEVO: Cargar solo actividades donde el usuario es participante o responsable
+  Future<List<Actividad>> _loadUserActivities() async {
+    try {
+      final auth = Provider.of<Auth>(context, listen: false);
+      final currentUserUuid = auth.currentUser?.uuid;
+      
+      if (currentUserUuid == null) {
+        print('[ChatListView] ⚠️ No hay usuario autenticado');
+        return [];
+      }
+      
+      print('[ChatListView] 🔍 Cargando actividades para usuario: $currentUserUuid');
+      
+      // Cargar TODAS las actividades (no solo futuras)
+      final todasActividades = await _actividadService.fetchActivities(pageSize: 100);
+      
+      // Filtrar solo las actividades donde el usuario es responsable o participante
+      final actividadesUsuario = todasActividades.where((actividad) {
+        final esResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
+        final esParticipante = actividad.profesoresParticipantesIds
+            .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
+        
+        return esResponsable || esParticipante;
+      }).toList();
+      
+      // Ordenar por fecha (más recientes primero)
+      actividadesUsuario.sort((a, b) {
+        try {
+          final dateA = DateTime.parse(a.fini);
+          final dateB = DateTime.parse(b.fini);
+          return dateB.compareTo(dateA);
+        } catch (e) {
+          return 0;
+        }
+      });
+      
+      print('[ChatListView] ✅ Actividades del usuario: ${actividadesUsuario.length}');
+      return actividadesUsuario;
+    } catch (e) {
+      print('[ChatListView] ❌ Error cargando actividades: $e');
+      return [];
+    }
   }
 
   @override
@@ -315,7 +359,7 @@ class ChatListViewState extends State<ChatListView> {
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              _futureActivities = _actividadService.fetchFutureActivities();
+              _futureActivities = _loadUserActivities(); // ✅ Recargar actividades del usuario
             });
             await _loadActivities();
           },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
+import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/shared/helpers/activity_formatters.dart';
@@ -58,84 +60,9 @@ class AllActividadesState extends State<AllActividades> {
     List<Actividad> filtered = [];
     
     for (var actividad in _allActividades) {
-      // Filtro por texto de búsqueda
+      // ✅ SOLO Filtro por texto de búsqueda - NO aplicar filtros de fecha, estado, curso o profesor
       final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
       if (!matchesSearch) continue;
-      
-      // Filtro por fecha (si está seleccionada)
-      bool matchesDate = true;
-      if (widget.selectedDate != null) {
-        try {
-          final actividadFecha = DateTime.parse(actividad.fini);
-          matchesDate = actividadFecha.year == widget.selectedDate!.year &&
-                       actividadFecha.month == widget.selectedDate!.month &&
-                       actividadFecha.day == widget.selectedDate!.day;
-        } catch (e) {
-          matchesDate = false;
-        }
-      }
-      if (!matchesDate) continue;
-      
-      // Filtro por estado (si está seleccionado)
-      bool matchesState = true;
-      if (widget.selectedState != null && widget.selectedState!.isNotEmpty) {
-        matchesState = actividad.estado.toLowerCase() == widget.selectedState!.toLowerCase();
-      }
-      if (!matchesState) continue;
-      
-      // Filtro por curso (si está seleccionado)
-      // Buscar si algún grupo participante pertenece al curso seleccionado
-      bool matchesCourse = true;
-      if (widget.selectedCourse != null && widget.selectedCourse!.isNotEmpty) {
-        try {
-          final gruposParticipantes = await _catalogoService.fetchGruposParticipantes(actividad.id);
-          // Verificar si algún grupo tiene el curso seleccionado
-          matchesCourse = gruposParticipantes.any((grupo) {
-            final cursoNombre = grupo['cursoNombre']?.toString() ?? '';
-            // Comparar el nombre del curso (ej: "1º ESO" == "1º ESO")
-            return cursoNombre.trim().toLowerCase() == widget.selectedCourse!.trim().toLowerCase();
-          });
-        } catch (e) {
-          print('[ERROR] Error obteniendo grupos para actividad ${actividad.id}: $e');
-          matchesCourse = false;
-        }
-      }
-      if (!matchesCourse) continue;
-      
-      // Filtro por profesor (si está seleccionado)
-      // Buscar si el profesor es solicitante, responsable o participante
-      bool matchesProfesor = true;
-      if (widget.selectedProfesorId != null && widget.selectedProfesorId!.isNotEmpty) {
-        try {
-          // Normalizar el UUID seleccionado a lowercase
-          final selectedId = widget.selectedProfesorId!.toLowerCase();
-          
-          print('[FILTRO DEBUG] Buscando profesor ID: $selectedId en actividad ${actividad.id} "${actividad.titulo}"');
-          
-          // Verificar si es el solicitante
-          bool isSolicitante = actividad.solicitante?.uuid.toLowerCase() == selectedId;
-          print('[FILTRO DEBUG]   Solicitante: ${actividad.solicitante?.uuid.toLowerCase()} == $selectedId ? $isSolicitante');
-          
-          // Verificar si es el responsable
-          bool isResponsable = actividad.responsable?.uuid.toLowerCase() == selectedId;
-          print('[FILTRO DEBUG]   Responsable: ${actividad.responsable?.uuid.toLowerCase()} == $selectedId ? $isResponsable');
-          
-          // Verificar si es participante
-          bool isParticipante = false;
-          final profesoresIds = await _profesorService.fetchProfesoresParticipantes(actividad.id);
-          print('[FILTRO DEBUG]   Participantes IDs (${profesoresIds.length}): ${profesoresIds.map((id) => id.toLowerCase()).join(", ")}');
-          isParticipante = profesoresIds.any((id) => id.toLowerCase() == selectedId);
-          print('[FILTRO DEBUG]   Es participante? $isParticipante');
-          
-          matchesProfesor = isSolicitante || isResponsable || isParticipante;
-          
-          print('[FILTRO DEBUG]   RESULTADO: ${matchesProfesor ? "✓ COINCIDE" : "✗ NO COINCIDE"}');
-        } catch (e) {
-          print('[ERROR] Error obteniendo profesores para actividad ${actividad.id}: $e');
-          matchesProfesor = false;
-        }
-      }
-      if (!matchesProfesor) continue;
       
       filtered.add(actividad);
     }
@@ -237,6 +164,23 @@ class OtrasActividadesState extends State<OtrasActividades> {
   }
 
   Future<void> _filterActivities() async {
+    // Obtener el UUID del usuario actual desde Auth
+    final auth = Provider.of<Auth>(context, listen: false);
+    final currentUserUuid = auth.currentUser?.uuid;
+    
+    if (currentUserUuid == null) {
+      print('[OtrasActividades] ⚠️ No hay usuario autenticado');
+      setState(() {
+        _filteredOtrasActividades = [];
+      });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        widget.onCountChanged?.call(0);
+      });
+      return;
+    }
+    
+    print('[OtrasActividades] 🔍 Filtrando actividades para usuario: $currentUserUuid');
+    
     List<Actividad> filtered = [];
     
     for (var actividad in _otrasActividades) {
@@ -244,19 +188,7 @@ class OtrasActividadesState extends State<OtrasActividades> {
       final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
       if (!matchesSearch) continue;
       
-      // Filtro por fecha (si está seleccionada)
-      bool matchesDate = true;
-      if (widget.selectedDate != null) {
-        try {
-          final actividadFecha = DateTime.parse(actividad.fini);
-          matchesDate = actividadFecha.year == widget.selectedDate!.year &&
-                       actividadFecha.month == widget.selectedDate!.month &&
-                       actividadFecha.day == widget.selectedDate!.day;
-        } catch (e) {
-          matchesDate = false;
-        }
-      }
-      if (!matchesDate) continue;
+      // ✅ SIN FILTRO POR FECHA - Mostrar TODAS las actividades del usuario (pasadas y futuras)
       
       // Filtro por estado (si está seleccionado)
       bool matchesState = true;
@@ -281,50 +213,42 @@ class OtrasActividadesState extends State<OtrasActividades> {
       }
       if (!matchesCourse) continue;
       
-      // Filtro por profesor (si está seleccionado)
-      bool matchesProfesor = true;
-      if (widget.selectedProfesorId != null && widget.selectedProfesorId!.isNotEmpty) {
-        try {
-          // Normalizar el UUID seleccionado a lowercase
-          final selectedId = widget.selectedProfesorId!.toLowerCase();
-          
-          print('[FILTRO DEBUG OTRAS] Buscando profesor ID: $selectedId en actividad ${actividad.id} "${actividad.titulo}"');
-          
-          bool isSolicitante = actividad.solicitante?.uuid.toLowerCase() == selectedId;
-          print('[FILTRO DEBUG OTRAS]   Solicitante: ${actividad.solicitante?.uuid.toLowerCase()} == $selectedId ? $isSolicitante');
-          
-          bool isResponsable = actividad.responsable?.uuid.toLowerCase() == selectedId;
-          print('[FILTRO DEBUG OTRAS]   Responsable: ${actividad.responsable?.uuid.toLowerCase()} == $selectedId ? $isResponsable');
-          
-          bool isParticipante = false;
-          final profesoresIds = await _profesorService.fetchProfesoresParticipantes(actividad.id);
-          print('[FILTRO DEBUG OTRAS]   Participantes IDs (${profesoresIds.length}): ${profesoresIds.map((id) => id.toLowerCase()).join(", ")}');
-          isParticipante = profesoresIds.any((id) => id.toLowerCase() == selectedId);
-          print('[FILTRO DEBUG OTRAS]   Es participante? $isParticipante');
-          
-          matchesProfesor = isSolicitante || isResponsable || isParticipante;
-          
-          print('[FILTRO DEBUG OTRAS]   RESULTADO: ${matchesProfesor ? "✓ COINCIDE" : "✗ NO COINCIDE"}');
-        } catch (e) {
-          print('[ERROR] Error obteniendo profesores para actividad ${actividad.id}: $e');
-          matchesProfesor = false;
-        }
+      // ✅ FILTRO OBLIGATORIO: Solo actividades donde el usuario es responsable o participante
+      bool isUserActivity = false;
+      try {
+        // Verificar si es el responsable
+        bool isResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
+        
+        // Verificar si es participante
+        bool isParticipante = actividad.profesoresParticipantesIds
+            .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
+        
+        isUserActivity = isResponsable || isParticipante;
+        
+        print('[OtrasActividades] Actividad ${actividad.id} "${actividad.titulo}": '
+            'Responsable=$isResponsable, Participante=$isParticipante → ${isUserActivity ? "✅ INCLUIR" : "❌ EXCLUIR"}');
+      } catch (e) {
+        print('[ERROR] Error verificando participación en actividad ${actividad.id}: $e');
+        isUserActivity = false;
       }
-      if (!matchesProfesor) continue;
+      
+      if (!isUserActivity) continue;
       
       filtered.add(actividad);
     }
     
-    // Ordenar por fecha (más próximas primero)
+    // Ordenar por fecha (más recientes primero, incluyendo pasadas)
     filtered.sort((a, b) {
       try {
         final dateA = DateTime.parse(a.fini);
         final dateB = DateTime.parse(b.fini);
-        return dateA.compareTo(dateB);
+        return dateB.compareTo(dateA); // Orden descendente (más recientes primero)
       } catch (e) {
         return 0; // Si hay error en el parsing, mantener orden original
       }
     });
+    
+    print('[OtrasActividades] ✅ Total actividades del usuario: ${filtered.length}');
     
     setState(() {
       _filteredOtrasActividades = filtered;

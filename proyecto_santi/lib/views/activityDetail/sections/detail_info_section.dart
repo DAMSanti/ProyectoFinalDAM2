@@ -339,41 +339,50 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 },
               ),
               SizedBox(height: 16),
-              // Secci�n de im�genes (refactorizada)
-              ActivityImagesSection(
-                imagesActividad: widget.imagesActividad,
-                selectedImages: widget.selectedImages,
-                selectedImagesDescriptions: widget.selectedImagesDescriptions,
-                isAdminOrSolicitante: widget.isAdminOrSolicitante,
-                showImagePicker: widget.showImagePicker,
-                removeSelectedImage: widget.removeSelectedImage,
-                removeApiImage: widget.removeApiImage,
-                removeApiImageConfirmed: widget.removeApiImageConfirmed,
-                editLocalImage: widget.editLocalImage,
-                onDataChanged: widget.onActivityDataChanged,
-              ),
+              // Sección de imágenes (refactorizada) - Solo admin/responsable
+              if (widget.isAdminOrSolicitante)
+                ActivityImagesSection(
+                  imagesActividad: widget.imagesActividad,
+                  selectedImages: widget.selectedImages,
+                  selectedImagesDescriptions: widget.selectedImagesDescriptions,
+                  isAdminOrSolicitante: widget.isAdminOrSolicitante,
+                  showImagePicker: widget.showImagePicker,
+                  removeSelectedImage: widget.removeSelectedImage,
+                  removeApiImage: widget.removeApiImage,
+                  removeApiImageConfirmed: widget.removeApiImageConfirmed,
+                  editLocalImage: widget.editLocalImage,
+                  onDataChanged: widget.onActivityDataChanged,
+                ),
+              if (widget.isAdminOrSolicitante)
+                SizedBox(height: 16),
+              // Sección de participantes (refactorizada) - Solo admin/responsable
+              if (widget.isAdminOrSolicitante)
+                ActivityParticipantsSection(
+                  profesoresParticipantes: _profesoresParticipantes,
+                  gruposParticipantes: _gruposParticipantes,
+                  isAdminOrSolicitante: widget.isAdminOrSolicitante,
+                  profesorService: _profesorService,
+                  catalogoService: _catalogoService,
+                  onDataChanged: (data) {
+                    setState(() {
+                      if (data.containsKey('profesoresParticipantes')) {
+                        _profesoresParticipantes = data['profesoresParticipantes'];
+                      }
+                      if (data.containsKey('gruposParticipantes')) {
+                        _gruposParticipantes = data['gruposParticipantes'];
+                      }
+                    });
+                    _notifyChanges();
+                  },
+                ),
+              if (widget.isAdminOrSolicitante)
+                SizedBox(height: 16),
+              // Presupuesto - Solo admin/responsable
+              if (widget.isAdminOrSolicitante)
+                _buildPresupuesto(context, constraints),
               SizedBox(height: 16),
-              // Secci�n de participantes (refactorizada)
-              ActivityParticipantsSection(
-                profesoresParticipantes: _profesoresParticipantes,
-                gruposParticipantes: _gruposParticipantes,
-                isAdminOrSolicitante: widget.isAdminOrSolicitante,
-                profesorService: _profesorService,
-                catalogoService: _catalogoService,
-                onDataChanged: (data) {
-                  setState(() {
-                    if (data.containsKey('profesoresParticipantes')) {
-                      _profesoresParticipantes = data['profesoresParticipantes'];
-                    }
-                    if (data.containsKey('gruposParticipantes')) {
-                      _gruposParticipantes = data['gruposParticipantes'];
-                    }
-                  });
-                  _notifyChanges();
-                },
-              ),
-              SizedBox(height: 16),
-              _buildPresupuestoYLocalizacion(context, constraints),
+              // Localizaciones - Visible para todos
+              _buildLocalizaciones(context, constraints),
               SizedBox(height: 16),
               _buildComentarios(context, constraints)
             ],
@@ -397,6 +406,41 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
             }
           },
         );
+      },
+    );
+  }
+
+  Widget _buildPresupuesto(BuildContext context, BoxConstraints constraints) {
+    return ActivityBudgetSection(
+      key: ValueKey('budget_${widget.reloadTrigger}'),
+      actividad: widget.actividad,
+      isAdminOrSolicitante: widget.isAdminOrSolicitante,
+      totalAlumnosParticipantes: _totalAlumnosParticipantes,
+      actividadService: _actividadService,
+      onBudgetChanged: (budgetData) {
+        setState(() {});
+        if (widget.onActivityDataChanged != null) {
+          widget.onActivityDataChanged!({
+            'budgetChanged': true,
+            ...budgetData,
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildLocalizaciones(BuildContext context, BoxConstraints constraints) {
+    return ActivityLocationsSection(
+      actividadId: widget.actividad.id,
+      isAdminOrSolicitante: widget.isAdminOrSolicitante,
+      localizacionService: _localizacionService,
+      onDataChanged: (data) {
+        if (data.containsKey('localizaciones')) {
+          setState(() {
+            _localizaciones = data['localizaciones'];
+          });
+        }
+        _notifyChanges();
       },
     );
   }
