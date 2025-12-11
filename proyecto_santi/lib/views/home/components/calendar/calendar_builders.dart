@@ -29,14 +29,23 @@ class CalendarBuilders {
                     date.day == today.day;
     
     // Verificar si el día tiene actividades (excluyendo festivos)
-    final hasActivities = details.appointments.isNotEmpty && 
-        details.appointments.any((app) {
+    bool hasActivities = false;
+    try {
+      if (details.appointments.isNotEmpty) {
+        for (final app in details.appointments) {
           if (app is Appointment) {
-            return app.id is int || 
-                (app.id is String && !app.id.toString().startsWith('holiday_'));
+            final appId = app.id;
+            if (appId is int || (appId is String && !appId.startsWith('holiday_'))) {
+              hasActivities = true;
+              break;
+            }
           }
-          return false;
-        });
+        }
+      }
+    } catch (e) {
+      // En caso de error, asumir que no hay actividades
+      hasActivities = false;
+    }
 
     return Container(
       decoration: BoxDecoration(
