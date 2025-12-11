@@ -159,16 +159,25 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenSize = MediaQuery.of(context).size;
     
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Usar el tamaño de pantalla si constraints es infinito
+        final effectiveWidth = constraints.maxWidth.isFinite 
+            ? constraints.maxWidth 
+            : screenSize.width;
+        final effectiveHeight = constraints.maxHeight.isFinite 
+            ? constraints.maxHeight 
+            : screenSize.height;
+            
         // Detectar si es una pantalla móvil (ancho < 600px)
-        final isMobileScreen = constraints.maxWidth < 600;
+        final isMobileScreen = effectiveWidth < 600;
         // Detectar orientación
         final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
         final isMobileLandscape = isMobileScreen && isLandscape;
         // Para pantallas grandes, cambiar a layout vertical si el ancho es menor a 1200px
-        final isNarrowScreen = constraints.maxWidth < 1200 && !isMobileScreen;
+        final isNarrowScreen = effectiveWidth < 1200 && !isMobileScreen;
         
         // En móvil landscape, usar botones verticales a la izquierda
         if (isMobileLandscape) {
