@@ -250,6 +250,22 @@ class CatalogoService {
   Future<Grupo> createGrupo(Map<String, dynamic> data) async {
     try {
       print('[CatalogoService] Creating grupo');
+      print('[CatalogoService] Data: $data');
+      
+      final response = await _apiService.postData('/Grupo', data);
+      
+      print('[CatalogoService] Response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Grupo.fromJson(response.data);
+      }
+      throw ApiException('Error al crear grupo', statusCode: response.statusCode);
+    } catch (e) {
+      print('[CatalogoService ERROR] createGrupo: $e');
+      rethrow;
+    }
+  }
+
   /// Actualiza un grupo existente
   Future<Grupo> updateGrupo(int id, Map<String, dynamic> data) async {
     try {
@@ -282,22 +298,6 @@ class CatalogoService {
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
       print('[CatalogoService ERROR] deleteGrupo: $e');
-      rethrow;
-    }
-  }
-}     print('[CatalogoService] Updating grupo $id');
-      print('[CatalogoService] Data: $data');
-      
-      final response = await _apiService.putData('/Grupo/$id', data);
-      
-      print('[CatalogoService] Response status: ${response.statusCode}');
-      
-      if (response.statusCode == 200) {
-        return Grupo.fromJson(response.data);
-      }
-      throw ApiException('Error al actualizar grupo', statusCode: response.statusCode);
-    } catch (e) {
-      print('[CatalogoService ERROR] updateGrupo: $e');
       rethrow;
     }
   }

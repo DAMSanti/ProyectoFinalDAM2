@@ -20,6 +20,7 @@ class DepartamentosCrudView extends StatefulWidget {
 
 class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
   final ApiService _apiService = ApiService();
+  late final CatalogoService _catalogoService;
   List<Departamento> _departamentos = [];
   List<Departamento> _filteredDepartamentos = [];
   bool _isLoading = true;
@@ -30,6 +31,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
   @override
   void initState() {
     super.initState();
+    _catalogoService = CatalogoService(_apiService);
     _loadDepartamentos();
   }
 
