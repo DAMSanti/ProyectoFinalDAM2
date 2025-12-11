@@ -59895,8 +59895,8 @@ cMN(a,b){return a.b<=b.b?b:a},
 czy(a,b,c,d,e){return $.aaO().PA(null,d,c,b,!0,!1,B.bsc,!1)},
 cg1(a,b,c,d,e,f){if(b==null)b=A.lf(B.H,10)
 return $.aaO().SC(c,e,b,f,a,d)},
-Cr(){return"http://64.226.85.100/api"},
-cap(){return"http://64.226.85.100/uploads"},
+Cr(){return"/api"},
+cap(){return"/uploads"},
 uT(a,b,c,d,e,f,g){var s=0,r=A.u(t.H)
 var $async$uT=A.o(function(h,i){if(h===1)return A.q(i,r)
 while(true)switch(s){case 0:s=2

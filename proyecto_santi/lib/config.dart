@@ -1,18 +1,24 @@
 ﻿import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
 import 'dart:io' show Platform;
 
 /// Configuración de la aplicación
 class AppConfig {
   // 🌐 SERVIDOR DE PRODUCCIÓN - Cambia esto a true para usar el servidor remoto
   static const bool useProductionServer = true;
-  static const String productionUrl = 'http://64.226.85.100';
+  static const String productionUrl = 'https://acex.damsanti.app';
+  static const String productionUrlFallback = 'http://64.226.85.100';
   static const String localUrl = 'http://localhost:5000';
   static const String localAndroidUrl = 'http://192.168.1.42:5000';
   
   // URL base de la API (ACEXAPI C# .NET)
   // IMPORTANTE: Para Android físico en local, usar la IP local de tu PC en la misma red WiFi
   static String get apiBaseUrl {
+    // En modo release web, usa ruta relativa (mismo dominio con proxy nginx)
+    if (kIsWeb && kReleaseMode) {
+      return '/api';
+    }
+    
     // Si está en modo producción, usa el servidor remoto
     if (useProductionServer) {
       return '$productionUrl/api';
@@ -40,6 +46,11 @@ class AppConfig {
   
   // URL de imágenes
   static String get imagenesBaseUrl {
+    // En modo release web, usa ruta relativa (mismo dominio)
+    if (kIsWeb && kReleaseMode) {
+      return '/uploads';
+    }
+    
     // Si está en modo producción, usa el servidor remoto
     if (useProductionServer) {
       return '$productionUrl/uploads';
