@@ -124,25 +124,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFlutterApp", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "*" };
-        
-        if (builder.Environment.IsDevelopment() || 
-            builder.Environment.EnvironmentName == "Trabajo" || 
-            builder.Environment.EnvironmentName == "Casa")
-        {
-            // En desarrollo, trabajo y casa, permitir cualquier origen para facilitar testing
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
-        }
-        else
-        {
-            // En producción real, usar orígenes específicos
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
+        // Permitir cualquier origen para facilitar desarrollo con Flutter
+        // En producción real se debería restringir a los dominios específicos
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
