@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import '../sections/detail_info_section.dart';
 import '../utils/detail_bar.dart';
-
 class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   final Actividad actividad;
   final bool isDarkTheme;
@@ -23,7 +22,6 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
   final VoidCallback? _revertChanges;
   final Function(Map<String, dynamic>)? onActivityDataChanged;
   final int reloadTrigger;
-
   const ActivityDetailLargeLandscapeLayout({
     super.key,
     required this.actividad,
@@ -50,7 +48,6 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
         _editLocalImage = editLocalImage,
         _saveChanges = saveChanges,
         _revertChanges = revertChanges;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -58,7 +55,7 @@ class ActivityDetailLargeLandscapeLayout extends StatelessWidget {
         return Stack(
           children: [
             SingleChildScrollView(
-              padding: EdgeInsets.only(top: 40.0), // Adjust the top padding to make space for the DetailBar
+              padding: EdgeInsets.only(top: 40.0), 
               child: ActivityDetailInfo(
                 actividad: actividad,
                 isAdminOrSolicitante: isAdminOrSolicitante,

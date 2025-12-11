@@ -1,22 +1,19 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
-
 class DetailBar extends StatelessWidget {
   final bool isDataChanged;
   final VoidCallback onSaveChanges;
   final VoidCallback? onRevertChanges;
-
   DetailBar({
     required this.isDataChanged,
     required this.onSaveChanges,
     this.onRevertChanges,
   });
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0), // Adjust the padding as needed
+      padding: const EdgeInsets.all(8.0), 
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -28,7 +25,6 @@ class DetailBar extends StatelessWidget {
           ),
           Row(
             children: [
-              // Botón Revertir (solo visible cuando hay cambios)
               if (isDataChanged && onRevertChanges != null) ...[
                 OutlinedButton.icon(
                   onPressed: onRevertChanges,
@@ -44,7 +40,6 @@ class DetailBar extends StatelessWidget {
                 ),
                 SizedBox(width: 8),
               ],
-              // Botón Guardar
               ElevatedButton(
                 onPressed: isDataChanged ? onSaveChanges : null,
                 style: ElevatedButton.styleFrom(

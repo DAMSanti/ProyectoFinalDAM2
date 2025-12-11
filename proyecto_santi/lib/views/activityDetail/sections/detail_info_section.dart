@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:flutter/gestures.dart';
@@ -33,7 +33,6 @@ import 'header_section.dart';
 import 'images_section.dart';
 import 'participants_section.dart';
 import 'locations_section.dart';
-
 class ActivityDetailInfo extends StatefulWidget {
   final Actividad actividad;
   final bool isAdminOrSolicitante;
@@ -42,12 +41,11 @@ class ActivityDetailInfo extends StatefulWidget {
   final Map<String, String> selectedImagesDescriptions;
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
-  final Function(int)? removeApiImage; // Nueva funci?n para eliminar fotos de la API
-  final Function(int)? removeApiImageConfirmed; // Para eliminaci�n ya confirmada
-  final Function(int)? editLocalImage; // Nueva funci?n para editar im?genes locales
-  final Function(Map<String, dynamic>)? onActivityDataChanged; // Callback para notificar cambios
-  final int reloadTrigger; // N?mero que cambia cuando se debe recargar
-
+  final Function(int)? removeApiImage; 
+  final Function(int)? removeApiImageConfirmed; 
+  final Function(int)? editLocalImage; 
+  final Function(Map<String, dynamic>)? onActivityDataChanged; 
+  final int reloadTrigger; 
   const ActivityDetailInfo({
     super.key,
     required this.actividad,
@@ -57,17 +55,15 @@ class ActivityDetailInfo extends StatefulWidget {
     required this.selectedImagesDescriptions,
     required this.showImagePicker,
     required this.removeSelectedImage,
-    this.removeApiImage, // Opcional
-    this.removeApiImageConfirmed, // Opcional
-    this.editLocalImage, // Opcional
-    this.onActivityDataChanged, // Opcional
-    this.reloadTrigger = 0, // Por defecto 0
+    this.removeApiImage, 
+    this.removeApiImageConfirmed, 
+    this.editLocalImage, 
+    this.onActivityDataChanged, 
+    this.reloadTrigger = 0, 
   });
-
   @override
   State<ActivityDetailInfo> createState() => _ActivityDetailInfoState();
 }
-
 class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   late final ApiService _apiService;
   late final ProfesorService _profesorService;
@@ -80,23 +76,19 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
   List<Profesor> _profesoresParticipantesOriginales = [];
   List<GrupoParticipante> _gruposParticipantesOriginales = [];
   List<Localizacion> _localizaciones = [];
-  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de iconos por ID de localizaci?n
-  Map<int, String> _photoDescriptionChanges = {}; // Mapa: photoId -> nueva descripci?n
+  Map<int, IconData> _iconosLocalizaciones = {}; 
+  Map<int, String> _photoDescriptionChanges = {}; 
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
   bool _loadingLocalizaciones = false;
-  int? _editingGrupoId; // ID del grupo que se est? editando
-  
-  // Variables para el folleto
+  int? _editingGrupoId; 
   String? _folletoFileName;
   String? _folletoFilePath;
   bool _folletoChanged = false;
   bool _folletoMarkedForDeletion = false;
-
   int get _totalAlumnosParticipantes {
     return _gruposParticipantes.fold(0, (sum, gp) => sum + gp.numeroParticipantes);
   }
-  
   @override
   void initState() {
     super.initState();
@@ -106,13 +98,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     _localizacionService = LocalizacionService(_apiService);
     _actividadService = ActividadService(_apiService);
     _photoService = PhotoService(_apiService);
-    
-    // Cargar participantes desde la base de datos
     _loadParticipantes();
-    // Cargar localizaciones
     _loadLocalizaciones();
   }
-  
   @override
   void didUpdateWidget(ActivityDetailInfo oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -120,47 +108,29 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       reloadData();
     }
   }
-  
   Future<void> _loadLocalizaciones() async {
     setState(() {
       _loadingLocalizaciones = true;
     });
-    
     try {
-
       final localizacionesData = await _localizacionService.fetchLocalizaciones(widget.actividad.id);
-
-      
-      // Debug: imprimir datos recibidos del API
-
       for (var data in localizacionesData) {
-
       }
-      
       setState(() {
         _localizaciones = localizacionesData.map((data) => Localizacion.fromJson(data)).toList();
-        
-        // Inicializar iconos desde la base de datos o usar por defecto
         for (var loc in _localizaciones) {
-
-          
           if (!_iconosLocalizaciones.containsKey(loc.id)) {
-            // Si la localizaci?n tiene un icono guardado en la BD, usarlo
             if (loc.icono != null && loc.icono!.isNotEmpty) {
               final iconData = IconHelper.getIcon(
                 loc.icono,
                 defaultIcon: loc.esPrincipal ? Icons.location_pin : Icons.location_on,
               );
               _iconosLocalizaciones[loc.id] = iconData;
-
             } else {
-              // Si no tiene icono guardado, usar el icono por defecto seg?n si es principal
               _iconosLocalizaciones[loc.id] = loc.esPrincipal ? Icons.location_pin : Icons.location_on;
-
             }
           }
         }
-        
         _loadingLocalizaciones = false;
       });
     } catch (e) {
@@ -169,38 +139,25 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       });
     }
   }
-  
   Future<void> _loadParticipantes() async {
     try {
-      // Cargar profesores participantes
       final profesoresIds = await _profesorService.fetchProfesoresParticipantes(widget.actividad.id);
-      
       final todosLosProfesores = await _profesorService.fetchProfesores();
-      
-      // Cargar grupos participantes
       final gruposData = await _catalogoService.fetchGruposParticipantes(widget.actividad.id);
-      
       final todosLosGrupos = await _catalogoService.fetchGrupos();
-      
       setState(() {
-        // Filtrar profesores que participan - convertir UUIDs a lowercase para comparar
         _profesoresParticipantes = todosLosProfesores
             .where((p) => profesoresIds.any((id) => id.toLowerCase() == p.uuid.toLowerCase()))
             .toList();
-        
-        // Construir lista de grupos participantes
         _gruposParticipantes = gruposData.map((data) {
           final grupoId = data['grupoId'] as int;
           final numParticipantes = data['numeroParticipantes'] as int;
           final grupo = todosLosGrupos.firstWhere((g) => g.id == grupoId);
-          
           return GrupoParticipante(
             grupo: grupo,
             numeroParticipantes: numParticipantes,
           );
         }).toList();
-        
-        // Guardar copias originales
         _profesoresParticipantesOriginales = List.from(_profesoresParticipantes);
         _gruposParticipantesOriginales = _gruposParticipantes.map((gp) => 
           GrupoParticipante(
@@ -210,92 +167,67 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         ).toList();
       });
     } catch (e) {
-      // Inicializar listas vac?as en caso de error
       setState(() {
         _profesoresParticipantesOriginales = [];
         _gruposParticipantesOriginales = [];
       });
     }
   }
-  
   void _notifyChanges() {
     if (widget.onActivityDataChanged != null) {
-      // Notificar todos los cambios incluyendo localizaciones
       final Map<String, dynamic> changes = {
         'profesoresParticipantes': _profesoresParticipantes,
         'gruposParticipantes': _gruposParticipantes,
       };
-      
-      // Agregar localizaciones si hay cambios
       if (_localizaciones.isNotEmpty) {
         changes['localizaciones'] = _localizaciones;
         changes['localizaciones_changed'] = true;
       }
-      
       widget.onActivityDataChanged!(changes);
     }
   }
-  
-  // M?todo p?blico para recargar datos desde el padre (al revertir)
   Future<void> reloadData() async {
     setState(() {
-      // Limpiar estado del folleto - el widget.actividad ya tiene la info actualizada
       _folletoFileName = null;
       _folletoFilePath = null;
       _folletoChanged = false;
       _folletoMarkedForDeletion = false;
-      // Limpiar cambios pendientes de descripciones de fotos
       _photoDescriptionChanges.clear();
     });
-    // Solo recargar participantes, no localizaciones (no se modifican en esta vista)
     await _loadParticipantes();
   }
-
-  // M?todo p?blico para guardar las descripciones de fotos pendientes
   Future<bool> savePhotoDescriptions() async {
     if (_photoDescriptionChanges.isEmpty) {
       return true;
     }
-
     bool allSuccess = true;
-
     for (var entry in _photoDescriptionChanges.entries) {
       try {
         final photoId = entry.key;
         final newDescription = entry.value;
-        
         await _photoService.updatePhotoDescription(photoId, newDescription);
       } catch (e) {
         allSuccess = false;
       }
     }
-
     if (allSuccess) {
       setState(() {
         _photoDescriptionChanges.clear();
       });
     }
-
     return allSuccess;
   }
-
   String _extractFileName(String url) {
-    // Extraer el nombre del archivo de la URL
     final parts = url.split('/');
     if (parts.isEmpty) return 'folleto.pdf';
-    
     final fileName = parts.last;
-    
-    // Si el nombre tiene formato "timestamp_nombreOriginal.pdf", extraer solo el nombre original
     final timestampPattern = RegExp(r'^\d+_(.+)$');
     final match = timestampPattern.firstMatch(fileName);
     if (match != null && match.groupCount >= 1) {
       return match.group(1)!;
     }
-    
     return fileName;
   }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -320,7 +252,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       _folletoFilePath = null;
                       _folletoChanged = false;
                     } else {
-                      // Se seleccionó un nuevo folleto
                       if (data.containsKey('folletoFileName')) {
                         _folletoFileName = data['folletoFileName'];
                       }
@@ -331,15 +262,12 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                       _folletoMarkedForDeletion = false;
                     }
                   });
-                  
-                  // Notificar al widget padre con los datos del folleto
                   if (widget.onActivityDataChanged != null) {
                     widget.onActivityDataChanged!(data);
                   }
                 },
               ),
               SizedBox(height: 16),
-              // Sección de imágenes (refactorizada) - Solo admin/responsable
               if (widget.isAdminOrSolicitante)
                 ActivityImagesSection(
                   imagesActividad: widget.imagesActividad,
@@ -355,7 +283,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 ),
               if (widget.isAdminOrSolicitante)
                 SizedBox(height: 16),
-              // Sección de participantes (refactorizada) - Solo admin/responsable
               if (widget.isAdminOrSolicitante)
                 ActivityParticipantsSection(
                   profesoresParticipantes: _profesoresParticipantes,
@@ -377,11 +304,9 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
                 ),
               if (widget.isAdminOrSolicitante)
                 SizedBox(height: 16),
-              // Presupuesto - Solo admin/responsable
               if (widget.isAdminOrSolicitante)
                 _buildPresupuesto(context, constraints),
               SizedBox(height: 16),
-              // Localizaciones - Visible para todos
               _buildLocalizaciones(context, constraints),
               SizedBox(height: 16),
               _buildComentarios(context, constraints)
@@ -391,7 +316,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       },
     );
   }
-
   void _showEditDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -399,8 +323,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         return EditActivityDialog(
           actividad: widget.actividad,
           onSave: (updatedData) {
-            
-            // Notificar al padre que hubo cambios
             if (widget.onActivityDataChanged != null) {
               widget.onActivityDataChanged!(updatedData);
             }
@@ -409,7 +331,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       },
     );
   }
-
   Widget _buildPresupuesto(BuildContext context, BoxConstraints constraints) {
     return ActivityBudgetSection(
       key: ValueKey('budget_${widget.reloadTrigger}'),
@@ -428,7 +349,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       },
     );
   }
-
   Widget _buildLocalizaciones(BuildContext context, BoxConstraints constraints) {
     return ActivityLocationsSection(
       actividadId: widget.actividad.id,
@@ -444,35 +364,28 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       },
     );
   }
-
   Widget _buildPresupuestoYLocalizacion(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
-    // En pantallas peque?as (< 800px), mostrar en columna
-    // En pantallas grandes, mostrar en fila (50/50)
     if (constraints.maxWidth < 800) {
       return Column(
         children: [
           ActivityBudgetSection(
-            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci?n al revertir
+            key: ValueKey('budget_${widget.reloadTrigger}'), 
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
             actividadService: _actividadService,
             onBudgetChanged: (budgetData) {
-              // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el bot?n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
-                  ...budgetData, // Incluir transporteReq y alojamientoReq
+                  ...budgetData, 
                 });
               }
             },
           ),
           SizedBox(height: 16),
-          // Secci�n de localizaciones (refactorizada)
           ActivityLocationsSection(
             actividadId: widget.actividad.id,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
@@ -489,27 +402,23 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         ],
       );
     }
-    
-    // Layout horizontal para pantallas grandes
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           flex: 1,
           child: ActivityBudgetSection(
-            key: ValueKey('budget_${widget.reloadTrigger}'), // Forzar reconstrucci?n al revertir
+            key: ValueKey('budget_${widget.reloadTrigger}'), 
             actividad: widget.actividad,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
             totalAlumnosParticipantes: _totalAlumnosParticipantes,
             actividadService: _actividadService,
             onBudgetChanged: (budgetData) {
-              // Callback cuando cambia el presupuesto o switches de transporte/alojamiento
               setState(() {});
-              // Notificar al padre que hubo cambios para activar el bot?n guardar
               if (widget.onActivityDataChanged != null) {
                 widget.onActivityDataChanged!({
                   'budgetChanged': true,
-                  ...budgetData, // Incluir transporteReq y alojamientoReq
+                  ...budgetData, 
                 });
               }
             },
@@ -518,7 +427,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         SizedBox(width: 16),
         Expanded(
           flex: 1,
-          // Secci�n de localizaciones (refactorizada)
           child: ActivityLocationsSection(
             actividadId: widget.actividad.id,
             isAdminOrSolicitante: widget.isAdminOrSolicitante,
@@ -536,8 +444,6 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
       ],
     );
   }
-
-  // M?todo para mostrar confirmaci?n de eliminaci?n de imagen
   Future<void> _showDeleteConfirmationDialog(BuildContext context, int index) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -559,20 +465,15 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
         );
       },
     );
-
     if (confirm == true && widget.removeApiImage != null) {
       widget.removeApiImage!(index);
     }
   }
-
-  // M?todo para construir secci?n de comentarios
   Widget _buildComentarios(BuildContext context, BoxConstraints constraints) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     if (widget.actividad.comentarios == null || widget.actividad.comentarios!.isEmpty) {
       return SizedBox.shrink();
     }
-
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -614,4 +515,3 @@ class _ActivityDetailInfoState extends State<ActivityDetailInfo> {
     );
   }
 }
-

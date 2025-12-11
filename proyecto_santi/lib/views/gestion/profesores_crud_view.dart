@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -8,36 +8,28 @@ import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/profesor_detail_dialog.dart';
-
-/// Vista CRUD moderna para gestionar Profesores
 class ProfesoresCrudView extends StatefulWidget {
   const ProfesoresCrudView({Key? key}) : super(key: key);
-
   @override
   State<ProfesoresCrudView> createState() => _ProfesoresCrudViewState();
 }
-
 class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
   final ProfesorService _profesorService = ProfesorService(ApiService());
   List<Profesor> _profesores = [];
   List<Profesor> _filteredProfesores = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
-
   bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
   @override
   void initState() {
     super.initState();
     _loadProfesores();
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadProfesores() async {
     setState(() => _isLoading = true);
     try {
@@ -58,7 +50,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       }
     }
   }
-
   void _filterProfesores(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -74,7 +65,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       }
     });
   }
-
   void _addProfesor() {
     showDialog(
       context: context,
@@ -83,7 +73,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       ),
     );
   }
-
   void _editProfesor(Profesor profesor) {
     showDialog(
       context: context,
@@ -93,7 +82,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       ),
     );
   }
-
   Future<void> _showDeleteDialog(Profesor profesor) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -125,7 +113,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
         ],
       ),
     );
-
     if (confirm == true) {
       try {
         final success = await _profesorService.deleteProfesor(profesor.uuid);
@@ -150,25 +137,21 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
             ? GradientBackgroundDark(child: Container()) 
             : GradientBackgroundLight(child: Container()),
-        
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -187,8 +170,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                       ],
                     ),
                   ),
-
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -215,10 +196,7 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
-
-                // Lista de profesores
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -247,7 +225,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       ],
     );
   }
-
   Widget _buildProfesoresList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -281,7 +258,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
             offset: Offset(0, 4),
             spreadRadius: 0,
           ),
-          // Inner shadow effect
           BoxShadow(
             color: isDark
                 ? Colors.black.withOpacity(0.2)
@@ -338,11 +314,9 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                          // Header con nombre y menú
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Icono de profesor
                               Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -356,7 +330,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                                 ),
                               ),
                               SizedBox(width: 12),
-                              // Nombre y apellidos
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +358,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                                   ],
                                 ),
                               ),
-                              // Menú de 3 puntos
                               PopupMenuButton<String>(
                                 icon: Icon(
                                   Icons.more_vert_rounded,
@@ -427,7 +399,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                             ],
                           ),
                           SizedBox(height: 12),
-                          // Divider sutil
                           Container(
                             height: 1,
                             decoration: BoxDecoration(
@@ -441,7 +412,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
                             ),
                           ),
                           SizedBox(height: 12),
-                          // Departamento
                           if (profesor.depart != null)
                             Row(
                               children: [
@@ -459,7 +429,6 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
       ),
     );
   }
-
   Widget _buildDepartamentoChip(String departamento, bool isDark) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -1,41 +1,31 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Diálogo responsive para crear/editar empresas de transporte
-/// Similar al estilo de UsuarioDetailDialog
 class EmpresaTransporteDetailDialog extends StatefulWidget {
-  final EmpresaTransporte? empresa; // null = crear nueva
+  final EmpresaTransporte? empresa; 
   final VoidCallback onSaved;
-
   const EmpresaTransporteDetailDialog({
     Key? key,
     this.empresa,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<EmpresaTransporteDetailDialog> createState() => _EmpresaTransporteDetailDialogState();
 }
-
 class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final ActividadService _actividadService;
-  
-  // Controllers
   late TextEditingController _nombreController;
   late TextEditingController _cifController;
   late TextEditingController _telefonoController;
   late TextEditingController _emailController;
   late TextEditingController _direccionController;
-  
   bool _isSaving = false;
-  
   bool get isDesktop {
     if (kIsWeb) return true;
     try {
@@ -44,9 +34,7 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       return false;
     }
   }
-  
   bool get isEditing => widget.empresa != null;
-
   @override
   void initState() {
     super.initState();
@@ -57,7 +45,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
     _emailController = TextEditingController(text: widget.empresa?.email ?? '');
     _direccionController = TextEditingController(text: widget.empresa?.direccion ?? '');
   }
-
   @override
   void dispose() {
     _nombreController.dispose();
@@ -67,12 +54,9 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
     _direccionController.dispose();
     super.dispose();
   }
-
   Future<void> _saveEmpresa() async {
     if (!_formKey.currentState!.validate()) return;
-    
     setState(() => _isSaving = true);
-    
     try {
       final data = {
         'nombre': _nombreController.text.trim(),
@@ -81,7 +65,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
         'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
         'direccion': _direccionController.text.trim().isEmpty ? null : _direccionController.text.trim(),
       };
-      
       if (isEditing) {
         await _actividadService.updateEmpresaTransporte(widget.empresa!.id, data);
         if (mounted) {
@@ -97,10 +80,8 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
           );
         }
       }
-      
       widget.onSaved();
       Navigator.of(context).pop();
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -116,13 +97,11 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -181,7 +160,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -248,12 +226,10 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: Nombre y CIF
         Row(
           children: [
             Expanded(child: _buildNombreField(isDark)),
@@ -262,8 +238,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
           ],
         ),
         SizedBox(height: 20),
-        
-        // Fila 2: Teléfono y Email
         Row(
           children: [
             Expanded(child: _buildTelefonoField(isDark)),
@@ -272,13 +246,10 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
           ],
         ),
         SizedBox(height: 20),
-        
-        // Fila 3: Dirección
         _buildDireccionField(isDark),
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,7 +266,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ],
     );
   }
-
   Widget _buildNombreField(bool isDark) {
     return _buildStyledField(
       label: 'Nombre de la Empresa',
@@ -323,7 +293,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildCIFField(bool isDark) {
     return _buildStyledField(
       label: 'CIF (opcional)',
@@ -342,7 +311,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildTelefonoField(bool isDark) {
     return _buildStyledField(
       label: 'Teléfono (opcional)',
@@ -361,7 +329,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildEmailField(bool isDark) {
     return _buildStyledField(
       label: 'Email (opcional)',
@@ -389,7 +356,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildDireccionField(bool isDark) {
     return _buildStyledField(
       label: 'Dirección Completa (opcional)',
@@ -408,7 +374,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ),
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -456,7 +421,6 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
       ],
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -515,6 +479,3 @@ class _EmpresaTransporteDetailDialogState extends State<EmpresaTransporteDetailD
     );
   }
 }
-
-
-

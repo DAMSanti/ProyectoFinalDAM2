@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
@@ -6,21 +6,17 @@ import 'package:proyecto_santi/views/activities/components/activities_listas.dar
 import 'package:proyecto_santi/views/activities/components/activities_search_bar.dart';
 import 'package:proyecto_santi/views/activities/components/activities_section_header.dart';
 import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
-
 class ActivitiesPortraitLayout extends StatefulWidget {
   final List<Actividad> activities;
   final VoidCallback onToggleTheme;
-
   const ActivitiesPortraitLayout({
     super.key,
     required this.activities,
     required this.onToggleTheme,
   });
-
   @override
   _ActivitiesPortraitLayoutState createState() => _ActivitiesPortraitLayoutState();
 }
-
 class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
   String searchQuery = '';
   Map<String, dynamic> filters = {
@@ -31,7 +27,6 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
   };
   int _allActivitiesCount = 0;
   int _userActivitiesCount = 0;
-
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
@@ -59,8 +54,6 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
               child: Column(
                 children: [
                   SizedBox(height: 8),
-                  
-                  // Barra de búsqueda moderna
                   ActivitiesSearchBar(
                     onSearchQueryChanged: (query) {
                       setState(() {
@@ -74,16 +67,12 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                       });
                     },
                   ),
-                  
                   SizedBox(height: 8),
-                  
-                  // Sección: Todas las actividades
                   ActivitiesSectionHeader(
                     title: 'Todas las Actividades',
                     icon: Icons.grid_view_rounded,
                     count: _allActivitiesCount,
                   ),
-                  
                   Expanded(
                     child: ActivitiesListContainer(
                       child: AllActividades(
@@ -103,16 +92,12 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                       ),
                     ),
                   ),
-                  
                   SizedBox(height: 8),
-                  
-                  // Sección: Tus actividades
                   ActivitiesSectionHeader(
                     title: 'Tus Actividades',
                     icon: Icons.person_rounded,
                     count: _userActivitiesCount,
                   ),
-                  
                   Expanded(
                     child: ActivitiesListContainer(
                       child: OtrasActividades(
@@ -132,7 +117,6 @@ class _ActivitiesPortraitLayoutState extends State<ActivitiesPortraitLayout> {
                       ),
                     ),
                   ),
-                  
                   SizedBox(height: 8),
                 ],
               ),

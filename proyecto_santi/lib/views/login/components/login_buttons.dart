@@ -1,17 +1,14 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 class LoginButtons extends StatelessWidget {
   final VoidCallback onLoginPressed;
   final VoidCallback onMicrosoftLoginPressed;
   final bool isColumn;
-
   const LoginButtons({
     super.key,
     required this.onLoginPressed,
     required this.onMicrosoftLoginPressed,
     this.isColumn = true,
   });
-
   @override
   Widget build(BuildContext context) {
     return isColumn

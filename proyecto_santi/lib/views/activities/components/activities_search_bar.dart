@@ -1,29 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/activities/components/activities_filter_dialog.dart';
-
-/// Barra de búsqueda moderna con botón de filtros integrado
 class ActivitiesSearchBar extends StatelessWidget {
   final Function(String) onSearchQueryChanged;
   final Map<String, dynamic> filters;
   final Function(Map<String, dynamic>) onFiltersChanged;
-
   const ActivitiesSearchBar({
     super.key,
     required this.onSearchQueryChanged,
     required this.filters,
     required this.onFiltersChanged,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasActiveFilters = filters.values.any((value) => value != null && value != '');
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Row(
         children: [
-          // Barra de búsqueda expandible
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -39,7 +33,6 @@ class ActivitiesSearchBar extends StatelessWidget {
                     blurRadius: 12,
                     offset: Offset(0, 4),
                   ),
-                  // Inner shadow para profundidad
                   BoxShadow(
                     color: isDark 
                         ? Colors.black.withValues(alpha: 0.2)
@@ -79,10 +72,7 @@ class ActivitiesSearchBar extends StatelessWidget {
               ),
             ),
           ),
-          
           SizedBox(width: 12),
-          
-          // Botón de filtros con indicador
           Stack(
             children: [
               Container(
@@ -119,7 +109,6 @@ class ActivitiesSearchBar extends StatelessWidget {
                   ),
                 ),
               ),
-              // Indicador de filtros activos
               if (hasActiveFilters)
                 Positioned(
                   right: 4,
@@ -143,7 +132,6 @@ class ActivitiesSearchBar extends StatelessWidget {
       ),
     );
   }
-
   void _showFilterDialog(BuildContext context) {
     showDialog(
       context: context,

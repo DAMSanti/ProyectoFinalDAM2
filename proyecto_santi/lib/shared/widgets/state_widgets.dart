@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
-
-/// Widget para estado de carga
+﻿import 'package:flutter/material.dart';
 class LoadingState extends StatelessWidget {
   final String? message;
-
   const LoadingState({
     super.key,
     this.message,
   });
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -28,18 +24,14 @@ class LoadingState extends StatelessWidget {
     );
   }
 }
-
-/// Widget para estado de error
 class ErrorState extends StatelessWidget {
   final String error;
   final VoidCallback? onRetry;
-
   const ErrorState({
     super.key,
     required this.error,
     this.onRetry,
   });
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -80,14 +72,11 @@ class ErrorState extends StatelessWidget {
     );
   }
 }
-
-/// Widget para estado vacío (sin datos)
 class EmptyState extends StatelessWidget {
   final String message;
   final IconData icon;
   final VoidCallback? onAction;
   final String? actionLabel;
-
   const EmptyState({
     super.key,
     required this.message,
@@ -95,7 +84,6 @@ class EmptyState extends StatelessWidget {
     this.onAction,
     this.actionLabel,
   });
-
   @override
   Widget build(BuildContext context) {
     return Center(

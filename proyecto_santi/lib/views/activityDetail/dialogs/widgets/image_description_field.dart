@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
 class ImageDescriptionField extends StatelessWidget {
   final TextEditingController controller;
   final bool isDark;
   final bool isMobile;
   final bool isMobileLandscape;
-
   const ImageDescriptionField({
     super.key,
     required this.controller,
@@ -14,7 +12,6 @@ class ImageDescriptionField extends StatelessWidget {
     required this.isMobile,
     required this.isMobileLandscape,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(

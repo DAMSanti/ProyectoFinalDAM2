@@ -1,22 +1,19 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'layouts/image_preview_portrait_layout.dart';
 import 'layouts/image_preview_landscape_layout.dart';
 import 'widgets/image_preview_widget.dart';
 import 'widgets/image_description_field.dart';
-
 class ImagePreviewDialog extends StatefulWidget {
   final XFile? imageFile;
   final String? imageUrl;
   final String? initialDescription;
   final Function(String description) onConfirm;
   final bool isEditing;
-
   const ImagePreviewDialog({
     super.key,
     this.imageFile,
@@ -25,15 +22,12 @@ class ImagePreviewDialog extends StatefulWidget {
     required this.onConfirm,
     this.isEditing = false,
   }) : assert(imageFile != null || imageUrl != null, 'Debe proporcionar imageFile o imageUrl');
-
   @override
   State<ImagePreviewDialog> createState() => _ImagePreviewDialogState();
 }
-
 class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
   final TextEditingController _descriptionController = TextEditingController();
   final bool isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
   @override
   void initState() {
     super.initState();
@@ -41,13 +35,11 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       _descriptionController.text = widget.initialDescription!;
     }
   }
-
   @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -57,7 +49,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
     final isPortrait = orientation == Orientation.portrait;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape
@@ -109,10 +100,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header compacto
             _buildHeader(context, isDark, isMobile, isMobileLandscape),
-            
-            // Contenido adaptativo
             Expanded(
               child: isMobileLandscape
                   ? ImagePreviewLandscapeLayout(
@@ -132,16 +120,12 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                       descriptionController: _descriptionController,
                     ),
             ),
-            
-            // Footer con botones
             _buildFooter(context, isDark, isMobile, isMobileLandscape),
           ],
         ),
       ),
     );
   }
-
-  // Header compacto y moderno
   Widget _buildHeader(BuildContext context, bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -198,8 +182,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       ),
     );
   }
-
-  // Footer con botones de acción
   Widget _buildFooter(BuildContext context, bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
@@ -221,7 +203,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       ),
       child: Row(
         children: [
-          // Botón Eliminar (solo en modo edición y móvil/tablet landscape)
           if (widget.isEditing && (isMobile || isMobileLandscape)) ...[
             Container(
               decoration: BoxDecoration(
@@ -254,8 +235,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
             ),
             SizedBox(width: isMobileLandscape ? 8 : 10),
           ],
-          
-          // Botón Cancelar
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -295,10 +274,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
               ),
             ),
           ),
-          
           SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-          
-          // Botón Añadir/Guardar
           Expanded(
             flex: isMobileLandscape ? 2 : 1,
             child: Container(
@@ -360,8 +336,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
       ),
     );
   }
-
-  // Confirmación de eliminación
   Future<void> _showDeleteConfirmation(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
@@ -373,7 +347,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
         final isPortrait = orientation == Orientation.portrait;
         final isMobile = screenWidth < 600;
         final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: isMobileLandscape
@@ -415,7 +388,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Header rojo
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: isMobileLandscape ? 12 : (isMobile ? 16 : 20),
@@ -468,8 +440,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     ],
                   ),
                 ),
-
-                // Content
                 Padding(
                   padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                   child: Column(
@@ -503,8 +473,6 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
                     ],
                   ),
                 ),
-
-                // Actions
                 Container(
                   padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 14 : 16)),
                   decoration: BoxDecoration(
@@ -595,9 +563,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog> {
         );
       },
     );
-
     if (result == true && context.mounted) {
-      // Cerrar el diálogo de edición y pasar resultado de eliminación
       Navigator.of(context).pop('delete');
     }
   }

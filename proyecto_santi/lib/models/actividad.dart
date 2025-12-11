@@ -1,8 +1,7 @@
-import 'package:proyecto_santi/models/profesor.dart';
+﻿import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
-
 class Actividad {
   final int id;
   String titulo;
@@ -34,7 +33,6 @@ class Actividad {
   final double? presupuestoEstimado;
   final double? costoReal;
   final List<String> profesoresParticipantesIds;
-
   Actividad({
     required this.id,
     required this.titulo,
@@ -67,105 +65,73 @@ class Actividad {
     this.costoReal,
     this.profesoresParticipantesIds = const [],
   });
-
   factory Actividad.fromJson(Map<String, dynamic> json) {
-    // Mapear desde la API de C# ACEXAPI
-    
-    // Parsear el solicitante si viene en el JSON
     Profesor? solicitante;
     if (json['solicitante'] != null) {
       solicitante = Profesor.fromJson(json['solicitante']);
     }
-    
-    // Parsear el responsable si viene en el JSON
     Profesor? responsable;
     if (json['responsable'] != null) {
       responsable = Profesor.fromJson(json['responsable']);
     }
-    
-    // Parsear el alojamiento si viene en el JSON
     Alojamiento? alojamiento;
     if (json['alojamiento'] != null && json['alojamiento'] is Map) {
       alojamiento = Alojamiento.fromJson(json['alojamiento']);
     }
-    
-    // Parsear la localización si viene en el JSON
     Localizacion? localizacion;
     if (json['localizacion'] != null && json['localizacion'] is Map) {
       localizacion = Localizacion.fromJson(json['localizacion']);
     }
-    
-    // Parsear la lista de localizaciones si viene en el JSON
     List<Localizacion> localizaciones = [];
     if (json['localizaciones'] != null && json['localizaciones'] is List) {
       localizaciones = (json['localizaciones'] as List)
           .map((loc) => Localizacion.fromJson(loc))
           .toList();
     }
-    
-    // Parsear la empresa de transporte si viene en el JSON
     EmpresaTransporte? empresaTransporte;
     if (json['empresaTransporte'] != null && json['empresaTransporte'] is Map) {
       empresaTransporte = EmpresaTransporte.fromJson(json['empresaTransporte']);
     } else if (json['empTransporteId'] != null && json['empTransporteNombre'] != null) {
-      // Si viene como campos planos desde el backend, construir el objeto
       empresaTransporte = EmpresaTransporte(
         id: json['empTransporteId'] as int,
         nombre: json['empTransporteNombre'] as String,
-        cif: '', // No disponible en la respuesta plana
+        cif: '', 
       );
     }
-    
-    // Parsear fechas de inicio y fin desde DateTime completos
     DateTime? fechaInicio;
     DateTime? fechaFin;
-    
-    // Intentar parsear fechaInicio desde varios campos posibles
     if (json['fechaInicio'] != null) {
       fechaInicio = DateTime.parse(json['fechaInicio'].toString());
     } else if (json['fini'] != null) {
       fechaInicio = DateTime.parse(json['fini'].toString());
     }
-    
-    // Intentar parsear fechaFin desde varios campos posibles
     if (json['fechaFin'] != null) {
       try {
         fechaFin = DateTime.parse(json['fechaFin'].toString());
       } catch (e) {
-        // Error silencioso, se maneja más abajo
       }
     } else if (json['ffin'] != null) {
       try {
         fechaFin = DateTime.parse(json['ffin'].toString());
       } catch (e) {
-        // Error silencioso, se maneja más abajo
       }
     }
-    
-    // Si no se pudo parsear, usar fecha actual
     if (fechaInicio == null) {
       fechaInicio = DateTime.now();
     }
     if (fechaFin == null) {
-      fechaFin = fechaInicio; // Si no hay fecha fin, usar la de inicio (actividad de un día)
+      fechaFin = fechaInicio; 
     }
-    
-    // Extraer solo la parte de fecha (sin hora) en formato ISO
     final fechaInicioStr = '${fechaInicio.year.toString().padLeft(4, '0')}-'
         '${fechaInicio.month.toString().padLeft(2, '0')}-'
         '${fechaInicio.day.toString().padLeft(2, '0')}T00:00:00';
-    
     final fechaFinStr = '${fechaFin.year.toString().padLeft(4, '0')}-'
         '${fechaFin.month.toString().padLeft(2, '0')}-'
         '${fechaFin.day.toString().padLeft(2, '0')}T00:00:00';
-    
-    // Extraer horas desde los DateTime o desde campos separados
     String horaInicio = json['hini']?.toString() ?? 
         '${fechaInicio.hour.toString().padLeft(2, '0')}:${fechaInicio.minute.toString().padLeft(2, '0')}';
-    
     String horaFin = json['hfin']?.toString() ?? 
         '${fechaFin.hour.toString().padLeft(2, '0')}:${fechaFin.minute.toString().padLeft(2, '0')}';
-    
     return Actividad(
       id: json['id'] ?? 0,
       titulo: json['nombre']?.toString() ?? json['titulo']?.toString() ?? 'Sin título',
@@ -183,7 +149,7 @@ class Actividad {
       alojamientoReq: json['alojamientoReq'] as int? ?? 0,
       comentAlojamiento: json['comentAlojamiento']?.toString(),
       precioAlojamiento: (json['precioAlojamiento'] as num?)?.toDouble(),
-      alojamiento: alojamiento, // Cambio: ahora es un objeto Alojamiento
+      alojamiento: alojamiento, 
       comentarios: json['comentarios']?.toString(),
       estado: json['estado']?.toString() ?? 'Pendiente',
       comentEstado: json['comentEstado']?.toString(),
@@ -201,34 +167,33 @@ class Actividad {
           : [],
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'nombre': titulo, // La API espera 'nombre', no 'titulo'
+      'nombre': titulo, 
       'tipo': tipo,
       'descripcion': descripcion,
-      'fechaInicio': fini, // La API espera 'fechaInicio'
-      'fechaFin': ffin, // La API espera 'fechaFin'
+      'fechaInicio': fini, 
+      'fechaFin': ffin, 
       'hini': hini,
       'hfin': hfin,
       'previstaIni': previstaIni,
       'transporteReq': transporteReq,
       'comentTransporte': comentTransporte,
       'precioTransporte': precioTransporte,
-      'empresaTransporteId': empresaTransporte?.id, // Enviar solo el ID de la empresa
+      'empresaTransporteId': empresaTransporte?.id, 
       'alojamientoReq': alojamientoReq,
       'comentAlojamiento': comentAlojamiento,
       'precioAlojamiento': precioAlojamiento,
-      'alojamientoId': alojamiento?.id, // Enviar solo el ID del alojamiento
+      'alojamientoId': alojamiento?.id, 
       'comentarios': comentarios,
-      'estado': estado, // Enviar el estado como string
+      'estado': estado, 
       'comentEstado': comentEstado,
       'incidencias': incidencias,
-      'folletoUrl': urlFolleto, // La API espera 'folletoUrl'
-      'responsableId': responsable?.uuid, // Enviar el ID del responsable
-      'solicitanteId': solicitante?.uuid, // Mantener por compatibilidad
-      'localizacionId': localizacion?.id, // Enviar solo el ID
+      'folletoUrl': urlFolleto, 
+      'responsableId': responsable?.uuid, 
+      'solicitanteId': solicitante?.uuid, 
+      'localizacionId': localizacion?.id, 
       'presupuestoEstimado': presupuestoEstimado ?? importePorAlumno,
       'costoReal': costoReal,
     };

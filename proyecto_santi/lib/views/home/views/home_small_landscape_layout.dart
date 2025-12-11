@@ -1,28 +1,21 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/home/components/home_activity_cards.dart';
 import 'package:proyecto_santi/views/home/components/calendar/syncfusion_calendar.dart';
 import 'package:proyecto_santi/models/actividad.dart';
-
 class HomeSmallLandscapeLayout extends StatelessWidget {
   final List<Actividad> activities;
-
   const HomeSmallLandscapeLayout({super.key, required this.activities});
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return LayoutBuilder(
       builder: (context, constraints) {
-        // En landscape móvil, priorizamos el calendario
         return Row(
           children: [
-            // Columna izquierda: Actividades (40%)
             Expanded(
               flex: 40,
               child: Column(
                 children: [
-                  // Header compacto
                   Padding(
                     padding: const EdgeInsets.fromLTRB(6.0, 6.0, 4.0, 4.0),
                     child: Row(
@@ -61,7 +54,6 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Lista vertical compacta
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(6.0, 0, 3.0, 6.0),
@@ -111,7 +103,7 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 6.0),
                                     child: SizedBox(
-                                      height: 120, // Altura muy reducida para landscape móvil
+                                      height: 120, 
                                       child: ActivityCardItem(
                                         actividad: actividad,
                                         isDarkTheme: isDark,
@@ -126,7 +118,6 @@ class HomeSmallLandscapeLayout extends StatelessWidget {
                 ],
               ),
             ),
-            // Columna derecha: Calendario (60%)
             Expanded(
               flex: 60,
               child: Padding(

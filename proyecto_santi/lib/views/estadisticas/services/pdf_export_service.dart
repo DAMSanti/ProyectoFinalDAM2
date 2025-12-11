@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,7 +8,6 @@ import 'package:printing/printing.dart';
 import 'package:proyecto_santi/views/estadisticas/models/chart_item.dart';
 import 'package:proyecto_santi/views/estadisticas/models/filter_period.dart';
 import 'package:intl/intl.dart';
-
 class PdfExportService {
   static Future<void> generateAndExport({
     required BuildContext context,
@@ -16,7 +15,6 @@ class PdfExportService {
     required FilterPeriod filterPeriod,
     required Map<ChartType, GlobalKey> chartKeys,
   }) async {
-    // Mostrar indicador de carga
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -36,16 +34,10 @@ class PdfExportService {
         ),
       ),
     );
-
     try {
-      // Dar tiempo para que los widgets se rendericen completamente
       await Future.delayed(Duration(milliseconds: 500));
-      
       final pdf = pw.Document();
-      
-      // Capturar imágenes de las gráficas seleccionadas
       final chartImages = <ChartType, Uint8List>{};
-      
       for (final chart in charts) {
         if (chartKeys.containsKey(chart.type)) {
           print('Capturando gráfica: ${chart.title}');
@@ -58,30 +50,21 @@ class PdfExportService {
           }
         }
       }
-
       if (chartImages.isEmpty) {
         throw Exception('No se pudo capturar ninguna gráfica');
       }
-
       print('Total gráficas capturadas: ${chartImages.length}');
-
-      // Generar páginas del PDF
       await _addPdfPages(
         pdf: pdf,
         charts: charts,
         chartImages: chartImages,
         filterPeriod: filterPeriod,
       );
-
-      // Cerrar diálogo de carga
       if (context.mounted) {
         Navigator.of(context).pop();
       }
-
       print('Total gráficas capturadas: ${chartImages.length}');
       print('Abriendo preview del PDF...');
-
-      // Mostrar preview del PDF en diálogo
       if (context.mounted) {
         await showDialog(
           context: context,
@@ -91,16 +74,12 @@ class PdfExportService {
           ),
         );
       }
-      
       print('Preview cerrado');
     } catch (e, stackTrace) {
       print('Error generando PDF: $e');
       print('Stack trace: $stackTrace');
-      
-      // Cerrar diálogo de carga si está abierto
       if (context.mounted) {
         Navigator.of(context).pop();
-        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al generar el PDF: $e'),
@@ -111,40 +90,30 @@ class PdfExportService {
       }
     }
   }
-
   static Future<Uint8List?> _captureWidget(GlobalKey key) async {
     try {
-      // Asegurar que el widget esté renderizado
       await Future.delayed(Duration(milliseconds: 100));
-      
       final context = key.currentContext;
       if (context == null) {
         print('Error: Context es null para la key');
         return null;
       }
-      
       final renderObject = context.findRenderObject();
       if (renderObject == null) {
         print('Error: RenderObject es null');
         return null;
       }
-      
       if (renderObject is! RenderRepaintBoundary) {
         print('Error: RenderObject no es RenderRepaintBoundary');
         return null;
       }
-      
       final boundary = renderObject as RenderRepaintBoundary;
-      
-      // Capturar imagen con alta resolución
       final image = await boundary.toImage(pixelRatio: 2.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      
       if (byteData == null) {
         print('Error: ByteData es null');
         return null;
       }
-      
       return byteData.buffer.asUint8List();
     } catch (e, stackTrace) {
       print('Error capturando widget: $e');
@@ -152,14 +121,12 @@ class PdfExportService {
       return null;
     }
   }
-
   static Future<void> _addPdfPages({
     required pw.Document pdf,
     required List<ChartItem> charts,
     required Map<ChartType, Uint8List> chartImages,
     required FilterPeriod filterPeriod,
   }) async {
-    // Página de portada
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
@@ -168,8 +135,8 @@ class PdfExportService {
               decoration: pw.BoxDecoration(
                 gradient: pw.LinearGradient(
                   colors: [
-                    PdfColor.fromHex('#1E88E5'),
-                    PdfColor.fromHex('#1565C0'),
+                    PdfColor.fromHex('
+                    PdfColor.fromHex('
                   ],
                 ),
               ),
@@ -197,7 +164,7 @@ class PdfExportService {
                     pw.Container(
                       padding: pw.EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: pw.BoxDecoration(
-                        color: PdfColor.fromInt(0x33FFFFFF), // White with 20% alpha
+                        color: PdfColor.fromInt(0x33FFFFFF), 
                         borderRadius: pw.BorderRadius.circular(8),
                       ),
                       child: pw.Column(
@@ -214,7 +181,7 @@ class PdfExportService {
                             'Generado: ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}',
                             style: pw.TextStyle(
                               fontSize: 14,
-                              color: PdfColor.fromInt(0xE6FFFFFF), // White with 90% alpha
+                              color: PdfColor.fromInt(0xE6FFFFFF), 
                             ),
                           ),
                         ],
@@ -226,14 +193,12 @@ class PdfExportService {
             );
           },
         ),
-      );    // Páginas con gráficas (2 por página)
+      );    
     for (int i = 0; i < charts.length; i += 2) {
       final chart1 = charts[i];
       final image1 = chartImages[chart1.type];
-      
       final chart2 = i + 1 < charts.length ? charts[i + 1] : null;
       final image2 = chart2 != null ? chartImages[chart2.type] : null;
-
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
@@ -242,24 +207,16 @@ class PdfExportService {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // Header
                 _buildPdfHeader(filterPeriod),
                 pw.SizedBox(height: 24),
-
-                // Primera gráfica
                 if (image1 != null) ...[
                   _buildChartSection(chart1.title, chart1.description, image1),
                   if (image2 != null) pw.SizedBox(height: 24),
                 ],
-
-                // Segunda gráfica (si existe)
                 if (image2 != null && chart2 != null) ...[
                   _buildChartSection(chart2.title, chart2.description, image2),
                 ],
-
                 pw.Spacer(),
-
-                // Footer
                 _buildPdfFooter(context),
               ],
             );
@@ -268,12 +225,11 @@ class PdfExportService {
       );
     }
   }
-
   static pw.Widget _buildPdfHeader(FilterPeriod filterPeriod) {
     return pw.Container(
       padding: pw.EdgeInsets.all(16),
       decoration: pw.BoxDecoration(
-        color: PdfColor.fromHex('#F5F5F5'),
+        color: PdfColor.fromHex('
         borderRadius: pw.BorderRadius.circular(8),
       ),
       child: pw.Row(
@@ -287,7 +243,7 @@ class PdfExportService {
                 style: pw.TextStyle(
                   fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
-                  color: PdfColor.fromHex('#1E88E5'),
+                  color: PdfColor.fromHex('
                 ),
               ),
               pw.SizedBox(height: 4),
@@ -311,7 +267,6 @@ class PdfExportService {
       ),
     );
   }
-
   static pw.Widget _buildChartSection(String title, String description, Uint8List imageData) {
     return pw.Container(
       decoration: pw.BoxDecoration(
@@ -324,7 +279,7 @@ class PdfExportService {
           pw.Container(
             padding: pw.EdgeInsets.all(12),
             decoration: pw.BoxDecoration(
-              color: PdfColor.fromHex('#F5F5F5'),
+              color: PdfColor.fromHex('
               borderRadius: pw.BorderRadius.vertical(top: pw.Radius.circular(8)),
             ),
             child: pw.Column(
@@ -335,7 +290,7 @@ class PdfExportService {
                   style: pw.TextStyle(
                     fontSize: 14,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColor.fromHex('#1E88E5'),
+                    color: PdfColor.fromHex('
                   ),
                 ),
                 pw.SizedBox(height: 4),
@@ -363,7 +318,6 @@ class PdfExportService {
       ),
     );
   }
-
   static pw.Widget _buildPdfFooter(pw.Context context) {
     return pw.Container(
       padding: pw.EdgeInsets.symmetric(vertical: 8),
@@ -393,10 +347,8 @@ class PdfExportService {
       ),
     );
   }
-
   static String _getPeriodLabel(FilterPeriod period) {
     final dateFormat = DateFormat('dd/MM/yyyy');
-    
     switch (period.type) {
       case FilterPeriodType.custom:
         return '${dateFormat.format(period.startDate)} - ${dateFormat.format(period.endDate)}';
@@ -418,22 +370,17 @@ class PdfExportService {
     }
   }
 }
-
-/// Diálogo para mostrar la vista previa del PDF
 class PdfPreviewDialog extends StatelessWidget {
   final pw.Document pdf;
   final String fileName;
-
   const PdfPreviewDialog({
     Key? key,
     required this.pdf,
     required this.fileName,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -452,7 +399,6 @@ class PdfPreviewDialog extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Header
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -497,8 +443,6 @@ class PdfPreviewDialog extends StatelessWidget {
                 ],
               ),
             ),
-
-            // PDF Preview
             Expanded(
               child: Container(
                 padding: EdgeInsets.all(16),
@@ -519,8 +463,6 @@ class PdfPreviewDialog extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Footer con botones
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(

@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
-
-// Funcion para mensaje popUp de salir
 Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
   if (!isHome) {
     return true;
@@ -31,15 +29,9 @@ Future<bool> onWillPopSalir(BuildContext context, {bool isHome = false}) async {
     ),
   )) ?? false;
 }
-
-// Funcion que oculta appbar en web y escritorio
 bool shouldShowAppBar() {
   return !(kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS);
 }
-
-// Funcion para hacer logout
 void logout(BuildContext context) {
   Provider.of<Auth>(context, listen: false).logout();
-  // Ya no necesitamos navegar manualmente, el Consumer en main.dart
-  // detectará el cambio de auth.isAuthenticated y mostrará el LoginView
 }

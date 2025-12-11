@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -8,43 +8,31 @@ import 'package:proyecto_santi/services/usuario_service.dart';
 import 'package:proyecto_santi/services/profesor_service.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Diálogo responsive para crear/editar usuarios
-/// Similar al estilo de ActivityDetailView
 class UsuarioDetailDialog extends StatefulWidget {
-  final Usuario? usuario; // null = crear nuevo
+  final Usuario? usuario; 
   final VoidCallback onSaved;
-
   const UsuarioDetailDialog({
     Key? key,
     this.usuario,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<UsuarioDetailDialog> createState() => _UsuarioDetailDialogState();
 }
-
 class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final UsuarioService _usuarioService = UsuarioService(ApiService());
   final ProfesorService _profesorService = ProfesorService(ApiService());
-  
-  // Controllers
   late TextEditingController _nombreUsuarioController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  
-  // Datos del formulario
   String _selectedRol = 'Usuario';
   bool _activo = true;
   Profesor? _profesorSeleccionado;
   List<Profesor> _profesores = [];
   bool _isLoadingProfesores = true;
   bool _isSaving = false;
-  
   final List<String> _roles = ['Administrador', 'Coordinador', 'Profesor', 'Usuario'];
-  
   bool get isDesktop {
     if (kIsWeb) return true;
     try {
@@ -53,9 +41,7 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       return false;
     }
   }
-  
   bool get isEditing => widget.usuario != null;
-
   @override
   void initState() {
     super.initState();
@@ -66,7 +52,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
     _activo = widget.usuario?.activo ?? true;
     _loadProfesores();
   }
-
   @override
   void dispose() {
     _nombreUsuarioController.dispose();
@@ -74,15 +59,12 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
     _passwordController.dispose();
     super.dispose();
   }
-
   Future<void> _loadProfesores() async {
     try {
       final profesores = await _profesorService.fetchProfesores();
       setState(() {
         _profesores = profesores;
         _isLoadingProfesores = false;
-        
-        // Si estamos editando y hay un profesorUuid, preseleccionar el profesor
         if (isEditing && widget.usuario!.profesorUuid != null) {
           _profesorSeleccionado = _profesores.firstWhere(
             (p) => p.uuid == widget.usuario!.profesorUuid,
@@ -99,15 +81,11 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       }
     }
   }
-
   Future<void> _saveUsuario() async {
     if (!_formKey.currentState!.validate()) return;
-    
     setState(() => _isSaving = true);
-    
     try {
       if (isEditing) {
-        // Al editar, actualizar datos del usuario (sin password)
         final data = {
           'nombreUsuario': _nombreUsuarioController.text.trim(),
           'email': _emailController.text.trim(),
@@ -115,24 +93,19 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
           'activo': _activo,
           'profesorUuid': _profesorSeleccionado?.uuid,
         };
-        
         await _usuarioService.updateUsuario(widget.usuario!.id, data);
-        
-        // Si se proporcionó una nueva contraseña, cambiarla por separado
         if (_passwordController.text.isNotEmpty) {
           await _usuarioService.changePassword(
             widget.usuario!.id,
             _passwordController.text.trim(),
           );
         }
-        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Usuario actualizado correctamente')),
           );
         }
       } else {
-        // Al crear, incluir password en los datos
         final data = {
           'nombreUsuario': _nombreUsuarioController.text.trim(),
           'email': _emailController.text.trim(),
@@ -141,7 +114,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
           'activo': _activo,
           'profesorUuid': _profesorSeleccionado?.uuid,
         };
-        
         await _usuarioService.createUsuario(data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -149,10 +121,8 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
           );
         }
       }
-      
       widget.onSaved();
       Navigator.of(context).pop();
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -168,13 +138,11 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -235,7 +203,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -302,12 +269,10 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: Nombre de usuario y Email
         Row(
           children: [
             Expanded(child: _buildNombreUsuarioField(isDark)),
@@ -316,8 +281,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
           ],
         ),
         SizedBox(height: 20),
-        
-        // Fila 2: Contraseña y Rol
         Row(
           children: [
             Expanded(child: _buildPasswordField(isDark)),
@@ -326,17 +289,12 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
           ],
         ),
         SizedBox(height: 20),
-        
-        // Fila 3: Profesor asociado
         _buildProfesorField(isDark),
         SizedBox(height: 20),
-        
-        // Fila 4: Estado activo
         _buildActivoSwitch(isDark),
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +313,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ],
     );
   }
-
   Widget _buildNombreUsuarioField(bool isDark) {
     return _buildStyledField(
       label: 'Nombre de Usuario',
@@ -382,7 +339,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildEmailField(bool isDark) {
     return _buildStyledField(
       label: 'Email',
@@ -410,7 +366,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildPasswordField(bool isDark) {
     return _buildStyledField(
       label: isEditing ? 'Nueva Contraseña (opcional)' : 'Contraseña',
@@ -438,7 +393,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildRolField(bool isDark) {
     return _buildStyledField(
       label: 'Rol del Usuario',
@@ -469,7 +423,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildProfesorField(bool isDark) {
     return _buildStyledField(
       label: 'Profesor Asociado (opcional)',
@@ -504,7 +457,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildActivoSwitch(bool isDark) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -562,7 +514,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -600,7 +551,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ],
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -658,7 +608,6 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
       ),
     );
   }
-
   Icon _getRolIcon(String rol) {
     final rolLower = rol.toLowerCase();
     if (rolLower == 'admin' || rolLower == 'administrador') {
@@ -672,6 +621,3 @@ class _UsuarioDetailDialogState extends State<UsuarioDetailDialog> {
     }
   }
 }
-
-
-

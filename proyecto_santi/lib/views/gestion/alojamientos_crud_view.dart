@@ -1,37 +1,30 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/alojamiento_detail_dialog.dart';
-
 class AlojamientosCrudView extends StatefulWidget {
   const AlojamientosCrudView({Key? key}) : super(key: key);
-
   @override
   State<AlojamientosCrudView> createState() => _AlojamientosCrudViewState();
 }
-
 class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
   final ApiService _apiService = ApiService();
   late final ActividadService _actividadService;
-  
   List<Alojamiento> _alojamientos = [];
   List<Alojamiento> _filteredAlojamientos = [];
   bool _isLoading = false;
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
     _actividadService = ActividadService(_apiService);
     _loadAlojamientos();
   }
-
   Future<void> _loadAlojamientos() async {
     setState(() => _isLoading = true);
-    
     try {
       final alojamientos = await _actividadService.fetchAlojamientos();
       setState(() {
@@ -49,7 +42,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       }
     }
   }
-
   void _filterAlojamientos(String query) {
     setState(() {
       _searchQuery = query;
@@ -65,7 +57,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       }
     });
   }
-
   void _showAlojamientoDialog({Alojamiento? alojamiento}) {
     showDialog(
       context: context,
@@ -75,15 +66,12 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       ),
     );
   }
-
   void _addAlojamiento() {
     _showAlojamientoDialog();
   }
-
   void _editAlojamiento(Alojamiento alojamiento) {
     _showAlojamientoDialog(alojamiento: alojamiento);
   }
-
   Future<void> _deleteAlojamiento(Alojamiento alojamiento) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -103,7 +91,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
         ],
       ),
     );
-
     if (confirmed == true) {
       try {
         final success = await _actividadService.deleteAlojamiento(alojamiento.id);
@@ -128,13 +115,11 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
@@ -145,7 +130,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -164,7 +148,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                       ],
                     ),
                   ),
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -182,7 +165,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Lista de alojamientos
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -214,7 +196,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       ],
     );
   }
-
   Widget _buildAlojamientosList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -271,7 +252,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       ),
     );
   }
-
   Widget _buildAlojamientoCard(Alojamiento alojamiento, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -312,11 +292,9 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono, nombre y menú
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono de alojamiento
                 Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -330,7 +308,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                   ),
                 ),
                 SizedBox(width: 12),
-                // Nombre del alojamiento
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,7 +344,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                     ],
                   ),
                 ),
-                // Menú de 3 puntos
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -409,7 +385,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               ],
             ),
             SizedBox(height: 12),
-            // Divider sutil con gradiente
             Container(
               height: 1,
               decoration: BoxDecoration(
@@ -423,7 +398,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               ),
             ),
             SizedBox(height: 12),
-            // Información del alojamiento
             _buildInfoRow(
               icon: Icons.location_city_rounded,
               label: '${alojamiento.ciudad ?? 'N/A'}, ${alojamiento.provincia ?? 'N/A'}',
@@ -466,7 +440,6 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       ),
     );
   }
-
   Widget _buildInfoRow({required IconData icon, required String label, required bool isDark}) {
     return Row(
       children: [

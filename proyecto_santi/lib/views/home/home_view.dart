@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/auth.dart';
@@ -10,21 +10,16 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:proyecto_santi/shared/widgets/state_widgets.dart';
-
 class HomeView extends StatefulWidget {
   final VoidCallback onToggleTheme;
-
   const HomeView({super.key, required this.onToggleTheme});
-
   @override
   HomeViewState createState() => HomeViewState();
 }
-
 class HomeViewState extends State<HomeView> {
   late Future<List<Actividad>> _futureActivities;
   late final ApiService _apiService;
   late final ActividadService _actividadService;
-
   @override
   void initState() {
     super.initState();
@@ -32,77 +27,53 @@ class HomeViewState extends State<HomeView> {
     _actividadService = ActividadService(_apiService);
     _futureActivities = _loadAndFilterActivities();
   }
-
   @override
   void reassemble() {
     super.reassemble();
-    // Recargar actividades al hacer hot reload/restart
     setState(() {
       _futureActivities = _loadAndFilterActivities();
     });
   }
-
   Future<List<Actividad>> _loadAndFilterActivities() async {
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final rol = currentUser?.rol;
     final profesorUuid = currentUser?.uuid;
-
     print('[HomeView] ========================================');
     print('[HomeView] Usuario actual: ${currentUser?.nombre}');
     print('[HomeView] Rol: $rol');
     print('[HomeView] ProfesorUuid: $profesorUuid');
     print('[HomeView] ========================================');
-
-    // Cargar todas las actividades
     final actividades = await _actividadService.fetchFutureActivities();
-    
     print('[HomeView] Total actividades cargadas: ${actividades.length}');
-
-    // Filtrar según el rol
     if (rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED') {
-      // Administradores y coordinadores ven todas las actividades
       print('[HomeView] Admin/Coordinador - Mostrando todas las actividades');
       return actividades;
     } else if (rol == 'Profesor' || rol == 'PROF') {
-      // Profesores solo ven actividades donde son responsables o participantes
       print('[HomeView] Filtrando actividades para profesor...');
-      
       final actividadesFiltradas = actividades.where((actividad) {
-        // Es responsable
         final esResponsable = actividad.responsable?.uuid == profesorUuid;
-        
-        // Es participante
         final esParticipante = actividad.profesoresParticipantesIds.contains(profesorUuid);
-        
         final cumpleFiltro = esResponsable || esParticipante;
-        
-        // LOG TODAS LAS ACTIVIDADES PARA DEBUG
         print('[HomeView] ${cumpleFiltro ? "✅" : "❌"} Actividad ${actividad.id} - ${actividad.titulo}');
         print('[HomeView]    Responsable: ${actividad.responsable?.uuid}');
         print('[HomeView]    Participantes (${actividad.profesoresParticipantesIds.length}): ${actividad.profesoresParticipantesIds}');
         print('[HomeView]    Cumple filtro: $cumpleFiltro (responsable: $esResponsable, participante: $esParticipante)');
-        
         return cumpleFiltro;
       }).toList();
-      
       print('[HomeView] ========================================');
       print('[HomeView] Actividades filtradas: ${actividadesFiltradas.length}');
       print('[HomeView] ========================================');
       return actividadesFiltradas;
     } else {
-      // Otros roles no ven actividades
       print('[HomeView] Rol sin acceso: $rol');
       return [];
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<Auth>(context);
     final rol = auth.currentUser?.rol;
-
-    // Bloquear acceso a usuarios normales
     if (rol != null && 
         rol != 'Administrador' && 
         rol != 'Admin' && 
@@ -149,9 +120,6 @@ class HomeViewState extends State<HomeView> {
         ],
       );
     }
-
-    // El contenido se muestra directamente sin Scaffold
-    // porque el DesktopShell ya proporciona el marco (tanto en desktop como en móvil)
     return Stack(
       children: [
         Theme.of(context).brightness == Brightness.dark
@@ -177,20 +145,15 @@ class HomeViewState extends State<HomeView> {
       ],
     );
   }
-
   Widget _buildResponsiveLayout(BuildContext context, List<Actividad> activities) {
-    // Detectar si es desktop o móvil
     final width = MediaQuery.of(context).size.width;
     final isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     if (isDesktop && width >= 800) {
-      // Vista de escritorio grande
       return HomeLargeLandscapeLayout(
         activities: activities,
         onToggleTheme: widget.onToggleTheme,
       );
     } else {
-      // Vista móvil (portrait o landscape pequeño)
       return OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.portrait) {

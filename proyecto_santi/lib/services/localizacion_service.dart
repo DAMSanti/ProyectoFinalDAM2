@@ -1,16 +1,10 @@
-import 'package:proyecto_santi/services/api_service.dart';
-
-/// Servicio para gestionar localizaciones de actividades
+﻿import 'package:proyecto_santi/services/api_service.dart';
 class LocalizacionService {
   final ApiService _apiService;
-
   LocalizacionService(this._apiService);
-
-  /// Obtiene todas las localizaciones del catálogo
   Future<List<Map<String, dynamic>>> fetchAllLocalizaciones() async {
     try {
       final response = await _apiService.getData('/Localizacion');
-      
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         return data.map((e) => e as Map<String, dynamic>).toList();
@@ -21,8 +15,6 @@ class LocalizacionService {
       rethrow;
     }
   }
-
-  /// Crea una nueva localización en el catálogo
   Future<Map<String, dynamic>?> createLocalizacion({
     required String nombre,
     String? direccion,
@@ -45,7 +37,6 @@ class LocalizacionService {
         'longitud': longitud,
         'icono': icono,
       });
-      
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data as Map<String, dynamic>;
       }
@@ -55,27 +46,20 @@ class LocalizacionService {
       return null;
     }
   }
-
-  /// Obtiene todas las localizaciones de una actividad
   Future<List<Map<String, dynamic>>> fetchLocalizaciones(int actividadId) async {
     try {
       final response = await _apiService.getData('/Actividad/$actividadId/localizaciones');
-      
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         return data.map((e) => e as Map<String, dynamic>).toList();
       }
-      // Si no es 200, retornar lista vacía en lugar de lanzar excepción
       print('[LocalizacionService] fetchLocalizaciones retornó status ${response.statusCode}');
       return [];
     } catch (e) {
       print('[LocalizacionService ERROR] fetchLocalizaciones: $e');
-      // Retornar lista vacía en lugar de relanzar para no bloquear el guardado
       return [];
     }
   }
-
-  /// Añade una localización a una actividad
   Future<bool> addLocalizacion(
     int actividadId, 
     int localizacionId, {
@@ -94,12 +78,10 @@ class LocalizacionService {
         if (tipoLocalizacion != null && tipoLocalizacion.isNotEmpty) 'tipoLocalizacion': tipoLocalizacion,
       };
       print('[LocalizacionService] Body data: $bodyData');
-      
       final response = await _apiService.postData(
         '/Actividad/$actividadId/localizaciones/$localizacionId',
         bodyData,
       );
-      
       print('[LocalizacionService] Response status: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
@@ -107,21 +89,16 @@ class LocalizacionService {
       return false;
     }
   }
-
-  /// Elimina una localización de una actividad
   Future<bool> removeLocalizacion(int actividadId, int localizacionId) async {
     try {
       print('[LocalizacionService] Removing localización $localizacionId from actividad $actividadId');
       final response = await _apiService.deleteData('/Actividad/$actividadId/localizaciones/$localizacionId');
-      
       return response.statusCode == 200;
     } catch (e) {
       print('[LocalizacionService ERROR] removeLocalizacion: $e');
       return false;
     }
   }
-
-  /// Actualiza una localización de una actividad (si es principal)
   Future<bool> updateLocalizacion(
     int actividadId, 
     int localizacionId, {
@@ -141,7 +118,6 @@ class LocalizacionService {
           if (tipoLocalizacion != null) 'tipoLocalizacion': tipoLocalizacion,
         },
       );
-      
       return response.statusCode == 200;
     } catch (e) {
       print('[LocalizacionService ERROR] updateLocalizacion: $e');

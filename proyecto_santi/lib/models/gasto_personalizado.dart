@@ -1,11 +1,9 @@
-/// Modelo para gastos personalizados de una actividad
-class GastoPersonalizado {
+﻿class GastoPersonalizado {
   final int? id;
   final int actividadId;
   final String concepto;
   final double cantidad;
   final DateTime? fechaCreacion;
-
   GastoPersonalizado({
     this.id,
     required this.actividadId,
@@ -13,8 +11,6 @@ class GastoPersonalizado {
     required this.cantidad,
     this.fechaCreacion,
   });
-
-  /// Crea una instancia desde JSON
   factory GastoPersonalizado.fromJson(Map<String, dynamic> json) {
     return GastoPersonalizado(
       id: json['id'] as int?,
@@ -26,8 +22,6 @@ class GastoPersonalizado {
           : null,
     );
   }
-
-  /// Convierte la instancia a JSON
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
@@ -37,8 +31,6 @@ class GastoPersonalizado {
       if (fechaCreacion != null) 'fechaCreacion': fechaCreacion!.toIso8601String(),
     };
   }
-
-  /// Crea una copia con campos actualizados
   GastoPersonalizado copyWith({
     int? id,
     int? actividadId,

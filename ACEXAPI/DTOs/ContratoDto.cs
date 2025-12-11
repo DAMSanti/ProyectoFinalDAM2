@@ -1,5 +1,4 @@
-namespace ACEXAPI.DTOs;
-
+﻿namespace ACEXAPI.DTOs;
 public class ContratoDto
 {
     public int Id { get; set; }
@@ -11,7 +10,6 @@ public class ContratoDto
     public string? PresupuestoUrl { get; set; }
     public string? FacturaUrl { get; set; }
 }
-
 public class ContratoCreateDto
 {
     public int ActividadId { get; set; }

@@ -1,7 +1,5 @@
-namespace ACEXAPI.DTOs;
-
+﻿namespace ACEXAPI.DTOs;
 using ACEXAPI.Models;
-
 public class FotoDto
 {
     public int Id { get; set; }
@@ -11,7 +9,6 @@ public class FotoDto
     public string? Descripcion { get; set; }
     public DateTime FechaSubida { get; set; }
     public long TamanoBytes { get; set; }
-
     public static FotoDto FromEntity(Foto foto)
     {
         return new FotoDto
@@ -26,13 +23,11 @@ public class FotoDto
         };
     }
 }
-
 public class FotoUploadDto
 {
     public int ActividadId { get; set; }
     public string? Descripcion { get; set; }
 }
-
 public class UpdateDescripcionDto
 {
     public string? Descripcion { get; set; }

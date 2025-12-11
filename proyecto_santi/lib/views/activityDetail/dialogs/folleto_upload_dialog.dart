@@ -1,27 +1,17 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../dialogs/pdf_viewer_dialog.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget especializado para la gestión de folletos PDF en una actividad.
-/// 
-/// Responsabilidades:
-/// - Mostrar folleto actual (si existe)
-/// - Permitir seleccionar nuevo folleto PDF
-/// - Permitir eliminar folleto
-/// - Notificar cambios al padre
-/// - Soportar modo compacto para header
 class FolletoUploadWidget extends StatefulWidget {
   final String? folletoUrl;
-  final String? initialFolletoFileName; // Nombre del folleto seleccionado desde el padre
-  final bool initialFolletoMarkedForDeletion; // Si está marcado para eliminación desde el padre
+  final String? initialFolletoFileName; 
+  final bool initialFolletoMarkedForDeletion; 
   final bool isAdminOrSolicitante;
   final Function(Map<String, dynamic>) onFolletoChanged;
-  final bool compact; // Modo compacto para el header
+  final bool compact; 
   final bool isMobile;
-
   const FolletoUploadWidget({
     super.key,
     this.folletoUrl,
@@ -32,36 +22,27 @@ class FolletoUploadWidget extends StatefulWidget {
     this.compact = false,
     this.isMobile = false,
   });
-
   @override
   State<FolletoUploadWidget> createState() => _FolletoUploadWidgetState();
 }
-
 class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
   String? _folletoFileName;
   String? _folletoFilePath;
   bool _folletoChanged = false;
   bool _folletoMarkedForDeletion = false;
-
   @override
   void initState() {
     super.initState();
-    // Inicializar desde los valores pasados por el padre
     _folletoMarkedForDeletion = widget.initialFolletoMarkedForDeletion;
-    
     if (widget.initialFolletoFileName != null) {
-      // Hay un nuevo folleto seleccionado desde el padre
       _folletoFileName = widget.initialFolletoFileName;
     } else if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
-      // Usar el folleto existente de la actividad
       _folletoFileName = _extractFileName(widget.folletoUrl!);
     }
   }
-
   @override
   void didUpdateWidget(FolletoUploadWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si cambió el folletoUrl (por ejemplo, al revertir), actualizar el estado
     if (widget.folletoUrl != oldWidget.folletoUrl) {
       setState(() {
         if (widget.folletoUrl != null && widget.folletoUrl!.isNotEmpty) {
@@ -78,7 +59,6 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       });
     }
   }
-
   Future<void> _selectFolleto() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -86,13 +66,11 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         allowedExtensions: ['pdf'],
         withData: kIsWeb,
       );
-
       if (result != null) {
         final file = result.files.single;
         setState(() {
           _folletoFileName = file.name;
           _folletoMarkedForDeletion = false;
-          
           if (kIsWeb) {
             _folletoFilePath = null;
             if (file.bytes != null) {
@@ -122,7 +100,6 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       }
     }
   }
-
   Future<void> _deleteFolleto() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -153,54 +130,40 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         );
       },
     );
-
     if (confirmed == true) {
       setState(() {
         _folletoMarkedForDeletion = true;
         _folletoFileName = null;
         _folletoFilePath = null;
-        
         widget.onFolletoChanged({
           'deleteFolleto': true,
         });
       });
     }
   }
-
   String _extractFileName(String url) {
     final parts = url.split('/');
     if (parts.isEmpty) return 'folleto.pdf';
-    
     final fileName = parts.last;
-    
-    // Extraer nombre original si tiene formato "timestamp_nombreOriginal.pdf"
     final timestampPattern = RegExp(r'^\d+_(.+)$');
     final match = timestampPattern.firstMatch(fileName);
     if (match != null && match.groupCount >= 1) {
       return match.group(1)!;
     }
-    
     return fileName;
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
-    // Modo compacto para el header
     if (widget.compact) {
       return _buildCompactMode(context, isDark, isWeb);
     }
-
-    // Modo completo: Si está marcado para eliminación y no hay nuevo folleto, no mostrar nada
     if (_folletoMarkedForDeletion && _folletoFileName == null) {
       return widget.isAdminOrSolicitante
           ? _buildUploadButton(isDark, isWeb)
           : SizedBox.shrink();
     }
-
-    // Si hay folleto (nuevo o existente)
     if (_folletoFileName != null) {
       return Container(
         padding: EdgeInsets.all(16),
@@ -275,17 +238,11 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         ),
       );
     }
-
-    // Si no hay folleto y es admin
     if (widget.isAdminOrSolicitante) {
       return _buildUploadButton(isDark, isWeb);
     }
-
-    // Si no hay folleto y no es admin, no mostrar nada
     return SizedBox.shrink();
   }
-
-  /// Modo compacto para el header (horizontal, sin padding extra)
   Widget _buildCompactMode(BuildContext context, bool isDark, bool isWeb) {
     final bool hasFolleto = !_folletoMarkedForDeletion && 
                            (_folletoFileName != null || widget.folletoUrl != null);
@@ -295,7 +252,6 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
             (widget.folletoUrl != null 
                 ? _extractFileName(widget.folletoUrl!)
                 : 'Sin folleto'));
-
     void _openPdfViewer() {
       if (hasFolleto && widget.folletoUrl != null) {
         showDialog(
@@ -309,7 +265,6 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
         );
       }
     }
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
@@ -399,7 +354,6 @@ class _FolletoUploadWidgetState extends State<FolletoUploadWidget> {
       ],
     );
   }
-
   Widget _buildUploadButton(bool isDark, bool isWeb) {
     return Container(
       decoration: BoxDecoration(

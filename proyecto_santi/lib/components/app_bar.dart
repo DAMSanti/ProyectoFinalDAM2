@@ -1,21 +1,17 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
   final String title;
   final bool showMenuButton;
-
   const AndroidAppBar({
     super.key,
     required this.onToggleTheme,
     required this.title,
     this.showMenuButton = true,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return OrientationBuilder(
       builder: (context, orientation) {
         return AppBar(
@@ -25,7 +21,7 @@ class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
-              color: Color(0xFF1976d2), // Azul consistente con desktop
+              color: Color(0xFF1976d2), 
               letterSpacing: 0.5,
             ),
           ),
@@ -56,7 +52,6 @@ class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
-
   @override
   Size get preferredSize {
     final orientation = WidgetsBinding.instance.window.physicalSize.aspectRatio > 1
@@ -64,7 +59,7 @@ class AndroidAppBar extends StatelessWidget implements PreferredSizeWidget {
         : Orientation.portrait;
     double appBarHeight = orientation == Orientation.portrait
         ? kToolbarHeight
-        : kToolbarHeight * 0.65; // Adjust height based on orientation
+        : kToolbarHeight * 0.65; 
     return Size.fromHeight(appBarHeight);
   }
 }

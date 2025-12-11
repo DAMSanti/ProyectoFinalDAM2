@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/estadisticas/models/trend_data.dart';
-
 class TrendStatCard extends StatelessWidget {
   final TrendData data;
   final bool isDark;
   final bool isMobile;
   final VoidCallback? onTap;
-
   const TrendStatCard({
     Key? key,
     required this.data,
@@ -14,7 +12,6 @@ class TrendStatCard extends StatelessWidget {
     required this.isMobile,
     this.onTap,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,7 +54,6 @@ class TrendStatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header compacto con icono y tendencia
                 Row(
                   children: [
                     Container(
@@ -80,7 +76,6 @@ class TrendStatCard extends StatelessWidget {
                       ),
                     ),
                     Spacer(),
-                    // Indicador de tendencia compacto
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 6 : 8,
@@ -117,8 +112,6 @@ class TrendStatCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: isMobile ? 8 : 10),
-                
-                // Valor actual más compacto
                 Text(
                   data.currentValue,
                   style: TextStyle(
@@ -129,8 +122,6 @@ class TrendStatCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 2),
-                
-                // Título compacto
                 Text(
                   data.title,
                   style: TextStyle(
@@ -144,10 +135,7 @@ class TrendStatCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
                 SizedBox(height: isMobile ? 6 : 8),
-                
-                // Comparación compacta
                 Row(
                   children: [
                     Icon(

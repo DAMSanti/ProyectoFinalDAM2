@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/utils/constants.dart';
-
-/// Utilidades para mostrar diálogos y mensajes
 class DialogUtils {
-  /// Muestra un diálogo de confirmación
   static Future<bool> showConfirmDialog(
     BuildContext context, {
     required String title,
@@ -35,11 +32,8 @@ class DialogUtils {
         ],
       ),
     );
-    
     return result ?? false;
   }
-
-  /// Muestra un diálogo de error
   static Future<void> showErrorDialog(
     BuildContext context, {
     String title = 'Error',
@@ -66,8 +60,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un diálogo de éxito
   static Future<void> showSuccessDialog(
     BuildContext context, {
     String title = 'Éxito',
@@ -94,8 +86,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un diálogo de información
   static Future<void> showInfoDialog(
     BuildContext context, {
     String title = 'Información',
@@ -122,8 +112,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un diálogo de carga
   static void showLoadingDialog(
     BuildContext context, {
     String message = 'Cargando...',
@@ -146,13 +134,9 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Cierra el diálogo de carga
   static void hideLoadingDialog(BuildContext context) {
     Navigator.of(context).pop();
   }
-
-  /// Muestra un SnackBar de error
   static void showErrorSnackBar(
     BuildContext context,
     String message, {
@@ -173,8 +157,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un SnackBar de éxito
   static void showSuccessSnackBar(
     BuildContext context,
     String message, {
@@ -195,8 +177,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un SnackBar de información
   static void showInfoSnackBar(
     BuildContext context,
     String message, {
@@ -217,8 +197,6 @@ class DialogUtils {
       ),
     );
   }
-
-  /// Muestra un bottom sheet con opciones
   static Future<T?> showOptionsBottomSheet<T>(
     BuildContext context, {
     required String title,
@@ -251,13 +229,10 @@ class DialogUtils {
     );
   }
 }
-
-/// Clase para opciones del bottom sheet
 class BottomSheetOption<T> {
   final String label;
   final IconData? icon;
   final T value;
-
   BottomSheetOption({
     required this.label,
     this.icon,

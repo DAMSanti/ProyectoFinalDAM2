@@ -1,15 +1,13 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'dart:io';
-
 class InfoCardWidget extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
   final int maxLines;
   final bool isMobile;
-
   const InfoCardWidget({
     super.key,
     required this.icon,
@@ -18,12 +16,10 @@ class InfoCardWidget extends StatelessWidget {
     this.maxLines = 2,
     this.isMobile = false,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
     return Container(
       padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(

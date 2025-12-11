@@ -4,10 +4,7 @@ import '../../../../models/empresa_transporte.dart';
 import '../../../../models/alojamiento.dart';
 import '../../../../services/actividad_service.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Clase helper para manejar la edición de elementos del presupuesto
 class BudgetEditHandlers {
-  /// Maneja la edición del presupuesto estimado
   static Future<void> handleEditPresupuesto({
     required BuildContext context,
     required bool editando,
@@ -19,13 +16,10 @@ class BudgetEditHandlers {
     required bool alojamientoReq,
   }) async {
     if (editando) {
-      // Guardar cambios
       final textoLimpio = controller.text.replaceAll(',', '.');
       final nuevoPresupuesto = double.tryParse(textoLimpio);
       if (nuevoPresupuesto != null && nuevoPresupuesto >= 0) {
         onStateChanged(false, nuevoPresupuesto);
-        
-        // Notificar cambio al padre
         onBudgetChanged({
           'presupuestoEstimado': nuevoPresupuesto,
           'transporteReq': transporteReq ? 1 : 0,
@@ -37,13 +31,10 @@ class BudgetEditHandlers {
         }
       }
     } else {
-      // Activar modo edición
       controller.text = (presupuestoActual ?? 0.0).toStringAsFixed(2);
       onStateChanged(true, presupuestoActual);
     }
   }
-
-  /// Maneja la edición del precio de transporte
   static Future<void> handleEditTransporte({
     required BuildContext context,
     required bool editando,
@@ -57,13 +48,10 @@ class BudgetEditHandlers {
     required bool alojamientoReq,
   }) async {
     if (editando) {
-      // Guardar cambios
       final textoLimpio = controller.text.replaceAll(',', '.');
       final nuevoPrecio = double.tryParse(textoLimpio);
       if (nuevoPrecio != null && nuevoPrecio >= 0) {
         onStateChanged(false, nuevoPrecio, empresaActual, [], false);
-        
-        // Notificar cambio al padre
         onBudgetChanged({
           'precioTransporte': nuevoPrecio,
           'empresaTransporteId': empresaActual?.id,
@@ -76,14 +64,10 @@ class BudgetEditHandlers {
         }
       }
     } else {
-      // Activar modo edición y cargar empresas
       controller.text = (precioActual ?? 0.0).toStringAsFixed(2);
       onStateChanged(true, precioActual, empresaActual, [], true);
-      
-      // Cargar empresas de transporte
       try {
         final empresas = await actividadService.fetchEmpresasTransporte();
-        
         if (empresaActual != null && context.mounted) {
           final empresaEncontrada = empresas.firstWhere(
             (e) => e.id == empresaActual.id,
@@ -102,8 +86,6 @@ class BudgetEditHandlers {
       }
     }
   }
-
-  /// Maneja la edición del precio de alojamiento
   static Future<void> handleEditAlojamiento({
     required BuildContext context,
     required bool editando,
@@ -117,13 +99,10 @@ class BudgetEditHandlers {
     required bool alojamientoReq,
   }) async {
     if (editando) {
-      // Guardar cambios
       final textoLimpio = controller.text.replaceAll(',', '.');
       final nuevoPrecio = double.tryParse(textoLimpio);
       if (nuevoPrecio != null && nuevoPrecio >= 0) {
         onStateChanged(false, nuevoPrecio, alojamientoActual, [], false);
-        
-        // Notificar cambio al padre
         onBudgetChanged({
           'precioAlojamiento': nuevoPrecio,
           'alojamientoId': alojamientoActual?.id,
@@ -136,14 +115,10 @@ class BudgetEditHandlers {
         }
       }
     } else {
-      // Activar modo edición y cargar alojamientos
       controller.text = (precioActual ?? 0.0).toStringAsFixed(2);
       onStateChanged(true, precioActual, alojamientoActual, [], true);
-      
-      // Cargar alojamientos disponibles
       try {
         final alojamientos = await actividadService.fetchAlojamientos();
-        
         if (alojamientoActual != null && context.mounted) {
           final alojamientoEncontrado = alojamientos.firstWhere(
             (a) => a.id == alojamientoActual.id,

@@ -1,68 +1,55 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'layouts/multi_select_portrait_layout.dart';
 import 'layouts/multi_select_landscape_layout.dart';
-
 class MultiSelectGrupoDialog extends StatefulWidget {
   final List<Curso> cursos;
   final List<Grupo> grupos;
   final List<Grupo> gruposYaSeleccionados;
-
   const MultiSelectGrupoDialog({
     Key? key,
     required this.cursos,
     required this.grupos,
     required this.gruposYaSeleccionados,
   }) : super(key: key);
-
   @override
   State<MultiSelectGrupoDialog> createState() => _MultiSelectGrupoDialogState();
 }
-
 class _MultiSelectGrupoDialogState extends State<MultiSelectGrupoDialog> {
   final List<Grupo> _selectedGrupos = [];
   final Set<int> _expandedCursos = {};
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
   }
-
   List<Curso> get _filteredCursos {
     if (_searchQuery.isEmpty) {
       return widget.cursos;
     }
-    
     return widget.cursos.where((curso) {
       final cursoName = curso.nombre.toLowerCase();
       final query = _searchQuery.toLowerCase();
-      
       final coincideCurso = cursoName.contains(query);
       final algunGrupoCoincide = _getGruposDeCurso(curso.id).any(
         (grupo) => grupo.nombre.toLowerCase().contains(query)
       );
-      
       return coincideCurso || algunGrupoCoincide;
     }).toList();
   }
-
   List<Grupo> _getGruposDeCurso(int cursoId) {
     return widget.grupos.where((g) => g.cursoId == cursoId).toList();
   }
-
   bool _isGrupoYaParticipante(Grupo grupo) {
     return widget.gruposYaSeleccionados.any((g) => g.id == grupo.id);
   }
-
   void _toggleCurso(int cursoId) {
     final gruposCurso = _getGruposDeCurso(cursoId);
     final todosSeleccionados = gruposCurso.every(
       (g) => _selectedGrupos.any((sg) => sg.id == g.id) || _isGrupoYaParticipante(g)
     );
-    
     setState(() {
       if (todosSeleccionados) {
         _selectedGrupos.removeWhere((g) => gruposCurso.any((gc) => gc.id == g.id));
@@ -75,7 +62,6 @@ class _MultiSelectGrupoDialogState extends State<MultiSelectGrupoDialog> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -85,7 +71,6 @@ class _MultiSelectGrupoDialogState extends State<MultiSelectGrupoDialog> {
     final isPortrait = orientation == Orientation.portrait;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape

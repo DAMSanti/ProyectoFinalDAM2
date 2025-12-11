@@ -1,8 +1,4 @@
-namespace ACEXAPI.Models;
-
-/// <summary>
-/// Estados posibles de una actividad
-/// </summary>
+﻿namespace ACEXAPI.Models;
 public enum EstadoActividad
 {
     Pendiente,

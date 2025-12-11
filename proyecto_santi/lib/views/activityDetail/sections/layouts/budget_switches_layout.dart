@@ -1,16 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../widgets/budget/budget_toggle_switch.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget que maneja el layout responsive de los switches de transporte y alojamiento.
-/// 
-/// Muestra dos switches que permiten activar/desactivar:
-/// - Transporte requerido
-/// - Alojamiento requerido
-/// 
-/// Layout:
-/// - Mobile portrait: columna vertical
-/// - Otros (landscape, desktop): fila horizontal
 class BudgetSwitchesLayout extends StatelessWidget {
   final bool isMobile;
   final bool isPortrait;
@@ -19,7 +9,6 @@ class BudgetSwitchesLayout extends StatelessWidget {
   final bool alojamientoReq;
   final Function(bool) onTransporteChanged;
   final Function(bool) onAlojamientoChanged;
-
   const BudgetSwitchesLayout({
     Key? key,
     required this.isMobile,
@@ -30,10 +19,8 @@ class BudgetSwitchesLayout extends StatelessWidget {
     required this.onTransporteChanged,
     required this.onAlojamientoChanged,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    // En móvil portrait: columna; en otros casos: fila
     if (isMobile && isPortrait) {
       return Column(
         children: [

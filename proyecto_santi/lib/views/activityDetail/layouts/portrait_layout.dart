@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/views/activityDetail/utils/detail_bar.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/views/activityDetail/sections/detail_info_section.dart';
-
 class ActivityDetailPortraitLayout extends StatelessWidget {
   final Actividad actividad;
   final bool isDarkTheme;
@@ -23,7 +22,6 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
   final VoidCallback? _revertChanges;
   final Function(Map<String, dynamic>)? onActivityDataChanged;
   final int reloadTrigger;
-
   const ActivityDetailPortraitLayout({
     super.key,
     required this.actividad,
@@ -50,7 +48,6 @@ class ActivityDetailPortraitLayout extends StatelessWidget {
         _editLocalImage = editLocalImage,
         _saveChanges = saveChanges,
         _revertChanges = revertChanges;
-
   @override
   Widget build(BuildContext context) {
     return MediaQuery(

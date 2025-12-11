@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'message_type.dart';
-
-/// Modelo de mensaje de chat
 class ChatMessage {
   final String id;
   final String senderId;
@@ -11,14 +9,13 @@ class ChatMessage {
   final MessageType type;
   final String? mediaUrl;
   final String? thumbnailUrl;
-  final int? duration; // En segundos para audio/video
+  final int? duration; 
   final DateTime timestamp;
   final bool edited;
   final DateTime? editedAt;
-  final Map<String, String> reactions; // userId -> emoji
+  final Map<String, String> reactions; 
   final String? replyToId;
-  final Map<String, DateTime> readBy; // userId -> timestamp
-
+  final Map<String, DateTime> readBy; 
   ChatMessage({
     required this.id,
     required this.senderId,
@@ -36,8 +33,6 @@ class ChatMessage {
     this.replyToId,
     this.readBy = const {},
   });
-
-  /// Convierte el mensaje a un Map para Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'senderId': senderId,
@@ -56,11 +51,8 @@ class ChatMessage {
       'readBy': readBy.map((key, value) => MapEntry(key, Timestamp.fromDate(value))),
     };
   }
-
-  /// Crea un ChatMessage desde un documento de Firestore
   factory ChatMessage.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
     return ChatMessage(
       id: doc.id,
       senderId: data['senderId'] ?? '',
@@ -82,8 +74,6 @@ class ChatMessage {
           {},
     );
   }
-
-  /// Crea una copia del mensaje con los campos modificados
   ChatMessage copyWith({
     String? id,
     String? senderId,
@@ -119,16 +109,10 @@ class ChatMessage {
       readBy: readBy ?? this.readBy,
     );
   }
-
-  /// Verifica si el mensaje ha sido leído por un usuario
   bool isReadBy(String userId) {
     return readBy.containsKey(userId);
   }
-
-  /// Verifica si el mensaje tiene reacciones
   bool get hasReactions => reactions.isNotEmpty;
-
-  /// Obtiene el conteo de cada reacción
   Map<String, int> get reactionCounts {
     final counts = <String, int>{};
     for (final emoji in reactions.values) {

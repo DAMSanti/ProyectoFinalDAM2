@@ -1,5 +1,4 @@
-namespace ACEXAPI.DTOs;
-
+﻿namespace ACEXAPI.DTOs;
 public class ActividadDto
 {
     public int Id { get; set; }
@@ -22,18 +21,11 @@ public class ActividadDto
     public int? AlojamientoId { get; set; }
     public AlojamientoDto? Alojamiento { get; set; }
     public int AlojamientoReq { get; set; }
-    
-    // Lista de localizaciones de la actividad
     public List<LocalizacionDto>? Localizaciones { get; set; }
-    
-    // Información del profesor responsable
     public Guid? ResponsableId { get; set; }
     public ProfesorSimpleDto? Responsable { get; set; }
-    
-    // Información del profesor solicitante (mantener por compatibilidad)
     public ProfesorSimpleDto? Solicitante { get; set; }
 }
-
 public class ProfesorSimpleDto
 {
     public int Id { get; set; }
@@ -45,7 +37,6 @@ public class ProfesorSimpleDto
     public int? DepartamentoId { get; set; }
     public string? DepartamentoNombre { get; set; }
 }
-
 public class ActividadCreateDto
 {
     public string Nombre { get; set; } = string.Empty;
@@ -58,7 +49,6 @@ public class ActividadCreateDto
     public int? EmpTransporteId { get; set; }
     public string Tipo { get; set; } = "Complementaria";
 }
-
 public class ActividadUpdateDto
 {
     public string? Nombre { get; set; }
@@ -71,16 +61,15 @@ public class ActividadUpdateDto
     public string? Estado { get; set; }
     public string? Tipo { get; set; }
     public Guid? ResponsableId { get; set; }
-    public Guid? SolicitanteId { get; set; } // Mantener por compatibilidad
+    public Guid? SolicitanteId { get; set; } 
     public int? LocalizacionId { get; set; }
     public int? EmpTransporteId { get; set; }
-    public int? EmpresaTransporteId { get; set; } // Alias para compatibilidad con Flutter
+    public int? EmpresaTransporteId { get; set; } 
     public int? AlojamientoId { get; set; }
     public decimal? PrecioAlojamiento { get; set; }
     public int? TransporteReq { get; set; }
     public int? AlojamientoReq { get; set; }
 }
-
 public class ActividadListDto
 {
     public int Id { get; set; }
@@ -90,18 +79,11 @@ public class ActividadListDto
     public DateTime? FechaFin { get; set; }
     public string Estado { get; set; } = "Pendiente";
     public string Tipo { get; set; } = "Complementaria";
-    
-    // Información del profesor responsable
     public Guid? ResponsableId { get; set; }
     public ProfesorSimpleDto? Responsable { get; set; }
-    
-    // Información del profesor solicitante (mantener por compatibilidad)
     public ProfesorSimpleDto? Solicitante { get; set; }
-    
-    // Lista de profesores participantes
     public List<Guid> ProfesoresParticipantesIds { get; set; } = new List<Guid>();
 }
-
 public class LocalizacionDto
 {
     public int Id { get; set; }
@@ -118,7 +100,6 @@ public class LocalizacionDto
     public string? Descripcion { get; set; }
     public string? TipoLocalizacion { get; set; }
 }
-
 public class AddLocalizacionDto
 {
     public bool EsPrincipal { get; set; } = false;
@@ -127,7 +108,6 @@ public class AddLocalizacionDto
     public string? Descripcion { get; set; }
     public string? TipoLocalizacion { get; set; }
 }
-
 public class UpdateLocalizacionDto
 {
     public bool EsPrincipal { get; set; }

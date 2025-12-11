@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
@@ -7,20 +7,11 @@ import 'package:proyecto_santi/widgets/localizaciones_map_widget.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import '../dialogs/add_localizacion_dialog.dart';
 import '../dialogs/edit_localizacion_dialog.dart';
-
-/// Widget que maneja toda la secci�n de localizaciones de una actividad.
-/// 
-/// Responsabilidades:
-/// - Mostrar mapa interactivo con todas las localizaciones
-/// - Lista de localizaciones con cards detalladas
-/// - Permitir agregar, editar y eliminar localizaciones
-/// - Cargar �conos din�micamente seg�n tipo de localizaci�n
 class ActivityLocationsSection extends StatefulWidget {
   final int actividadId;
   final bool isAdminOrSolicitante;
   final LocalizacionService localizacionService;
   final Function(Map<String, dynamic>)? onDataChanged;
-
   const ActivityLocationsSection({
     super.key,
     required this.actividadId,
@@ -28,40 +19,30 @@ class ActivityLocationsSection extends StatefulWidget {
     required this.localizacionService,
     this.onDataChanged,
   });
-
   @override
   State<ActivityLocationsSection> createState() => _ActivityLocationsSectionState();
 }
-
 class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
   List<Localizacion> _localizaciones = [];
   Map<int, IconData> _iconosLocalizaciones = {};
   bool _loadingLocalizaciones = false;
-
   @override
   void initState() {
     super.initState();
     _loadLocalizaciones();
   }
-
   Future<void> _loadLocalizaciones() async {
     if (widget.actividadId == null) return;
-
     setState(() {
       _loadingLocalizaciones = true;
     });
-
     try {
       final localizacionesData = await widget.localizacionService.fetchLocalizaciones(
         widget.actividadId,
       );
-
-      // Mapear a objetos Localizacion
       final localizaciones = localizacionesData
           .map((data) => Localizacion.fromJson(data))
           .toList();
-
-      // Cargar �conos para cada localizaci�n
       final iconos = <int, IconData>{};
       for (var loc in localizaciones) {
         if (loc.icono != null) {
@@ -71,7 +52,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           }
         }
       }
-
       if (mounted) {
         setState(() {
           _localizaciones = localizaciones;
@@ -88,9 +68,7 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       }
     }
   }
-
   IconData? _getIconFromString(String iconName) {
-    // Mapeo b�sico de nombres a �conos
     final iconMap = <String, IconData>{
       'place': Icons.place,
       'restaurant': Icons.restaurant,
@@ -113,10 +91,8 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       'city': Icons.location_city,
       'sports': Icons.sports_soccer,
     };
-
     return iconMap[iconName.toLowerCase()] ?? Icons.place;
   }
-
   void _notifyChanges() {
     if (widget.onDataChanged != null) {
       widget.onDataChanged!({
@@ -125,7 +101,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -134,12 +109,10 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       },
     );
   }
-
   Widget _buildLocalizacionContainer(BuildContext context, BoxConstraints constraints) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isMobile = constraints.maxWidth < 600;
-    
     return Container(
       constraints: BoxConstraints(minHeight: 500),
       padding: EdgeInsets.all(20),
@@ -178,7 +151,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -298,8 +270,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
             ],
           ),
           SizedBox(height: 16),
-          
-          // Loading state
           if (_loadingLocalizaciones)
             Center(
               child: Padding(
@@ -307,7 +277,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                 child: CircularProgressIndicator(),
               ),
             )
-          // Mapa interactivo
           else ...[
             Container(
               height: 600,
@@ -320,7 +289,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
                 localizaciones: _localizaciones,
                 iconosLocalizaciones: _iconosLocalizaciones,
                 onLocalizacionTapped: (localizacion) {
-                  // Abrir diálogo de edición si es administrador o solicitante
                   if (widget.isAdminOrSolicitante) {
                     _showEditLocalizacionDialog(context, localizacion);
                   }
@@ -332,7 +300,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       ),
     );
   }
-
   void _showAddLocalizacionDialog(BuildContext context) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -341,23 +308,17 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           actividadId: widget.actividadId,
           localizacionesExistentes: _localizaciones,
           onLocalizacionAdded: () {
-            // Este callback se llama desde el diálogo cuando hay cambios
           },
         );
       },
     );
-
-    // El diálogo devuelve las localizaciones modificadas, iconos y un flag de cambios
     if (result != null && result['hasChanges'] == true) {
       List<Localizacion>? localizacionesModificadas;
       Map<int, IconData>? iconosModificados;
-      
-      // Cast seguro de localizaciones
       final locsResult = result['localizaciones'];
       if (locsResult is List<Localizacion>) {
         localizacionesModificadas = locsResult;
       } else if (locsResult is List) {
-        // Intentar convertir cada elemento
         try {
           localizacionesModificadas = locsResult.map((e) {
             if (e is Localizacion) return e;
@@ -368,8 +329,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           print('ERROR al convertir localizaciones: $e');
         }
       }
-      
-      // Cast seguro de iconos
       final iconosResult = result['iconos'];
       if (iconosResult is Map<int, IconData>) {
         iconosModificados = iconosResult;
@@ -380,7 +339,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
           print('ERROR al convertir iconos: $e');
         }
       }
-      
       if (localizacionesModificadas != null) {
         setState(() {
           _localizaciones = localizacionesModificadas!;
@@ -388,17 +346,13 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
             _iconosLocalizaciones = iconosModificados!;
           }
         });
-        
-        // Notificar cambios al padre para activar botón guardar
         _notifyChanges();
-        
         if (mounted) {
           SnackBarHelper.showSuccess(context, 'Localizaciones modificadas (pendientes de guardar)');
         }
       }
     }
   }
-
   void _showEditLocalizacionDialog(BuildContext context, Localizacion localizacion) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -419,7 +373,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
         );
       },
     );
-
     if (result != null && result['success'] == true) {
       await _loadLocalizaciones();
       if (mounted) {
@@ -427,7 +380,6 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       }
     }
   }
-
   Future<void> _showDeleteConfirmationDialog(BuildContext context, Localizacion localizacion) async {
     final result = await showDialog<bool>(
       context: context,
@@ -460,13 +412,11 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
         );
       },
     );
-
     if (result == true) {
       try {
         await widget.localizacionService.removeLocalizacion(widget.actividadId, localizacion.id);
         await _loadLocalizaciones();
         _notifyChanges();
-        
         if (mounted) {
           SnackBarHelper.showSuccess(context, 'Localizaci�n eliminada correctamente');
         }
@@ -477,13 +427,9 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
       }
     }
   }
-
-  /// Recargar localizaciones desde el exterior
   Future<void> reload() async {
     await _loadLocalizaciones();
   }
-
-  /// Obtener las localizaciones actuales
   List<Localizacion> getLocalizaciones() {
     return List.from(_localizaciones);
   }

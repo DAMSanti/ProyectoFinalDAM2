@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../../shared/constants/app_theme_constants.dart';
 import '../../../activityDetail/activity_detail_view.dart';
@@ -6,10 +6,7 @@ import '../../../../models/actividad.dart';
 import '../../../../services/holidays_service.dart';
 import '../../../../components/desktop_shell.dart';
 import '../../widgets/calendar_appointment_widget.dart';
-
-/// Clase con los builders personalizados para el calendario
 class CalendarBuilders {
-  /// Builder para las celdas del mes
   static Widget monthCellBuilder(
     BuildContext context,
     MonthCellDetails details,
@@ -27,8 +24,6 @@ class CalendarBuilders {
     final isToday = date.year == today.year && 
                     date.month == today.month && 
                     date.day == today.day;
-    
-    // Verificar si el día tiene actividades (excluyendo festivos)
     bool hasActivities = false;
     try {
       if (details.appointments.isNotEmpty) {
@@ -43,13 +38,10 @@ class CalendarBuilders {
         }
       }
     } catch (e) {
-      // En caso de error, asumir que no hay actividades
       hasActivities = false;
     }
-
     return Container(
       decoration: BoxDecoration(
-        // Prioridad: Hoy > Festivo > Actividades > Transparente
         color: isToday
             ? (isDark 
                 ? Color.fromRGBO(
@@ -74,7 +66,6 @@ class CalendarBuilders {
                     : Color(0xFF1976D2).withValues(alpha: 0.1))
                 : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
-        // Borde para día de hoy o días con actividades
         border: isToday
             ? Border.all(
                 color: Color.fromRGBO(
@@ -124,8 +115,6 @@ class CalendarBuilders {
       ),
     );
   }
-
-  /// Builder para los appointments (actividades)
   static Widget appointmentBuilder(
     BuildContext context,
     CalendarAppointmentDetails calendarAppointmentDetails,
@@ -139,8 +128,6 @@ class CalendarBuilders {
       isSmallScreen: isSmallScreen,
     );
   }
-
-  /// Handler para tap en appointment
   static void handleAppointmentTap(
     BuildContext context,
     CalendarTapDetails details,
@@ -148,14 +135,11 @@ class CalendarBuilders {
   ) {
     if (details.targetElement == CalendarElement.appointment) {
       final Appointment appointment = details.appointments![0];
-      
-      // Solo navegar si es una actividad (no un festivo)
       if (appointment.id is int || (appointment.id is String && !appointment.id.toString().startsWith('holiday_'))) {
         try {
           final actividad = activities.firstWhere(
             (a) => a.id == appointment.id,
           );
-          
           navigateToActivityDetailInShell(
             context,
             {'activity': actividad},

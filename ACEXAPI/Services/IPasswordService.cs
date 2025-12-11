@@ -1,5 +1,4 @@
-namespace ACEXAPI.Services;
-
+﻿namespace ACEXAPI.Services;
 public interface IPasswordService
 {
     string HashPassword(string password);

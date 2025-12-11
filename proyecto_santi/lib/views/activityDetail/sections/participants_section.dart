@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/models/grupo_participante.dart';
@@ -7,14 +7,6 @@ import '../dialogs/multi_select_profesor_dialog.dart';
 import '../dialogs/multi_select_grupo_dialog.dart';
 import '../widgets/lists/profesor_list.dart';
 import '../widgets/lists/grupo_list.dart';
-
-/// Widget que maneja toda la sección de participantes de una actividad.
-/// 
-/// Responsabilidades:
-/// - Coordinar profesores y grupos participantes
-/// - Gestionar diálogos de selección múltiple
-/// - Layout responsivo (2 columnas en desktop, 1 columna en móvil)
-/// - Delegar renderizado a widgets especializados
 class ActivityParticipantsSection extends StatefulWidget {
   final List<Profesor> profesoresParticipantes;
   final List<GrupoParticipante> gruposParticipantes;
@@ -22,7 +14,6 @@ class ActivityParticipantsSection extends StatefulWidget {
   final Function(Map<String, dynamic>)? onDataChanged;
   final ProfesorService profesorService;
   final CatalogoService catalogoService;
-
   const ActivityParticipantsSection({
     super.key,
     required this.profesoresParticipantes,
@@ -32,24 +23,20 @@ class ActivityParticipantsSection extends StatefulWidget {
     required this.catalogoService,
     this.onDataChanged,
   });
-
   @override
   State<ActivityParticipantsSection> createState() => _ActivityParticipantsSectionState();
 }
-
 class _ActivityParticipantsSectionState extends State<ActivityParticipantsSection> {
   late List<Profesor> _profesoresParticipantes;
   late List<GrupoParticipante> _gruposParticipantes;
   bool _loadingProfesores = false;
   bool _loadingGrupos = false;
-
   @override
   void initState() {
     super.initState();
     _profesoresParticipantes = List.from(widget.profesoresParticipantes);
     _gruposParticipantes = List.from(widget.gruposParticipantes);
   }
-
   @override
   void didUpdateWidget(ActivityParticipantsSection oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -60,7 +47,6 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
       _gruposParticipantes = List.from(widget.gruposParticipantes);
     }
   }
-
   void _notifyChanges() {
     if (widget.onDataChanged != null) {
       widget.onDataChanged!({
@@ -69,12 +55,10 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Layout responsivo: dos columnas en pantallas anchas, una columna en móvil
         return constraints.maxWidth > 800
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,18 +142,12 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
       },
     );
   }
-
-  // Diálogo para agregar profesores
   void _showAddProfesorDialog(BuildContext context) async {
     setState(() => _loadingProfesores = true);
-    
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
     try {
       final profesores = await widget.profesorService.fetchProfesores();
-      
       if (!mounted) return;
-      
       final selectedProfesores = await showDialog<List<Profesor>>(
         context: context,
         builder: (BuildContext context) {
@@ -179,7 +157,6 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
           );
         },
       );
-      
       if (selectedProfesores != null && selectedProfesores.isNotEmpty) {
         setState(() {
           for (var profesor in selectedProfesores) {
@@ -188,9 +165,7 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
             }
           }
         });
-        
         _notifyChanges();
-        
         if (mounted) {
           scaffoldMessenger.showSnackBar(
             SnackBar(content: Text('${selectedProfesores.length} profesor(es) agregado(s)')),
@@ -209,19 +184,13 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
       }
     }
   }
-
-  // Diálogo para agregar grupos
   void _showAddGrupoDialog(BuildContext context) async {
     setState(() => _loadingGrupos = true);
-    
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
     try {
       final cursos = await widget.catalogoService.fetchCursos();
       final todosLosGrupos = await widget.catalogoService.fetchGrupos();
-      
       if (!mounted) return;
-      
       final gruposSeleccionados = await showDialog<List<Grupo>>(
         context: context,
         builder: (BuildContext context) {
@@ -232,7 +201,6 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
           );
         },
       );
-      
       if (gruposSeleccionados != null && gruposSeleccionados.isNotEmpty) {
         setState(() {
           for (var grupo in gruposSeleccionados) {
@@ -244,9 +212,7 @@ class _ActivityParticipantsSectionState extends State<ActivityParticipantsSectio
             }
           }
         });
-        
         _notifyChanges();
-        
         if (mounted) {
           scaffoldMessenger.showSnackBar(
             SnackBar(content: Text('${gruposSeleccionados.length} grupo(s) agregado(s)')),

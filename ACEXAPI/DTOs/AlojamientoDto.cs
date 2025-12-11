@@ -1,5 +1,4 @@
-namespace ACEXAPI.DTOs;
-
+﻿namespace ACEXAPI.DTOs;
 public class AlojamientoDto
 {
     public int Id { get; set; }
@@ -16,7 +15,6 @@ public class AlojamientoDto
     public bool Activo { get; set; }
     public DateTime FechaCreacion { get; set; }
 }
-
 public class CreateAlojamientoDto
 {
     public string Nombre { get; set; } = string.Empty;
@@ -30,7 +28,6 @@ public class CreateAlojamientoDto
     public int? CapacidadTotal { get; set; }
     public string? Observaciones { get; set; }
 }
-
 public class UpdateAlojamientoDto
 {
     public string? Nombre { get; set; }

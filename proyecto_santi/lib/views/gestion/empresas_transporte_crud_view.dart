@@ -1,37 +1,30 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/empresa_transporte_detail_dialog.dart';
-
 class EmpresasTransporteCrudView extends StatefulWidget {
   const EmpresasTransporteCrudView({Key? key}) : super(key: key);
-
   @override
   State<EmpresasTransporteCrudView> createState() => _EmpresasTransporteCrudViewState();
 }
-
 class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView> {
   final ApiService _apiService = ApiService();
   late final ActividadService _actividadService;
-  
   List<EmpresaTransporte> _empresas = [];
   List<EmpresaTransporte> _filteredEmpresas = [];
   bool _isLoading = false;
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
     _actividadService = ActividadService(_apiService);
     _loadEmpresas();
   }
-
   Future<void> _loadEmpresas() async {
     setState(() => _isLoading = true);
-    
     try {
       final empresas = await _actividadService.fetchEmpresasTransporte();
       setState(() {
@@ -49,7 +42,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       }
     }
   }
-
   void _filterEmpresas(String query) {
     setState(() {
       _searchQuery = query;
@@ -66,7 +58,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       }
     });
   }
-
   void _showEmpresaDialog({EmpresaTransporte? empresa}) {
     showDialog(
       context: context,
@@ -76,15 +67,12 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       ),
     );
   }
-
   void _addEmpresa() {
     _showEmpresaDialog();
   }
-
   void _editEmpresa(EmpresaTransporte empresa) {
     _showEmpresaDialog(empresa: empresa);
   }
-
   Future<void> _deleteEmpresa(EmpresaTransporte empresa) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -104,7 +92,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
         ],
       ),
     );
-
     if (confirmed == true) {
       try {
         final success = await _actividadService.deleteEmpresaTransporte(empresa.id);
@@ -129,13 +116,11 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
@@ -146,7 +131,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -165,7 +149,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                       ],
                     ),
                   ),
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -183,7 +166,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                   ),
                 ),
                 SizedBox(height: 16),
-                // Lista de empresas
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -215,7 +197,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       ],
     );
   }
-
   Widget _buildEmpresasList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -272,7 +253,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       ),
     );
   }
-
   Widget _buildEmpresaCard(EmpresaTransporte empresa, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -313,11 +293,9 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono, nombre y menú
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono de empresa de transporte
                 Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -331,7 +309,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                   ),
                 ),
                 SizedBox(width: 12),
-                // Nombre de la empresa
                 Expanded(
                   child: Text(
                     empresa.nombre,
@@ -345,7 +322,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Menú de 3 puntos
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -387,7 +363,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
               ],
             ),
             SizedBox(height: 12),
-            // Divider sutil con gradiente
             Container(
               height: 1,
               decoration: BoxDecoration(
@@ -401,7 +376,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
               ),
             ),
             SizedBox(height: 12),
-            // Información de la empresa
             if (empresa.cif != null && empresa.cif!.isNotEmpty) ...[
               _buildInfoRow(
                 icon: Icons.badge_rounded,
@@ -438,7 +412,6 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       ),
     );
   }
-
   Widget _buildInfoRow({required IconData icon, required String label, required bool isDark}) {
     return Row(
       children: [

@@ -1,18 +1,13 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/config.dart';
-
-/// Servicio para gestión de actividades
 class ActividadService {
   final ApiService _apiService;
-
   ActividadService(this._apiService);
-
-  /// Obtiene todas las actividades (con paginación opcional)
   Future<List<Actividad>> fetchActivities({
     int? page,
     int? pageSize,
@@ -23,7 +18,6 @@ class ActividadService {
       if (page != null) queryParams['page'] = page;
       if (pageSize != null) queryParams['pageSize'] = pageSize;
       if (search != null) queryParams['search'] = search;
-      
       String endpoint = AppConfig.actividadEndpoint;
       if (queryParams.isNotEmpty) {
         final query = queryParams.entries
@@ -31,18 +25,12 @@ class ActividadService {
             .join('&');
         endpoint += '?$query';
       }
-      
       final response = await _apiService.getData(endpoint);
-      
       if (response.statusCode == 200) {
-        // La API C# puede devolver un objeto paginado o una lista directa
         dynamic data = response.data;
-        
-        // Si viene con paginación
         if (data is Map && data.containsKey('items')) {
           data = data['items'];
         }
-        
         final List<dynamic> list = data as List;
         return list.map((json) => Actividad.fromJson(json)).toList();
       }
@@ -52,15 +40,11 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Obtiene actividades futuras (hoy o posteriores)
   Future<List<Actividad>> fetchFutureActivities() async {
     try {
-      // Solicitar todas las actividades sin paginación (pageSize = 100 es el máximo)
       final allActivities = await fetchActivities(pageSize: 100);
       final currentDate = DateTime.now();
       final today = DateTime(currentDate.year, currentDate.month, currentDate.day);
-      
       final futureActivities = allActivities.where((actividad) {
         try {
           final activityDate = DateTime.parse(actividad.fini);
@@ -75,8 +59,6 @@ class ActividadService {
           return false;
         }
       }).toList();
-      
-      // Ordenar por fecha (más próximas primero)
       futureActivities.sort((a, b) {
         try {
           final dateA = DateTime.parse(a.fini);
@@ -86,19 +68,15 @@ class ActividadService {
           return 0;
         }
       });
-      
       return futureActivities;
     } catch (e) {
       print('[ActividadService ERROR] fetchFutureActivities: $e');
       rethrow;
     }
   }
-
-  /// Obtiene una actividad por ID
   Future<Actividad?> fetchActivityById(int id) async {
     try {
       final response = await _apiService.getData('${AppConfig.actividadEndpoint}/$id');
-      
       if (response.statusCode == 200 && response.data != null) {
         return Actividad.fromJson(response.data);
       }
@@ -108,15 +86,12 @@ class ActividadService {
       return null;
     }
   }
-
-  /// Crea una nueva actividad
   Future<Actividad?> createActivity(Actividad actividad) async {
     try {
       final response = await _apiService.postData(
         AppConfig.actividadEndpoint,
         actividad.toJson(),
       );
-      
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Actividad.fromJson(response.data);
       }
@@ -126,18 +101,12 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Actualiza una actividad existente
   Future<Actividad?> updateActivity(int id, Actividad actividad) async {
     try {
       print('[ActividadService] ========== UPDATE ACTIVITY ==========');
       print('[ActividadService] ID: $id');
-      
-      // Combinar fecha y hora para FechaInicio y FechaFin
       String fechaInicioConHora = actividad.fini;
       String fechaFinConHora = actividad.ffin;
-      
-      // Si hay hora de inicio, combinarla con la fecha
       if (actividad.hini.isNotEmpty && actividad.hini != '00:00:00') {
         final fechaInicio = DateTime.parse(actividad.fini);
         final horaPartes = actividad.hini.split(':');
@@ -151,8 +120,6 @@ class ActividadService {
         );
         fechaInicioConHora = fechaConHora.toIso8601String();
       }
-      
-      // Si hay hora de fin, combinarla con la fecha
       if (actividad.hfin.isNotEmpty && actividad.hfin != '00:00:00') {
         final fechaFin = DateTime.parse(actividad.ffin);
         final horaPartes = actividad.hfin.split(':');
@@ -166,11 +133,8 @@ class ActividadService {
         );
         fechaFinConHora = fechaConHora.toIso8601String();
       }
-      
       print('[ActividadService] FechaInicio con hora: $fechaInicioConHora');
       print('[ActividadService] FechaFin con hora: $fechaFinConHora');
-      
-      // Preparar FormData en lugar de JSON
       final formData = FormData.fromMap({
         'Nombre': actividad.titulo,
         'Descripcion': actividad.descripcion,
@@ -187,30 +151,23 @@ class ActividadService {
         'AlojamientoReq': actividad.alojamientoReq,
         'PrecioAlojamiento': actividad.precioAlojamiento?.toString(),
         'AlojamientoId': actividad.alojamiento?.id,
-        // LocalizacionId es opcional
       });
-      
       print('[ActividadService] FormData preparado con ResponsableId: ${actividad.responsable?.uuid}');
       print('[ActividadService] FormData - TransporteReq: ${actividad.transporteReq}, PrecioTransporte: ${actividad.precioTransporte}, EmpresaTransporteId: ${actividad.empresaTransporte?.id}');
       print('[ActividadService] FormData - AlojamientoReq: ${actividad.alojamientoReq}, PrecioAlojamiento: ${actividad.precioAlojamiento}, AlojamientoId: ${actividad.alojamiento?.id}');
       print('[ActividadService] FormData - PresupuestoEstimado: ${actividad.presupuestoEstimado}');
       print('[ActividadService] FormData - CostoReal: ${actividad.costoReal}');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
-      
-      // Imprimir todo el contenido del FormData
       print('[ActividadService] ========== FORMDATA COMPLETO ==========');
       formData.fields.forEach((field) {
         print('[ActividadService] ${field.key}: ${field.value}');
       });
       print('[ActividadService] ==========================================');
-      
       final response = await _apiService.dio.put(
         '${AppConfig.actividadEndpoint}/$id',
         data: formData,
       );
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       if (response.statusCode == 200) {
         print('[ActividadService] Actividad actualizada correctamente');
         return Actividad.fromJson(response.data);
@@ -225,23 +182,18 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Actualiza campos específicos de una actividad
   Future<Actividad?> updateActivityFields(int id, Map<String, dynamic> fields) async {
     try {
       print('[ActividadService] ========== UPDATE ACTIVITY FIELDS ==========');
       print('[ActividadService] ID: $id');
       print('[ActividadService] Campos a actualizar: $fields');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}${AppConfig.actividadEndpoint}/$id');
-      
       final response = await _apiService.putData(
         '${AppConfig.actividadEndpoint}/$id',
         fields,
       );
-      
       print('[ActividadService] Response status: ${response.statusCode}');
       print('[ActividadService] Response data: ${response.data}');
-      
       if (response.statusCode == 200) {
         print('[ActividadService] Actividad actualizada correctamente');
         return Actividad.fromJson(response.data);
@@ -258,8 +210,6 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Elimina una actividad
   Future<bool> deleteActivity(int id) async {
     try {
       final response = await _apiService.deleteData('${AppConfig.actividadEndpoint}/$id');
@@ -269,32 +219,24 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Sube un folleto PDF a una actividad
   Future<String> uploadFolleto(int actividadId, {String? filePath, Uint8List? fileBytes, required String fileName}) async {
     try {
       print('[ActividadService] Uploading folleto for actividad $actividadId');
-      
       MultipartFile multipartFile;
       if (fileBytes != null) {
-        // Web: usar bytes
         multipartFile = MultipartFile.fromBytes(fileBytes, filename: fileName);
       } else if (filePath != null) {
-        // Móvil/Desktop: usar path
         multipartFile = await MultipartFile.fromFile(filePath, filename: fileName);
       } else {
         throw Exception('Se requiere filePath o fileBytes');
       }
-      
       final formData = FormData.fromMap({
         'folleto': multipartFile,
       });
-      
       final response = await _apiService.dio.post(
         '/Actividad/$actividadId/folleto',
         data: formData,
       );
-      
       if (response.statusCode == 200) {
         return response.data['folletoUrl'];
       } else {
@@ -305,14 +247,10 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Elimina el folleto de una actividad
   Future<void> deleteFolleto(int actividadId) async {
     try {
       print('[ActividadService] Deleting folleto for actividad $actividadId');
-      
       final response = await _apiService.deleteData('/Actividad/$actividadId/folleto');
-      
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Error al eliminar el folleto');
       }
@@ -321,28 +259,21 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Obtiene todas las empresas de transporte
   Future<List<EmpresaTransporte>> fetchEmpresasTransporte() async {
     try {
       print('[ActividadService] Fetching empresas de transporte');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}/EmpTransporte');
-      
       final response = await _apiService.getData('/EmpTransporte');
-      
       print('[ActividadService] Response status: ${response.statusCode}');
       print('[ActividadService] Response data type: ${response.data.runtimeType}');
       print('[ActividadService] Response data: ${response.data}');
-      
       if (response.statusCode == 200) {
         final List<dynamic> list = response.data as List;
         print('[ActividadService] Lista parseada - Cantidad: ${list.length}');
-        
         final empresas = list.map((json) {
           print('[ActividadService] Parseando: $json');
           return EmpresaTransporte.fromJson(json);
         }).toList();
-        
         print('[ActividadService] Empresas cargadas exitosamente: ${empresas.length}');
         return empresas;
       }
@@ -356,17 +287,12 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Crea una nueva empresa de transporte
   Future<EmpresaTransporte> createEmpresaTransporte(Map<String, dynamic> data) async {
     try {
       print('[ActividadService] Creating empresa de transporte');
       print('[ActividadService] Data: $data');
-      
       final response = await _apiService.postData('/EmpTransporte', data);
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       if (response.statusCode == 200 || response.statusCode == 201) {
         return EmpresaTransporte.fromJson(response.data);
       }
@@ -376,17 +302,12 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Actualiza una empresa de transporte existente
   Future<EmpresaTransporte> updateEmpresaTransporte(int id, Map<String, dynamic> data) async {
     try {
       print('[ActividadService] Updating empresa de transporte $id');
       print('[ActividadService] Data: $data');
-      
       final response = await _apiService.putData('/EmpTransporte/$id', data);
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       if (response.statusCode == 200) {
         return EmpresaTransporte.fromJson(response.data);
       }
@@ -396,44 +317,32 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Elimina una empresa de transporte
   Future<bool> deleteEmpresaTransporte(int id) async {
     try {
       print('[ActividadService] Deleting empresa de transporte $id');
-      
       final response = await _apiService.deleteData('/EmpTransporte/$id');
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
       print('[ActividadService ERROR] deleteEmpresaTransporte: $e');
       rethrow;
     }
   }
-
-  /// Obtiene todos los alojamientos activos
   Future<List<Alojamiento>> fetchAlojamientos() async {
     try {
       print('[ActividadService] Fetching alojamientos');
       print('[ActividadService] URL: ${AppConfig.apiBaseUrl}/Alojamiento?soloActivos=true');
-      
       final response = await _apiService.getData('/Alojamiento?soloActivos=true');
-      
       print('[ActividadService] Response status: ${response.statusCode}');
       print('[ActividadService] Response data type: ${response.data.runtimeType}');
       print('[ActividadService] Response data count: ${(response.data as List).length}');
-      
       if (response.statusCode == 200) {
         final List<dynamic> list = response.data as List;
         print('[ActividadService] Lista parseada - Cantidad: ${list.length}');
-        
         final alojamientos = list.map((json) {
           print('[ActividadService] Parseando alojamiento: ${json['nombre']}');
           return Alojamiento.fromJson(json);
         }).toList();
-        
         print('[ActividadService] Alojamientos cargados exitosamente: ${alojamientos.length}');
         return alojamientos;
       }
@@ -447,17 +356,12 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Crea un nuevo alojamiento
   Future<Alojamiento> createAlojamiento(Map<String, dynamic> data) async {
     try {
       print('[ActividadService] Creating alojamiento');
       print('[ActividadService] Data: $data');
-      
       final response = await _apiService.postData('/Alojamiento', data);
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Alojamiento.fromJson(response.data);
       }
@@ -467,17 +371,12 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Actualiza un alojamiento existente
   Future<Alojamiento> updateAlojamiento(int id, Map<String, dynamic> data) async {
     try {
       print('[ActividadService] Updating alojamiento $id');
       print('[ActividadService] Data: $data');
-      
       final response = await _apiService.putData('/Alojamiento/$id', data);
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       if (response.statusCode == 200) {
         return Alojamiento.fromJson(response.data);
       }
@@ -487,16 +386,11 @@ class ActividadService {
       rethrow;
     }
   }
-
-  /// Elimina un alojamiento
   Future<bool> deleteAlojamiento(int id) async {
     try {
       print('[ActividadService] Deleting alojamiento $id');
-      
       final response = await _apiService.deleteData('/Alojamiento/$id');
-      
       print('[ActividadService] Response status: ${response.statusCode}');
-      
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
       print('[ActividadService ERROR] deleteAlojamiento: $e');

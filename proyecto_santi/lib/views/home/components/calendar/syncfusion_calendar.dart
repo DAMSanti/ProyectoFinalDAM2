@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../../models/actividad.dart';
 import '../../../../services/holidays_service.dart';
@@ -8,28 +8,23 @@ import 'calendar_view_buttons.dart';
 import 'calendar_data_source.dart';
 import 'calendar_builders.dart';
 import 'calendar_config.dart';
-
 class ModernSyncfusionCalendar extends StatefulWidget {
   final List<Actividad> activities;
   final String countryCode;
-
   const ModernSyncfusionCalendar({
     super.key,
     required this.activities,
     this.countryCode = 'ES',
   });
-
   @override
   State<ModernSyncfusionCalendar> createState() => _ModernSyncfusionCalendarState();
 }
-
 class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
   late final CalendarController _calendarController;
   CalendarView _currentView = CalendarView.month;
   Map<String, List<Holiday>> _holidays = {};
   bool _isLoadingHolidays = false;
   late ActivityDataSource _dataSource;
-
   @override
   void initState() {
     super.initState();
@@ -39,7 +34,6 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
     _dataSource = ActivityDataSource(_getAppointments());
     _loadHolidays();
   }
-
   @override
   void didUpdateWidget(ModernSyncfusionCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -47,35 +41,27 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       _holidays.clear();
       _loadHolidays();
     }
-    // Actualizar dataSource si cambian las actividades
     if (oldWidget.activities != widget.activities) {
       _updateDataSource();
     }
   }
-
   void _updateDataSource() {
     setState(() {
       _dataSource = ActivityDataSource(_getAppointments());
     });
   }
-
   @override
   void dispose() {
     _calendarController.dispose();
     super.dispose();
   }
-
-  /// Carga festivos para 3 años (anterior, actual, siguiente)
   Future<void> _loadHolidays() async {
     if (_isLoadingHolidays) return;
-    
     setState(() => _isLoadingHolidays = true);
-
     try {
       final displayDate = _calendarController.displayDate ?? DateTime.now();
       final year = displayDate.year;
       bool holidaysUpdated = false;
-      
       for (int y = year - 1; y <= year + 1; y++) {
         final key = CalendarHelpers.getCacheKey(widget.countryCode, y);
         if (!_holidays.containsKey(key)) {
@@ -88,8 +74,6 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
           }
         }
       }
-      
-      // Actualizar dataSource si se cargaron nuevos festivos
       if (holidaysUpdated && mounted) {
         _updateDataSource();
       }
@@ -101,13 +85,10 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       }
     }
   }
-
-  /// Obtiene el festivo para una fecha específica
   Holiday? _getHoliday(DateTime day) {
     final key = CalendarHelpers.getCacheKey(widget.countryCode, day.year);
     final yearHolidays = _holidays[key];
     if (yearHolidays == null) return null;
-
     try {
       return yearHolidays.firstWhere((h) =>
           h.date.year == day.year &&
@@ -117,27 +98,20 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       return null;
     }
   }
-
-  /// Genera lista de appointments (actividades + festivos)
   List<Appointment> _getAppointments() {
     List<Appointment> appointments = [];
-
-    // Agregar actividades usando CalendarHelpers
     for (var actividad in widget.activities) {
       final appointment = CalendarHelpers.actividadToAppointment(actividad);
       if (appointment != null) {
         appointments.add(appointment);
       }
     }
-
-    // Agregar festivos como appointments SOLO en vistas día/semana/agenda (NO en mes)
     if (_currentView != CalendarView.month) {
       final displayDate = _calendarController.displayDate ?? DateTime.now();
       for (int yearOffset = -1; yearOffset <= 1; yearOffset++) {
         final year = displayDate.year + yearOffset;
         final key = CalendarHelpers.getCacheKey(widget.countryCode, year);
         final yearHolidays = _holidays[key];
-        
         if (yearHolidays != null) {
           for (var holiday in yearHolidays) {
             appointments.add(Appointment(
@@ -152,39 +126,28 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
         }
       }
     }
-
     return appointments;
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
-    
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Usar el tamaño de pantalla si constraints es infinito
         final effectiveWidth = constraints.maxWidth.isFinite 
             ? constraints.maxWidth 
             : screenSize.width;
         final effectiveHeight = constraints.maxHeight.isFinite 
             ? constraints.maxHeight 
             : screenSize.height;
-            
-        // Detectar si es una pantalla móvil (ancho < 600px)
         final isMobileScreen = effectiveWidth < 600;
-        // Detectar orientación
         final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
         final isMobileLandscape = isMobileScreen && isLandscape;
-        // Para pantallas grandes, cambiar a layout vertical si el ancho es menor a 1200px
         final isNarrowScreen = effectiveWidth < 1200 && !isMobileScreen;
-        
-        // En móvil landscape, usar botones verticales a la izquierda
         if (isMobileLandscape) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Botones verticales compactos para móvil landscape
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
@@ -192,18 +155,15 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 isVertical: true,
               ),
               const SizedBox(width: 8),
-              // Calendario expandido
               Expanded(
                 child: _buildCalendarContainer(context, isDark, isMobileScreen),
               ),
             ],
           );
         }
-        // En móvil portrait, SIEMPRE usar botones horizontales arriba
         else if (isMobileScreen) {
           return Column(
             children: [
-              // Botones horizontales compactos para móvil
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: CalendarViewButtons(
@@ -214,19 +174,16 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 ),
               ),
               const SizedBox(height: 8),
-              // Calendario expandido
               Expanded(
                 child: _buildCalendarContainer(context, isDark, isMobileScreen),
               ),
             ],
           );
         }
-        // Para pantallas medianas (tablet), botones verticales a la izquierda
         else if (isNarrowScreen) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Botones verticales
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
@@ -234,18 +191,15 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                 isVertical: true,
               ),
               const SizedBox(width: 16),
-              // Calendario expandido
               Expanded(
                 child: _buildCalendarContainer(context, isDark, isNarrowScreen),
               ),
             ],
           );
         } 
-        // Para pantallas grandes, botones horizontales arriba
         else {
           return Column(
             children: [
-              // Botones horizontales
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
@@ -262,20 +216,14 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       },
     );
   }
-
   Widget _buildCalendarContainer(BuildContext context, bool isDark, bool isNarrowScreen) {
     final screenSize = MediaQuery.of(context).size;
-    
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Usar MediaQuery si constraints es infinito
         final effectiveWidth = constraints.maxWidth.isFinite 
             ? constraints.maxWidth 
             : screenSize.width;
-        
-        // Usar isNarrowScreen para determinar si ocultar iconos
         final isSmallScreen = isNarrowScreen || effectiveWidth < 600;
-        
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -324,30 +272,23 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     controller: _calendarController,
                     view: _currentView,
                     dataSource: _dataSource,
-                    firstDayOfWeek: 1, // Lunes como primer día
-                    showNavigationArrow: false, // Desactivamos las flechas predeterminadas
+                    firstDayOfWeek: 1, 
+                    showNavigationArrow: false, 
                     showDatePickerButton: true,
                     allowViewNavigation: true,
                     onViewChanged: (ViewChangedDetails details) {
-                      // Actualizar cuando el usuario navega en el calendario o cambia de vista
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (mounted) {
                           bool needsUpdate = false;
-                          
-                          // Actualizar el estado de la vista actual si cambió
                           if (_calendarController.view != null && _calendarController.view != _currentView) {
                             setState(() {
                               _currentView = _calendarController.view!;
                             });
                           needsUpdate = true;
                         }
-                        
-                        // Cargar festivos si cambió el período mostrado
                         if (_calendarController.displayDate != null) {
                           _loadHolidays();
                         }
-                        
-                        // Actualizar dataSource cuando cambia la vista para refrescar los festivos
                         if (needsUpdate) {
                           _updateDataSource();
                         }
@@ -383,12 +324,11 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     context,
                     details,
                     isDark,
-                    isNarrowScreen,  // Usar isNarrowScreen en lugar de isSmallScreen
+                    isNarrowScreen,  
                     _getHoliday,
                     _calendarController,
                   );
                 },
-                // Configuración para vista de día
                 timeSlotViewSettings: TimeSlotViewSettings(
                   startHour: 7,
                   endHour: 22,
@@ -469,8 +409,7 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                   );
                 },
                   ),
-                ), // Cierra SizedBox.expand
-                // Flechas de navegación personalizadas
+                ), 
                 Positioned(
                   top: 12,
                   left: 16,
@@ -542,12 +481,10 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
       },
     );
   }
-
   void _changeView(CalendarView newView) {
     setState(() {
       _currentView = newView;
       _calendarController.view = newView;
-      // Actualizar dataSource para reflejar el cambio de vista
       _updateDataSource();
     });
   }

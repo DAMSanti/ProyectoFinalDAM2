@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-/// Sección de información básica (nombre y descripción)
+﻿import 'package:flutter/material.dart';
 class BasicInfoSection extends StatelessWidget {
   final TextEditingController nombreController;
   final TextEditingController descripcionController;
@@ -17,7 +15,6 @@ class BasicInfoSection extends StatelessWidget {
     required bool isMobileLandscape,
   }) buildTextField;
   final Widget Function(String title, IconData icon, bool isMobile, bool isMobileLandscape) buildSectionTitle;
-
   const BasicInfoSection({
     Key? key,
     required this.nombreController,
@@ -27,7 +24,6 @@ class BasicInfoSection extends StatelessWidget {
     required this.buildTextField,
     required this.buildSectionTitle,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -1,13 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'app_colors.dart';
-
-/// Helper para mostrar SnackBars consistentes en toda la aplicación
 class SnackBarHelper {
-  /// Duración por defecto de los SnackBars
   static const Duration _defaultDuration = Duration(seconds: 3);
   static const Duration _longDuration = Duration(seconds: 5);
-
-  /// Muestra un SnackBar de éxito (verde)
   static void showSuccess(
     BuildContext context,
     String message, {
@@ -21,8 +16,6 @@ class SnackBarHelper {
       duration: duration,
     );
   }
-
-  /// Muestra un SnackBar de error (rojo)
   static void showError(
     BuildContext context,
     String message, {
@@ -36,8 +29,6 @@ class SnackBarHelper {
       duration: duration ?? _longDuration,
     );
   }
-
-  /// Muestra un SnackBar de información (azul)
   static void showInfo(
     BuildContext context,
     String message, {
@@ -51,8 +42,6 @@ class SnackBarHelper {
       duration: duration,
     );
   }
-
-  /// Muestra un SnackBar de advertencia (naranja)
   static void showWarning(
     BuildContext context,
     String message, {
@@ -66,8 +55,6 @@ class SnackBarHelper {
       duration: duration,
     );
   }
-
-  /// Muestra un SnackBar simple sin icono
   static void show(
     BuildContext context,
     String message, {
@@ -87,8 +74,6 @@ class SnackBarHelper {
       ),
     );
   }
-
-  /// Método interno para mostrar SnackBar con icono
   static void _show(
     BuildContext context,
     String message, {
@@ -124,8 +109,6 @@ class SnackBarHelper {
       ),
     );
   }
-
-  /// Muestra un SnackBar con acción personalizada
   static void showWithAction(
     BuildContext context,
     String message, {

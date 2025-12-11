@@ -1,24 +1,14 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget especializado para mostrar y gestionar la lista de profesores participantes.
-/// 
-/// Responsabilidades:
-/// - Renderizar lista de profesores con avatares
-/// - Mostrar informaci�n de contacto (email)
-/// - Permitir eliminar profesores (si isAdmin)
-/// - Bot�n para agregar nuevos profesores
-/// - Empty state cuando no hay profesores
 class ProfesorListWidget extends StatelessWidget {
   final List<Profesor> profesores;
   final bool isAdminOrSolicitante;
   final VoidCallback onAddProfesor;
   final Function(Profesor) onRemoveProfesor;
   final bool isLoading;
-
   const ProfesorListWidget({
     super.key,
     required this.profesores,
@@ -27,12 +17,10 @@ class ProfesorListWidget extends StatelessWidget {
     required this.onRemoveProfesor,
     this.isLoading = false,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -69,7 +57,6 @@ class ProfesorListWidget extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -82,16 +69,13 @@ class ProfesorListWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Contenido
           Padding(
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con t�tulo y bot�n agregar
                 _buildHeader(context, isDark, isWeb),
                 SizedBox(height: 16),
-                // Lista de profesores o empty state
                 profesores.isEmpty
                     ? _buildEmptyState(isWeb)
                     : _buildProfesorList(context, isDark, isWeb),
@@ -102,7 +86,6 @@ class ProfesorListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildHeader(BuildContext context, bool isDark, bool isWeb) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,7 +134,6 @@ class ProfesorListWidget extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildEmptyState(bool isWeb) {
     return Center(
       child: Padding(
@@ -177,7 +159,6 @@ class ProfesorListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildProfesorList(BuildContext context, bool isDark, bool isWeb) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: 300),
@@ -190,7 +171,6 @@ class ProfesorListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildProfesorCard(BuildContext context, Profesor profesor, bool isDark, bool isWeb) {
     return Container(
       margin: EdgeInsets.only(bottom: 10),
@@ -245,7 +225,6 @@ class ProfesorListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildAvatar(Profesor profesor, bool isWeb) {
     return Container(
       width: 40,
@@ -278,7 +257,6 @@ class ProfesorListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildDeleteButton(BuildContext context, Profesor profesor) {
     return Container(
       decoration: BoxDecoration(
@@ -323,7 +301,6 @@ class ProfesorListWidget extends StatelessWidget {
               );
             },
           );
-
           if (confirmed == true) {
             onRemoveProfesor(profesor);
             ScaffoldMessenger.of(context).showSnackBar(

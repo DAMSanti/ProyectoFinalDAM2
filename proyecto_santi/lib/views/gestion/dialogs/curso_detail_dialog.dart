@@ -1,38 +1,29 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
 class CursoDetailDialog extends StatefulWidget {
   final Curso? curso;
   final VoidCallback onSaved;
-
   const CursoDetailDialog({
     Key? key,
     this.curso,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<CursoDetailDialog> createState() => _CursoDetailDialogState();
 }
-
 class _CursoDetailDialogState extends State<CursoDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
-  
-  // Controllers
   late final TextEditingController _codCursoController;
   late final TextEditingController _tituloController;
-  
   String? _etapaSeleccionada;
   String? _nivelSeleccionado;
   bool _activo = true;
   bool _isLoading = false;
-
-  // Etapas según la base de datos
   final List<Map<String, String>> _etapas = [
     {'value': 'ESO', 'label': 'ESO - Educación Secundaria Obligatoria'},
     {'value': 'BACH', 'label': 'BACH - Bachillerato'},
@@ -41,43 +32,31 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
     {'value': 'FPGS', 'label': 'FPGS - FP Grado Superior'},
     {'value': 'FPCE', 'label': 'FPCE - FP Curso de Especialización'},
   ];
-
   final List<String> _niveles = ['1', '2', '3', '4'];
-
   @override
   void initState() {
     super.initState();
     _catalogoService = CatalogoService(_apiService);
-    
-    // Inicializar controllers con valores existentes o vacíos
     _codCursoController = TextEditingController(text: widget.curso?.codCurso ?? '');
     _tituloController = TextEditingController(text: widget.curso?.titulo ?? '');
-    
-    // Validar que la etapa exista en la lista de valores permitidos
     if (widget.curso != null && widget.curso!.etapa.isNotEmpty) {
       final etapaValida = _etapas.any((e) => e['value'] == widget.curso!.etapa);
       _etapaSeleccionada = etapaValida ? widget.curso!.etapa : null;
     }
-    
-    // Validar que el nivel exista en la lista de valores permitidos
     if (widget.curso != null && widget.curso!.nivel.isNotEmpty) {
       final nivelValido = _niveles.contains(widget.curso!.nivel);
       _nivelSeleccionado = nivelValido ? widget.curso!.nivel : null;
     }
-    
     _activo = widget.curso?.activo ?? true;
   }
-
   @override
   void dispose() {
     _codCursoController.dispose();
     _tituloController.dispose();
     super.dispose();
   }
-
   Future<void> _saveCurso() async {
     if (!_formKey.currentState!.validate()) return;
-
     if (_etapaSeleccionada == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -87,7 +66,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       );
       return;
     }
-
     if (_nivelSeleccionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -97,22 +75,15 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       );
       return;
     }
-
     setState(() => _isLoading = true);
-
     try {
-      // El backend solo acepta: nombre, nivel, activo
-      // Guardamos toda la info en el campo nombre: "CODIGO - TITULO"
       final nombreCompleto = '${_codCursoController.text.trim()} - ${_tituloController.text.trim()}';
-      
       final data = {
         'nombre': nombreCompleto,
         'nivel': _nivelSeleccionado,
         'activo': _activo,
       };
-
       if (widget.curso != null) {
-        // Actualizar
         await _catalogoService.updateCurso(widget.curso!.id, data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -123,7 +94,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
           );
         }
       } else {
-        // Crear
         await _catalogoService.createCurso(data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -134,7 +104,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
           );
         }
       }
-
       widget.onSaved();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -149,14 +118,12 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isDesktop = screenWidth > 900;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -196,9 +163,7 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header con gradiente
               _buildHeader(isDark, isMobile),
-              // Contenido con scroll
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -210,7 +175,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
                   ),
                 ),
               ),
-              // Footer con botones
               _buildFooter(isDark, isMobile),
             ],
           ),
@@ -218,7 +182,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -271,7 +234,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -330,12 +292,10 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: Código y Título
         Row(
           children: [
             Expanded(child: _buildCodCursoField(isDark)),
@@ -344,7 +304,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 2: Etapa y Nivel
         Row(
           children: [
             Expanded(flex: 2, child: _buildEtapaField(isDark)),
@@ -353,12 +312,10 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 3: Estado activo
         _buildActivoField(isDark),
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       children: [
@@ -374,7 +331,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ],
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -412,7 +368,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ],
     );
   }
-
   Widget _buildCodCursoField(bool isDark) {
     return _buildStyledField(
       label: 'Código del Curso *',
@@ -441,7 +396,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildTituloField(bool isDark) {
     return _buildStyledField(
       label: 'Título del Curso *',
@@ -466,7 +420,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildEtapaField(bool isDark) {
     return _buildStyledField(
       label: 'Etapa Educativa *',
@@ -501,7 +454,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildNivelField(bool isDark) {
     return _buildStyledField(
       label: 'Nivel *',
@@ -532,7 +484,6 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
       ),
     );
   }
-
   Widget _buildActivoField(bool isDark) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -575,6 +526,3 @@ class _CursoDetailDialogState extends State<CursoDetailDialog> {
     );
   }
 }
-
-
-

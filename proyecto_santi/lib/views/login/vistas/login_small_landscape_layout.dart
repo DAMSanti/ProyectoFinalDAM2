@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
-
 Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
   return LayoutBuilder(
     builder: (context, constraints) {
@@ -55,7 +54,6 @@ Widget loginSmallLandscapeLayout(BuildContext context, BoxConstraints constraint
     },
   );
 }
-
 Widget _buildRightSide(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, VoidCallback login, VoidCallback showLoginDialog) {
   return Center(
     child: Container(

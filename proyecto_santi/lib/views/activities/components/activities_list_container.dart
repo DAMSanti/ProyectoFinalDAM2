@@ -1,20 +1,15 @@
-import 'package:flutter/material.dart';
-
-/// Contenedor moderno para las listas de actividades
+﻿import 'package:flutter/material.dart';
 class ActivitiesListContainer extends StatelessWidget {
   final Widget child;
   final double? height;
-
   const ActivitiesListContainer({
     super.key,
     required this.child,
     this.height,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       height: height,
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -48,7 +43,6 @@ class ActivitiesListContainer extends StatelessWidget {
             offset: Offset(0, 4),
             spreadRadius: 0,
           ),
-          // Inner shadow effect
           BoxShadow(
             color: isDark
                 ? Colors.black.withValues(alpha: 0.2)

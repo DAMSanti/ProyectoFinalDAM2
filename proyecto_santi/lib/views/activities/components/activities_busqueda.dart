@@ -1,15 +1,11 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 class Busqueda extends StatelessWidget {
   final Function(String) onSearchQueryChanged;
   final Function(String?, int?, String?, String?) onFilterSelected;
-
   Busqueda({required this.onSearchQueryChanged, required this.onFilterSelected});
-
   @override
   Widget build(BuildContext context) {
     var showPopup = false;
-
     return Column(
       children: [
         TextField(
@@ -30,7 +26,6 @@ class Busqueda extends StatelessWidget {
           ),
         ),
         if (showPopup)
-        // Implement filter options popup
           Container(),
       ],
     );

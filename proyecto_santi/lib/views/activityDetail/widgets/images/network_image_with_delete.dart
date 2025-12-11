@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget para mostrar una imagen de red con bot�n de eliminar en hover
 class NetworkImageWithDelete extends StatefulWidget {
   final String imageUrl;
   final double maxHeight;
   final bool showDeleteButton;
   final VoidCallback? onDelete;
   final VoidCallback? onTap;
-
   const NetworkImageWithDelete({
     Key? key,
     required this.imageUrl,
@@ -17,14 +14,11 @@ class NetworkImageWithDelete extends StatefulWidget {
     this.onDelete,
     this.onTap,
   }) : super(key: key);
-
   @override
   NetworkImageWithDeleteState createState() => NetworkImageWithDeleteState();
 }
-
 class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
   bool _isHovering = false;
-
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -83,7 +77,6 @@ class NetworkImageWithDeleteState extends State<NetworkImageWithDelete> {
                 ),
               ),
             ),
-            // Bot�n de eliminar (solo visible en hover y si est� habilitado)
             if (_isHovering && widget.showDeleteButton && widget.onDelete != null)
               Positioned(
                 top: 4,

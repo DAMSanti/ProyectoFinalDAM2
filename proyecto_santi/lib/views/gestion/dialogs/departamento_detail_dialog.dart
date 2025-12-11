@@ -1,64 +1,48 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
 class DepartamentoDetailDialog extends StatefulWidget {
   final Departamento? departamento;
   final VoidCallback onSaved;
-
   const DepartamentoDetailDialog({
     Key? key,
     this.departamento,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<DepartamentoDetailDialog> createState() => _DepartamentoDetailDialogState();
 }
-
 class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
-  
-  // Controllers
   late final TextEditingController _codigoController;
   late final TextEditingController _nombreController;
-  
   bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
     _catalogoService = CatalogoService(_apiService);
-    
-    // Inicializar controllers con valores existentes o vacíos
     _codigoController = TextEditingController(text: widget.departamento?.codigo ?? '');
     _nombreController = TextEditingController(text: widget.departamento?.nombre ?? '');
   }
-
   @override
   void dispose() {
     _codigoController.dispose();
     _nombreController.dispose();
     super.dispose();
   }
-
   Future<void> _saveDepartamento() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final data = {
         'codigo': _codigoController.text.trim(),
         'nombre': _nombreController.text.trim(),
       };
-
       if (widget.departamento != null) {
-        // Actualizar
         await _catalogoService.updateDepartamento(widget.departamento!.id, data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +53,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
           );
         }
       } else {
-        // Crear
         await _catalogoService.createDepartamento(data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +63,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
           );
         }
       }
-
       widget.onSaved();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -95,14 +77,12 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isDesktop = screenWidth > 900;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -142,9 +122,7 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header con gradiente
               _buildHeader(isDark, isMobile),
-              // Contenido con scroll
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -156,7 +134,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
                   ),
                 ),
               ),
-              // Footer con botones
               _buildFooter(isDark, isMobile),
             ],
           ),
@@ -164,7 +141,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -217,7 +193,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ),
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -276,7 +251,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +261,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       children: [
@@ -297,7 +270,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ],
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -335,7 +307,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ],
     );
   }
-
   Widget _buildCodigoField(bool isDark) {
     return _buildStyledField(
       label: 'Código *',
@@ -365,7 +336,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       ),
     );
   }
-
   Widget _buildNombreField(bool isDark) {
     return _buildStyledField(
       label: 'Nombre del Departamento *',
@@ -390,6 +360,3 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
     );
   }
 }
-
-
-

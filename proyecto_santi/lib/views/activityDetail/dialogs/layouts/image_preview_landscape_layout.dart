@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/image_preview_widget.dart';
 import '../widgets/image_description_field.dart';
-
-/// Layout landscape para el diálogo de preview de imagen
 class ImagePreviewLandscapeLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -12,7 +10,6 @@ class ImagePreviewLandscapeLayout extends StatelessWidget {
   final XFile? imageFile;
   final String? imageUrl;
   final TextEditingController descriptionController;
-
   const ImagePreviewLandscapeLayout({
     Key? key,
     required this.isDark,
@@ -22,7 +19,6 @@ class ImagePreviewLandscapeLayout extends StatelessWidget {
     this.imageUrl,
     required this.descriptionController,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -30,7 +26,6 @@ class ImagePreviewLandscapeLayout extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Columna izquierda: Imagen
           Expanded(
             flex: 3,
             child: Container(
@@ -65,10 +60,7 @@ class ImagePreviewLandscapeLayout extends StatelessWidget {
               ),
             ),
           ),
-          
           SizedBox(width: 12),
-          
-          // Columna derecha: Descripción
           Expanded(
             flex: 2,
             child: ImageDescriptionField(

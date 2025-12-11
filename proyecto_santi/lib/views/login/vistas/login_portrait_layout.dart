@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
-
 Widget loginPortraitLayout(BuildContext context, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
   return LayoutBuilder(
     builder: (context, constraints) {

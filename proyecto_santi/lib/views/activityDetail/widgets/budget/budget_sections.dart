@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/empresa_transporte.dart';
 import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'budget_card.dart';
 import 'gastos_varios_card.dart';
-
-/// Widgets auxiliares para la secci�n de presupuesto
-
-/// Tarjetas de resumen de presupuesto (estimado y real)
 class BudgetSummaryCards extends StatelessWidget {
   final double presupuesto;
   final double costoReal;
@@ -20,7 +16,6 @@ class BudgetSummaryCards extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onSave;
   final VoidCallback? onCancel;
-
   const BudgetSummaryCards({
     Key? key,
     required this.presupuesto,
@@ -34,7 +29,6 @@ class BudgetSummaryCards extends StatelessWidget {
     this.onSave,
     this.onCancel,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
@@ -71,8 +65,6 @@ class BudgetSummaryCards extends StatelessWidget {
     );
   }
 }
-
-/// Secci�n de transporte (tarjeta + detalles)
 class TransporteSection extends StatelessWidget {
   final bool transporteReq;
   final bool isEditing;
@@ -89,7 +81,6 @@ class TransporteSection extends StatelessWidget {
   final VoidCallback? onCancel;
   final Function(EmpresaTransporte?)? onEmpresaChanged;
   final VoidCallback? onSolicitarPresupuesto;
-
   const TransporteSection({
     Key? key,
     required this.transporteReq,
@@ -108,11 +99,9 @@ class TransporteSection extends StatelessWidget {
     this.onEmpresaChanged,
     this.onSolicitarPresupuesto,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     if (!transporteReq) return SizedBox.shrink();
-
     return Column(
       children: [
         SizedBox(height: 16),
@@ -139,7 +128,6 @@ class TransporteSection extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildTransporteDetails() {
     return Container(
       padding: EdgeInsets.all(16),
@@ -222,7 +210,6 @@ class TransporteSection extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildEmpresaInfo(String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 6),
@@ -251,8 +238,6 @@ class TransporteSection extends StatelessWidget {
     );
   }
 }
-
-/// Secci�n de alojamiento (tarjeta + detalles)
 class AlojamientoSection extends StatelessWidget {
   final bool alojamientoReq;
   final bool isEditing;
@@ -269,7 +254,6 @@ class AlojamientoSection extends StatelessWidget {
   final VoidCallback? onCancel;
   final Function(Alojamiento?)? onAlojamientoChanged;
   final VoidCallback? onSolicitarPresupuesto;
-
   const AlojamientoSection({
     Key? key,
     required this.alojamientoReq,
@@ -288,11 +272,9 @@ class AlojamientoSection extends StatelessWidget {
     this.onAlojamientoChanged,
     this.onSolicitarPresupuesto,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     if (!alojamientoReq) return SizedBox.shrink();
-
     return Column(
       children: [
         SizedBox(height: 16),
@@ -319,7 +301,6 @@ class AlojamientoSection extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildAlojamientoDetails() {
     return Container(
       padding: EdgeInsets.all(16),
@@ -406,7 +387,6 @@ class AlojamientoSection extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildAlojamientoInfo(String label, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 6),
@@ -435,20 +415,16 @@ class AlojamientoSection extends StatelessWidget {
     );
   }
 }
-
-/// Tarjeta de coste por alumno
 class CostoPorAlumnoCard extends StatelessWidget {
   final double costoPorAlumno;
   final bool isWeb;
   final bool isDark;
-
   const CostoPorAlumnoCard({
     Key? key,
     required this.costoPorAlumno,
     required this.isWeb,
     required this.isDark,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(

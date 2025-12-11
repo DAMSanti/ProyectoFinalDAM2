@@ -1,19 +1,8 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/grupo_participante.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget especializado para mostrar y gestionar la lista de grupos participantes.
-/// 
-/// Responsabilidades:
-/// - Renderizar lista de grupos con avatares
-/// - Mostrar n�mero de alumnos participantes por grupo
-/// - Permitir editar inline el n�mero de participantes
-/// - Permitir eliminar grupos (si isAdmin)
-/// - Bot�n para agregar nuevos grupos
-/// - Mostrar total de alumnos participantes
-/// - Empty state cuando no hay grupos
 class GrupoListWidget extends StatefulWidget {
   final List<GrupoParticipante> grupos;
   final bool isAdminOrSolicitante;
@@ -21,7 +10,6 @@ class GrupoListWidget extends StatefulWidget {
   final Function(GrupoParticipante) onRemoveGrupo;
   final Function(GrupoParticipante, int) onUpdateNumeroParticipantes;
   final bool isLoading;
-
   const GrupoListWidget({
     super.key,
     required this.grupos,
@@ -31,23 +19,18 @@ class GrupoListWidget extends StatefulWidget {
     required this.onUpdateNumeroParticipantes,
     this.isLoading = false,
   });
-
   @override
   State<GrupoListWidget> createState() => _GrupoListWidgetState();
 }
-
 class _GrupoListWidgetState extends State<GrupoListWidget> {
   int? _editingGrupoId;
-
   int get _totalAlumnosParticipantes {
     return widget.grupos.fold(0, (sum, gp) => sum + gp.numeroParticipantes);
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -84,7 +67,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patr�n decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -97,16 +79,13 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
               ),
             ),
           ),
-          // Contenido
           Padding(
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header con t�tulo y bot�n agregar
                 _buildHeader(context, isDark, isWeb),
                 SizedBox(height: 16),
-                // Lista de grupos o empty state
                 widget.grupos.isEmpty
                     ? _buildEmptyState(isWeb)
                     : _buildGrupoList(context, isDark, isWeb),
@@ -117,7 +96,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildHeader(BuildContext context, bool isDark, bool isWeb) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,7 +172,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ],
     );
   }
-
   Widget _buildEmptyState(bool isWeb) {
     return Center(
       child: Padding(
@@ -220,7 +197,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildGrupoList(BuildContext context, bool isDark, bool isWeb) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: 300),
@@ -233,10 +209,8 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildGrupoCard(BuildContext context, GrupoParticipante grupoParticipante, bool isDark, bool isWeb) {
     final isEditing = _editingGrupoId == grupoParticipante.grupo.id;
-    
     return Container(
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -273,7 +247,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildAvatar(GrupoParticipante grupoParticipante, bool isWeb) {
     return Container(
       width: 40,
@@ -306,7 +279,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildParticipantesInfo(GrupoParticipante grupoParticipante) {
     return InkWell(
       onTap: widget.isAdminOrSolicitante 
@@ -359,12 +331,10 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ),
     );
   }
-
   Widget _buildEditableParticipantes(GrupoParticipante grupoParticipante) {
     final controller = TextEditingController(
       text: grupoParticipante.numeroParticipantes.toString(),
     );
-    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -416,24 +386,20 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       ],
     );
   }
-
   void _saveEditedParticipantes(GrupoParticipante grupoParticipante, String value) {
     final nuevoNumero = int.tryParse(value);
-    
     if (nuevoNumero == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor ingrese un n�mero v�lido')),
       );
       return;
     }
-    
     if (nuevoNumero <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('El n�mero debe ser mayor a 0')),
       );
       return;
     }
-    
     if (nuevoNumero > grupoParticipante.grupo.numeroAlumnos) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -444,14 +410,11 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
       );
       return;
     }
-    
     setState(() {
       _editingGrupoId = null;
     });
-    
     widget.onUpdateNumeroParticipantes(grupoParticipante, nuevoNumero);
   }
-
   Widget _buildDeleteButton(BuildContext context, GrupoParticipante grupoParticipante) {
     return Container(
       decoration: BoxDecoration(
@@ -496,7 +459,6 @@ class _GrupoListWidgetState extends State<GrupoListWidget> {
               );
             },
           );
-
           if (confirmed == true) {
             widget.onRemoveGrupo(grupoParticipante);
             ScaffoldMessenger.of(context).showSnackBar(

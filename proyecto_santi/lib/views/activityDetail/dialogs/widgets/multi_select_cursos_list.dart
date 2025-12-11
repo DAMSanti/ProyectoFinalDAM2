@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+ï»¿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Widget para mostrar la lista de cursos y sus grupos en el multi-select
 class MultiSelectCursosList extends StatelessWidget {
   final List<Curso> filteredCursos;
   final List<Grupo> allGrupos;
@@ -16,7 +14,6 @@ class MultiSelectCursosList extends StatelessWidget {
   final Function(int) onToggleCurso;
   final Function(int) onExpandCurso;
   final Function(Grupo, bool) onSelectGrupo;
-
   const MultiSelectCursosList({
     Key? key,
     required this.filteredCursos,
@@ -31,15 +28,12 @@ class MultiSelectCursosList extends StatelessWidget {
     required this.onExpandCurso,
     required this.onSelectGrupo,
   }) : super(key: key);
-
   List<Grupo> _getGruposDeCurso(int cursoId) {
     return allGrupos.where((g) => g.cursoId == cursoId).toList();
   }
-
   bool _isGrupoYaParticipante(Grupo grupo) {
     return gruposYaSeleccionados.any((g) => g.id == grupo.id);
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,7 +56,6 @@ class MultiSelectCursosList extends StatelessWidget {
           ),
     );
   }
-
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -92,7 +85,7 @@ class MultiSelectCursosList extends StatelessWidget {
           if (!isCompact) ...[
             SizedBox(height: 8),
             Text(
-              'Intenta con otros términos de búsqueda',
+              'Intenta con otros tï¿½rminos de bï¿½squeda',
               style: TextStyle(
                 fontSize: isMobile ? 12 : 13,
                 color: isDark ? Colors.white54 : Colors.black38,
@@ -103,7 +96,6 @@ class MultiSelectCursosList extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCursoItem(Curso curso) {
     final grupos = _getGruposDeCurso(curso.id);
     final isExpanded = expandedCursos.contains(curso.id);
@@ -113,7 +105,6 @@ class MultiSelectCursosList extends StatelessWidget {
     final algunoSeleccionado = grupos.any(
       (g) => selectedGrupos.any((sg) => sg.id == g.id)
     );
-    
     return Container(
       margin: EdgeInsets.only(bottom: isCompact ? 6 : 8),
       decoration: BoxDecoration(
@@ -134,7 +125,6 @@ class MultiSelectCursosList extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCursoHeader(
     Curso curso,
     List<Grupo> grupos,
@@ -238,7 +228,6 @@ class MultiSelectCursosList extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildGruposList(List<Grupo> grupos) {
     return Container(
       padding: EdgeInsets.only(
@@ -251,7 +240,6 @@ class MultiSelectCursosList extends StatelessWidget {
         children: grupos.map((grupo) {
           final yaParticipante = _isGrupoYaParticipante(grupo);
           final isSelected = selectedGrupos.any((g) => g.id == grupo.id);
-          
           return Container(
             margin: EdgeInsets.only(top: isCompact ? 6 : 8),
             decoration: BoxDecoration(

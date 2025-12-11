@@ -1,15 +1,12 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
-/// Servicio para subir archivos al backend C# (reemplaza Firebase Storage)
 class BackendStorageService {
   final Dio _dio;
   final String _baseUrl;
-
   BackendStorageService({required String baseUrl})
       : _baseUrl = baseUrl,
         _dio = Dio(BaseOptions(
@@ -17,12 +14,10 @@ class BackendStorageService {
           connectTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
         ));
-
-  /// Sube una imagen al backend y devuelve la URL
   Future<String> uploadImage({
     required String actividadId,
     required String userId,
-    required dynamic imageFile, // File (mobile) o Uint8List (web)
+    required dynamic imageFile, 
     String? fileName,
     Function(double)? onProgress,
   }) async {
@@ -33,7 +28,6 @@ class BackendStorageService {
         actividadId: actividadId,
         userId: userId,
       );
-
       final response = await _dio.post(
         '/api/ChatMedia/upload',
         data: formData,
@@ -43,7 +37,6 @@ class BackendStorageService {
           }
         },
       );
-
       if (response.statusCode == 200) {
         final data = response.data;
         return data['url'] as String;
@@ -54,12 +47,10 @@ class BackendStorageService {
       throw Exception('Error al subir imagen: $e');
     }
   }
-
-  /// Sube un video al backend y devuelve la URL
   Future<String> uploadVideo({
     required String actividadId,
     required String userId,
-    required dynamic videoFile, // File (mobile) o Uint8List (web)
+    required dynamic videoFile, 
     String? fileName,
     Function(double)? onProgress,
   }) async {
@@ -70,7 +61,6 @@ class BackendStorageService {
         actividadId: actividadId,
         userId: userId,
       );
-
       final response = await _dio.post(
         '/api/ChatMedia/upload',
         data: formData,
@@ -80,7 +70,6 @@ class BackendStorageService {
           }
         },
       );
-
       if (response.statusCode == 200) {
         final data = response.data;
         return data['url'] as String;
@@ -91,12 +80,10 @@ class BackendStorageService {
       throw Exception('Error al subir video: $e');
     }
   }
-
-  /// Sube un audio al backend y devuelve la URL
   Future<String> uploadAudio({
     required String actividadId,
     required String userId,
-    required dynamic audioFile, // File (mobile) o Uint8List (web)
+    required dynamic audioFile, 
     String? fileName,
     Function(double)? onProgress,
   }) async {
@@ -107,7 +94,6 @@ class BackendStorageService {
         actividadId: actividadId,
         userId: userId,
       );
-
       final response = await _dio.post(
         '/api/ChatMedia/upload',
         data: formData,
@@ -117,7 +103,6 @@ class BackendStorageService {
           }
         },
       );
-
       if (response.statusCode == 200) {
         final data = response.data;
         return data['url'] as String;
@@ -128,8 +113,6 @@ class BackendStorageService {
       throw Exception('Error al subir audio: $e');
     }
   }
-
-  /// Elimina un archivo del backend
   Future<void> deleteFile({
     required String actividadId,
     required String fileName,
@@ -146,8 +129,6 @@ class BackendStorageService {
       throw Exception('Error al eliminar archivo: $e');
     }
   }
-
-  /// Crea FormData compatible con Web y Mobile
   Future<FormData> _createFormData({
     required dynamic file,
     required String fileName,
@@ -155,9 +136,7 @@ class BackendStorageService {
     required String userId,
   }) async {
     MultipartFile multipartFile;
-
     if (kIsWeb && file is Uint8List) {
-      // Web: Usar bytes directamente
       final mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
       multipartFile = MultipartFile.fromBytes(
         file,
@@ -165,7 +144,6 @@ class BackendStorageService {
         contentType: MediaType.parse(mimeType),
       );
     } else if (file is File) {
-      // Mobile/Desktop: Usar archivo
       final mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
       multipartFile = await MultipartFile.fromFile(
         file.path,
@@ -173,7 +151,6 @@ class BackendStorageService {
         contentType: MediaType.parse(mimeType),
       );
     } else if (file is Uint8List) {
-      // Mobile pero con bytes (por ejemplo, de la cámara)
       final mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
       multipartFile = MultipartFile.fromBytes(
         file,
@@ -183,15 +160,12 @@ class BackendStorageService {
     } else {
       throw Exception('Tipo de archivo no soportado');
     }
-
     return FormData.fromMap({
       'file': multipartFile,
       'actividadId': actividadId,
       'userId': userId,
     });
   }
-
-  /// Obtiene la información de un archivo
   Future<Map<String, dynamic>> getFileInfo({
     required String actividadId,
     required String fileName,
@@ -204,7 +178,6 @@ class BackendStorageService {
           'fileName': fileName,
         },
       );
-
       if (response.statusCode == 200) {
         return response.data as Map<String, dynamic>;
       } else {

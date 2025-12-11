@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/marco_desktop.dart';
 import 'package:proyecto_santi/views/home/home_view.dart';
 import 'package:proyecto_santi/views/activities/activities_view.dart';
@@ -19,36 +19,26 @@ import 'package:proyecto_santi/func.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/components/user_avatar.dart';
-
-/// Shell que mantiene el menú fijo y solo cambia el contenido
 class DesktopShell extends StatefulWidget {
   final VoidCallback onToggleTheme;
-
   const DesktopShell({
     super.key,
     required this.onToggleTheme,
   });
-
   @override
   State<DesktopShell> createState() => _DesktopShellState();
 }
-
 class _DesktopShellState extends State<DesktopShell> {
-  String _currentRoute = '/home'; // Siempre empieza en home
-  String _previousRoute = '/home'; // Ruta anterior para volver atrás
+  String _currentRoute = '/home'; 
+  String _previousRoute = '/home'; 
   Map<String, dynamic>? _activityDetailArgs;
   Map<String, dynamic>? _chatViewArgs;
-  int _activitiesCount = 0; // Contador de actividades
-
+  int _activitiesCount = 0; 
   @override
   void initState() {
     super.initState();
-    // Siempre empezar en home
     _currentRoute = '/home';
   }
-
-  // Método público para navegar entre rutas
-  // Método para actualizar el contador de actividades
   void updateActivitiesCount(int count) {
     if (mounted) {
       setState(() {
@@ -56,18 +46,16 @@ class _DesktopShellState extends State<DesktopShell> {
       });
     }
   }
-
   void navigateTo(String route) {
     if (route != _currentRoute) {
       setState(() {
-        _previousRoute = _currentRoute; // Guardar la ruta actual como anterior
+        _previousRoute = _currentRoute; 
         _currentRoute = route;
-        _activityDetailArgs = null; // Limpiar args cuando no es detalle
-        _chatViewArgs = null; // Limpiar args del chat
+        _activityDetailArgs = null; 
+        _chatViewArgs = null; 
       });
     }
   }
-
   String _getTitleForRoute() {
     switch (_currentRoute) {
       case '/home':
@@ -106,35 +94,28 @@ class _DesktopShellState extends State<DesktopShell> {
         return 'Próximas Actividades';
     }
   }
-
-  // Método público para navegar al detalle de actividad
   void navigateToActivityDetail(Map<String, dynamic> args) {
     setState(() {
-      _previousRoute = _currentRoute; // Guardar ruta actual antes de ir al detalle
+      _previousRoute = _currentRoute; 
       _currentRoute = '/activityDetail';
       _activityDetailArgs = args;
       _chatViewArgs = null;
     });
   }
-
-  // Método público para navegar al chat de una actividad
   void navigateToChatView(Map<String, dynamic> args) {
     setState(() {
-      _previousRoute = _currentRoute; // Guardar ruta actual antes de ir al chat
+      _previousRoute = _currentRoute; 
       _currentRoute = '/chatView';
       _chatViewArgs = args;
       _activityDetailArgs = null;
     });
   }
-
-  // Método público para volver a la ruta anterior
   void navigateBack() {
     setState(() {
       _currentRoute = _previousRoute;
       _activityDetailArgs = null;
     });
   }
-
   Widget _buildCurrentView() {
     switch (_currentRoute) {
       case '/home':
@@ -204,7 +185,6 @@ class _DesktopShellState extends State<DesktopShell> {
         return HomeView(onToggleTheme: widget.onToggleTheme);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return _DesktopShellScope(
@@ -212,7 +192,7 @@ class _DesktopShellState extends State<DesktopShell> {
       child: DesktopShellFrame(
         currentRoute: _currentRoute,
         currentTitle: _getTitleForRoute(),
-        activitiesCount: _activitiesCount, // Pasar el contador
+        activitiesCount: _activitiesCount, 
         onNavigate: navigateTo,
         onToggleTheme: widget.onToggleTheme,
         child: _buildCurrentView(),
@@ -220,44 +200,32 @@ class _DesktopShellState extends State<DesktopShell> {
     );
   }
 }
-
-// InheritedWidget para acceder al estado del shell desde cualquier lugar
 class _DesktopShellScope extends InheritedWidget {
   final _DesktopShellState state;
-
   const _DesktopShellScope({
     required this.state,
     required super.child,
   });
-
   static _DesktopShellState? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<_DesktopShellScope>()?.state;
   }
-
   @override
   bool updateShouldNotify(_DesktopShellScope oldWidget) => false;
 }
-
-// Función helper para actualizar el contador de actividades
 void updateActivitiesCountInShell(BuildContext context, int count) {
   final shellState = _DesktopShellScope.of(context);
   if (shellState != null) {
     shellState.updateActivitiesCount(count);
   }
 }
-
-// Función helper para verificar si estamos dentro del shell
 bool isInsideDesktopShell(BuildContext context) {
   return _DesktopShellScope.of(context) != null;
 }
-
-// Función helper para navegar al detalle de actividad desde cualquier lugar
 void navigateToActivityDetailInShell(BuildContext context, Map<String, dynamic> args) {
   final shellState = _DesktopShellScope.of(context);
   if (shellState != null) {
     shellState.navigateToActivityDetail(args);
   } else {
-    // Fallback para mobile o si no hay shell
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -270,26 +238,19 @@ void navigateToActivityDetailInShell(BuildContext context, Map<String, dynamic> 
     );
   }
 }
-
-// Función helper para volver atrás desde el detalle de actividad
 void navigateBackFromDetail(BuildContext context, String defaultRoute) {
   final shellState = _DesktopShellScope.of(context);
   if (shellState != null) {
-    // Si estamos en el shell, volver a la ruta anterior
     shellState.navigateBack();
   } else {
-    // Si no, usar navegación tradicional (mobile)
     Navigator.pop(context);
   }
 }
-
-// Función helper para navegar al chat de una actividad desde cualquier lugar
 void navigateToChatInShell(BuildContext context, Map<String, dynamic> args) {
   final shellState = _DesktopShellScope.of(context);
   if (shellState != null) {
     shellState.navigateToChatView(args);
   } else {
-    // Fallback para mobile o si no hay shell
     final auth = Provider.of<Auth>(context, listen: false);
     Navigator.push(
       context,
@@ -305,50 +266,38 @@ void navigateToChatInShell(BuildContext context, Map<String, dynamic> args) {
     );
   }
 }
-
-/// Frame del shell con menú lateral y barra superior
 class DesktopShellFrame extends StatelessWidget {
   final String currentRoute;
   final String currentTitle;
-  final int activitiesCount; // Número de actividades
+  final int activitiesCount; 
   final Function(String) onNavigate;
   final VoidCallback onToggleTheme;
   final Widget child;
-
   const DesktopShellFrame({
     super.key,
     required this.currentRoute,
     required this.currentTitle,
-    required this.activitiesCount, // Nuevo parámetro
+    required this.activitiesCount, 
     required this.onNavigate,
     required this.onToggleTheme,
     required this.child,
   });
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Determinar si es móvil basándose en el ancho y alto
         final width = constraints.maxWidth;
         final height = constraints.maxHeight;
         final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-        
-        // Móvil: ancho < 800 o (landscape con altura < 600)
         final isMobile = width < 800 || (isLandscape && height < 600);
         final isMobileLandscape = isMobile && isLandscape;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        
         if (isMobile) {
-          // Obtener información del usuario para móvil
           final auth = Provider.of<Auth>(context, listen: false);
           final currentUser = auth.currentUser;
-          
-          // Versión móvil: Scaffold con Drawer oculto
           return Scaffold(
             appBar: AppBar(
-              toolbarHeight: isMobileLandscape ? 48 : 56, // Más compacto en landscape
-              // Sin título, solo iconos y usuario
+              toolbarHeight: isMobileLandscape ? 48 : 56, 
               leading: Builder(
                 builder: (context) => IconButton(
                   icon: Icon(
@@ -362,7 +311,6 @@ class DesktopShellFrame extends StatelessWidget {
                 ),
               ),
               actions: [
-                // Mostrar avatar y info del usuario en móvil (compacta)
                 if (currentUser != null)
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
@@ -374,7 +322,7 @@ class DesktopShellFrame extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (!isMobileLandscape) // Ocultar texto en landscape
+                          if (!isMobileLandscape) 
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -423,16 +371,14 @@ class DesktopShellFrame extends StatelessWidget {
             drawer: MenuDesktopStatic(
               currentRoute: currentRoute,
               onNavigate: onNavigate,
-              showLogo: !isMobileLandscape, // Ocultar logo en landscape móvil
+              showLogo: !isMobileLandscape, 
             ),
             body: child,
           );
         } else {
-          // Versión desktop: menú fijo lateral
           final minMenuWidth = 200.0;
           final menuWidth = constraints.maxWidth * 0.15;
           final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
-
           return Stack(
             children: [
               Row(
@@ -446,7 +392,7 @@ class DesktopShellFrame extends StatelessWidget {
                           child: DesktopBar(
                             onToggleTheme: onToggleTheme,
                             title: currentTitle,
-                            activitiesCount: currentRoute == '/home' ? activitiesCount : null, // Solo mostrar en home
+                            activitiesCount: currentRoute == '/home' ? activitiesCount : null, 
                           ),
                         ),
                         Expanded(
@@ -485,7 +431,6 @@ class DesktopShellFrame extends StatelessWidget {
       },
     );
   }
-
   void _showAccountSettingsDialog(BuildContext context, dynamic currentUser, bool isDark) {
     showDialog(
       context: context,
@@ -509,7 +454,6 @@ class DesktopShellFrame extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar y nombre del usuario
                   Center(
                     child: Column(
                       children: [
@@ -547,11 +491,8 @@ class DesktopShellFrame extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24),
-                  
                   Divider(),
                   SizedBox(height: 16),
-                  
-                  // Información del usuario
                   Text(
                     'Información Personal',
                     style: TextStyle(
@@ -561,7 +502,6 @@ class DesktopShellFrame extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
                   _buildInfoTile(
                     icon: Icons.email,
                     label: 'Correo',
@@ -569,19 +509,15 @@ class DesktopShellFrame extends StatelessWidget {
                     isDark: isDark,
                   ),
                   SizedBox(height: 8),
-                  
                   _buildInfoTile(
                     icon: Icons.badge,
                     label: 'DNI',
                     value: currentUser?.dni?.isNotEmpty == true ? currentUser!.dni : 'No disponible',
                     isDark: isDark,
                   ),
-                  
                   SizedBox(height: 24),
                   Divider(),
                   SizedBox(height: 16),
-                  
-                  // Opciones de configuración (placeholder)
                   Text(
                     'Opciones',
                     style: TextStyle(
@@ -591,7 +527,6 @@ class DesktopShellFrame extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.lock,
@@ -602,7 +537,6 @@ class DesktopShellFrame extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     enabled: false,
                   ),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.notifications,
@@ -613,7 +547,6 @@ class DesktopShellFrame extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     enabled: false,
                   ),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.language,
@@ -638,7 +571,6 @@ class DesktopShellFrame extends StatelessWidget {
       },
     );
   }
-
   Widget _buildInfoTile({
     required IconData icon,
     required String label,
@@ -688,20 +620,16 @@ class DesktopShellFrame extends StatelessWidget {
     );
   }
 }
-
-/// Menú lateral estático que usa callback en lugar de Navigator
 class MenuDesktopStatic extends StatelessWidget {
   final String currentRoute;
   final Function(String) onNavigate;
   final bool showLogo;
-
   const MenuDesktopStatic({
     super.key,
     required this.currentRoute,
     required this.onNavigate,
-    this.showLogo = true, // Por defecto mostrar logo
+    this.showLogo = true, 
   });
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -709,14 +637,11 @@ class MenuDesktopStatic extends StatelessWidget {
       child: _buildMenuContent(context),
     );
   }
-
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     final height = MediaQuery.of(context).size.height;
     final isMobileLandscape = isLandscape && height < 600;
-    
-    // Obtener el usuario actual para verificar si es admin
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
@@ -724,7 +649,6 @@ class MenuDesktopStatic extends StatelessWidget {
     final isAdminOrCoord = isAdmin || 
                            currentUser?.rol.toLowerCase() == 'coordinador' ||
                            currentUser?.rol.toLowerCase() == 'ed';
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -737,7 +661,6 @@ class MenuDesktopStatic extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          // Header - Mostrar solo si showLogo es true
           if (showLogo)
             Container(
               height: 140.0,
@@ -796,7 +719,6 @@ class MenuDesktopStatic extends StatelessWidget {
                 ],
               ),
             )
-          // Mostrar info de usuario en landscape móvil cuando no hay logo
           else if (isMobileLandscape && currentUser != null)
             Container(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -848,10 +770,7 @@ class MenuDesktopStatic extends StatelessWidget {
                 ],
               ),
             ),
-
           SizedBox(height: showLogo ? 16 : (isMobileLandscape ? 4 : 8)),
-
-          // Items del menú
           Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(horizontal: isMobileLandscape ? 6 : 8),
@@ -895,7 +814,6 @@ class MenuDesktopStatic extends StatelessWidget {
                   routeName: '/solicitar-actividad',
                   isCompact: isMobileLandscape,
                 ),
-                // Estadísticas solo para administradores y coordinadores
                 if (isAdminOrCoord) ...[
                   SizedBox(height: isMobileLandscape ? 4 : 8),
                   _buildDrawerItem(
@@ -906,7 +824,6 @@ class MenuDesktopStatic extends StatelessWidget {
                     isCompact: isMobileLandscape,
                   ),
                 ],
-                // Menú de Gestión solo para administradores
                 if (isAdmin) ...[
                   SizedBox(height: isMobileLandscape ? 4 : 8),
                   _buildGestionMenu(context, isDark, isCompact: isMobileLandscape),
@@ -914,8 +831,6 @@ class MenuDesktopStatic extends StatelessWidget {
               ],
             ),
           ),
-
-          // Separador
           Container(
             height: 1,
             margin: EdgeInsets.symmetric(
@@ -932,8 +847,6 @@ class MenuDesktopStatic extends StatelessWidget {
               ),
             ),
           ),
-
-          // Footer
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: isMobileLandscape ? 6 : 8, 
@@ -966,7 +879,6 @@ class MenuDesktopStatic extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildGestionMenu(BuildContext context, bool isDark, {bool isCompact = false}) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -1005,7 +917,6 @@ class MenuDesktopStatic extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName, {bool isCompact = false}) {
     return Container(
       margin: EdgeInsets.only(
@@ -1053,7 +964,6 @@ class MenuDesktopStatic extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildDrawerItem(
     BuildContext context, {
     required IconData icon,
@@ -1065,7 +975,6 @@ class MenuDesktopStatic extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCurrentRoute = currentRoute == routeName;
-
     return Container(
       decoration: BoxDecoration(
         gradient: isCurrentRoute
@@ -1092,7 +1001,6 @@ class MenuDesktopStatic extends StatelessWidget {
           borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
           onTap: () async {
             if (isLogout) {
-              // Mostrar diálogo de confirmación para salir
               final shouldLogout = await showDialog<bool>(
                 context: context,
                 builder: (BuildContext dialogContext) {
@@ -1112,12 +1020,10 @@ class MenuDesktopStatic extends StatelessWidget {
                   );
                 },
               );
-              
               if (shouldLogout == true) {
                 logout(context);
               }
             } else if (isSettings) {
-              // Mostrar ventana de configuración
               final isDarkSettings = Theme.of(context).brightness == Brightness.dark;
               showDialog(
                 context: context,

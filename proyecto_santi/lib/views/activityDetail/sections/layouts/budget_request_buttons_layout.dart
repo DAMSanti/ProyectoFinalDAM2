@@ -1,15 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget que maneja el layout responsive de los botones de solicitar presupuestos.
-/// 
-/// Muestra botones para solicitar presupuestos de transporte y/o alojamiento
-/// seg�n est�n activados.
-/// 
-/// Layout:
-/// - Mobile landscape: columna vertical compacta
-/// - Mobile portrait: columna vertical con m�s espaciado
-/// - Desktop: fila horizontal con texto abreviado
 class BudgetRequestButtonsLayout extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
@@ -17,7 +7,6 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
   final bool alojamientoReq;
   final VoidCallback onRequestTransporte;
   final VoidCallback onRequestAlojamiento;
-
   const BudgetRequestButtonsLayout({
     Key? key,
     required this.isMobile,
@@ -27,14 +16,11 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
     required this.onRequestTransporte,
     required this.onRequestAlojamiento,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    // Si ninguno est� activo, no mostrar nada
     if (!transporteReq && !alojamientoReq) {
       return SizedBox.shrink();
     }
-
     if (isMobileLandscape) {
       return _buildMobileLandscapeLayout();
     } else if (isMobile) {
@@ -43,8 +29,6 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
       return _buildDesktopLayout();
     }
   }
-
-  /// Layout para m�vil en modo landscape (columna compacta)
   Widget _buildMobileLandscapeLayout() {
     return Column(
       children: [
@@ -75,8 +59,6 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
       ],
     );
   }
-
-  /// Layout para m�vil en modo portrait (columna con espaciado)
   Widget _buildMobilePortraitLayout() {
     return Column(
       children: [
@@ -107,8 +89,6 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
       ],
     );
   }
-
-  /// Layout para escritorio (fila horizontal con texto corto)
   Widget _buildDesktopLayout() {
     return Row(
       children: [
@@ -142,8 +122,6 @@ class BudgetRequestButtonsLayout extends StatelessWidget {
       ],
     );
   }
-
-  /// Construye un bot�n de solicitud con estilo gradiente
   Widget _buildButton({
     required VoidCallback onTap,
     required Color color,

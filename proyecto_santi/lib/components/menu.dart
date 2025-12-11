@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
-
 class Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -15,10 +14,9 @@ class Menu extends StatelessWidget {
         } else if (constraints.maxWidth < 600) {
           drawerWidth = constraints.maxWidth * 0.65;
         }
-
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
-          width: drawerWidth, // Adjust the width of the Drawer
+          width: drawerWidth, 
           child: Drawer(
             child: _buildMenuContent(context),
           ),
@@ -26,21 +24,17 @@ class Menu extends StatelessWidget {
       },
     );
   }
-
   Widget _buildMenuContent(BuildContext context) {
-    // Obtener el usuario actual para verificar si es admin
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
                     currentUser?.rol.toLowerCase() == 'administrador';
-
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
       child: Column(
         children: <Widget>[
           SizedBox(
             height: 150.0,
-            // Set the desired height for the DrawerHeader
             child: DrawerHeader(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -87,7 +81,6 @@ class Menu extends StatelessWidget {
             text: 'Mapa',
             routeName: '/mapa',
           ),
-          // Menú de Gestión solo para administradores
           if (isAdmin)
             _buildGestionMenu(context),
           Expanded(
@@ -116,7 +109,6 @@ class Menu extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildGestionMenu(BuildContext context) {
     return ExpansionTile(
       leading: FaIcon(Icons.admin_panel_settings, color: Theme.of(context).primaryColor),
@@ -188,7 +180,6 @@ class Menu extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),
@@ -206,7 +197,6 @@ class Menu extends StatelessWidget {
     );
   }
 }
-
 class MenuLandscape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -218,10 +208,9 @@ class MenuLandscape extends StatelessWidget {
         } else if (constraints.maxWidth < 600) {
           drawerWidth = constraints.maxWidth * 0.65;
         }
-
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
-          width: drawerWidth, // Adjust the width of the Drawer
+          width: drawerWidth, 
           child: Drawer(
             child: SingleChildScrollView(
               child: _buildMenuContent(context),
@@ -231,17 +220,13 @@ class MenuLandscape extends StatelessWidget {
       },
     );
   }
-
   Widget _buildMenuContent(BuildContext context) {
-    // Obtener el usuario actual para verificar si es admin
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
                     currentUser?.rol.toLowerCase() == 'administrador';
-
     return Column(
       children: <Widget>[
-        // Header removido para landscape
         _buildDrawerItem(
           context,
           icon: Icons.home,
@@ -266,7 +251,6 @@ class MenuLandscape extends StatelessWidget {
           text: 'Mapa',
           routeName: '/mapa',
         ),
-        // Menú de Gestión solo para administradores
         if (isAdmin)
           _buildGestionMenuLandscape(context),
         _buildDrawerItem(
@@ -284,7 +268,6 @@ class MenuLandscape extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildGestionMenuLandscape(BuildContext context) {
     return ExpansionTile(
       leading: FaIcon(Icons.admin_panel_settings, color: Theme.of(context).primaryColor),
@@ -356,7 +339,6 @@ class MenuLandscape extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required String routeName}) {
     return ListTile(
       leading: FaIcon(icon, color: Theme.of(context).primaryColor),

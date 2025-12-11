@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Clase con métodos helper para construir formularios en diálogos
 class DialogFormHelpers {
-  /// Construye un título de sección con icono y gradiente
   static Widget buildSectionTitle(
     String title,
     IconData icon,
@@ -34,8 +31,6 @@ class DialogFormHelpers {
       ],
     );
   }
-
-  /// Construye un TextField personalizado con estilo consistente
   static Widget buildTextField({
     required TextEditingController controller,
     required String label,
@@ -79,8 +74,6 @@ class DialogFormHelpers {
       ),
     );
   }
-
-  /// Construye un botón para seleccionar fecha/hora
   static Widget buildDateTimeButton({
     required String label,
     required IconData icon,
@@ -138,8 +131,6 @@ class DialogFormHelpers {
       ),
     );
   }
-
-  /// Construye un Dropdown con estilo consistente
   static Widget buildDropdown<T>({
     required T? value,
     required String label,
@@ -182,8 +173,6 @@ class DialogFormHelpers {
       ),
     );
   }
-
-  /// Construye una opción de radio button con icono y estilo visual
   static Widget buildRadioOption({
     required String value,
     required String groupValue,

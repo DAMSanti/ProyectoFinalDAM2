@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+﻿import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -14,25 +14,19 @@ import 'package:proyecto_santi/views/estadisticas/widgets/trend_stat_card.dart';
 import 'package:proyecto_santi/views/estadisticas/views/pdf_editor_view.dart';
 import 'package:proyecto_santi/views/estadisticas/services/pdf_export_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 class EstadisticasView extends StatefulWidget {
   const EstadisticasView({Key? key}) : super(key: key);
-
   @override
   State<EstadisticasView> createState() => _EstadisticasViewState();
 }
-
 class _EstadisticasViewState extends State<EstadisticasView> {
   final ApiService _apiService = ApiService();
   late final ActividadService _actividadService;
-  
   List<Actividad> _actividades = [];
   List<Actividad> _actividadesFiltradas = [];
   List<Actividad> _actividadesPeriodoAnterior = [];
   bool _isLoading = false;
-  bool _showFilters = false; // Filtros colapsados por defecto
-  
-  // Global keys para capturar widgets de gráficas
+  bool _showFilters = false; 
   final Map<ChartType, GlobalKey> _chartKeys = {
     ChartType.tendencias: GlobalKey(),
     ChartType.actividadesPorEstado: GlobalKey(),
@@ -41,10 +35,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     ChartType.actividadesPorMes: GlobalKey(),
     ChartType.presupuestoVsCosto: GlobalKey(),
   };
-  
-  // Filtros
   FilterPeriod _currentPeriod = FilterPeriod.currentMonth();
-
   @override
   void initState() {
     super.initState();
@@ -52,20 +43,15 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     _loadSavedFilter();
     _loadActividades();
   }
-
-  // Cargar filtro guardado
   Future<void> _loadSavedFilter() async {
     final prefs = await SharedPreferences.getInstance();
     final savedFilterType = prefs.getString('stats_filter_type');
-    
     if (savedFilterType != null) {
       try {
         final filterType = FilterPeriodType.values.firstWhere(
           (e) => e.toString() == savedFilterType,
           orElse: () => FilterPeriodType.currentMonth,
         );
-        
-        // Si es custom, cargar fechas guardadas
         if (filterType == FilterPeriodType.custom) {
           final startStr = prefs.getString('stats_filter_start');
           final endStr = prefs.getString('stats_filter_end');
@@ -76,7 +62,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
             );
           }
         } else {
-          // Usar el factory correspondiente
           switch (filterType) {
             case FilterPeriodType.last30Days:
               _currentPeriod = FilterPeriod.last30Days();
@@ -106,21 +91,16 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       }
     }
   }
-
-  // Guardar filtro seleccionado
   Future<void> _saveFilter() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('stats_filter_type', _currentPeriod.type.toString());
-    
     if (_currentPeriod.type == FilterPeriodType.custom) {
       await prefs.setString('stats_filter_start', _currentPeriod.startDate.toIso8601String());
       await prefs.setString('stats_filter_end', _currentPeriod.endDate.toIso8601String());
     }
   }
-
   Future<void> _loadActividades() async {
     setState(() => _isLoading = true);
-    
     try {
       final actividades = await _actividadService.fetchActivities(pageSize: 100);
       setState(() {
@@ -133,9 +113,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       setState(() => _isLoading = false);
     }
   }
-
   void _applyFilters() {
-    // Filtrar actividades del período actual
     _actividadesFiltradas = _actividades.where((actividad) {
       try {
         final fecha = DateTime.parse(actividad.fini);
@@ -145,8 +123,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         return false;
       }
     }).toList();
-
-    // Filtrar actividades del período anterior para comparación
     final previousPeriod = _currentPeriod.getPreviousPeriod();
     _actividadesPeriodoAnterior = _actividades.where((actividad) {
       try {
@@ -158,15 +134,13 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       }
     }).toList();
   }
-
   void _changePeriod(FilterPeriod newPeriod) {
     setState(() {
       _currentPeriod = newPeriod;
       _applyFilters();
     });
-    _saveFilter(); // Guardar automáticamente
+    _saveFilter(); 
   }
-
   void _openPdfEditor() {
     showDialog(
       context: context,
@@ -182,7 +156,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   void _showCustomDateRangePicker() async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -204,12 +177,10 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         );
       },
     );
-
     if (picked != null) {
       _changePeriod(FilterPeriod.custom(picked.start, picked.end));
     }
   }
-
   Map<String, int> _getActividadesPorEstado() {
     final Map<String, int> estadoCounts = {};
     for (var actividad in _actividadesFiltradas) {
@@ -217,7 +188,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     }
     return estadoCounts;
   }
-
   Map<String, int> _getActividadesPorTipo() {
     final Map<String, int> tipoCounts = {};
     for (var actividad in _actividadesFiltradas) {
@@ -225,7 +195,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     }
     return tipoCounts;
   }
-
   Map<String, int> _getActividadesPorDepartamento() {
     final Map<String, int> deptoCounts = {};
     for (var actividad in _actividadesFiltradas) {
@@ -236,11 +205,9 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     }
     return deptoCounts;
   }
-
   Map<String, int> _getActividadesPorMes() {
     final Map<String, int> mesCounts = {};
     final meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
     for (var actividad in _actividadesFiltradas) {
       try {
         final fecha = DateTime.parse(actividad.fini);
@@ -252,52 +219,39 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     }
     return mesCounts;
   }
-
   double _getTotalPresupuesto() {
     return _actividadesFiltradas.fold(0.0, (sum, act) => sum + (act.presupuestoEstimado ?? 0.0));
   }
-
   double _getTotalCostoReal() {
     return _actividadesFiltradas.fold(0.0, (sum, act) => sum + (act.costoReal ?? 0.0));
   }
-
   int _getActividadesConTransporte() {
     return _actividadesFiltradas.where((act) => act.transporteReq == 1).length;
   }
-
   int _getActividadesConAlojamiento() {
     return _actividadesFiltradas.where((act) => act.alojamientoReq == 1).length;
   }
-
-  // Métodos para cálculos del período anterior
   double _getTotalPresupuestoPrevio() {
     return _actividadesPeriodoAnterior.fold(0.0, (sum, act) => sum + (act.presupuestoEstimado ?? 0.0));
   }
-
   double _getTotalCostoRealPrevio() {
     return _actividadesPeriodoAnterior.fold(0.0, (sum, act) => sum + (act.costoReal ?? 0.0));
   }
-
   int _getActividadesConTransportePrevio() {
     return _actividadesPeriodoAnterior.where((act) => act.transporteReq == 1).length;
   }
-
   int _getActividadesConAlojamientoPrevio() {
     return _actividadesPeriodoAnterior.where((act) => act.alojamientoReq == 1).length;
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = MediaQuery.of(context).size.width < 600;
-
     return Stack(
       children: [
-        // Fondo con degradado
         isDark 
           ? GradientBackgroundDark(child: Container()) 
           : GradientBackgroundLight(child: Container()),
-        // Contenido
         Scaffold(
           backgroundColor: Colors.transparent,
           body: _isLoading
@@ -311,15 +265,11 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Espaciado superior compacto
                       SizedBox(height: isMobile ? 8 : 12),
-                      
-                      // Botones superiores: Filtro Global y Exportar PDF
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: isMobile ? 0 : 4),
                         child: Row(
                           children: [
-                            // Botón de Filtros Globales (estilo similar a activities)
                             Expanded(
                               child: Stack(
                                 children: [
@@ -376,7 +326,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                                       ),
                                     ),
                                   ),
-                                  // Indicador si hay filtros activos
                                   if (_currentPeriod.type != FilterPeriodType.currentMonth)
                                     Positioned(
                                       right: 8,
@@ -397,10 +346,7 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                                 ],
                               ),
                             ),
-                            
                             SizedBox(width: 12),
-                            
-                            // Botón de Exportar PDF (solo icono)
                             Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -440,8 +386,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                         ),
                       ),
                       SizedBox(height: 12),
-                      
-                      // Barra de filtros globales colapsable
                       AnimatedContainer(
                         duration: Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
@@ -461,15 +405,11 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                               )
                             : SizedBox.shrink(),
                       ),
-                      
-                      // Cards de estadísticas generales con tendencias (más compacto)
                       RepaintBoundary(
                         key: _chartKeys[ChartType.tendencias],
                         child: _buildTrendStats(isMobile, isDark),
                       ),
                       SizedBox(height: isMobile ? 12 : 16),
-                      
-                      // Gráficas en dos columnas o una
                       if (MediaQuery.of(context).size.width > 800) ...[
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -539,8 +479,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                           child: _buildPresupuestoChart(isMobile, isDark),
                         ),
                       ],
-                      
-                      // Espaciado final
                       SizedBox(height: isMobile ? 60 : 40),
                     ],
                   ),
@@ -549,24 +487,17 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ],
     );
   }
-
-  // Construir las estadísticas generales con indicadores de tendencia
   Widget _buildTrendStats(bool isMobile, bool isDark) {
-    // Calcular estadísticas del período actual
     final totalActividades = _actividadesFiltradas.length;
     final totalPresupuesto = _getTotalPresupuesto();
     final totalCostoReal = _getTotalCostoReal();
     final actividadesConTransporte = _getActividadesConTransporte();
     final actividadesConAlojamiento = _getActividadesConAlojamiento();
-    
-    // Calcular estadísticas del período anterior
     final totalActividadesPrevio = _actividadesPeriodoAnterior.length;
     final totalPresupuestoPrevio = _getTotalPresupuestoPrevio();
     final totalCostoRealPrevio = _getTotalCostoRealPrevio();
     final actividadesConTransportePrevio = _getActividadesConTransportePrevio();
     final actividadesConAlojamientoPrevio = _getActividadesConAlojamientoPrevio();
-    
-    // Crear datos de tendencia
     final trendActividades = TrendData.fromValues(
       title: 'Total Actividades',
       currentValue: totalActividades.toDouble(),
@@ -576,7 +507,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       subtitle: _currentPeriod.label,
       decimals: 0,
     );
-    
     final trendPresupuesto = TrendData.fromValues(
       title: 'Presupuesto Total',
       currentValue: totalPresupuesto,
@@ -587,7 +517,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       valuePrefix: '€',
       decimals: 2,
     );
-    
     final trendCostoReal = TrendData.fromValues(
       title: 'Costo Real',
       currentValue: totalCostoReal,
@@ -598,7 +527,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       valuePrefix: '€',
       decimals: 2,
     );
-    
     final trendTransporte = TrendData.fromValues(
       title: 'Con Transporte',
       currentValue: actividadesConTransporte.toDouble(),
@@ -608,7 +536,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       subtitle: 'Actividades',
       decimals: 0,
     );
-    
     final trendAlojamiento = TrendData.fromValues(
       title: 'Con Alojamiento',
       currentValue: actividadesConAlojamiento.toDouble(),
@@ -618,7 +545,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       subtitle: 'Actividades',
       decimals: 0,
     );
-
     if (isMobile) {
       return Column(
         children: [
@@ -659,8 +585,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         ],
       );
     }
-
-    // Layout para desktop (grid de 3 columnas más compacto)
     return Wrap(
       spacing: 12,
       runSpacing: 12,
@@ -713,14 +637,12 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ],
     );
   }
-
   Widget _buildGeneralStats(bool isMobile, bool isDark) {
     final totalActividades = _actividades.length;
     final totalPresupuesto = _getTotalPresupuesto();
     final totalCostoReal = _getTotalCostoReal();
     final conTransporte = _getActividadesConTransporte();
     final conAlojamiento = _getActividadesConAlojamiento();
-
     final stats = [
       _StatData('Total Actividades', totalActividades.toString(), Icons.event_rounded, AppColors.primary),
       _StatData('Presupuesto Total', '€${totalPresupuesto.toStringAsFixed(0)}', Icons.euro_rounded, AppColors.estadoAprobado),
@@ -728,7 +650,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       _StatData('Con Transporte', conTransporte.toString(), Icons.directions_bus_rounded, AppColors.presupuestoTransporte),
       _StatData('Con Alojamiento', conAlojamiento.toString(), Icons.hotel_rounded, AppColors.presupuestoAlojamiento),
     ];
-
     if (isMobile) {
       return Column(
         children: stats.map((stat) => Padding(
@@ -737,7 +658,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         )).toList(),
       );
     }
-
     return Wrap(
       spacing: 16,
       runSpacing: 16,
@@ -747,7 +667,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       )).toList(),
     );
   }
-
   Widget _buildModernStatCard(_StatData stat, bool isMobile, bool isDark) {
     return Container(
       decoration: BoxDecoration(
@@ -848,8 +767,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
-  // Helper para construir el encabezado de gráfica con botón de filtro individual
   Widget _buildChartHeader({
     required String title,
     required IconData icon,
@@ -903,8 +820,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ],
     );
   }
-
-  // Mostrar opciones de filtro específicas para una gráfica
   void _showChartFilterOptions({
     required BuildContext context,
     required String title,
@@ -939,7 +854,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: EdgeInsets.only(top: 12, bottom: 8),
               width: 40,
@@ -951,7 +865,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            // Título
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -981,7 +894,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
               ),
             ),
             Divider(height: 1),
-            // Opciones
             ListView.builder(
               shrinkWrap: true,
               itemCount: options.length,
@@ -1008,7 +920,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                         duration: Duration(seconds: 2),
                       ),
                     );
-                    // TODO: Implementar lógica de filtro específica
                   },
                   trailing: Icon(
                     Icons.arrow_forward_ios,
@@ -1026,11 +937,9 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildActividadesPorEstadoChart(bool isMobile, bool isDark) {
     final data = _getActividadesPorEstado();
     if (data.isEmpty) return SizedBox.shrink();
-
     final colors = [
       AppColors.estadoAprobado,
       AppColors.estadoPendiente,
@@ -1038,12 +947,10 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       AppColors.primary,
       AppColors.presupuestoAlojamiento,
     ];
-
     int colorIndex = 0;
     final sections = data.entries.map((entry) {
       final color = colors[colorIndex % colors.length];
       colorIndex++;
-      
       return PieChartSectionData(
         value: entry.value.toDouble(),
         title: '${entry.value}',
@@ -1056,7 +963,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
         ),
       );
     }).toList();
-
     return Container(
       padding: EdgeInsets.all(isMobile ? 12 : 14),
       decoration: BoxDecoration(
@@ -1174,13 +1080,10 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildActividadesPorTipoChart(bool isMobile, bool isDark) {
     final data = _getActividadesPorTipo();
     if (data.isEmpty) return SizedBox.shrink();
-
     final maxValue = data.values.reduce((a, b) => a > b ? a : b).toDouble();
-
     return _buildChartContainer(
       title: 'Actividades por Tipo',
       icon: Icons.category_rounded,
@@ -1275,7 +1178,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildChartContainer({
     required String title,
     required IconData icon,
@@ -1337,13 +1239,10 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildActividadesPorDepartamentoChart(bool isMobile, bool isDark) {
     final data = _getActividadesPorDepartamento();
     if (data.isEmpty) return SizedBox.shrink();
-
     final maxValue = data.values.reduce((a, b) => a > b ? a : b).toDouble();
-
     return _buildChartContainer(
       title: 'Actividades por Departamento',
       icon: Icons.business_rounded,
@@ -1443,16 +1342,13 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildActividadesPorMesChart(bool isMobile, bool isDark) {
     final data = _getActividadesPorMes();
     if (data.isEmpty) return SizedBox.shrink();
-
     final meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     final maxValue = data.values.isNotEmpty 
         ? data.values.reduce((a, b) => a > b ? a : b).toDouble() 
         : 10.0;
-
     return _buildChartContainer(
       title: 'Actividades por Mes',
       icon: Icons.calendar_month_rounded,
@@ -1550,16 +1446,12 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildPresupuestoChart(bool isMobile, bool isDark) {
     if (_actividades.isEmpty) return SizedBox.shrink();
-
     final actividades = _actividades.where((a) => 
       a.presupuestoEstimado != null || a.costoReal != null
     ).toList();
-
     if (actividades.isEmpty) return SizedBox.shrink();
-
     return _buildChartContainer(
       title: 'Presupuesto vs Costo Real',
       icon: Icons.trending_up_rounded,
@@ -1579,7 +1471,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
             child: LineChart(
               LineChartData(
                 lineBarsData: [
-                  // Línea de Presupuesto Estimado
                   LineChartBarData(
                     spots: actividades.asMap().entries.map((entry) {
                       return FlSpot(
@@ -1618,7 +1509,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
                       ),
                     ),
                   ),
-                  // Línea de Costo Real
                   LineChartBarData(
                     spots: actividades.asMap().entries.map((entry) {
                       return FlSpot(
@@ -1722,7 +1612,6 @@ class _EstadisticasViewState extends State<EstadisticasView> {
       ),
     );
   }
-
   Widget _buildLegendItem(String label, Color color, bool isMobile, bool isDark) {
     return Row(
       children: [
@@ -1753,13 +1642,10 @@ class _EstadisticasViewState extends State<EstadisticasView> {
     );
   }
 }
-
-// Clase helper para datos de estadísticas
 class _StatData {
   final String title;
   final String value;
   final IconData icon;
   final Color color;
-
   _StatData(this.title, this.value, this.icon, this.color);
 }

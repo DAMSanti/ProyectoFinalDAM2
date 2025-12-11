@@ -1,26 +1,18 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/config.dart';
-
-/// Servicio para gestión de profesores
 class ProfesorService {
   final ApiService _apiService;
-
   ProfesorService(this._apiService);
-
-  /// Obtiene todos los profesores
   Future<List<Profesor>> fetchProfesores() async {
     try {
       final response = await _apiService.getData(AppConfig.profesorEndpoint);
-      
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
-        
         final profesores = data.map((json) {
           return Profesor.fromJson(json);
         }).toList();
-        
         return profesores;
       }
       throw ApiException('Error al obtener profesores', statusCode: response.statusCode);
@@ -29,12 +21,9 @@ class ProfesorService {
       rethrow;
     }
   }
-
-  /// Verifica si un profesor existe por UUID
   Future<Profesor?> getProfesorByUuid(String uuid) async {
     try {
       final response = await _apiService.getData('${AppConfig.profesorEndpoint}/$uuid');
-      
       if (response.statusCode == 200 && response.data != null) {
         return Profesor.fromJson(response.data);
       }
@@ -44,8 +33,6 @@ class ProfesorService {
       return null;
     }
   }
-
-  /// Crea un nuevo profesor usando FormData (requerido por la API)
   Future<Profesor?> createProfesor(Profesor profesor, {int? departamentoId}) async {
     try {
       final formData = FormData.fromMap({
@@ -53,15 +40,13 @@ class ProfesorService {
         'Nombre': profesor.nombre,
         'Apellidos': profesor.apellidos,
         'Correo': profesor.correo,
-        'Telefono': '', // Campo opcional
+        'Telefono': '', 
         'DepartamentoId': departamentoId ?? profesor.depart?.id,
       });
-
       final response = await _apiService.dio.post(
         AppConfig.profesorEndpoint,
         data: formData,
       );
-      
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Profesor.fromJson(response.data);
       }
@@ -71,23 +56,19 @@ class ProfesorService {
       rethrow;
     }
   }
-
-  /// Actualiza un profesor usando FormData (requerido por la API)
   Future<Profesor?> updateProfesor(String uuid, Profesor profesor, {int? departamentoId}) async {
     try {
       final formData = FormData.fromMap({
         'Nombre': profesor.nombre,
         'Apellidos': profesor.apellidos,
-        'Telefono': '', // Campo opcional
+        'Telefono': '', 
         'Activo': profesor.activo == 1,
         'DepartamentoId': departamentoId ?? profesor.depart?.id,
       });
-
       final response = await _apiService.dio.put(
         '${AppConfig.profesorEndpoint}/$uuid',
         data: formData,
       );
-      
       if (response.statusCode == 200) {
         return Profesor.fromJson(response.data);
       }
@@ -97,8 +78,6 @@ class ProfesorService {
       rethrow;
     }
   }
-
-  /// Elimina un profesor
   Future<bool> deleteProfesor(String uuid) async {
     try {
       final response = await _apiService.deleteData('${AppConfig.profesorEndpoint}/$uuid');
@@ -108,12 +87,9 @@ class ProfesorService {
       rethrow;
     }
   }
-
-  /// Obtiene los profesores participantes de una actividad
   Future<List<String>> fetchProfesoresParticipantes(int actividadId) async {
     try {
       final response = await _apiService.getData('/Actividad/$actividadId/profesores-participantes');
-      
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List;
         final result = data.map((e) => e.toString()).toList();
@@ -125,16 +101,12 @@ class ProfesorService {
       rethrow;
     }
   }
-
-  /// Actualiza los profesores participantes de una actividad
   Future<bool> updateProfesoresParticipantes(int actividadId, List<String> profesoresIds) async {
     try {
-      // El backend espera List<string> directamente, no un objeto con 'profesoresIds'
       final response = await _apiService.put(
         '/Actividad/$actividadId/profesores-participantes',
         profesoresIds,
       );
-      
       return response.statusCode == 200;
     } catch (e) {
       print('[ProfesorService ERROR] updateProfesoresParticipantes: $e');

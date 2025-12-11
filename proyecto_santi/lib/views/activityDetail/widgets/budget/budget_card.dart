@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../models/empresa_transporte.dart';
 import '../../../../models/alojamiento.dart';
-
-/// Widget reutilizable para mostrar tarjetas de presupuesto
-/// Soporta modo display y modo edición con callbacks
 class BudgetCardWidget extends StatelessWidget {
   final String titulo;
   final double valor;
@@ -24,7 +21,6 @@ class BudgetCardWidget extends StatelessWidget {
   final bool cargandoAlojamientos;
   final TextEditingController? controller;
   final Function(String)? onSubmitted;
-
   const BudgetCardWidget({
     Key? key,
     required this.titulo,
@@ -47,13 +43,10 @@ class BudgetCardWidget extends StatelessWidget {
     this.controller,
     this.onSubmitted,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Container(
       width: width > 600 ? width : double.infinity,
       padding: EdgeInsets.symmetric(
@@ -98,24 +91,18 @@ class BudgetCardWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildHeader(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
-    // Para "Coste por Alumno" no mostrar header separado
     if (titulo == 'Coste por Alumno') {
       return SizedBox.shrink();
     }
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: Row(
             children: [
-              // Ocultar icono en móvil
               if (!isMobile)
                 Container(
                   padding: EdgeInsets.all(10),
@@ -187,20 +174,15 @@ class BudgetCardWidget extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildEditingContent(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
-    // Si es transporte o alojamiento con dropdown
     if ((titulo == 'Transporte' && empresasDisponibles != null) ||
         (titulo == 'Alojamiento' && alojamientosDisponibles != null)) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Campo de precio
           Expanded(
             flex: 2,
             child: TextField(
@@ -233,7 +215,6 @@ class BudgetCardWidget extends StatelessWidget {
             ),
           ),
           SizedBox(width: isMobile ? 12 : 16),
-          // Dropdown
           Expanded(
             flex: 3,
             child: titulo == 'Transporte'
@@ -243,8 +224,6 @@ class BudgetCardWidget extends StatelessWidget {
         ],
       );
     }
-
-    // Campo simple de edición (para Presupuesto Estimado)
     return TextField(
       controller: controller,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -275,12 +254,9 @@ class BudgetCardWidget extends StatelessWidget {
       onSubmitted: onSubmitted,
     );
   }
-
   Widget _buildEmpresaDropdown(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     if (cargandoEmpresas) {
       return Center(
         child: SizedBox(
@@ -293,9 +269,7 @@ class BudgetCardWidget extends StatelessWidget {
         ),
       );
     }
-
     final empresasUnicas = _getUniqueEmpresas();
-
     return Container(
       padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       decoration: BoxDecoration(
@@ -357,12 +331,9 @@ class BudgetCardWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildAlojamientoDropdown(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     if (cargandoAlojamientos) {
       return Center(
         child: SizedBox(
@@ -375,9 +346,7 @@ class BudgetCardWidget extends StatelessWidget {
         ),
       );
     }
-
     final alojamientosUnicos = _getUniqueAlojamientos();
-
     return Container(
       padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       decoration: BoxDecoration(
@@ -427,12 +396,9 @@ class BudgetCardWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCosteAlumnoContent(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -466,12 +432,9 @@ class BudgetCardWidget extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildDisplayContent(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -519,7 +482,6 @@ class BudgetCardWidget extends StatelessWidget {
       ],
     );
   }
-
   List<EmpresaTransporte> _getUniqueEmpresas() {
     if (empresasDisponibles == null) return [];
     final idsVistos = <int>{};
@@ -532,7 +494,6 @@ class BudgetCardWidget extends StatelessWidget {
     }
     return empresasUnicas;
   }
-
   List<Alojamiento> _getUniqueAlojamientos() {
     if (alojamientosDisponibles == null) return [];
     final idsVistos = <int>{};

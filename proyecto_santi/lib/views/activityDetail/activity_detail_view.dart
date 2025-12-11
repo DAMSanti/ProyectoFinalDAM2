@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,23 +27,19 @@ import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:proyecto_santi/components/desktop_shell.dart';
-
 class ActivityDetailView extends StatefulWidget {
   final Actividad actividad;
   final bool isDarkTheme;
   final VoidCallback onToggleTheme;
-
   const ActivityDetailView({
     super.key,
     required this.actividad,
     required this.isDarkTheme,
     required this.onToggleTheme,
   });
-
   @override
   ActivityDetailViewState createState() => ActivityDetailViewState();
 }
-
 class ActivityDetailViewState extends State<ActivityDetailView> {
   late Future<List<Photo>> _futurePhotos;
   late final ApiService _apiService;
@@ -57,19 +53,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
   bool isAdminOrSolicitante = true;
   List<Photo> imagesActividad = [];
   List<XFile> selectedImages = [];
-  Map<String, String> selectedImagesDescriptions = {}; // Mapa: path -> descripción
-  List<int> imagesToDelete = []; // IDs de imágenes marcadas para eliminar
+  Map<String, String> selectedImagesDescriptions = {}; 
+  List<int> imagesToDelete = []; 
   bool isDialogVisible = false;
   bool isPopupVisible = false;
   bool isCameraVisible = false;
-  
-  // Actividad completa con todos los datos
   Actividad? _actividadCompleta;
-  Actividad? _actividadOriginal; // Copia de los datos originales de la BD
-  Map<String, dynamic>? _datosEditados; // Datos modificados en el diálogo
+  Actividad? _actividadOriginal; 
+  Map<String, dynamic>? _datosEditados; 
   bool _isLoadingActivity = true;
-  int _widgetKey = 0; // Key para forzar reconstrucción del widget
-
+  int _widgetKey = 0; 
   @override
   void initState() {
     super.initState();
@@ -87,10 +80,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       localizacionService: _localizacionService,
       gastoService: GastoPersonalizadoService(_apiService),
     );
-    
-    // Calcular permisos de edición
     _calculatePermissions();
-    
     _loadActivityDetails();
     _futurePhotos = _photoService.fetchPhotosByActivityId(widget.actividad.id);
     _futurePhotos.then((photos) {
@@ -99,23 +89,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       });
     });
   }
-  
   void _calculatePermissions() {
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final rol = currentUser?.rol;
     final profesorUuid = currentUser?.uuid;
-    
-    // Es admin o coordinador
     final esAdmin = rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED';
-    
-    // Es el responsable de la actividad
     final esResponsable = widget.actividad.responsable?.uuid == profesorUuid;
-    
     setState(() {
       isAdminOrSolicitante = esAdmin || esResponsable;
     });
-    
     print('[ActivityDetail] Usuario: ${currentUser?.nombre}');
     print('[ActivityDetail] Rol: $rol');
     print('[ActivityDetail] UUID: $profesorUuid');
@@ -123,31 +106,24 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     print('[ActivityDetail] Es Responsable: $esResponsable');
     print('[ActivityDetail] Puede Editar: $isAdminOrSolicitante');
   }
-  
   Future<void> _loadActivityDetails() async {
     try {
-
       final actividadCompleta = await _actividadService.fetchActivityById(widget.actividad.id);
-
-      
-      // Cargar fotos de la actividad
       final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
-      
       setState(() {
         _actividadCompleta = actividadCompleta ?? widget.actividad;
-        _actividadOriginal = actividadCompleta ?? widget.actividad; // Guardar copia original
+        _actividadOriginal = actividadCompleta ?? widget.actividad; 
         imagesActividad = photos;
         _isLoadingActivity = false;
       });
     } catch (e) {
       setState(() {
         _actividadCompleta = widget.actividad;
-        _actividadOriginal = widget.actividad; // Guardar copia original
+        _actividadOriginal = widget.actividad; 
         _isLoadingActivity = false;
       });
     }
   }
-
   Future<void> _loadPhotos() async {
     try {
       final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
@@ -157,14 +133,12 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
     } catch (e) {
     }
   }
-
   void _showImagePicker() async {
     await ImagePickerHelper.showImagePicker(
       context: context,
       onImageSelected: (image, description) {
         setState(() {
           selectedImages.add(image);
-          // Guardar la descripción asociada a esta imagen
           if (description.isNotEmpty) {
             selectedImagesDescriptions[image.path] = description;
           }
@@ -173,53 +147,36 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       },
     );
   }
-
   void _removeSelectedImage(int index) {
     setState(() {
       final imagePath = selectedImages[index].path;
       selectedImages.removeAt(index);
-      // Eliminar también la descripción asociada
       selectedImagesDescriptions.remove(imagePath);
       isDataChanged = true;
     });
   }
-
   Future<void> _removeApiImage(int index) async {
-    // Mostrar diálogo de confirmación
     final confirmed = await ImagePickerHelper.confirmImageDeletion(context);
-
     if (confirmed && index < imagesActividad.length) {
       final photo = imagesActividad[index];
       setState(() {
-        // Marcar la imagen para eliminar
         imagesToDelete.add(photo.id);
-        // Remover de la lista de visualización
         imagesActividad.removeAt(index);
-        // Marcar que hay cambios
         isDataChanged = true;
       });
     }
   }
-
-  // Método para eliminar una imagen de la API cuando ya se confirmó la eliminación (desde diálogo de edición)
   void _removeApiImageConfirmed(int index) {
     print('DEBUG: _removeApiImageConfirmed llamado con index: $index');
     print('DEBUG: imagesActividad.length: ${imagesActividad.length}');
-    
     if (index < imagesActividad.length) {
       final photo = imagesActividad[index];
       print('DEBUG: Eliminando foto ID: ${photo.id}');
-      
       setState(() {
-        // Marcar la imagen para eliminar
         imagesToDelete.add(photo.id);
         print('DEBUG: Foto agregada a imagesToDelete. Total: ${imagesToDelete.length}');
-        
-        // Remover de la lista de visualización
         imagesActividad.removeAt(index);
         print('DEBUG: Foto removida de imagesActividad. Nueva longitud: ${imagesActividad.length}');
-        
-        // Marcar que hay cambios
         isDataChanged = true;
         print('DEBUG: isDataChanged = true');
       });
@@ -227,21 +184,16 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       print('ERROR: Index fuera de rango! index: $index, length: ${imagesActividad.length}');
     }
   }
-  
-  // Método para editar la descripción de una imagen local
   void _editLocalImage(int index) async {
     if (index >= selectedImages.length) return;
-    
     final image = selectedImages[index];
     final currentDescription = selectedImagesDescriptions[image.path];
-    
     await ImagePickerHelper.editImageDescription(
       context: context,
       image: image,
       currentDescription: currentDescription,
       onDescriptionChanged: (description) {
         setState(() {
-          // Actualizar o eliminar la descripción
           if (description.isNotEmpty) {
             selectedImagesDescriptions[image.path] = description;
           } else {
@@ -251,7 +203,6 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       },
     );
   }
-  
   bool _hasRealChanges() {
     return ChangeDetectionHelper.hasRealChanges(
       selectedImages: selectedImages,
@@ -260,9 +211,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       actividadOriginal: _actividadOriginal,
     );
   }
-  
   Future<void> _revertChanges() async {
-    // Limpiar todos los cambios pendientes
     setState(() {
       _datosEditados = null;
       selectedImages.clear();
@@ -270,80 +219,48 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       imagesToDelete.clear();
       isDataChanged = false;
     });
-    
-    // Recargar todo desde la base de datos (actividad, fotos, profesores, grupos)
-    // Esto restaurará folleto, profesores participantes, grupos participantes, etc.
     await _loadActivityDetails();
-    
-    // Incrementar _widgetKey para que los componentes internos se recarguen
     setState(() {
       _widgetKey++;
     });
   }
-  
   void _handleActivityDataChanged(Map<String, dynamic> updatedData) async {
-
-
     updatedData.forEach((key, value) {
       if (key != 'folletoBytes' && key != 'selectedImages') {
-
       }
     });
-    
-    // Si _datosEditados es null, inicializarlo
     if (_datosEditados == null) {
       _datosEditados = {};
     }
-    
-    // DEBUG: Ver qué datos se están actualizando
     print('DEBUG [activity_detail_view]: updatedData keys: ${updatedData.keys.toList()}');
     if (updatedData.containsKey('localizaciones')) {
       print('DEBUG [activity_detail_view]: localizaciones count: ${updatedData['localizaciones']?.length ?? 0}');
     }
-    
-    // Fusionar los datos actualizados con los existentes
     _datosEditados!.addAll(updatedData);
-    
-    // DEBUG: Ver qué hay en _datosEditados después del addAll
     print('DEBUG [activity_detail_view]: _datosEditados keys después de addAll: ${_datosEditados!.keys.toList()}');
     if (_datosEditados!.containsKey('localizaciones')) {
       print('DEBUG [activity_detail_view]: localizaciones en _datosEditados: ${_datosEditados!['localizaciones']?.length ?? 0}');
     }
-    
-
-
     _datosEditados!.forEach((key, value) {
       if (key != 'folletoBytes' && key != 'selectedImages') {
-
       }
     });
-    
-    // Si hay cambios en localizaciones, marcar como cambio
     if (updatedData.containsKey('localizaciones_changed') && updatedData['localizaciones_changed'] == true) {
-      // Asegurarse de que las localizaciones estén en _datosEditados para que se guarden
       if (updatedData.containsKey('localizaciones')) {
         _datosEditados!['localizaciones'] = updatedData['localizaciones'];
       }
-      
       setState(() {
         isDataChanged = true;
       });
-
       return;
     }
-    
-    // Si hay cambios en descripciones de fotos, marcar como cambio
     if (updatedData.containsKey('photoDescriptionChanges')) {
       setState(() {
         isDataChanged = true;
       });
       return;
     }
-    
-    // Buscar el profesor (responsable) actualizado si cambió
     dynamic nuevoProfesor = _actividadCompleta?.responsable;
-    
-    // Si cambió el profesor, buscar el nuevo
     if (updatedData['profesorId'] != null) {
       try {
         final profesores = await _profesorService.fetchProfesores();
@@ -354,13 +271,8 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       } catch (e) {
       }
     }
-    
-    // Ya no usamos departamento, eliminamos este código
-    
     setState(() {
-      // Actualizar la actividad completa con los nuevos datos
       if (_actividadCompleta != null) {
-        // Crear una nueva instancia de Actividad con los datos actualizados
         _actividadCompleta = Actividad(
           id: _actividadCompleta!.id,
           titulo: updatedData['nombre'] ?? _actividadCompleta!.titulo,
@@ -374,7 +286,6 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           transporteReq: updatedData['transporteReq'] ?? _actividadCompleta!.transporteReq,
           comentTransporte: _actividadCompleta!.comentTransporte,
           precioTransporte: updatedData['precioTransporte'] ?? _actividadCompleta!.precioTransporte,
-          // NO actualizar empresaTransporte aquí - se actualizará después de guardar con datos completos
           empresaTransporte: _actividadCompleta!.empresaTransporte,
           alojamientoReq: updatedData['alojamientoReq'] ?? _actividadCompleta!.alojamientoReq,
           comentAlojamiento: _actividadCompleta!.comentAlojamiento,
@@ -392,12 +303,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
           costoReal: _actividadCompleta!.costoReal,
         );
       }
-      
-      // Verificar si hay cambios reales comparando con el original
-      // Esto se ejecuta cada vez que se edita, así que siempre compara con los últimos valores
       isDataChanged = _hasRealChanges();
-      
-      // Evitar imprimir datos binarios en bruto (ej. fichero en bytes)
       try {
         final safeUpdated = Map<String, dynamic>.from(updatedData);
         if (safeUpdated.containsKey('folletoBytes')) {
@@ -408,24 +314,17 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         if (safeUpdated.containsKey('selectedImages')) {
           safeUpdated['selectedImages'] = '<images count: ${selectedImages.length}>';
         }
-
       } catch (e) {
-
       }
-
     });
   }
-
   Future<void> _saveChanges() async {
-    // Verificar si hay cambios para guardar
     if (selectedImages.isEmpty && imagesToDelete.isEmpty && _datosEditados == null) {
       if (mounted) {
         _showMessage('No hay cambios para guardar', isError: false);
       }
       return;
     }
-
-    // Mostrar diálogo de carga
     if (mounted) {
       showDialog(
         context: context,
@@ -449,9 +348,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         },
       );
     }
-
     try {
-      // Usar SaveHandler para procesar todos los cambios
       final result = await _saveHandler.saveChanges(
         actividadOriginal: _actividadOriginal!,
         actividadId: widget.actividad.id,
@@ -460,27 +357,19 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         selectedImagesDescriptions: selectedImagesDescriptions,
         imagesToDelete: imagesToDelete,
       );
-
-      // Cerrar diálogo de carga
       if (mounted) {
         Navigator.of(context).pop();
       }
-
       if (result.success) {
-        // Recargar las fotos de la actividad
         final photos = await _photoService.fetchPhotosByActivityId(widget.actividad.id);
-        
-        // Si hubo cambios significativos, recargar actividad completa
         if (_datosEditados != null && 
             (_datosEditados!.containsKey('localizaciones_changed') || 
              _datosEditados!.containsKey('transporteReq') ||
              _datosEditados!.containsKey('alojamientoReq'))) {
           await _loadActivityDetails();
         }
-        
         if (mounted) {
           setState(() {
-            // Actualizar con la actividad devuelta por SaveHandler
             _actividadOriginal = result.actividad;
             _actividadCompleta = result.actividad;
             imagesActividad = photos;
@@ -490,24 +379,20 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
             isDataChanged = false;
             _datosEditados = null;
           });
-
           _showMessage('Cambios guardados correctamente', isError: false);
         }
       } else {
         throw Exception('Error al guardar algunos cambios');
       }
     } catch (e) {
-      // Cerrar diálogo de carga si aún está abierto
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
         _showMessage('Error al guardar: ${e.toString()}', isError: true);
       }
     }
   }
-
   void _showMessage(String message, {required bool isError}) {
     if (!mounted) return;
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -533,43 +418,31 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       },
     );
   }
-
   Future<bool> _uploadSelectedImages() async {
     try {
-      // Para cada imagen seleccionada, subirla individualmente
       for (var xFile in selectedImages) {
         final bytes = await xFile.readAsBytes();
         final fileName = xFile.name;
-        
-        // Obtener la descripción asociada a esta imagen (si existe)
         final description = selectedImagesDescriptions[xFile.path] ?? '';
-
-        // Subir la imagen usando el método del ApiService
         bool success = await _photoService.uploadPhotosFromBytes(
           activityId: widget.actividad.id,
           bytes: bytes,
           filename: fileName,
           descripcion: description,
         );
-
         if (!success) {
           return false;
         }
       }
-
       return true;
     } catch (e) {
       return false;
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    // Verificar si estamos dentro del shell (desktop/web)
     final bool isInsideShell = isInsideDesktopShell(context);
     final bool isDesktopWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
-    // Si estamos en desktop/web Y dentro del shell, mostrar solo el contenido
     if (isDesktopWeb && isInsideShell) {
       return Stack(
         children: [
@@ -583,8 +456,6 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         ],
       );
     }
-    
-    // Si no estamos en el shell, mostrar la vista completa con Scaffold
     return WillPopScope(
       onWillPop: () => onWillPopSalir(context),
       child: Stack(
@@ -614,16 +485,11 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
       ),
     );
   }
-
   Widget _buildLayout(BuildContext context) {
-    // Si estamos cargando, mostrar indicador
     if (_isLoadingActivity) {
       return Center(child: CircularProgressIndicator());
     }
-    
-    // Usar la actividad completa si está disponible, si no usar la del widget
     final actividadAMostrar = _actividadCompleta ?? widget.actividad;
-    
     if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return ActivityDetailLargeLandscapeLayout(
         actividad: actividadAMostrar,
@@ -642,7 +508,7 @@ class ActivityDetailViewState extends State<ActivityDetailView> {
         saveChanges: _saveChanges,
         revertChanges: _revertChanges,
         onActivityDataChanged: _handleActivityDataChanged,
-        reloadTrigger: _widgetKey, // Pasar el contador de reload
+        reloadTrigger: _widgetKey, 
       );
     } else {
       return OrientationBuilder(

@@ -1,4 +1,4 @@
-namespace ACEXAPI.DTOs
+﻿namespace ACEXAPI.DTOs
 {
     public class GastoPersonalizadoDto
     {
@@ -8,7 +8,6 @@ namespace ACEXAPI.DTOs
         public decimal Cantidad { get; set; }
         public DateTime? FechaCreacion { get; set; }
     }
-
     public class CreateGastoPersonalizadoDto
     {
         public int ActividadId { get; set; }

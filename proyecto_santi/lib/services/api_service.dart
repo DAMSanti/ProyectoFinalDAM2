@@ -1,35 +1,16 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:proyecto_santi/config.dart';
-
-/// Excepción personalizada para errores de la API
 class ApiException implements Exception {
   final String message;
   final int? statusCode;
   final dynamic data;
-
   ApiException(this.message, {this.statusCode, this.data});
-
   @override
   String toString() => 'ApiException: $message (Status: $statusCode)';
 }
-
-/// Servicio base para comunicación con la API ACEX (C# .NET)
-/// 
-/// Esta clase proporciona los métodos genéricos HTTP (GET, POST, PUT, DELETE)
-/// y gestiona el token JWT de autenticación.
-/// 
-/// Para operaciones específicas, usar los servicios especializados:
-/// - [ActividadService] para actividades
-/// - [ProfesorService] para profesores
-/// - [PhotoService] para fotos
-/// - [CatalogoService] para departamentos, cursos y grupos
-/// - [AuthService] para autenticación
-/// - [LocalizacionService] para localizaciones
 class ApiService {
   late final Dio _dio;
-  // Token compartido entre TODAS las instancias de ApiService
   static String? _jwtToken;
-
   ApiService() {
     _dio = Dio(BaseOptions(
       baseUrl: AppConfig.apiBaseUrl,
@@ -40,16 +21,6 @@ class ApiService {
         'Accept': 'application/json',
       },
     ));
-
-    // Interceptor para logging (desactivado para producción)
-    // _dio.interceptors.add(LogInterceptor(
-    //   requestBody: true,
-    //   responseBody: true,
-    //   error: true,
-    //   logPrint: (obj) => print('[API] $obj'),
-    // ));
-
-    // Interceptor para agregar JWT token automáticamente
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         if (_jwtToken != null) {
@@ -58,7 +29,6 @@ class ApiService {
         return handler.next(options);
       },
       onError: (DioException error, ErrorInterceptorHandler handler) {
-        // Log solo errores críticos
         if (error.response?.statusCode == 401 || error.response?.statusCode == 500) {
           print('[API Error] ${error.response?.statusCode}: ${error.message}');
         }
@@ -66,19 +36,11 @@ class ApiService {
       },
     ));
   }
-
-  /// Acceso directo al cliente Dio para casos especiales (FormData, etc.)
   Dio get dio => _dio;
-
-  /// Establece el token JWT para las peticiones (compartido entre todas las instancias)
   void setToken(String? token) {
     _jwtToken = token;
   }
-
-  /// Obtiene el token actual
   String? get token => _jwtToken;
-
-  /// Manejo genérico de errores
   ApiException _handleError(dynamic error) {
     if (error is DioException) {
       switch (error.type) {
@@ -89,8 +51,6 @@ class ApiService {
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
           String message = 'Error del servidor: $statusCode';
-          
-          // Manejo específico de errores HTTP
           if (statusCode == 401) {
             message = 'No autorizado. Por favor, inicia sesión nuevamente.';
           } else if (statusCode == 403) {
@@ -100,7 +60,6 @@ class ApiService {
           } else if (statusCode == 500) {
             message = 'Error interno del servidor.';
           }
-          
           return ApiException(
             message,
             statusCode: statusCode,
@@ -114,10 +73,6 @@ class ApiService {
     }
     return ApiException('Error desconocido: $error');
   }
-
-  // ==================== MÉTODOS GENÉRICOS HTTP ====================
-
-  /// GET genérico
   Future<Response> getData(String endpoint) async {
     try {
       return await _dio.get(endpoint);
@@ -125,8 +80,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// POST genérico
   Future<Response> postData(String endpoint, Map<String, dynamic> data) async {
     try {
       return await _dio.post(endpoint, data: data);
@@ -134,8 +87,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// PUT genérico
   Future<Response> putData(String endpoint, Map<String, dynamic> data) async {
     try {
       return await _dio.put(endpoint, data: data);
@@ -143,8 +94,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// PUT genérico con cualquier tipo de dato (usado para enviar listas directamente)
   Future<Response> put(String endpoint, dynamic data) async {
     try {
       return await _dio.put(endpoint, data: data);
@@ -152,8 +101,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// DELETE genérico
   Future<Response> deleteData(String endpoint) async {
     try {
       return await _dio.delete(endpoint);

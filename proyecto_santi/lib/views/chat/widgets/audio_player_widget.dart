@@ -1,24 +1,19 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
-
-/// Widget para reproducir mensajes de audio
 class AudioPlayerWidget extends StatefulWidget {
   final String audioUrl;
-  final int duration; // Duración en segundos
+  final int duration; 
   final bool isMine;
-
   const AudioPlayerWidget({
     super.key,
     required this.audioUrl,
     required this.duration,
     required this.isMine,
   });
-
   @override
   State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
 }
-
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
@@ -28,16 +23,13 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   StreamSubscription? _positionSubscription;
   StreamSubscription? _durationSubscription;
   StreamSubscription? _playerStateSubscription;
-
   @override
   void initState() {
     super.initState();
     _initAudioPlayer();
   }
-
   void _initAudioPlayer() {
     _duration = Duration(seconds: widget.duration);
-
     _positionSubscription = _audioPlayer.onPositionChanged.listen((position) {
       if (mounted) {
         setState(() {
@@ -45,7 +37,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         });
       }
     });
-
     _durationSubscription = _audioPlayer.onDurationChanged.listen((duration) {
       if (mounted) {
         setState(() {
@@ -53,7 +44,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         });
       }
     });
-
     _playerStateSubscription = _audioPlayer.onPlayerComplete.listen((_) {
       if (mounted) {
         setState(() {
@@ -63,7 +53,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       }
     });
   }
-
   @override
   void dispose() {
     _positionSubscription?.cancel();
@@ -72,7 +61,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     _audioPlayer.dispose();
     super.dispose();
   }
-
   Future<void> _togglePlayPause() async {
     try {
       if (_isPlaying) {
@@ -80,13 +68,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         setState(() => _isPlaying = false);
       } else {
         setState(() => _isLoading = true);
-        
         if (_position >= _duration) {
           _position = Duration.zero;
         }
-
         await _audioPlayer.play(UrlSource(widget.audioUrl));
-        
         setState(() {
           _isPlaying = true;
           _isLoading = false;
@@ -97,13 +82,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       _showError('Error al reproducir audio: $e');
     }
   }
-
   Future<void> _seekTo(double value) async {
     final position = Duration(seconds: value.toInt());
     await _audioPlayer.seek(position);
     setState(() => _position = position);
   }
-
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,31 +97,24 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       );
     }
   }
-
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
-    // Colores según si es mensaje propio o ajeno
     final backgroundColor = widget.isMine
         ? (isDark ? Colors.blue[700] : Colors.blue[100])
         : (isDark ? Colors.grey[800] : Colors.grey[200]);
-    
     final textColor = widget.isMine
         ? (isDark ? Colors.white : Colors.blue[900])
         : (isDark ? Colors.white : Colors.black87);
-
     final iconColor = widget.isMine
         ? (isDark ? Colors.white : Colors.blue[700])
         : (isDark ? Colors.white70 : Colors.grey[700]);
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -148,7 +124,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Botón play/pause
           _isLoading
               ? SizedBox(
                   width: 36,
@@ -177,10 +152,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     minHeight: 36,
                   ),
                 ),
-
           const SizedBox(width: 8),
-
-          // Slider de progreso
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,8 +178,6 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     onChanged: _seekTo,
                   ),
                 ),
-                
-                // Tiempo
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Row(
@@ -233,10 +203,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               ],
             ),
           ),
-
           const SizedBox(width: 8),
-
-          // Icono de audio
           Icon(
             Icons.mic,
             color: iconColor?.withOpacity(0.7),

@@ -1,35 +1,25 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/services/services.dart';
-
-/// Diálogo de filtros para la vista de actividades
 class ActivitiesFilterDialog extends StatefulWidget {
   final Map<String, dynamic> currentFilters;
   final Function(Map<String, dynamic>) onApplyFilters;
-
   const ActivitiesFilterDialog({
     super.key,
     required this.currentFilters,
     required this.onApplyFilters,
   });
-
   @override
   State<ActivitiesFilterDialog> createState() => _ActivitiesFilterDialogState();
 }
-
 class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
   late Map<String, dynamic> _tempFilters;
   late final ApiService _apiService;
   late final ProfesorService _profesorService;
-  
-  // Opciones de filtros
   final List<String> _estados = ['Pendiente', 'Aprobada', 'Cancelada'];
   final List<String> _cursos = ['1º ESO', '2º ESO', '3º ESO', '4º ESO', '1º Bach', '2º Bach'];
-  
-  // Profesores cargados dinámicamente
   List<Profesor> _profesores = [];
   bool _isLoadingProfesores = true;
-
   @override
   void initState() {
     super.initState();
@@ -38,7 +28,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
     _profesorService = ProfesorService(_apiService);
     _loadProfesores();
   }
-
   Future<void> _loadProfesores() async {
     try {
       final profesores = await _profesorService.fetchProfesores();
@@ -53,7 +42,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -62,7 +50,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
     final screenHeight = MediaQuery.of(context).size.height;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = isMobile && !isPortrait;
-
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(isMobileLandscape ? 12 : 16),
@@ -91,7 +78,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header compacto
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
@@ -139,15 +125,12 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                 ],
               ),
             ),
-
-            // Contenido
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Filtro por fecha
                     _buildFilterSection(
                       context,
                       icon: Icons.calendar_today_rounded,
@@ -213,10 +196,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                         ),
                       ),
                     ),
-
                     SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
-
-                    // Filtro por estado
                     _buildFilterSection(
                       context,
                       icon: Icons.flag_rounded,
@@ -256,10 +236,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                         }).toList(),
                       ),
                     ),
-
                     SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
-
-                    // Filtro por curso
                     _buildFilterSection(
                       context,
                       icon: Icons.school_rounded,
@@ -299,10 +276,7 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                         }).toList(),
                       ),
                     ),
-
                     SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 14 : 20)),
-
-                    // Filtro por profesor
                     _buildFilterSection(
                       context,
                       icon: Icons.person_rounded,
@@ -397,8 +371,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                 ),
               ),
             ),
-
-            // Footer con botones
             Container(
               padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
               decoration: BoxDecoration(
@@ -412,7 +384,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
               ),
               child: Row(
                 children: [
-                  // Botón limpiar
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
@@ -447,7 +418,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
                     ),
                   ),
                   SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
-                  // Botón aplicar
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
@@ -483,7 +453,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
       ),
     );
   }
-
   Widget _buildFilterSection(
     BuildContext context, {
     required IconData icon,
@@ -519,7 +488,6 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
       ],
     );
   }
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -537,14 +505,12 @@ class _ActivitiesFilterDialogState extends State<ActivitiesFilterDialog> {
         );
       },
     );
-
     if (picked != null) {
       setState(() {
         _tempFilters['fecha'] = picked;
       });
     }
   }
-
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }

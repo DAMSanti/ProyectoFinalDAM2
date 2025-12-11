@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'app_colors.dart';
-
-/// Decoraciones y estilos comunes para diálogos
 class DialogDecorations {
-  /// Decoración para el contenedor principal del diálogo
   static BoxDecoration dialogContainer({
     required bool isDark,
     required bool isMobileLandscape,
@@ -35,8 +32,6 @@ class DialogDecorations {
       ],
     );
   }
-  
-  /// Decoración para diálogos de advertencia (delete, etc)
   static BoxDecoration warningDialogContainer({
     required bool isDark,
     required bool isMobileLandscape,
@@ -68,8 +63,6 @@ class DialogDecorations {
       ],
     );
   }
-  
-  /// Padding para diálogos según tamaño de pantalla
   static EdgeInsets dialogPadding({
     required bool isMobileLandscape,
     required bool isMobile,
@@ -80,8 +73,6 @@ class DialogDecorations {
             ? EdgeInsets.symmetric(horizontal: 16, vertical: 40)
             : EdgeInsets.symmetric(horizontal: 40, vertical: 24));
   }
-  
-  /// InputDecoration para campos de texto en diálogos
   static InputDecoration textFieldDecoration({
     required String label,
     required String hint,
@@ -144,8 +135,6 @@ class DialogDecorations {
       ),
     );
   }
-  
-  /// BoxDecoration para campos de búsqueda
   static BoxDecoration searchFieldDecoration({
     required bool isDark,
     required bool isMobileLandscape,
@@ -169,8 +158,6 @@ class DialogDecorations {
       ],
     );
   }
-  
-  /// Decoración para badges de contador
   static BoxDecoration counterBadgeDecoration({
     required bool isMobileLandscape,
     required bool isMobile,

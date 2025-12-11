@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -9,15 +9,11 @@ import 'package:proyecto_santi/config.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/departamento_detail_dialog.dart';
-
-/// Vista CRUD moderna para gestionar Departamentos
 class DepartamentosCrudView extends StatefulWidget {
   const DepartamentosCrudView({Key? key}) : super(key: key);
-
   @override
   State<DepartamentosCrudView> createState() => _DepartamentosCrudViewState();
 }
-
 class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
@@ -25,22 +21,18 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
   List<Departamento> _filteredDepartamentos = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
-
   bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
   @override
   void initState() {
     super.initState();
     _catalogoService = CatalogoService(_apiService);
     _loadDepartamentos();
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadDepartamentos() async {
     setState(() => _isLoading = true);
     try {
@@ -70,7 +62,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       }
     }
   }
-
   void _filterDepartamentos(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -84,7 +75,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       }
     });
   }
-
   void _addDepartamento() {
     showDialog(
       context: context,
@@ -93,7 +83,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       ),
     );
   }
-
   void _editDepartamento(Departamento departamento) {
     showDialog(
       context: context,
@@ -103,7 +92,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       ),
     );
   }
-
   Future<void> _showDeleteDialog(Departamento departamento) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -135,7 +123,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
         ],
       ),
     );
-
     if (confirm == true) {
       try {
         final success = await _catalogoService.deleteDepartamento(departamento.id);
@@ -160,25 +147,21 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
             ? GradientBackgroundDark(child: Container()) 
             : GradientBackgroundLight(child: Container()),
-        
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -197,8 +180,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                       ],
                     ),
                   ),
-
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -225,10 +206,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
-
-                // Lista de departamentos
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -257,7 +235,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       ],
     );
   }
-
   Widget _buildDepartamentosList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -291,7 +268,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
             offset: Offset(0, 4),
             spreadRadius: 0,
           ),
-          // Inner shadow effect
           BoxShadow(
             color: isDark
                 ? Colors.black.withOpacity(0.2)
@@ -348,11 +324,9 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                          // Header con nombre y menú
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Icono de departamento
                               Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -366,7 +340,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                                 ),
                               ),
                               SizedBox(width: 12),
-                              // Nombre del departamento
                               Expanded(
                                 child: Text(
                                   departamento.nombre,
@@ -380,7 +353,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              // Menú de 3 puntos
                               PopupMenuButton<String>(
                                 icon: Icon(
                                   Icons.more_vert_rounded,
@@ -423,7 +395,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                           ),
                           if (departamento.codigo != null && departamento.codigo!.isNotEmpty) ...[
                             SizedBox(height: 12),
-                            // Divider sutil
                             Container(
                               height: 1,
                               decoration: BoxDecoration(
@@ -437,7 +408,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
                               ),
                             ),
                             SizedBox(height: 12),
-                            // Chip de código
                             Row(
                               children: [
                                 Flexible(
@@ -455,7 +425,6 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
       ),
     );
   }
-
   Widget _buildCodigoChip(String codigo, bool isDark) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

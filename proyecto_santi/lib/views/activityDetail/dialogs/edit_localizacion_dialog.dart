@@ -1,17 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'layouts/edit_localizacion_landscape_layout.dart';
 import 'layouts/edit_localizacion_portrait_layout.dart';
-
-/// Diálogo para editar una localización existente
-/// Permite cambiar el icono y marcar/desmarcar como principal
 class EditLocalizacionDialog extends StatefulWidget {
   final Localizacion localizacion;
   final List<IconData> iconosDisponibles;
   final IconData? iconoActual;
   final bool puedeSerPrincipal;
-
   const EditLocalizacionDialog({
     Key? key,
     required this.localizacion,
@@ -19,25 +15,20 @@ class EditLocalizacionDialog extends StatefulWidget {
     this.iconoActual,
     required this.puedeSerPrincipal,
   }) : super(key: key);
-
   @override
   EditLocalizacionDialogState createState() => EditLocalizacionDialogState();
 }
-
 class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
   late bool _esPrincipal;
   IconData? _iconoSeleccionado;
   late TextEditingController _descripcionController;
   String? _tipoSeleccionado;
-  
-  // Tipos de localización disponibles
   final List<String> _tiposLocalizacion = [
     'Punto de salida',
     'Punto de llegada',
     'Alojamiento',
     'Actividad',
   ];
-
   @override
   void initState() {
     super.initState();
@@ -46,13 +37,11 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
     _descripcionController = TextEditingController(text: widget.localizacion.descripcion ?? '');
     _tipoSeleccionado = widget.localizacion.tipoLocalizacion;
   }
-  
   @override
   void dispose() {
     _descripcionController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -62,7 +51,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
     final isPortrait = orientation == Orientation.portrait;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape
@@ -108,7 +96,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
@@ -165,8 +152,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                 ],
               ),
             ),
-            
-            // Content - Layout condicional
             Flexible(
               child: isMobileLandscape
                   ? EditLocalizacionLandscapeLayout(
@@ -226,8 +211,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                       },
                     ),
             ),
-            
-            // Actions - Footer adaptivo
             Container(
               padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
               decoration: BoxDecoration(
@@ -250,10 +233,8 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Botón Guardar (full width en móvil)
                         _buildSaveButton(isMobile),
                         SizedBox(height: 8),
-                        // Botón Cancelar (full width en móvil)
                         _buildCancelButton(isMobile),
                       ],
                     )
@@ -271,7 +252,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
       ),
     );
   }
-
   Widget _buildCancelButton(bool isMobile) {
     return Container(
       constraints: isMobile ? BoxConstraints(minWidth: double.infinity) : BoxConstraints(),
@@ -326,7 +306,6 @@ class EditLocalizacionDialogState extends State<EditLocalizacionDialog> {
       ),
     );
   }
-
   Widget _buildSaveButton(bool isMobile) {
     return Container(
       constraints: isMobile ? BoxConstraints(minWidth: double.infinity) : BoxConstraints(),

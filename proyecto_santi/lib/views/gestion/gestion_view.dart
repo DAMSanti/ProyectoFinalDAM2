@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Vista principal de Gestión con navegación a todas las entidades CRUD
 class GestionView extends StatelessWidget {
   const GestionView({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -16,19 +13,14 @@ class GestionView extends StatelessWidget {
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 900;
     final isDesktop = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     return Stack(
       children: [
-        // Fondo con gradiente consistente con el resto de la app
         isDark 
             ? GradientBackgroundDark(child: Container()) 
             : GradientBackgroundLight(child: Container()),
-        
-        // Contenido
         SafeArea(
           child: CustomScrollView(
             slivers: [
-              // Header simple sin gradiente complejo
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -55,8 +47,6 @@ class GestionView extends StatelessWidget {
                   ),
                 ),
               ),
-              
-              // Grid de entidades
               SliverPadding(
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobile ? 16 : 24,
@@ -77,7 +67,6 @@ class GestionView extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildEntityGrid(BuildContext context, bool isMobile, bool isTablet, bool isDesktop, bool isDark) {
     final entities = [
       {
@@ -123,11 +112,8 @@ class GestionView extends StatelessWidget {
         'color': Colors.red,
       },
     ];
-
-    // Determinar número de columnas
     int crossAxisCount;
     double childAspectRatio;
-    
     if (isMobile) {
       crossAxisCount = 2;
       childAspectRatio = 1.1;
@@ -138,7 +124,6 @@ class GestionView extends StatelessWidget {
       crossAxisCount = 4;
       childAspectRatio = 1.3;
     }
-
     return GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -163,7 +148,6 @@ class GestionView extends StatelessWidget {
       },
     );
   }
-
   Widget _buildEntityCard(
     BuildContext context, {
     required String name,

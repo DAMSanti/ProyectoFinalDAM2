@@ -1,16 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
-
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace ACEXAPI.Migrations
 {
-    /// <inheritdoc />
     public partial class CleanStart : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -36,7 +29,6 @@ namespace ACEXAPI.Migrations
                 {
                     table.PrimaryKey("PK_Alojamientos", x => x.Id);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Cursos",
                 columns: table => new
@@ -51,7 +43,6 @@ namespace ACEXAPI.Migrations
                 {
                     table.PrimaryKey("PK_Cursos", x => x.Id);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Departamentos",
                 columns: table => new
@@ -65,7 +56,6 @@ namespace ACEXAPI.Migrations
                 {
                     table.PrimaryKey("PK_Departamentos", x => x.Id);
                 });
-
             migrationBuilder.CreateTable(
                 name: "EmpTransportes",
                 columns: table => new
@@ -82,7 +72,6 @@ namespace ACEXAPI.Migrations
                 {
                     table.PrimaryKey("PK_EmpTransportes", x => x.Id);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Localizaciones",
                 columns: table => new
@@ -103,7 +92,6 @@ namespace ACEXAPI.Migrations
                 {
                     table.PrimaryKey("PK_Localizaciones", x => x.Id);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Grupos",
                 columns: table => new
@@ -124,7 +112,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Profesores",
                 columns: table => new
@@ -149,7 +136,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Actividades",
                 columns: table => new
@@ -202,7 +188,6 @@ namespace ACEXAPI.Migrations
                         principalTable: "Profesores",
                         principalColumn: "Uuid");
                 });
-
             migrationBuilder.CreateTable(
                 name: "Usuarios",
                 columns: table => new
@@ -224,7 +209,6 @@ namespace ACEXAPI.Migrations
                         principalTable: "Profesores",
                         principalColumn: "Uuid");
                 });
-
             migrationBuilder.CreateTable(
                 name: "ActividadLocalizaciones",
                 columns: table => new
@@ -253,7 +237,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Contratos",
                 columns: table => new
@@ -279,7 +262,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "Fotos",
                 columns: table => new
@@ -303,7 +285,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "GastosPersonalizados",
                 columns: table => new
@@ -325,7 +306,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "GrupoPartics",
                 columns: table => new
@@ -353,7 +333,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "ProfParticipantes",
                 columns: table => new
@@ -381,7 +360,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Uuid",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateTable(
                 name: "ProfResponsables",
                 columns: table => new
@@ -410,7 +388,6 @@ namespace ACEXAPI.Migrations
                         principalColumn: "Uuid",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.InsertData(
                 table: "Cursos",
                 columns: new[] { "Id", "Activo", "Nivel", "Nombre" },
@@ -420,7 +397,6 @@ namespace ACEXAPI.Migrations
                     { 2, true, "ESO", "2� ESO" },
                     { 3, true, "BACH", "1� Bach" }
                 });
-
             migrationBuilder.InsertData(
                 table: "Departamentos",
                 columns: new[] { "Id", "Descripcion", "Nombre" },
@@ -430,165 +406,127 @@ namespace ACEXAPI.Migrations
                     { 2, "Departamento de Matem�ticas", "Matem�ticas" },
                     { 3, "Departamento de Lengua y Literatura", "Lengua" }
                 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Actividades_AlojamientoId",
                 table: "Actividades",
                 column: "AlojamientoId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Actividades_EmpTransporteId",
                 table: "Actividades",
                 column: "EmpTransporteId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Actividades_LocalizacionId",
                 table: "Actividades",
                 column: "LocalizacionId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Actividades_ResponsableId",
                 table: "Actividades",
                 column: "ResponsableId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_ActividadLocalizaciones_ActividadId_LocalizacionId",
                 table: "ActividadLocalizaciones",
                 columns: new[] { "ActividadId", "LocalizacionId" },
                 unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_ActividadLocalizaciones_LocalizacionId",
                 table: "ActividadLocalizaciones",
                 column: "LocalizacionId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Contratos_ActividadId",
                 table: "Contratos",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Fotos_ActividadId",
                 table: "Fotos",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_GastosPersonalizados_ActividadId",
                 table: "GastosPersonalizados",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_GrupoPartics_ActividadId",
                 table: "GrupoPartics",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_GrupoPartics_GrupoId",
                 table: "GrupoPartics",
                 column: "GrupoId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Grupos_CursoId",
                 table: "Grupos",
                 column: "CursoId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Profesores_Correo",
                 table: "Profesores",
                 column: "Correo",
                 unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_Profesores_DepartamentoId",
                 table: "Profesores",
                 column: "DepartamentoId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Profesores_Dni",
                 table: "Profesores",
                 column: "Dni",
                 unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProfParticipantes_ActividadId",
                 table: "ProfParticipantes",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProfParticipantes_ProfesorUuid",
                 table: "ProfParticipantes",
                 column: "ProfesorUuid");
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProfResponsables_ActividadId",
                 table: "ProfResponsables",
                 column: "ActividadId");
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProfResponsables_ProfesorUuid",
                 table: "ProfResponsables",
                 column: "ProfesorUuid");
-
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_NombreUsuario",
                 table: "Usuarios",
                 column: "NombreUsuario",
                 unique: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_ProfesorUuid",
                 table: "Usuarios",
                 column: "ProfesorUuid");
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "ActividadLocalizaciones");
-
             migrationBuilder.DropTable(
                 name: "Contratos");
-
             migrationBuilder.DropTable(
                 name: "Fotos");
-
             migrationBuilder.DropTable(
                 name: "GastosPersonalizados");
-
             migrationBuilder.DropTable(
                 name: "GrupoPartics");
-
             migrationBuilder.DropTable(
                 name: "ProfParticipantes");
-
             migrationBuilder.DropTable(
                 name: "ProfResponsables");
-
             migrationBuilder.DropTable(
                 name: "Usuarios");
-
             migrationBuilder.DropTable(
                 name: "Grupos");
-
             migrationBuilder.DropTable(
                 name: "Actividades");
-
             migrationBuilder.DropTable(
                 name: "Cursos");
-
             migrationBuilder.DropTable(
                 name: "Alojamientos");
-
             migrationBuilder.DropTable(
                 name: "EmpTransportes");
-
             migrationBuilder.DropTable(
                 name: "Localizaciones");
-
             migrationBuilder.DropTable(
                 name: "Profesores");
-
             migrationBuilder.DropTable(
                 name: "Departamentos");
         }

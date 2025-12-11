@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
-
-/// Header genérico para diálogos
-/// Permite personalizar el título y el icono
+﻿import 'package:flutter/material.dart';
 class DialogHeader extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
   final VoidCallback onClose;
   final String title;
   final IconData icon;
-
   const DialogHeader({
     Key? key,
     required this.isMobile,
@@ -17,7 +13,6 @@ class DialogHeader extends StatelessWidget {
     required this.title,
     this.icon = Icons.edit_rounded,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -91,20 +86,16 @@ class DialogHeader extends StatelessWidget {
     );
   }
 }
-
-/// Header del diálogo de edición de actividad (mantenido para compatibilidad)
 class EditDialogHeader extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
   final VoidCallback onClose;
-
   const EditDialogHeader({
     Key? key,
     required this.isMobile,
     required this.isMobileLandscape,
     required this.onClose,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return DialogHeader(

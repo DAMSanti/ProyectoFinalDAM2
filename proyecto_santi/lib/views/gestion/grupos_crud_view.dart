@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/models/curso.dart';
@@ -6,24 +6,19 @@ import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/grupo_detail_dialog.dart';
-
 class GruposCrudView extends StatefulWidget {
   const GruposCrudView({Key? key}) : super(key: key);
-
   @override
   State<GruposCrudView> createState() => _GruposCrudViewState();
 }
-
 class _GruposCrudViewState extends State<GruposCrudView> {
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
-  
   List<Grupo> _grupos = [];
   List<Grupo> _filteredGrupos = [];
   List<Curso> _cursos = [];
   bool _isLoading = false;
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
@@ -31,10 +26,8 @@ class _GruposCrudViewState extends State<GruposCrudView> {
     _loadGrupos();
     _loadCursos();
   }
-
   Future<void> _loadGrupos() async {
     setState(() => _isLoading = true);
-    
     try {
       final grupos = await _catalogoService.fetchGrupos();
       setState(() {
@@ -52,7 +45,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       }
     }
   }
-
   Future<void> _loadCursos() async {
     try {
       final cursos = await _catalogoService.fetchCursos();
@@ -63,7 +55,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       print('[ERROR] Error al cargar cursos: $e');
     }
   }
-
   void _filterGrupos(String query) {
     setState(() {
       _searchQuery = query;
@@ -80,7 +71,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       }
     });
   }
-
   void _showGrupoDialog({Grupo? grupo}) {
     showDialog(
       context: context,
@@ -91,15 +81,12 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       ),
     );
   }
-
   void _addGrupo() {
     _showGrupoDialog();
   }
-
   void _editGrupo(Grupo grupo) {
     _showGrupoDialog(grupo: grupo);
   }
-
   Future<void> _deleteGrupo(Grupo grupo) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -119,7 +106,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
         ],
       ),
     );
-
     if (confirmed == true) {
       try {
         final success = await _catalogoService.deleteGrupo(grupo.id);
@@ -144,13 +130,11 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
@@ -161,7 +145,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -180,7 +163,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                       ],
                     ),
                   ),
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -198,7 +180,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Lista de grupos
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -230,7 +211,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       ],
     );
   }
-
   Widget _buildGruposList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -287,7 +267,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       ),
     );
   }
-
   Widget _buildGrupoCard(Grupo grupo, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -328,11 +307,9 @@ class _GruposCrudViewState extends State<GruposCrudView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono, nombre y menú
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono de grupo
                 Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -346,7 +323,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                   ),
                 ),
                 SizedBox(width: 12),
-                // Nombre del grupo
                 Expanded(
                   child: Text(
                     grupo.nombre,
@@ -360,7 +336,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Menú de 3 puntos
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -402,7 +377,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
               ],
             ),
             SizedBox(height: 12),
-            // Divider sutil con gradiente
             Container(
               height: 1,
               decoration: BoxDecoration(
@@ -416,10 +390,8 @@ class _GruposCrudViewState extends State<GruposCrudView> {
               ),
             ),
             SizedBox(height: 12),
-            // Información del grupo (curso y alumnos)
             Row(
               children: [
-                // Chip de curso
                 Flexible(
                   child: _buildInfoChip(
                     icon: Icons.school_rounded,
@@ -428,7 +400,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                   ),
                 ),
                 SizedBox(width: 8),
-                // Chip de alumnos
                 Flexible(
                   child: _buildInfoChip(
                     icon: Icons.people_rounded,
@@ -443,7 +414,6 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       ),
     );
   }
-
   Widget _buildInfoChip({required IconData icon, required String label, required bool isDark}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

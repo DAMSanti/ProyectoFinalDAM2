@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
-/// Barra de búsqueda y filtrado para las vistas CRUD
 class CrudSearchBar extends StatefulWidget {
   final String hintText;
   final Function(String) onSearch;
   final VoidCallback? onAdd;
   final String? addButtonText;
-
   const CrudSearchBar({
     Key? key,
     required this.hintText,
@@ -16,20 +13,16 @@ class CrudSearchBar extends StatefulWidget {
     this.onAdd,
     this.addButtonText,
   }) : super(key: key);
-
   @override
   State<CrudSearchBar> createState() => _CrudSearchBarState();
 }
-
 class _CrudSearchBarState extends State<CrudSearchBar> {
   final TextEditingController _searchController = TextEditingController();
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Padding(

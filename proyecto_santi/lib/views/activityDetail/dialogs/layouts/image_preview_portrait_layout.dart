@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/image_preview_widget.dart';
 import '../widgets/image_description_field.dart';
-
-/// Layout portrait para el diálogo de preview de imagen
 class ImagePreviewPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -12,7 +10,6 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
   final XFile? imageFile;
   final String? imageUrl;
   final TextEditingController descriptionController;
-
   const ImagePreviewPortraitLayout({
     Key? key,
     required this.isDark,
@@ -22,7 +19,6 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
     this.imageUrl,
     required this.descriptionController,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -30,7 +26,6 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Preview de la imagen
           Container(
             constraints: BoxConstraints(
               maxHeight: isMobile ? 300 : 400,
@@ -62,10 +57,7 @@ class ImagePreviewPortraitLayout extends StatelessWidget {
               ),
             ),
           ),
-          
           SizedBox(height: isMobile ? 16 : 20),
-          
-          // Campo de descripción
           ImageDescriptionField(
             controller: descriptionController,
             isDark: isDark,

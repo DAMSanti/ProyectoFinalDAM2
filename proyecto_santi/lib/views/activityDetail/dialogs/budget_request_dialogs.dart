@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-/// Muestra diálogo informativo sobre solicitud de presupuesto de transporte
+﻿import 'package:flutter/material.dart';
 void mostrarDialogoSolicitarPresupuestosTransporte(BuildContext context) {
   showDialog(
     context: context,
@@ -19,8 +17,6 @@ void mostrarDialogoSolicitarPresupuestosTransporte(BuildContext context) {
     ),
   );
 }
-
-/// Muestra diálogo informativo sobre solicitud de presupuesto de alojamiento
 void mostrarDialogoSolicitarPresupuestosAlojamiento(BuildContext context) {
   showDialog(
     context: context,

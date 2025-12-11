@@ -1,16 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
-
-/// Widget para mostrar una imagen local (XFile) con botón de eliminar en hover
 class ImageWithDeleteButton extends StatefulWidget {
   final XFile image;
   final double maxHeight;
   final VoidCallback onDelete;
   final VoidCallback? onTap;
-
   const ImageWithDeleteButton({
     Key? key,
     required this.image,
@@ -18,21 +15,17 @@ class ImageWithDeleteButton extends StatefulWidget {
     required this.onDelete,
     this.onTap,
   }) : super(key: key);
-
   @override
   ImageWithDeleteButtonState createState() => ImageWithDeleteButtonState();
 }
-
 class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
   bool _isHovering = false;
   double? _aspectRatio;
-
   @override
   void initState() {
     super.initState();
     _loadImageDimensions();
   }
-
   Future<void> _loadImageDimensions() async {
     try {
       final bytes = await widget.image.readAsBytes();
@@ -44,11 +37,10 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
       });
     } catch (e) {
       setState(() {
-        _aspectRatio = 1.0; // Default to square if error
+        _aspectRatio = 1.0; 
       });
     }
   }
-
   Future<Widget> _buildImageWidget(XFile image) async {
     if (kIsWeb) {
       final bytes = await image.readAsBytes();
@@ -57,20 +49,17 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
       return Image.file(File(image.path), fit: BoxFit.contain);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     if (_aspectRatio == null) {
       return Container(
         margin: EdgeInsets.symmetric(horizontal: 8.0),
-        width: widget.maxHeight, // Usar un ancho temporal
+        width: widget.maxHeight, 
         height: widget.maxHeight,
         child: Center(child: CircularProgressIndicator()),
       );
     }
-
     final width = widget.maxHeight * _aspectRatio!;
-
     return MouseRegion(
       cursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
       onEnter: (_) => setState(() => _isHovering = true),
@@ -81,7 +70,6 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
         height: widget.maxHeight,
         child: Stack(
           children: [
-            // Imagen con GestureDetector para el tap
             GestureDetector(
               onTap: widget.onTap,
               child: ClipRRect(
@@ -97,7 +85,6 @@ class ImageWithDeleteButtonState extends State<ImageWithDeleteButton> {
                 ),
               ),
             ),
-            // Botón de eliminar (solo visible en hover)
             if (_isHovering)
               Positioned(
                 top: 4,

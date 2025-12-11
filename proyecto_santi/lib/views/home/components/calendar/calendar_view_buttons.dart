@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../../shared/constants/app_theme_constants.dart';
-
-/// Widget para los botones de cambio de vista del calendario
 class CalendarViewButtons extends StatelessWidget {
   final CalendarView currentView;
   final Function(CalendarView) onViewChanged;
   final bool isDark;
   final bool isVertical;
-
   const CalendarViewButtons({
     super.key,
     required this.currentView,
@@ -16,7 +13,6 @@ class CalendarViewButtons extends StatelessWidget {
     required this.isDark,
     this.isVertical = false,
   });
-
   @override
   Widget build(BuildContext context) {
     if (isVertical) {
@@ -25,13 +21,10 @@ class CalendarViewButtons extends StatelessWidget {
       return _buildHorizontalButtons();
     }
   }
-
   Widget _buildHorizontalButtons() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Detectar si es móvil (menos de 600px)
         final isMobile = constraints.maxWidth < 600;
-        
         return Container(
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 8 : 16,
@@ -91,15 +84,12 @@ class CalendarViewButtons extends StatelessWidget {
       },
     );
   }
-
   Widget _buildVerticalButtons() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ajustar el espaciado según la altura disponible
         final availableHeight = constraints.maxHeight;
         final spacing = availableHeight < 220 ? 4.0 : 8.0;
         final verticalPadding = availableHeight < 220 ? 8.0 : 12.0;
-        
         return Container(
           width: 80,
           padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: 8),
@@ -158,16 +148,12 @@ class CalendarViewButtons extends StatelessWidget {
       },
     );
   }
-
   Widget _buildButton(String label, CalendarView view, IconData icon, {required bool showText, bool isMobile = false}) {
     final isSelected = currentView == view;
-    
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ajustar tamaño del icono según el espacio disponible
         final iconSize = isMobile ? 18.0 : (constraints.maxHeight < 50 ? 20.0 : 24.0);
         final buttonPadding = isMobile ? 6.0 : (constraints.maxHeight < 50 ? 8.0 : 10.0);
-        
         Widget buttonContent = Material(
           color: Colors.transparent,
           child: InkWell(
@@ -247,7 +233,6 @@ class CalendarViewButtons extends StatelessWidget {
             ),
           ),
         );
-
         return showText ? Expanded(child: buttonContent) : buttonContent;
       },
     );

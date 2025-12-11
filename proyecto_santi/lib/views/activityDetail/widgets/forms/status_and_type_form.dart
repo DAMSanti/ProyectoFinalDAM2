@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
+ï»¿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Sección de estado y tipo de actividad
 class ActivityStatusAndTypeSection extends StatelessWidget {
   final String estadoActividad;
   final String tipoActividad;
@@ -19,7 +17,6 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
     required bool isMobile,
     required bool isMobileLandscape,
   }) buildRadioOption;
-
   const ActivityStatusAndTypeSection({
     Key? key,
     required this.estadoActividad,
@@ -30,13 +27,11 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
     required this.isMobileLandscape,
     required this.buildRadioOption,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Estado de la Actividad
         Container(
           padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
           decoration: BoxDecoration(
@@ -105,8 +100,6 @@ class ActivityStatusAndTypeSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
-        
-        // Tipo de Actividad
         Container(
           padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 16)),
           decoration: BoxDecoration(

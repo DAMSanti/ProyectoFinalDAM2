@@ -1,39 +1,24 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:image_picker/image_picker.dart';
 import '../dialogs/image_preview_dialog.dart';
-
-/// Helper para manejar la selección y gestión de imágenes
 class ImagePickerHelper {
-  /// Muestra el selector de imágenes con opciones de cámara o galería en móvil
   static Future<void> showImagePicker({
     required BuildContext context,
     required Function(XFile image, String description) onImageSelected,
   }) async {
     final ImagePicker picker = ImagePicker();
-    
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     XFile? image;
-    
-    // En móvil, mostrar opciones de cámara o galería
     if (isMobile) {
       final ImageSource? source = await _showImageSourceSelector(context);
-      
-      // Si el usuario canceló, salir
       if (source == null) return;
-      
-      // Obtener imagen de la fuente seleccionada
       image = await picker.pickImage(source: source);
     } else {
-      // En desktop, usar directamente la galería
       image = await picker.pickImage(source: ImageSource.gallery);
     }
-    
     if (image != null && context.mounted) {
-      // Mostrar diálogo de preview con descripción
       await _showImagePreviewDialog(
         context: context,
         image: image,
@@ -41,8 +26,6 @@ class ImagePickerHelper {
       );
     }
   }
-
-  /// Muestra el diálogo para editar la descripción de una imagen
   static Future<void> editImageDescription({
     required BuildContext context,
     required XFile image,
@@ -61,8 +44,6 @@ class ImagePickerHelper {
       },
     );
   }
-
-  /// Muestra el diálogo de confirmación para eliminar una imagen
   static Future<bool> confirmImageDeletion(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -85,13 +66,8 @@ class ImagePickerHelper {
         );
       },
     );
-
     return confirmed == true;
   }
-
-  // ==================== MÉTODOS PRIVADOS ====================
-
-  /// Muestra el selector de fuente de imagen (cámara o galería)
   static Future<ImageSource?> _showImageSourceSelector(BuildContext context) async {
     return await showModalBottomSheet<ImageSource>(
       context: context,
@@ -122,7 +98,6 @@ class ImagePickerHelper {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Handle visual
                 Container(
                   margin: EdgeInsets.only(top: 12),
                   width: 40,
@@ -133,7 +108,6 @@ class ImagePickerHelper {
                   ),
                 ),
                 SizedBox(height: 20),
-                // Título
                 Text(
                   'Seleccionar imagen',
                   style: TextStyle(
@@ -143,7 +117,6 @@ class ImagePickerHelper {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Opción: Tomar foto
                 ListTile(
                   leading: Container(
                     padding: EdgeInsets.all(10),
@@ -174,7 +147,6 @@ class ImagePickerHelper {
                   ),
                   onTap: () => Navigator.pop(context, ImageSource.camera),
                 ),
-                // Opción: Galería
                 ListTile(
                   leading: Container(
                     padding: EdgeInsets.all(10),
@@ -206,7 +178,6 @@ class ImagePickerHelper {
                   onTap: () => Navigator.pop(context, ImageSource.gallery),
                 ),
                 SizedBox(height: 8),
-                // Botón cancelar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: SizedBox(
@@ -240,8 +211,6 @@ class ImagePickerHelper {
       },
     );
   }
-
-  /// Muestra el diálogo de preview de imagen con campo de descripción
   static Future<void> _showImagePreviewDialog({
     required BuildContext context,
     required XFile image,
@@ -253,9 +222,7 @@ class ImagePickerHelper {
         return ImagePreviewDialog(
           imageFile: image,
           onConfirm: (description) {
-            // Cerrar el diálogo
             Navigator.of(dialogContext).pop();
-            // Ejecutar callback
             onConfirm(description);
           },
         );

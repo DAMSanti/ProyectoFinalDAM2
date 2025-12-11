@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -9,21 +9,17 @@ import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-
 class ChatListView extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
-
   const ChatListView({
     super.key,
     required this.onToggleTheme,
     required this.isDarkTheme,
   });
-
   @override
   ChatListViewState createState() => ChatListViewState();
 }
-
 class ChatListViewState extends State<ChatListView> {
   late Future<List<Actividad>> _futureActivities;
   late final ApiService _apiService;
@@ -31,39 +27,28 @@ class ChatListViewState extends State<ChatListView> {
   final TextEditingController _searchController = TextEditingController();
   List<Actividad> _allActividades = [];
   List<Actividad> _filteredActividades = [];
-
   @override
   void initState() {
     super.initState();
     _apiService = ApiService();
     _actividadService = ActividadService(_apiService);
-    _futureActivities = _loadUserActivities(); // ✅ Cargar solo actividades del usuario
+    _futureActivities = _loadUserActivities(); 
     _loadActivities();
   }
-
-  /// ✅ NUEVO: Cargar actividades según el rol del usuario
   Future<List<Actividad>> _loadUserActivities() async {
     try {
       final auth = Provider.of<Auth>(context, listen: false);
       final currentUser = auth.currentUser;
       final currentUserUuid = currentUser?.uuid;
       final rol = currentUser?.rol;
-      
       if (currentUserUuid == null) {
         print('[ChatListView] ⚠️ No hay usuario autenticado');
         return [];
       }
-      
       print('[ChatListView] 🔍 Cargando actividades para usuario: $currentUserUuid (Rol: $rol)');
-      
-      // Cargar TODAS las actividades (no solo futuras)
       final todasActividades = await _actividadService.fetchActivities(pageSize: 100);
-      
-      // Administradores y Coordinadores ven TODAS las actividades
       if (rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED') {
         print('[ChatListView] ✅ Admin/Coordinador - Mostrando todas las actividades: ${todasActividades.length}');
-        
-        // Ordenar por fecha (más recientes primero)
         todasActividades.sort((a, b) {
           try {
             final dateA = DateTime.parse(a.fini);
@@ -73,20 +58,14 @@ class ChatListViewState extends State<ChatListView> {
             return 0;
           }
         });
-        
         return todasActividades;
       }
-      
-      // Profesores solo ven actividades donde son responsables o participantes
       final actividadesUsuario = todasActividades.where((actividad) {
         final esResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
         final esParticipante = actividad.profesoresParticipantesIds
             .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
-        
         return esResponsable || esParticipante;
       }).toList();
-      
-      // Ordenar por fecha (más recientes primero)
       actividadesUsuario.sort((a, b) {
         try {
           final dateA = DateTime.parse(a.fini);
@@ -96,7 +75,6 @@ class ChatListViewState extends State<ChatListView> {
           return 0;
         }
       });
-      
       print('[ChatListView] ✅ Actividades del usuario: ${actividadesUsuario.length}');
       return actividadesUsuario;
     } catch (e) {
@@ -104,13 +82,11 @@ class ChatListViewState extends State<ChatListView> {
       return [];
     }
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadActivities() async {
     try {
       final activities = await _futureActivities;
@@ -122,7 +98,6 @@ class ChatListViewState extends State<ChatListView> {
       print('[ERROR] Error cargando actividades: $e');
     }
   }
-
   void _filterActivities(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -135,12 +110,10 @@ class ChatListViewState extends State<ChatListView> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacementNamed(context, '/home');
@@ -165,15 +138,12 @@ class ChatListViewState extends State<ChatListView> {
           ),
           child: Column(
             children: [
-              // Search Bar (sin header)
               Padding(
                 padding: EdgeInsets.only(
                   top: MediaQuery.of(context).padding.top + 16,
                 ),
                 child: _buildSearchBar(context, isDark, isWeb),
               ),
-              
-              // Activities List
               Expanded(
                 child: _buildActivitiesList(context, isDark, isWeb),
               ),
@@ -183,7 +153,6 @@ class ChatListViewState extends State<ChatListView> {
       ),
     );
   }
-
   Widget _buildSearchBar(BuildContext context, bool isDark, bool isWeb) {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -259,7 +228,6 @@ class ChatListViewState extends State<ChatListView> {
       ),
     );
   }
-
   Widget _buildActivitiesList(BuildContext context, bool isDark, bool isWeb) {
     return FutureBuilder<List<Actividad>>(
       future: _futureActivities,
@@ -286,7 +254,6 @@ class ChatListViewState extends State<ChatListView> {
             ),
           );
         }
-
         if (snapshot.hasError) {
           return Center(
             child: Column(
@@ -326,7 +293,6 @@ class ChatListViewState extends State<ChatListView> {
             ),
           );
         }
-
         if (_filteredActividades.isEmpty) {
           return Center(
             child: Column(
@@ -375,11 +341,10 @@ class ChatListViewState extends State<ChatListView> {
             ),
           );
         }
-
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              _futureActivities = _loadUserActivities(); // ✅ Recargar actividades del usuario
+              _futureActivities = _loadUserActivities(); 
             });
             await _loadActivities();
           },
@@ -391,16 +356,14 @@ class ChatListViewState extends State<ChatListView> {
               final actividad = _filteredActividades[index];
               final auth = Provider.of<Auth>(context, listen: false);
               final userName = auth.currentUser?.nombre ?? 'Usuario';
-              
               return ActividadCard(
                 actividad: actividad,
                 isDark: isDark,
                 isWeb: isWeb,
                 onTap: () {
-                  // Navegar usando el shell en lugar de Navigator.push
                   navigateToChatInShell(context, {
                     'activityId': actividad.id.toString(),
-                    'displayName': userName, // Nombre del usuario, no de la actividad
+                    'displayName': userName, 
                   });
                 },
               );
@@ -411,13 +374,11 @@ class ChatListViewState extends State<ChatListView> {
     );
   }
 }
-
 class ActividadCard extends StatefulWidget {
   final Actividad actividad;
   final bool isDark;
   final bool isWeb;
   final VoidCallback onTap;
-
   const ActividadCard({
     super.key,
     required this.actividad,
@@ -425,14 +386,11 @@ class ActividadCard extends StatefulWidget {
     required this.isWeb,
     required this.onTap,
   });
-
   @override
   State<ActividadCard> createState() => _ActividadCardState();
 }
-
 class _ActividadCardState extends State<ActividadCard> {
   bool _isHovered = false;
-
   String _formatDateRange() {
     try {
       final inicio = DateTime.parse(widget.actividad.fini);
@@ -441,7 +399,6 @@ class _ActividadCardState extends State<ActividadCard> {
       return widget.actividad.fini;
     }
   }
-
   Color _getStatusColor() {
     switch (widget.actividad.estado.toLowerCase()) {
       case 'aprobada':
@@ -454,7 +411,6 @@ class _ActividadCardState extends State<ActividadCard> {
         return const Color(0xFF42A5F5);
     }
   }
-
   IconData _getStatusIcon() {
     switch (widget.actividad.estado.toLowerCase()) {
       case 'aprobada':
@@ -467,12 +423,10 @@ class _ActividadCardState extends State<ActividadCard> {
         return Icons.info_rounded;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final estadoColor = _getStatusColor();
     final estadoIcon = _getStatusIcon();
-    
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -488,7 +442,7 @@ class _ActividadCardState extends State<ActividadCard> {
                 ..multiply(Matrix4.diagonal3Values(1.005, 1.005, 1.0)))
               : Matrix4.identity(),
           child: Container(
-            height: 95, // Altura fija para el surco horizontal
+            height: 95, 
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.0),
               gradient: LinearGradient(
@@ -505,7 +459,6 @@ class _ActividadCardState extends State<ActividadCard> {
                       ],
               ),
               boxShadow: [
-                // Sombra principal
                 BoxShadow(
                   color: _isHovered 
                       ? const Color.fromRGBO(25, 118, 210, 0.30)
@@ -514,7 +467,6 @@ class _ActividadCardState extends State<ActividadCard> {
                   blurRadius: _isHovered ? 20.0 : 10.0,
                   spreadRadius: _isHovered ? 0 : -1,
                 ),
-                // Sombra secundaria en hover
                 if (_isHovered)
                   const BoxShadow(
                     color: Color.fromRGBO(25, 118, 210, 0.15),
@@ -535,7 +487,6 @@ class _ActividadCardState extends State<ActividadCard> {
                 borderRadius: BorderRadius.circular(16.0),
                 child: Stack(
                   children: [
-                    // Barra lateral izquierda decorativa
                     Positioned(
                       left: 0,
                       top: 0,
@@ -548,20 +499,19 @@ class _ActividadCardState extends State<ActividadCard> {
                             end: Alignment.bottomCenter,
                             colors: widget.actividad.tipo == 'Complementaria'
                               ? [
-                                  Color(0xFF1976d2), // Azul oscuro
-                                  Color(0xFF42A5F5), // Azul medio
-                                  Color(0xFF64B5F6), // Azul claro
+                                  Color(0xFF1976d2), 
+                                  Color(0xFF42A5F5), 
+                                  Color(0xFF64B5F6), 
                                 ]
                               : [
-                                  Color(0xFFE65100), // Naranja oscuro
-                                  Color(0xFFFF6F00), // Naranja medio
-                                  Color(0xFFFF9800), // Naranja claro
+                                  Color(0xFFE65100), 
+                                  Color(0xFFFF6F00), 
+                                  Color(0xFFFF9800), 
                                 ],
                           ),
                         ),
                       ),
                     ),
-                    // Efecto de brillo en hover
                     if (_isHovered)
                       Positioned.fill(
                         child: Container(
@@ -577,7 +527,6 @@ class _ActividadCardState extends State<ActividadCard> {
                           ),
                         ),
                       ),
-                    // Icono decorativo de fondo
                     Positioned(
                       right: -15,
                       top: -15,
@@ -590,7 +539,6 @@ class _ActividadCardState extends State<ActividadCard> {
                         ),
                       ),
                     ),
-                    // Contenido principal
                     InkWell(
                       onTap: widget.onTap,
                       borderRadius: BorderRadius.circular(16.0),
@@ -598,7 +546,6 @@ class _ActividadCardState extends State<ActividadCard> {
                         padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
                         child: Row(
                           children: [
-                            // Icono del tipo de actividad
                             Container(
                               width: 48,
                               height: 48,
@@ -616,16 +563,12 @@ class _ActividadCardState extends State<ActividadCard> {
                                 size: 24,
                               ),
                             ),
-                            
                             const SizedBox(width: 14),
-                            
-                            // Información de la actividad
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Título
                                   Text(
                                     widget.actividad.titulo,
                                     style: TextStyle(
@@ -638,10 +581,7 @@ class _ActividadCardState extends State<ActividadCard> {
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
-                                  
                                   const SizedBox(height: 4),
-                                  
-                                  // Descripción
                                   Text(
                                     widget.actividad.descripcion?.isNotEmpty == true 
                                         ? widget.actividad.descripcion! 
@@ -657,15 +597,11 @@ class _ActividadCardState extends State<ActividadCard> {
                                 ],
                               ),
                             ),
-                            
                             const SizedBox(width: 14),
-                            
-                            // Fecha y estado
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Fecha con icono
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -685,10 +621,7 @@ class _ActividadCardState extends State<ActividadCard> {
                                     ),
                                   ],
                                 ),
-                                
                                 const SizedBox(height: 6),
-                                
-                                // Badge de estado
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(

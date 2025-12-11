@@ -1,29 +1,17 @@
-namespace ACEXAPI.DTOs;
-
-/// <summary>
-/// DTO para registrar el token FCM de un usuario
-/// </summary>
+﻿namespace ACEXAPI.DTOs;
 public class FcmTokenDto
 {
     public string Token { get; set; } = string.Empty;
-    public string? DeviceType { get; set; } // "android", "ios", "web"
+    public string? DeviceType { get; set; } 
     public string? DeviceId { get; set; }
 }
-
-/// <summary>
-/// DTO para enviar una notificación push
-/// </summary>
 public class SendNotificationDto
 {
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty; // "nueva_actividad", "nuevo_mensaje", etc.
+    public string Type { get; set; } = string.Empty; 
     public Dictionary<string, string>? Data { get; set; }
 }
-
-/// <summary>
-/// DTO para notificación de nueva actividad
-/// </summary>
 public class ActividadNotificationDto
 {
     public int ActividadId { get; set; }
@@ -31,10 +19,6 @@ public class ActividadNotificationDto
     public DateTime FechaInicio { get; set; }
     public List<string> ProfesoresUuids { get; set; } = new();
 }
-
-/// <summary>
-/// DTO para notificación de nuevo mensaje
-/// </summary>
 public class MensajeNotificationDto
 {
     public string ChatId { get; set; } = string.Empty;

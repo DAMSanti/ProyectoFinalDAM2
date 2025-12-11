@@ -1,39 +1,30 @@
-import 'package:flutter/material.dart';
+ï»¿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_footer.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Diálogo para seleccionar múltiples profesores participantes
 class MultiSelectProfesorDialog extends StatefulWidget {
   final List<Profesor> profesores;
   final List<Profesor> profesoresYaSeleccionados;
-
   const MultiSelectProfesorDialog({
     Key? key,
     required this.profesores,
     required this.profesoresYaSeleccionados,
   }) : super(key: key);
-
   @override
   State<MultiSelectProfesorDialog> createState() => _MultiSelectProfesorDialogState();
 }
-
 class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
   final List<Profesor> _selectedProfesores = [];
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
-    // No pre-seleccionamos ninguno, el usuario elegirá
   }
-
   List<Profesor> get _filteredProfesores {
     if (_searchQuery.isEmpty) {
       return widget.profesores;
     }
-    
     return widget.profesores.where((profesor) {
       final fullName = '${profesor.nombre} ${profesor.apellidos}'.toLowerCase();
       final email = profesor.correo.toLowerCase();
@@ -41,11 +32,9 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       return fullName.contains(query) || email.contains(query);
     }).toList();
   }
-
   bool _isProfesorYaParticipante(Profesor profesor) {
     return widget.profesoresYaSeleccionados.any((p) => p.uuid == profesor.uuid);
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -55,7 +44,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
     final isPortrait = orientation == Orientation.portrait;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape
@@ -102,7 +90,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             DialogHeader(
               isMobile: isMobile,
               isMobileLandscape: isMobileLandscape,
@@ -110,39 +97,28 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
               title: isMobile ? 'Agregar Profesores' : 'Agregar Profesores Participantes',
               icon: Icons.group_add_rounded,
             ),
-            
-            // Content - Layout condicional
             Expanded(
               child: isMobileLandscape
                   ? _buildLandscapeMobileLayout(isDark, isMobile, isMobileLandscape)
                   : _buildPortraitLayout(isDark, isMobile, isMobileLandscape),
             ),
-            
-            // Actions - Footer with custom logic for add button
             _buildCustomFooter(isDark, isMobile, isMobileLandscape, context),
           ],
         ),
       ),
     );
   }
-
-  // Layout vertical para portrait y desktop
   Widget _buildPortraitLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
     return Padding(
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       child: Column(
         children: [
-          // Buscador
           _buildSearchField(isMobile, isMobileLandscape),
           SizedBox(height: isMobile ? 12 : 16),
-          
-          // Contador
           if (_selectedProfesores.isNotEmpty) ...[
             _buildCounter(isMobile, isMobileLandscape),
             SizedBox(height: isMobile ? 10 : 12),
           ],
-          
-          // Lista
           Expanded(
             child: _buildListaProfesores(isDark, isMobile, isMobileLandscape),
           ),
@@ -150,14 +126,11 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       ),
     );
   }
-
-  // Layout horizontal 2 columnas para landscape
   Widget _buildLandscapeMobileLayout(bool isDark, bool isMobile, bool isMobileLandscape) {
     return Padding(
       padding: EdgeInsets.all(12),
       child: Row(
         children: [
-          // Columna izquierda: Búsqueda + contador (40%)
           Expanded(
             flex: 4,
             child: Column(
@@ -173,8 +146,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
             ),
           ),
           SizedBox(width: 12),
-          
-          // Columna derecha: Lista (60%)
           Expanded(
             flex: 6,
             child: _buildListaProfesores(isDark, isMobile, isMobileLandscape),
@@ -183,8 +154,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       ),
     );
   }
-
-  // Campo de búsqueda reutilizable
   Widget _buildSearchField(bool isMobile, bool isMobileLandscape) {
     return Container(
       decoration: BoxDecoration(
@@ -232,8 +201,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       ),
     );
   }
-
-  // Contador de seleccionados reutilizable
   Widget _buildCounter(bool isMobile, bool isMobileLandscape) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -289,8 +256,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       ),
     );
   }
-
-  // Lista de profesores reutilizable
   Widget _buildListaProfesores(bool isDark, bool isMobile, bool isMobileLandscape) {
     return Container(
       decoration: BoxDecoration(
@@ -333,7 +298,7 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 0),
                   child: Text(
-                    'Intenta con otros términos de búsqueda',
+                    'Intenta con otros tï¿½rminos de bï¿½squeda',
                     style: TextStyle(
                       fontSize: isMobileLandscape ? 11 : (isMobile ? 12 : 13),
                       color: isDark ? Colors.white54 : Colors.black38,
@@ -351,7 +316,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
               final profesor = _filteredProfesores[index];
               final yaParticipante = _isProfesorYaParticipante(profesor);
               final isSelected = _selectedProfesores.any((p) => p.uuid == profesor.uuid);
-              
               return Container(
                 margin: EdgeInsets.only(bottom: isMobileLandscape ? 4 : (isMobile ? 6 : 8)),
                 decoration: BoxDecoration(
@@ -496,8 +460,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
           ),
     );
   }
-
-  // Custom footer with special logic for enabled/disabled state
   Widget _buildCustomFooter(bool isDark, bool isMobile, bool isMobileLandscape, BuildContext context) {
     return Container(
       padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
@@ -520,7 +482,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
       child: Row(
         mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
         children: [
-          // Botón Cancelar - using base DialogFooter styling
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Container(
@@ -576,7 +537,6 @@ class _MultiSelectProfesorDialogState extends State<MultiSelectProfesorDialog> {
             ),
           ),
           SizedBox(width: 12),
-          // Botón Agregar with custom disabled state logic
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Opacity(

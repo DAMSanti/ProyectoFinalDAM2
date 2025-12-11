@@ -1,4 +1,4 @@
-class Alojamiento {
+﻿class Alojamiento {
   final int id;
   final String nombre;
   final String? direccion;
@@ -18,7 +18,6 @@ class Alojamiento {
   final DateTime fechaCreacion;
   final double? latitud;
   final double? longitud;
-
   Alojamiento({
     required this.id,
     required this.nombre,
@@ -40,7 +39,6 @@ class Alojamiento {
     this.latitud,
     this.longitud,
   });
-
   factory Alojamiento.fromJson(Map<String, dynamic> json) {
     return Alojamiento(
       id: json['id'] as int,
@@ -64,7 +62,6 @@ class Alojamiento {
       longitud: (json['longitud'] as num?)?.toDouble(),
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -88,7 +85,6 @@ class Alojamiento {
       'longitud': longitud,
     };
   }
-
   Alojamiento copyWith({
     int? id,
     String? nombre,
@@ -132,8 +128,6 @@ class Alojamiento {
       longitud: longitud ?? this.longitud,
     );
   }
-
-  // Método auxiliar para obtener la dirección completa
   String get direccionCompleta {
     final partes = <String>[];
     if (direccion != null && direccion!.isNotEmpty) partes.add(direccion!);
@@ -142,13 +136,11 @@ class Alojamiento {
     if (provincia != null && provincia!.isNotEmpty) partes.add(provincia!);
     return partes.join(', ');
   }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is Alojamiento && other.id == id;
   }
-
   @override
   int get hashCode => id.hashCode;
 }

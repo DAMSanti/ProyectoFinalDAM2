@@ -1,29 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'app_colors.dart';
-
-// ============================================================================
-// NOTA: Los colores ahora están centralizados en app_colors.dart
-// Estas constantes se mantienen por compatibilidad con código existente
-// ============================================================================
-
-// Colores del tema claro
 const Color colorFondoLight = AppColors.backgroundLight;
 const Color colorTextoLight = AppColors.textLight;
 const Color colorAccentLight = AppColors.accentLight;
 const Color colorSoftLight = AppColors.softLight;
 const Color colorAccentDLight = AppColors.accentDarkLight;
-
-// Colores del tema oscuro
 const Color colorFondoDark = AppColors.backgroundDark;
 const Color colorTextoDark = AppColors.textDark;
 const Color colorAccentDark = AppColors.accentDark;
-
-// Tema claro
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   scaffoldBackgroundColor: AppColors.backgroundLight,
   primaryColor: AppColors.accentLight,
-  // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(color: AppColors.textLight), 
     focusedBorder: OutlineInputBorder(
@@ -33,7 +21,6 @@ final ThemeData lightTheme = ThemeData(
       borderSide: BorderSide(color: AppColors.textLight)
     ),
   ),
-  // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.accentLight,
@@ -42,7 +29,6 @@ final ThemeData lightTheme = ThemeData(
       textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
-  // TEXTOS
   textTheme: TextTheme(
     displayLarge: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
     displayMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
@@ -60,11 +46,10 @@ final ThemeData lightTheme = ThemeData(
     labelMedium: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
     labelSmall: TextStyle(color: AppColors.textLight, inherit: true, fontSize: 16),
   ),
-  // APPBAR
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.transparent,
     titleTextStyle: TextStyle(
-      color: AppColors.primary, // Azul consistente
+      color: AppColors.primary, 
       fontSize: 20,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.5,
@@ -72,20 +57,17 @@ final ThemeData lightTheme = ThemeData(
     ),
     iconTheme: IconThemeData(color: AppColors.primary),
   ),
-  // CARDS
   cardTheme: CardThemeData(
     color: AppColors.accentLight,
     shadowColor: Colors.grey,
     elevation: 4,
   ),
-  // LISTTILE
   listTileTheme: ListTileThemeData(
     titleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     subtitleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     textColor: AppColors.textLight,
     iconColor: AppColors.textLight,
   ),
-  // DIALOG
   dialogTheme: DialogThemeData(
     backgroundColor: AppColors.backgroundLight,
     titleTextStyle: TextStyle(color: AppColors.textLight, fontSize: 20, inherit: true),
@@ -94,7 +76,6 @@ final ThemeData lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(8),
     ),
   ),
-  // DRAWER
   drawerTheme: DrawerThemeData(
     backgroundColor: AppColors.backgroundLight,
   ),
@@ -103,13 +84,10 @@ final ThemeData lightTheme = ThemeData(
       secondary: AppColors.backgroundLight
   ),
 );
-
-// Tema oscuro
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   scaffoldBackgroundColor: AppColors.backgroundDark,
   primaryColor: AppColors.accentDark,
-  // TEXTFIELD
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(color: AppColors.textDark), 
     focusedBorder: OutlineInputBorder(
@@ -119,7 +97,6 @@ final ThemeData darkTheme = ThemeData(
       borderSide: BorderSide(color: AppColors.textDark)
     ),
   ),
-  // BOTONES
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.accentDark,
@@ -128,7 +105,6 @@ final ThemeData darkTheme = ThemeData(
       textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     ),
   ),
-  // TEXTOS
   textTheme: TextTheme(
     displayLarge: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
     displayMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
@@ -146,11 +122,10 @@ final ThemeData darkTheme = ThemeData(
     labelMedium: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
     labelSmall: TextStyle(color: AppColors.textDark, inherit: true, fontSize: 16),
   ),
-  // APPBAR
   appBarTheme: AppBarTheme(
     backgroundColor: AppColors.accentDark,
     titleTextStyle: TextStyle(
-      color: AppColors.primary, // Azul consistente también en tema oscuro
+      color: AppColors.primary, 
       fontSize: 20,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.5,
@@ -158,20 +133,17 @@ final ThemeData darkTheme = ThemeData(
     ),
     iconTheme: IconThemeData(color: AppColors.textDark),
   ),
-  // CARDS
   cardTheme: CardThemeData(
     color: AppColors.accentDark,
     shadowColor: Colors.grey,
     elevation: 4,
   ),
-  // LISTTILE
   listTileTheme: ListTileThemeData(
     titleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     subtitleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 16, fontWeight: FontWeight.bold, inherit: true),
     textColor: AppColors.textDark,
     iconColor: AppColors.textDark,
   ),
-  // DIALOG
   dialogTheme: DialogThemeData(
     backgroundColor: AppColors.backgroundDark,
     titleTextStyle: TextStyle(color: AppColors.textDark, fontSize: 20, inherit: true),
@@ -180,7 +152,6 @@ final ThemeData darkTheme = ThemeData(
       borderRadius: BorderRadius.circular(8),
     ),
   ),
-  // DRAWER
   drawerTheme: DrawerThemeData(
     backgroundColor: AppColors.backgroundDark,
   ),

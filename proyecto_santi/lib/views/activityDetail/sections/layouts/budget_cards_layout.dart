@@ -1,14 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../widgets/budget/budget_card.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget que maneja el layout responsive de las tarjetas de presupuesto.
-/// 
-/// Muestra tres tarjetas (Presupuesto Estimado, Coste Real, Coste por Alumno)
-/// en diferentes layouts según el tamaño de pantalla:
-/// - Mobile landscape: columna vertical compacta
-/// - Mobile portrait: columna vertical con más espaciado
-/// - Desktop: fila 2+1 (dos arriba, una abajo centrada)
 class BudgetCardsLayout extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
@@ -19,7 +11,6 @@ class BudgetCardsLayout extends StatelessWidget {
   final bool editandoPresupuesto;
   final TextEditingController presupuestoController;
   final VoidCallback onEditPresupuesto;
-
   const BudgetCardsLayout({
     Key? key,
     required this.isMobile,
@@ -32,7 +23,6 @@ class BudgetCardsLayout extends StatelessWidget {
     required this.presupuestoController,
     required this.onEditPresupuesto,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     if (isMobileLandscape) {
@@ -43,8 +33,6 @@ class BudgetCardsLayout extends StatelessWidget {
       return _buildDesktopLayout();
     }
   }
-
-  /// Layout para móvil en modo landscape (columna vertical compacta)
   Widget _buildMobileLandscapeLayout() {
     return Column(
       children: [
@@ -81,8 +69,6 @@ class BudgetCardsLayout extends StatelessWidget {
       ],
     );
   }
-
-  /// Layout para móvil en modo portrait (columna vertical con espaciado)
   Widget _buildMobilePortraitLayout() {
     return Column(
       children: [
@@ -119,12 +105,9 @@ class BudgetCardsLayout extends StatelessWidget {
       ],
     );
   }
-
-  /// Layout para escritorio (2 tarjetas arriba, 1 abajo centrada)
   Widget _buildDesktopLayout() {
     return Column(
       children: [
-        // Fila superior: Presupuesto Estimado y Coste Real
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -158,7 +141,6 @@ class BudgetCardsLayout extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16),
-        // Fila inferior: Coste por Alumno ocupa todo el ancho
         BudgetCardWidget(
           titulo: 'Coste por Alumno',
           valor: costoPorAlumno,

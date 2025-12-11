@@ -1,63 +1,49 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
 class GrupoDetailDialog extends StatefulWidget {
   final Grupo? grupo;
   final List<Curso> cursos;
   final VoidCallback onSaved;
-
   const GrupoDetailDialog({
     Key? key,
     this.grupo,
     required this.cursos,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<GrupoDetailDialog> createState() => _GrupoDetailDialogState();
 }
-
 class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
-  
-  // Controllers
   late final TextEditingController _nombreController;
   late final TextEditingController _numeroAlumnosController;
-  
   int? _cursoSeleccionado;
   bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
     _catalogoService = CatalogoService(_apiService);
-    
-    // Inicializar controllers con valores existentes o vacíos
     _nombreController = TextEditingController(text: widget.grupo?.nombre ?? '');
     _numeroAlumnosController = TextEditingController(
       text: widget.grupo?.numeroAlumnos.toString() ?? ''
     );
-    
     _cursoSeleccionado = widget.grupo?.cursoId;
   }
-
   @override
   void dispose() {
     _nombreController.dispose();
     _numeroAlumnosController.dispose();
     super.dispose();
   }
-
   Future<void> _saveGrupo() async {
     if (!_formKey.currentState!.validate()) return;
-
     if (_cursoSeleccionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -67,18 +53,14 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       );
       return;
     }
-
     setState(() => _isLoading = true);
-
     try {
       final data = {
         'nombre': _nombreController.text.trim(),
         'numeroAlumnos': int.parse(_numeroAlumnosController.text.trim()),
         'cursoId': _cursoSeleccionado,
       };
-
       if (widget.grupo != null) {
-        // Actualizar
         await _catalogoService.updateGrupo(widget.grupo!.id, data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +71,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
           );
         }
       } else {
-        // Crear
         await _catalogoService.createGrupo(data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +81,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
           );
         }
       }
-
       widget.onSaved();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -115,14 +95,12 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isDesktop = screenWidth > 900;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -162,9 +140,7 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header con gradiente
               _buildHeader(isDark, isMobile),
-              // Contenido con scroll
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -176,7 +152,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
                   ),
                 ),
               ),
-              // Footer con botones
               _buildFooter(isDark, isMobile),
             ],
           ),
@@ -184,7 +159,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -237,7 +211,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ),
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -296,12 +269,10 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: Nombre y Curso
         Row(
           children: [
             Expanded(child: _buildNombreField(isDark)),
@@ -310,12 +281,10 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 2: Número de alumnos
         _buildNumeroAlumnosField(isDark),
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       children: [
@@ -327,7 +296,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ],
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -365,7 +333,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ],
     );
   }
-
   Widget _buildNombreField(bool isDark) {
     return _buildStyledField(
       label: 'Código del Grupo *',
@@ -391,7 +358,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ),
     );
   }
-
   Widget _buildCursoField(bool isDark) {
     return _buildStyledField(
       label: 'Curso *',
@@ -426,7 +392,6 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
       ),
     );
   }
-
   Widget _buildNumeroAlumnosField(bool isDark) {
     return _buildStyledField(
       label: 'Número de Alumnos *',
@@ -457,6 +422,3 @@ class _GrupoDetailDialogState extends State<GrupoDetailDialog> {
     );
   }
 }
-
-
-

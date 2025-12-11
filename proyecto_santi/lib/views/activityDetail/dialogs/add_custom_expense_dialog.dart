@@ -1,14 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Muestra diálogo para agregar un nuevo gasto personalizado
 Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
   BuildContext context,
 ) async {
   final conceptoController = TextEditingController();
   final cantidadController = TextEditingController();
-  
   final result = await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -19,7 +16,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
       final isPortrait = orientation == Orientation.portrait;
       final isMobile = screenWidth < 600;
       final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-
       return Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: isMobileLandscape
@@ -66,7 +62,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               DialogHeader(
                 isMobile: isMobile,
                 isMobileLandscape: isMobileLandscape,
@@ -74,8 +69,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                 title: isMobile ? 'Agregar Gasto' : 'Agregar Gasto Personalizado',
                 icon: Icons.add_card_rounded,
               ),
-
-              // Content
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
@@ -83,7 +76,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Campo Concepto
                       Text(
                         'Concepto',
                         style: TextStyle(
@@ -137,10 +129,7 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                         ),
                         textCapitalization: TextCapitalization.sentences,
                       ),
-                      
                       SizedBox(height: isMobileLandscape ? 12 : 16),
-                      
-                      // Campo Cantidad
                       Text(
                         'Cantidad (€)',
                         style: TextStyle(
@@ -204,8 +193,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                   ),
                 ),
               ),
-
-              // Actions - Footer
               Container(
                 padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 decoration: BoxDecoration(
@@ -227,7 +214,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                 child: Row(
                   mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
                   children: [
-                    // Botón Cancelar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -258,7 +244,6 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                       ),
                     ),
                     SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-                    // Botón Agregar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -267,20 +252,16 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
                           onPressed: () {
                             final concepto = conceptoController.text.trim();
                             final cantidadStr = cantidadController.text.trim();
-                            
                             if (concepto.isEmpty || cantidadStr.isEmpty) {
                               SnackBarHelper.showWarning(context, 'Por favor completa todos los campos');
                               return;
                             }
-                            
-                            // Reemplazar coma por punto para asegurar parseo correcto
                             final textoLimpio = cantidadStr.replaceAll(',', '.');
                             final cantidad = double.tryParse(textoLimpio);
                             if (cantidad == null || cantidad <= 0) {
                               SnackBarHelper.showWarning(context, 'Ingresa una cantidad válida');
                               return;
                             }
-                            
                             Navigator.of(context).pop(true);
                           },
                           style: ElevatedButton.styleFrom(
@@ -325,17 +306,14 @@ Future<Map<String, dynamic>?> mostrarDialogoAgregarGasto(
       );
     },
   );
-  
   if (result == true) {
     final concepto = conceptoController.text.trim();
     final cantidadStr = cantidadController.text.trim().replaceAll(',', '.');
     final cantidad = double.tryParse(cantidadStr);
-    
     return {
       'concepto': concepto,
       'cantidad': cantidad,
     };
   }
-  
   return null;
 }

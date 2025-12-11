@@ -1,18 +1,15 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 class ImagePreviewWidget extends StatelessWidget {
   final XFile? imageFile;
   final String? imageUrl;
-
   const ImagePreviewWidget({
     super.key,
     this.imageFile,
     this.imageUrl,
   });
-
   @override
   Widget build(BuildContext context) {
     if (imageUrl != null) {

@@ -3,15 +3,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_santi/models/photo.dart';
 import 'package:proyecto_santi/views/activityDetail/state/activity_detail_state.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Clase que maneja toda la lógica relacionada con imágenes
 class ImageHandler {
   final ActivityDetailState state;
   final Function(VoidCallback) setState;
-
   ImageHandler(this.state, this.setState);
-
-  /// Muestra el selector de imágenes y añade la imagen seleccionada
   Future<void> showImagePicker() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -22,16 +17,12 @@ class ImageHandler {
       });
     }
   }
-
-  /// Elimina una imagen seleccionada (aún no subida)
   void removeSelectedImage(int index) {
     setState(() {
       state.selectedImages.removeAt(index);
       state.markAsChanged();
     });
   }
-
-  /// Muestra diálogo de confirmación y marca imagen de API para eliminar
   Future<void> removeApiImage(BuildContext context, int index) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -52,7 +43,6 @@ class ImageHandler {
         );
       },
     );
-
     if (confirmed == true && index < state.imagesActividad.length) {
       final photo = state.imagesActividad[index];
       setState(() {
@@ -62,8 +52,6 @@ class ImageHandler {
       });
     }
   }
-
-  /// Carga las fotos de la actividad desde el servidor
   Future<void> loadPhotos(int actividadId) async {
     try {
       final photos = await state.photoService.fetchPhotosByActivityId(actividadId);
@@ -73,14 +61,10 @@ class ImageHandler {
     } catch (e) {
     }
   }
-
-  /// Sube las imágenes seleccionadas al servidor
   Future<bool> uploadSelectedImages(int actividadId) async {
     if (state.selectedImages.isEmpty) {
       return true;
     }
-
-    
     for (XFile imageFile in state.selectedImages) {
       try {
         final bytes = await imageFile.readAsBytes();
@@ -93,17 +77,12 @@ class ImageHandler {
         return false;
       }
     }
-    
     return true;
   }
-
-  /// Elimina las imágenes marcadas para eliminación
   Future<bool> deleteMarkedImages() async {
     if (state.imagesToDelete.isEmpty) {
       return true;
     }
-
-    
     for (int photoId in state.imagesToDelete) {
       try {
         await state.photoService.deletePhoto(photoId);
@@ -111,7 +90,6 @@ class ImageHandler {
         return false;
       }
     }
-    
     return true;
   }
 }

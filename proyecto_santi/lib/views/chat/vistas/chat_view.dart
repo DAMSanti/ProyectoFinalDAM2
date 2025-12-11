@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/models/chat/chat_message.dart';
@@ -13,14 +13,12 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import '../widgets/audio_recorder_widget.dart';
 import '../widgets/audio_player_widget.dart';
-
 class ChatView extends StatefulWidget {
   final String activityId;
   final String displayName;
-  final String userId; // ID del usuario actual
+  final String userId; 
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
-
   const ChatView({
     super.key,
     required this.activityId,
@@ -29,65 +27,46 @@ class ChatView extends StatefulWidget {
     required this.onToggleTheme,
     required this.isDarkTheme,
   });
-
   @override
   State<ChatView> createState() => _ChatViewState();
 }
-
 class _ChatViewState extends State<ChatView> {
   final FirebaseChatService _chatService = FirebaseChatService();
   final FirebaseStorageService _storageService = FirebaseStorageService();
-  final PresenceService? _presenceService = null; // Deshabilitado para Windows
+  final PresenceService? _presenceService = null; 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _imagePicker = ImagePicker();
   final ValueNotifier<bool> _hasTextNotifier = ValueNotifier<bool>(false);
-  
   bool _isUploading = false;
   double _uploadProgress = 0.0;
   bool _isRecordingAudio = false;
-
   @override
   void initState() {
     super.initState();
-    // Configurar español para timeago
     timeago.setLocaleMessages('es', timeago.EsMessages());
-    
-    // Listener optimizado para cambiar botón de enviar/micrófono
-    // Usa ValueNotifier para no reconstruir toda la vista
     _messageController.addListener(() {
       final hasText = _messageController.text.trim().isNotEmpty;
       if (hasText != _hasTextNotifier.value) {
         _hasTextNotifier.value = hasText;
       }
     });
-    
-    // PresenceService deshabilitado para Windows (Realtime Database no soportado)
-    // En Android/iOS funcionará correctamente
-    // _presenceService?.setUserOnline(widget.userId);
-    
-    // Marcar todos los mensajes como leídos al entrar
     _chatService.markAllAsRead(
       actividadId: widget.activityId,
       userId: widget.userId,
     );
   }
-
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
     _hasTextNotifier.dispose();
-    // _presenceService?.setUserOffline(widget.userId);
     super.dispose();
   }
-
   void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
-
     final messageText = _messageController.text.trim();
     _messageController.clear();
-
     try {
       await _chatService.sendTextMessage(
         actividadId: widget.activityId,
@@ -95,14 +74,11 @@ class _ChatViewState extends State<ChatView> {
         senderName: widget.displayName,
         message: messageText,
       );
-
-      // Scroll al final
       _scrollToBottom();
     } catch (e) {
       _showError('Error al enviar mensaje: $e');
     }
   }
-
   void _sendImage() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -111,18 +87,13 @@ class _ChatViewState extends State<ChatView> {
         maxHeight: 1080,
         imageQuality: 85,
       );
-
       if (image == null) return;
-
       setState(() {
         _isUploading = true;
         _uploadProgress = 0.0;
       });
-
       String imageUrl;
-      
       if (kIsWeb) {
-        // Web: usar bytes
         final bytes = await image.readAsBytes();
         imageUrl = await _storageService.uploadImage(
           actividadId: widget.activityId,
@@ -134,7 +105,6 @@ class _ChatViewState extends State<ChatView> {
           },
         );
       } else {
-        // Mobile/Desktop: usar File
         final file = File(image.path);
         imageUrl = await _storageService.uploadImage(
           actividadId: widget.activityId,
@@ -146,8 +116,6 @@ class _ChatViewState extends State<ChatView> {
           },
         );
       }
-
-      // Enviar mensaje con la imagen
       await _chatService.sendMediaMessage(
         actividadId: widget.activityId,
         senderId: widget.userId,
@@ -156,12 +124,10 @@ class _ChatViewState extends State<ChatView> {
         type: MessageType.image,
         mediaUrl: imageUrl,
       );
-
       setState(() {
         _isUploading = false;
         _uploadProgress = 0.0;
       });
-
       _scrollToBottom();
     } catch (e) {
       setState(() {
@@ -171,28 +137,21 @@ class _ChatViewState extends State<ChatView> {
       _showError('Error al subir imagen: $e');
     }
   }
-
   void _startRecordingAudio() {
     setState(() => _isRecordingAudio = true);
   }
-
   void _cancelRecordingAudio() {
     setState(() => _isRecordingAudio = false);
   }
-
   void _sendAudio(String audioPath, int duration) async {
     setState(() => _isRecordingAudio = false);
-
     try {
       setState(() {
         _isUploading = true;
         _uploadProgress = 0.0;
       });
-
       String audioUrl;
-      
       if (kIsWeb) {
-        // Web: leer bytes del archivo
         final file = File(audioPath);
         final bytes = await file.readAsBytes();
         audioUrl = await _storageService.uploadAudio(
@@ -205,7 +164,6 @@ class _ChatViewState extends State<ChatView> {
           },
         );
       } else {
-        // Mobile/Desktop: usar File
         final file = File(audioPath);
         audioUrl = await _storageService.uploadAudio(
           actividadId: widget.activityId,
@@ -217,8 +175,6 @@ class _ChatViewState extends State<ChatView> {
           },
         );
       }
-
-      // Enviar mensaje con el audio
       await _chatService.sendMediaMessage(
         actividadId: widget.activityId,
         senderId: widget.userId,
@@ -228,15 +184,11 @@ class _ChatViewState extends State<ChatView> {
         mediaUrl: audioUrl,
         duration: duration,
       );
-
       setState(() {
         _isUploading = false;
         _uploadProgress = 0.0;
       });
-
       _scrollToBottom();
-
-      // Eliminar archivo temporal
       try {
         final file = File(audioPath);
         if (await file.exists()) {
@@ -253,7 +205,6 @@ class _ChatViewState extends State<ChatView> {
       _showError('Error al subir audio: $e');
     }
   }
-
   void _scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 300), () {
       if (_scrollController.hasClients) {
@@ -265,7 +216,6 @@ class _ChatViewState extends State<ChatView> {
       }
     });
   }
-
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -274,7 +224,6 @@ class _ChatViewState extends State<ChatView> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -297,8 +246,7 @@ class _ChatViewState extends State<ChatView> {
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 48), // Espacio para la flecha de volver
-                  // Lista de mensajes
+                  const SizedBox(height: 48), 
                   Expanded(
                 child: StreamBuilder<List<ChatMessage>>(
                   stream: _chatService.getMessagesStream(widget.activityId),
@@ -306,13 +254,11 @@ class _ChatViewState extends State<ChatView> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     if (snapshot.hasError) {
                       return Center(
                         child: Text('Error: ${snapshot.error}'),
                       );
                     }
-
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(
                         child: Column(
@@ -343,13 +289,10 @@ class _ChatViewState extends State<ChatView> {
                         ),
                       );
                     }
-
                     final messages = snapshot.data!.reversed.toList();
-
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       _scrollToBottom();
                     });
-
                     return ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),
@@ -357,15 +300,12 @@ class _ChatViewState extends State<ChatView> {
                       itemBuilder: (context, index) {
                         final message = messages[index];
                         final isMe = message.senderId == widget.userId;
-
                         return _buildMessageBubble(message, isMe);
                       },
                     );
                   },
                 ),
               ),
-
-              // Indicador de subida
               if (_isUploading)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -377,8 +317,6 @@ class _ChatViewState extends State<ChatView> {
                     ],
                   ),
                 ),
-
-              // Input de mensaje o grabador de audio
               _isRecordingAudio
                   ? AudioRecorderWidget(
                       onRecordingComplete: _sendAudio,
@@ -400,13 +338,11 @@ class _ChatViewState extends State<ChatView> {
                       ),
                       child: Row(
                         children: [
-                          // Botón de imagen
                           IconButton(
                             icon: const Icon(Icons.image, color: Color(0xFF1976d2)),
                             onPressed: _isUploading ? null : _sendImage,
                             tooltip: 'Enviar imagen',
                           ),
-                          // Campo de texto
                           Expanded(
                             child: TextField(
                               controller: _messageController,
@@ -430,7 +366,6 @@ class _ChatViewState extends State<ChatView> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // Botón de micrófono o enviar - ValueListenableBuilder para evitar reconstruir toda la vista
                           ValueListenableBuilder<bool>(
                             valueListenable: _hasTextNotifier,
                             builder: (context, hasText, child) {
@@ -460,7 +395,6 @@ class _ChatViewState extends State<ChatView> {
                     ),
             ],
           ),
-          // Flecha de volver (posicionada en la esquina superior izquierda)
           Positioned(
             top: 8,
             left: 8,
@@ -497,7 +431,6 @@ class _ChatViewState extends State<ChatView> {
   ),
     );
   }
-
   Widget _buildMessageBubble(ChatMessage message, bool isMe) {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -532,7 +465,6 @@ class _ChatViewState extends State<ChatView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Nombre del remitente (siempre visible)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
@@ -546,8 +478,6 @@ class _ChatViewState extends State<ChatView> {
                 ),
               ),
             ),
-
-            // Contenido del mensaje
             if (message.type == MessageType.image && message.mediaUrl != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -587,8 +517,6 @@ class _ChatViewState extends State<ChatView> {
                   fontSize: 14,
                 ),
               ),
-
-            // Timestamp
             const SizedBox(height: 4),
             Text(
               timeago.format(message.timestamp, locale: 'es'),

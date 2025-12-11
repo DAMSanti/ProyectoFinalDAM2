@@ -1,20 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/shared/constants/app_theme_constants.dart';
-
-/// Título del calendario reutilizable
-/// Aplica DRY (Don't Repeat Yourself)
 class CalendarTitle extends StatelessWidget {
   final bool isCompact;
-
   const CalendarTitle({
     super.key,
     this.isCompact = false,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: AppThemeConstants.spacingXLarge,

@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-/// Sección de fechas y horarios
+﻿import 'package:flutter/material.dart';
 class DateTimeSection extends StatelessWidget {
   final DateTime fechaInicio;
   final DateTime fechaFin;
@@ -19,7 +17,6 @@ class DateTimeSection extends StatelessWidget {
     required bool isMobile,
     required bool isMobileLandscape,
   }) buildDateTimeButton;
-
   const DateTimeSection({
     Key? key,
     required this.fechaInicio,
@@ -33,7 +30,6 @@ class DateTimeSection extends StatelessWidget {
     required this.buildSectionTitle,
     required this.buildDateTimeButton,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -42,7 +38,6 @@ class DateTimeSection extends StatelessWidget {
         buildSectionTitle('Fechas y Horarios', Icons.event_rounded, isMobile, isMobileLandscape),
         SizedBox(height: isMobile ? 10 : 12),
         if (isMobile && !isMobileLandscape) ...[
-          // Layout vertical para móviles portrait
           buildDateTimeButton(
             label: 'Fecha Inicio',
             icon: Icons.calendar_today_rounded,
@@ -79,7 +74,6 @@ class DateTimeSection extends StatelessWidget {
             isMobileLandscape: isMobileLandscape,
           ),
         ] else if (isMobileLandscape) ...[
-          // Layout compacto para landscape mobile
           Row(
             children: [
               Expanded(
@@ -132,7 +126,6 @@ class DateTimeSection extends StatelessWidget {
             ],
           ),
         ] else ...[
-          // Layout horizontal para desktop
           Row(
             children: [
               Expanded(

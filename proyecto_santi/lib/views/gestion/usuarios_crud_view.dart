@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -9,37 +9,29 @@ import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/usuario_detail_dialog.dart';
 import 'package:intl/intl.dart';
-
-/// Vista CRUD de Usuarios siguiendo el patrón coherente de la app
 class UsuariosCrudView extends StatefulWidget {
   const UsuariosCrudView({Key? key}) : super(key: key);
-
   @override
   State<UsuariosCrudView> createState() => _UsuariosCrudViewState();
 }
-
 class _UsuariosCrudViewState extends State<UsuariosCrudView> {
   final UsuarioService _usuarioService = UsuarioService(ApiService());
   List<Usuario> _usuarios = [];
   List<Usuario> _filteredUsuarios = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
-  String? _selectedRolFilter; // null = todos los roles
-  
+  String? _selectedRolFilter; 
   bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
   @override
   void initState() {
     super.initState();
     _loadUsuarios();
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadUsuarios() async {
     setState(() => _isLoading = true);
     try {
@@ -60,49 +52,37 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       }
     }
   }
-
   void _filterUsuarios(String query) {
     setState(() {
       _filteredUsuarios = _usuarios.where((usuario) {
-        // Filtro por texto de búsqueda
         final matchesSearch = query.isEmpty || 
             usuario.nombreUsuario.toLowerCase().contains(query.toLowerCase()) ||
             usuario.email.toLowerCase().contains(query.toLowerCase()) ||
             usuario.rol.toLowerCase().contains(query.toLowerCase());
-        
-        // Filtro por rol seleccionado
         final matchesRol = _selectedRolFilter == null || 
             usuario.rol.toLowerCase() == _selectedRolFilter!.toLowerCase();
-        
         return matchesSearch && matchesRol;
       }).toList();
     });
   }
-
   void _applyFilters() {
     _filterUsuarios(_searchController.text);
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
-        // Fondo consistente
         isDark 
             ? GradientBackgroundDark(child: Container()) 
             : GradientBackgroundLight(child: Container()),
-        
-        // Contenido
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -121,13 +101,10 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                       ],
                     ),
                   ),
-
-                // Barra de búsqueda y filtro
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   child: Row(
                     children: [
-                      // Barra de búsqueda expandible
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
@@ -183,10 +160,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                           ),
                         ),
                       ),
-                      
                       SizedBox(width: 12),
-                      
-                      // Botón de filtros con indicador
                       Stack(
                         children: [
                           Container(
@@ -223,7 +197,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                               ),
                             ),
                           ),
-                          // Indicador de filtros activos
                           if (_selectedRolFilter != null)
                             Positioned(
                               right: 4,
@@ -246,8 +219,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                     ],
                   ),
                 ),
-
-                // Lista de usuarios
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -277,7 +248,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ],
     );
   }
-
   Widget _buildUsuariosList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -334,7 +304,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ),
     );
   }
-
   Widget _buildUsuarioCard(Usuario usuario, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -377,11 +346,9 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header con avatar, nombre y menú
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar con inicial
                   CircleAvatar(
                     radius: 24,
                     backgroundColor: _getRolColor(usuario.rol).withOpacity(0.2),
@@ -395,7 +362,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                     ),
                   ),
                   SizedBox(width: 12),
-                  // Nombre del usuario y profesor
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,7 +394,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                       ],
                     ),
                   ),
-                  // Menú de 3 puntos
                   PopupMenuButton<String>(
                     icon: Icon(
                       Icons.more_vert_rounded,
@@ -486,7 +451,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                 ],
               ),
               SizedBox(height: 12),
-              // Divider sutil con gradiente
               Container(
                 height: 1,
                 decoration: BoxDecoration(
@@ -500,14 +464,12 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                 ),
               ),
               SizedBox(height: 12),
-              // Email
               _buildInfoRow(
                 icon: Icons.email_rounded,
                 label: usuario.email,
                 isDark: isDark,
               ),
               SizedBox(height: 12),
-              // Chips de rol y estado
               Row(
                 children: [
                   Flexible(child: _buildRolChip(usuario.rol)),
@@ -521,7 +483,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ),
     );
   }
-
   Widget _buildInfoRow({required IconData icon, required String label, required bool isDark}) {
     return Row(
       children: [
@@ -545,7 +506,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ],
     );
   }
-
   Widget _buildRolChip(String rol) {
     final color = _getRolColor(rol);
     return Chip(
@@ -563,7 +523,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       labelPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
-
   Widget _buildStatusChip(bool activo) {
     return Chip(
       label: Text(
@@ -580,7 +539,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       labelPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
-
   Color _getRolColor(String rol) {
     switch (rol.toLowerCase()) {
       case 'admin':
@@ -594,7 +552,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
         return Colors.grey;
     }
   }
-
   void _showUsuarioDialog({Usuario? usuario}) {
     showDialog(
       context: context,
@@ -604,7 +561,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ),
     );
   }
-
   Future<void> _deleteUsuario(Usuario usuario) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -624,7 +580,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
         ],
       ),
     );
-
     if (confirm == true) {
       try {
         await _usuarioService.deleteUsuario(usuario.id);
@@ -643,7 +598,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       }
     }
   }
-
   Future<void> _toggleActivo(Usuario usuario) async {
     try {
       await _usuarioService.toggleUsuarioActivo(usuario.id, !usuario.activo);
@@ -661,7 +615,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       }
     }
   }
-
   void _showRolFilterDialog(bool isDark) {
     final roles = ['Administrador', 'Coordinador', 'Profesor', 'Usuario'];
     final screenWidth = MediaQuery.of(context).size.width;
@@ -669,7 +622,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
     final isMobile = screenWidth < 600;
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final isMobileLandscape = isMobile && !isPortrait;
-    
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -700,7 +652,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobileLandscape ? 10 : (isMobile ? 12 : 20),
@@ -748,20 +699,16 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                   ],
                 ),
               ),
-
-              // Contenido
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Filtro por rol usando FilterChips
                       Wrap(
                         spacing: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
                         runSpacing: isMobileLandscape ? 6 : (isMobile ? 8 : 10),
                         children: [
-                          // Opción "Todos"
                           FilterChip(
                             label: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -797,7 +744,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                               fontWeight: _selectedRolFilter == null ? FontWeight.w600 : FontWeight.normal,
                             ),
                           ),
-                          // Opciones de roles
                           ...roles.map((rol) {
                             final isSelected = _selectedRolFilter == rol;
                             final color = _getRolColor(rol);
@@ -843,8 +789,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                   ),
                 ),
               ),
-
-              // Footer con botones
               Container(
                 padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
                 decoration: BoxDecoration(
@@ -858,7 +802,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                 ),
                 child: Row(
                   children: [
-                    // Botón limpiar
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
@@ -887,7 +830,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                       ),
                     ),
                     SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
-                    // Botón cerrar
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
@@ -920,7 +862,6 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       ),
     );
   }
-
   IconData _getRolIconData(String rol) {
     switch (rol.toLowerCase()) {
       case 'admin':

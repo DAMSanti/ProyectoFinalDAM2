@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -10,21 +10,16 @@ import 'package:proyecto_santi/views/activities/views/activities_large_landscape
 import 'package:proyecto_santi/views/activities/views/activities_small_landscape_layout.dart';
 import 'package:proyecto_santi/views/activities/views/activities_portrait_layout.dart';
 import 'dart:io' show Platform;
-
 class ActivitiesView extends StatefulWidget {
   final VoidCallback onToggleTheme;
-
   const ActivitiesView({super.key, required this.onToggleTheme});
-
   @override
   ActivitiesViewState createState() => ActivitiesViewState();
 }
-
 class ActivitiesViewState extends State<ActivitiesView> {
   late Future<List<Actividad>> _futureActivities;
   late final ApiService _apiService;
   late final ActividadService _actividadService;
-
   @override
   void initState() {
     super.initState();
@@ -32,7 +27,6 @@ class ActivitiesViewState extends State<ActivitiesView> {
     _actividadService = ActividadService(_apiService);
     _futureActivities = _actividadService.fetchFutureActivities();
   }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -77,7 +71,6 @@ class ActivitiesViewState extends State<ActivitiesView> {
       ),
     );
   }
-
   Widget _buildLayout(BuildContext context, List<Actividad> activities) {
     if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return ActivitiesLargeLandscapeLayout(activities: activities, onToggleTheme: widget.onToggleTheme);

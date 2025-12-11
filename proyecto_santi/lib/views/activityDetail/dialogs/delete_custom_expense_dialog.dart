@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/shared/widgets/dialog_header.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Confirma eliminaci�n de un gasto personalizado
 Future<bool> confirmarEliminarGasto(
   BuildContext context,
   GastoPersonalizado gasto,
@@ -18,7 +16,6 @@ Future<bool> confirmarEliminarGasto(
       final isPortrait = orientation == Orientation.portrait;
       final isMobile = screenWidth < 600;
       final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-
       return Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: isMobileLandscape
@@ -65,10 +62,7 @@ Future<bool> confirmarEliminarGasto(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header - Custom red warning header
               _buildWarningHeader(isMobile, isMobileLandscape, context),
-
-              // Content
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
@@ -140,8 +134,6 @@ Future<bool> confirmarEliminarGasto(
                   ),
                 ),
               ),
-
-              // Actions - Footer
               Container(
                 padding: EdgeInsets.all(isMobileLandscape ? 12 : (isMobile ? 16 : 20)),
                 decoration: BoxDecoration(
@@ -163,7 +155,6 @@ Future<bool> confirmarEliminarGasto(
                 child: Row(
                   mainAxisAlignment: isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
                   children: [
-                    // Bot�n Cancelar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -194,7 +185,6 @@ Future<bool> confirmarEliminarGasto(
                       ),
                     ),
                     SizedBox(width: isMobileLandscape ? 8 : (isMobile ? 10 : 12)),
-                    // Bot�n Eliminar
                     Expanded(
                       flex: isMobile ? 1 : 0,
                       child: Container(
@@ -243,11 +233,8 @@ Future<bool> confirmarEliminarGasto(
       );
     },
   );
-  
   return result ?? false;
 }
-
-/// Builds a custom red warning header for delete confirmation
 Widget _buildWarningHeader(bool isMobile, bool isMobileLandscape, BuildContext context) {
   return Container(
     padding: EdgeInsets.symmetric(

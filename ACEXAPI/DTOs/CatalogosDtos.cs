@@ -1,5 +1,4 @@
-namespace ACEXAPI.DTOs;
-
+﻿namespace ACEXAPI.DTOs;
 public class DepartamentoDto
 {
     public int Id { get; set; }
@@ -7,7 +6,6 @@ public class DepartamentoDto
     public string? Codigo { get; set; }
     public string? Descripcion { get; set; }
 }
-
 public class CursoDto
 {
     public int Id { get; set; }
@@ -15,7 +13,6 @@ public class CursoDto
     public string? Nivel { get; set; }
     public bool Activo { get; set; }
 }
-
 public class GrupoDto
 {
     public int Id { get; set; }
@@ -25,7 +22,6 @@ public class GrupoDto
     public string? CursoNombre { get; set; }
     public CursoDto? Curso { get; set; }
 }
-
 public class EmpTransporteDto
 {
     public int Id { get; set; }
@@ -35,7 +31,6 @@ public class EmpTransporteDto
     public string? Email { get; set; }
     public string? Direccion { get; set; }
 }
-
 public class GrupoParticDto
 {
     public int Id { get; set; }
@@ -44,7 +39,6 @@ public class GrupoParticDto
     public string? GrupoNombre { get; set; }
     public int NumeroParticipantes { get; set; }
 }
-
 public class ProfParticipanteDto
 {
     public int Id { get; set; }
@@ -53,7 +47,6 @@ public class ProfParticipanteDto
     public string? ProfesorNombre { get; set; }
     public string? Observaciones { get; set; }
 }
-
 public class ProfResponsableDto
 {
     public int Id { get; set; }
@@ -63,7 +56,6 @@ public class ProfResponsableDto
     public bool EsCoordinador { get; set; }
     public string? Observaciones { get; set; }
 }
-
 public class GrupoParticipanteDto
 {
     public int GrupoId { get; set; }
@@ -73,7 +65,6 @@ public class GrupoParticipanteDto
     public int CursoId { get; set; }
     public string? CursoNombre { get; set; }
 }
-
 public class GrupoParticipanteUpdateDto
 {
     public int GrupoId { get; set; }

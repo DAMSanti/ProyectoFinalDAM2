@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,8 +9,6 @@ import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/models/gasto_personalizado.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/services/gasto_personalizado_service.dart';
-
-/// Servicio que maneja la lógica de guardado de cambios en ActivityDetail
 class SaveHandler {
   final ActividadService actividadService;
   final ProfesorService profesorService;
@@ -18,7 +16,6 @@ class SaveHandler {
   final PhotoService photoService;
   final LocalizacionService localizacionService;
   final GastoPersonalizadoService gastoService;
-
   SaveHandler({
     required this.actividadService,
     required this.profesorService,
@@ -27,8 +24,6 @@ class SaveHandler {
     required this.localizacionService,
     required this.gastoService,
   });
-
-  /// Guarda los cambios realizados en la actividad
   Future<SaveResult> saveChanges({
     required Actividad actividadOriginal,
     required int actividadId,
@@ -39,12 +34,9 @@ class SaveHandler {
   }) async {
     bool success = true;
     Actividad? actividadActualizada;
-
-    // 1. Guardar cambios en los datos de la actividad
     final hasActivityChanges = datosEditados != null &&
         datosEditados.keys.any((key) =>
             key != 'profesoresParticipantes' && key != 'gruposParticipantes');
-
     if (hasActivityChanges) {
       final result = await _saveActivityChanges(
         actividadOriginal: actividadOriginal,
@@ -54,13 +46,9 @@ class SaveHandler {
       success = result.success;
       actividadActualizada = result.actividad;
     }
-
-    // 2. Eliminar imágenes marcadas
     if (imagesToDelete.isNotEmpty) {
       success = success && await _deleteMarkedImages(imagesToDelete);
     }
-
-    // 3. Subir imágenes nuevas
     if (selectedImages.isNotEmpty) {
       success = success &&
           await _uploadNewImages(
@@ -69,8 +57,6 @@ class SaveHandler {
             descriptions: selectedImagesDescriptions,
           );
     }
-
-    // 4. Guardar profesores participantes
     if (datosEditados != null && datosEditados.containsKey('profesoresParticipantes')) {
       success = success &&
           await _saveProfesoresParticipantes(
@@ -78,8 +64,6 @@ class SaveHandler {
             profesoresParticipantes: datosEditados['profesoresParticipantes'],
           );
     }
-
-    // 5. Guardar grupos participantes
     if (datosEditados != null && datosEditados.containsKey('gruposParticipantes')) {
       success = success &&
           await _saveGruposParticipantes(
@@ -87,13 +71,10 @@ class SaveHandler {
             gruposParticipantes: datosEditados['gruposParticipantes'],
           );
     }
-
-    // 6. Manejar folleto
     if (datosEditados != null) {
       if (datosEditados['deleteFolleto'] == true) {
         success = success && await _deleteFolleto(actividadId);
       } else if (datosEditados.containsKey('folletoBytes')) {
-        // Caso Web: Los bytes vienen directamente del FilePicker
         var folletoBytes = datosEditados['folletoBytes'];
         if (folletoBytes is Uint8List) {
           folletoBytes = folletoBytes.toList();
@@ -105,7 +86,6 @@ class SaveHandler {
               folletoFileName: datosEditados['folletoFileName'],
             );
       } else if (datosEditados.containsKey('folletoFilePath')) {
-        // Caso Desktop: Leer el archivo desde el path
         try {
           final file = File(datosEditados['folletoFilePath']);
           final bytes = await file.readAsBytes();
@@ -121,8 +101,6 @@ class SaveHandler {
         }
       }
     }
-
-    // 7. Guardar gastos personalizados
     if (datosEditados != null && datosEditados.containsKey('gastosPersonalizados')) {
       success = success &&
           await _saveGastosPersonalizados(
@@ -130,8 +108,6 @@ class SaveHandler {
             gastos: datosEditados['gastosPersonalizados'],
           );
     }
-
-    // 8. Guardar localizaciones
     if (datosEditados != null && datosEditados.containsKey('localizaciones')) {
       print('DEBUG: Intentando guardar localizaciones - ${datosEditados['localizaciones']?.length ?? 0} localizaciones');
       success = success &&
@@ -145,34 +121,27 @@ class SaveHandler {
         print('DEBUG: Claves en datosEditados: ${datosEditados.keys.toList()}');
       }
     }
-
-    // 9. Guardar descripciones de fotos
     if (datosEditados != null && datosEditados.containsKey('photoDescriptionChanges')) {
       success = success &&
           await _savePhotoDescriptions(
             photoChanges: datosEditados['photoDescriptionChanges'],
           );
     }
-
     return SaveResult(
       success: success,
       actividad: actividadActualizada ?? actividadOriginal,
     );
   }
-
   Future<ActivitySaveResult> _saveActivityChanges({
     required Actividad actividadOriginal,
     required int actividadId,
     required Map<String, dynamic> datosEditados,
   }) async {
     try {
-      // Calcular coste real
       final transporteReq = (datosEditados['transporteReq'] ?? actividadOriginal.transporteReq) ?? 0;
       final alojamientoReq = (datosEditados['alojamientoReq'] ?? actividadOriginal.alojamientoReq) ?? 0;
       final precioTransporte = (datosEditados['precioTransporte'] ?? actividadOriginal.precioTransporte) ?? 0.0;
       final precioAlojamiento = (datosEditados['precioAlojamiento'] ?? actividadOriginal.precioAlojamiento) ?? 0.0;
-
-      // Obtener gastos personalizados
       List<GastoPersonalizado> gastosPersonalizados = [];
       if (datosEditados.containsKey('gastosPersonalizados')) {
         gastosPersonalizados = datosEditados['gastosPersonalizados'] as List<GastoPersonalizado>;
@@ -180,27 +149,21 @@ class SaveHandler {
         try {
           gastosPersonalizados = await gastoService.fetchGastosByActividad(actividadId);
         } catch (e) {
-          // Error silencioso
         }
       }
-
       final totalGastosPersonalizados = gastosPersonalizados.fold<double>(
         0.0,
         (sum, gasto) => sum + (gasto.cantidad ?? 0.0),
       );
-
       double costoRealCalculado = totalGastosPersonalizados;
       if (transporteReq == 1) costoRealCalculado += precioTransporte;
       if (alojamientoReq == 1) costoRealCalculado += precioAlojamiento;
-
-      // Preparar profesor responsable si ha cambiado
       Profesor? responsableParaGuardar = actividadOriginal.responsable;
       if (datosEditados.containsKey('profesorId') && datosEditados['profesorId'] != null) {
-        // Crear un objeto Profesor temporal solo con el UUID para el guardado
         responsableParaGuardar = Profesor(
           uuid: datosEditados['profesorId'],
           dni: '',
-          nombre: '', // Se actualizará después con los datos completos
+          nombre: '', 
           apellidos: '',
           correo: '',
           password: '',
@@ -210,8 +173,6 @@ class SaveHandler {
         );
         print('DEBUG: Preparando guardado con nuevo responsable UUID: ${datosEditados['profesorId']}');
       }
-
-      // Crear actividad para guardar
       final actividadParaGuardar = Actividad(
         id: actividadOriginal.id,
         titulo: datosEditados['nombre'] ?? actividadOriginal.titulo,
@@ -238,26 +199,17 @@ class SaveHandler {
         presupuestoEstimado: datosEditados['presupuestoEstimado'] ?? actividadOriginal.presupuestoEstimado,
         costoReal: costoRealCalculado,
       );
-
       final actividadActualizada = await actividadService.updateActivity(actividadId, actividadParaGuardar);
-
       if (actividadActualizada != null) {
-        // Cargar datos completos de relaciones
         Profesor? profesorCompleto = actividadActualizada.responsable;
         if (datosEditados.containsKey('profesorId') && datosEditados['profesorId'] != null) {
           try {
             profesorCompleto = await profesorService.getProfesorByUuid(datosEditados['profesorId']);
           } catch (e) {
-            // Error silencioso
           }
         }
-
         EmpresaTransporte? empresaCompletaTransporte = actividadActualizada.empresaTransporte;
-        // No hay método para obtener empresa de transporte por ID, usar la que viene en actividadActualizada
-
         Alojamiento? alojamientoCompleto = actividadActualizada.alojamiento;
-        // No hay método para obtener alojamiento por ID, usar el que viene en actividadActualizada
-
         final actividadCompletaConObjetos = Actividad(
           id: actividadActualizada.id,
           titulo: actividadActualizada.titulo,
@@ -284,16 +236,13 @@ class SaveHandler {
           presupuestoEstimado: actividadActualizada.presupuestoEstimado,
           costoReal: actividadActualizada.costoReal,
         );
-
         return ActivitySaveResult(success: true, actividad: actividadCompletaConObjetos);
       }
-
       return ActivitySaveResult(success: false, actividad: null);
     } catch (e) {
       return ActivitySaveResult(success: false, actividad: null);
     }
   }
-
   Future<bool> _deleteMarkedImages(List<int> imagesToDelete) async {
     for (int photoId in imagesToDelete) {
       try {
@@ -304,18 +253,15 @@ class SaveHandler {
     }
     return true;
   }
-
   Future<bool> _uploadNewImages({
     required int actividadId,
     required List<XFile> selectedImages,
     required Map<String, String> descriptions,
   }) async {
     try {
-      // Subir imágenes una por una
       for (final imageFile in selectedImages) {
         final bytes = await imageFile.readAsBytes();
         final description = descriptions[imageFile.path] ?? '';
-        
         await photoService.uploadPhotosFromBytes(
           activityId: actividadId,
           bytes: bytes,
@@ -323,13 +269,11 @@ class SaveHandler {
           descripcion: description,
         );
       }
-      
       return true;
     } catch (e) {
       return false;
     }
   }
-
   Future<bool> _saveProfesoresParticipantes({
     required int actividadId,
     required List<dynamic> profesoresParticipantes,
@@ -337,36 +281,30 @@ class SaveHandler {
     try {
       print('DEBUG: Profesores participantes recibidos: ${profesoresParticipantes.length}');
       print('DEBUG: Tipo del primer elemento: ${profesoresParticipantes.isNotEmpty ? profesoresParticipantes.first.runtimeType : "lista vacía"}');
-      
       final profesoresIds = profesoresParticipantes.map((p) {
         String? uuid;
         if (p is Map<String, dynamic>) {
           uuid = p['uuid'] as String?;
           print('DEBUG: Extrayendo UUID de Map: $uuid');
         } else {
-          // Asumimos que es un objeto Profesor
           uuid = (p as dynamic).uuid as String?;
           print('DEBUG: Extrayendo UUID de objeto: $uuid');
         }
-        
         if (uuid == null || uuid.isEmpty) {
           throw Exception('UUID nulo o vacío encontrado en profesor: $p');
         }
-        
         return uuid;
       }).toList();
-
-      print('DEBUG: Guardando profesores participantes - IDs: $profesoresIds'); // DEBUG
+      print('DEBUG: Guardando profesores participantes - IDs: $profesoresIds'); 
       await profesorService.updateProfesoresParticipantes(actividadId, profesoresIds);
-      print('DEBUG: Profesores participantes guardados exitosamente'); // DEBUG
+      print('DEBUG: Profesores participantes guardados exitosamente'); 
       return true;
     } catch (e, stackTrace) {
-      print('ERROR al guardar profesores participantes: $e'); // DEBUG
-      print('StackTrace: $stackTrace'); // DEBUG
+      print('ERROR al guardar profesores participantes: $e'); 
+      print('StackTrace: $stackTrace'); 
       return false;
     }
   }
-
   Future<bool> _saveGruposParticipantes({
     required int actividadId,
     required List<dynamic> gruposParticipantes,
@@ -374,44 +312,35 @@ class SaveHandler {
     try {
       print('DEBUG: Grupos participantes recibidos: ${gruposParticipantes.length}');
       print('DEBUG: Tipo del primer elemento: ${gruposParticipantes.isNotEmpty ? gruposParticipantes.first.runtimeType : "lista vacía"}');
-      
       final gruposMapped = gruposParticipantes.map((g) {
         int? id;
         int? numeroParticipantes;
-        
         if (g is Map<String, dynamic>) {
-          // Si es un Map, puede venir de diferentes formas
           if (g.containsKey('grupo')) {
-            // Formato: { grupo: { id: X }, numeroParticipantes: Y }
             final grupoData = g['grupo'];
             id = grupoData is Map ? grupoData['id'] as int? : (grupoData as dynamic).id as int?;
             numeroParticipantes = g['numeroParticipantes'] as int?;
           } else {
-            // Formato: { id: X, numeroAlumnos: Y }
             id = g['id'] as int?;
             numeroParticipantes = g['numeroAlumnos'] as int? ?? g['numeroParticipantes'] as int?;
           }
           print('DEBUG: Extrayendo de Map - ID: $id, NumeroParticipantes: $numeroParticipantes');
         } else {
-          // Es un objeto GrupoParticipante
           id = (g as dynamic).grupo.id as int?;
           numeroParticipantes = (g as dynamic).numeroParticipantes as int?;
           print('DEBUG: Extrayendo de objeto GrupoParticipante - ID: $id, NumeroParticipantes: $numeroParticipantes');
         }
-        
         if (id == null) {
           throw Exception('ID de grupo nulo encontrado en: $g');
         }
         if (numeroParticipantes == null || numeroParticipantes <= 0) {
           throw Exception('Número de participantes inválido para grupo $id: $numeroParticipantes');
         }
-        
         return {
-          'grupoId': id,  // Cambiado de 'id' a 'grupoId' para coincidir con el DTO del backend
-          'numeroParticipantes': numeroParticipantes,  // Cambiado de 'numeroAlumnos' a 'numeroParticipantes'
+          'grupoId': id,  
+          'numeroParticipantes': numeroParticipantes,  
         };
       }).toList();
-
       print('DEBUG: Guardando grupos participantes - Datos: $gruposMapped');
       await catalogoService.updateGruposParticipantes(actividadId, gruposMapped);
       print('DEBUG: Grupos participantes guardados exitosamente');
@@ -422,7 +351,6 @@ class SaveHandler {
       return false;
     }
   }
-
   Future<bool> _deleteFolleto(int actividadId) async {
     try {
       await actividadService.deleteFolleto(actividadId);
@@ -432,7 +360,6 @@ class SaveHandler {
       return false;
     }
   }
-
   Future<bool> _uploadFolleto({
     required int actividadId,
     required List<int> folletoBytes,
@@ -450,21 +377,16 @@ class SaveHandler {
       return false;
     }
   }
-
   Future<bool> _saveGastosPersonalizados({
     required int actividadId,
     required List<GastoPersonalizado> gastos,
   }) async {
     try {
       print('DEBUG: Guardando gastos personalizados - Total: ${gastos.length}');
-      
       final gastosOriginales = await gastoService.fetchGastosByActividad(actividadId);
       print('DEBUG: Gastos originales en BD: ${gastosOriginales.length}');
-      
       final gastosOriginalesIds = gastosOriginales.map((g) => g.id).toSet();
       final gastosNuevosIds = gastos.where((g) => g.id != null).map((g) => g.id!).toSet();
-
-      // Eliminar gastos
       final gastosAEliminar = gastosOriginalesIds.difference(gastosNuevosIds);
       print('DEBUG: Gastos a eliminar: ${gastosAEliminar.length} -> $gastosAEliminar');
       for (final gastoId in gastosAEliminar) {
@@ -473,8 +395,6 @@ class SaveHandler {
           await gastoService.deleteGasto(gastoId);
         }
       }
-
-      // Crear gastos nuevos
       final gastosACrear = gastos.where((g) => g.id == null).toList();
       print('DEBUG: Gastos a crear: ${gastosACrear.length}');
       for (final gasto in gastosACrear) {
@@ -484,7 +404,6 @@ class SaveHandler {
           print('DEBUG: Gasto creado con ID: ${gastoCreado.id}');
         }
       }
-
       print('DEBUG: Gastos personalizados guardados exitosamente');
       return true;
     } catch (e, stackTrace) {
@@ -493,7 +412,6 @@ class SaveHandler {
       return false;
     }
   }
-
   Future<bool> _saveLocalizaciones({
     required int actividadId,
     required List<dynamic> localizaciones,
@@ -506,8 +424,6 @@ class SaveHandler {
       if (localizaciones.isNotEmpty) {
         print('DEBUG: Tipo del primer elemento: ${localizaciones.first.runtimeType}');
       }
-      
-      // Obtener las localizaciones actuales de la BD
       List<Map<String, dynamic>> localizacionesOriginales;
       try {
         localizacionesOriginales = await localizacionService.fetchLocalizaciones(actividadId);
@@ -516,19 +432,14 @@ class SaveHandler {
         print('DEBUG: ERROR al obtener localizaciones originales: $e');
         localizacionesOriginales = [];
       }
-      
-      // Procesar cada localización
       for (var loc in localizaciones) {
-        // Convertir a Map si es un objeto Localizacion
         Map<String, dynamic> locData;
         try {
           if (loc is Map<String, dynamic>) {
             locData = loc;
           } else if (loc is Map) {
-            // Es un Map pero no Map<String, dynamic>
             locData = Map<String, dynamic>.from(loc);
           } else {
-            // Es un objeto Localizacion, usar toJson()
             locData = (loc as dynamic).toJson() as Map<String, dynamic>;
           }
         } catch (e) {
@@ -536,7 +447,6 @@ class SaveHandler {
           print('DEBUG: Tipo de loc: ${loc.runtimeType}');
           continue;
         }
-        
         int? locId;
         try {
           locId = locData['id'] as int?;
@@ -548,13 +458,9 @@ class SaveHandler {
         String? icono = locData['icono'] as String?;
         String? descripcion = locData['descripcion'] as String?;
         String? tipoLocalizacion = locData['tipoLocalizacion'] as String?;
-        
         print('DEBUG: Procesando localización ID: $locId, nombre: ${locData['nombre']}, esPrincipal: $esPrincipal');
-        
-        // Si el ID es null o negativo (temporal), necesitamos crear la localización primero
         if (locId == null || locId < 0) {
           print('DEBUG: Localización con ID temporal ($locId), necesita ser creada primero');
-          
           String? nombre = locData['nombre'] as String?;
           String? direccion = locData['direccion'] as String?;
           String? ciudad = locData['ciudad'] as String?;
@@ -562,13 +468,10 @@ class SaveHandler {
           String? codigoPostal = locData['codigoPostal'] as String?;
           double? latitud = (locData['latitud'] as num?)?.toDouble();
           double? longitud = (locData['longitud'] as num?)?.toDouble();
-          
           if (nombre == null || latitud == null || longitud == null) {
             print('DEBUG: Localización sin datos mínimos requeridos (nombre: $nombre, lat: $latitud, lon: $longitud), omitiendo');
             continue;
           }
-          
-          // Crear la localización en la BD
           print('DEBUG: Creando nueva localización: $nombre en ($latitud, $longitud)');
           final locCreada = await localizacionService.createLocalizacion(
             nombre: nombre,
@@ -579,7 +482,6 @@ class SaveHandler {
             latitud: latitud,
             longitud: longitud,
           );
-          
           if (locCreada != null && locCreada['id'] != null) {
             locId = locCreada['id'] as int;
             print('DEBUG: Localización creada exitosamente con ID: $locId');
@@ -588,10 +490,7 @@ class SaveHandler {
             continue;
           }
         }
-        
-        // Ahora agregar o actualizar la relación con la actividad
         final yaExiste = localizacionesOriginales.any((l) => l['id'] == locId);
-        
         bool operacionExitosa = false;
         if (yaExiste) {
           print('DEBUG: Actualizando localización $locId en actividad $actividadId');
@@ -616,14 +515,10 @@ class SaveHandler {
           );
           print('DEBUG: Resultado de agregar localización: $operacionExitosa');
         }
-        
         if (!operacionExitosa) {
           print('ERROR: No se pudo guardar la localización $locId en la actividad $actividadId');
-          // Continuamos con las demás localizaciones pero marcamos que hubo error
         }
       }
-      
-      // Eliminar localizaciones que ya no están en la lista
       final localizacionesActualesIds = <int>{};
       for (var l in localizaciones) {
         try {
@@ -642,7 +537,6 @@ class SaveHandler {
           print('DEBUG: Error obteniendo ID para eliminación: $e');
         }
       }
-      
       for (var locOriginal in localizacionesOriginales) {
         final locOriginalId = locOriginal['id'] as int?;
         if (locOriginalId != null && !localizacionesActualesIds.contains(locOriginalId)) {
@@ -650,7 +544,6 @@ class SaveHandler {
           await localizacionService.removeLocalizacion(actividadId, locOriginalId);
         }
       }
-      
       print('DEBUG: Localizaciones guardadas exitosamente');
       print('DEBUG: ========================================');
       return true;
@@ -663,7 +556,6 @@ class SaveHandler {
       return false;
     }
   }
-
   Future<bool> _savePhotoDescriptions({
     required Map<int, String> photoChanges,
   }) async {
@@ -679,23 +571,17 @@ class SaveHandler {
     }
   }
 }
-
-/// Resultado de la operación de guardado
 class SaveResult {
   final bool success;
   final Actividad actividad;
-
   SaveResult({
     required this.success,
     required this.actividad,
   });
 }
-
-/// Resultado de guardado de actividad
 class ActivitySaveResult {
   final bool success;
   final Actividad? actividad;
-
   ActivitySaveResult({
     required this.success,
     required this.actividad,

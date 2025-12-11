@@ -1,37 +1,30 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/gestion/dialogs/curso_detail_dialog.dart';
-
 class CursosCrudView extends StatefulWidget {
   const CursosCrudView({Key? key}) : super(key: key);
-
   @override
   State<CursosCrudView> createState() => _CursosCrudViewState();
 }
-
 class _CursosCrudViewState extends State<CursosCrudView> {
   final ApiService _apiService = ApiService();
   late final CatalogoService _catalogoService;
-  
   List<Curso> _cursos = [];
   List<Curso> _filteredCursos = [];
   bool _isLoading = false;
   String _searchQuery = '';
-
   @override
   void initState() {
     super.initState();
     _catalogoService = CatalogoService(_apiService);
     _loadCursos();
   }
-
   Future<void> _loadCursos() async {
     setState(() => _isLoading = true);
-    
     try {
       final cursos = await _catalogoService.fetchCursos();
       setState(() {
@@ -49,7 +42,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       }
     }
   }
-
   void _filterCursos(String query) {
     setState(() {
       _searchQuery = query;
@@ -67,7 +59,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       }
     });
   }
-
   void _showCursoDialog({Curso? curso}) {
     showDialog(
       context: context,
@@ -77,15 +68,12 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       ),
     );
   }
-
   void _addCurso() {
     _showCursoDialog();
   }
-
   void _editCurso(Curso curso) {
     _showCursoDialog(curso: curso);
   }
-
   Future<void> _deleteCurso(Curso curso) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -105,7 +93,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
         ],
       ),
     );
-
     if (confirmed == true) {
       try {
         final success = await _catalogoService.deleteCurso(curso.id);
@@ -130,13 +117,11 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
@@ -147,7 +132,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -166,7 +150,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                       ],
                     ),
                   ),
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -184,7 +167,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                   ),
                 ),
                 SizedBox(height: 16),
-                // Lista de cursos
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -216,7 +198,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       ],
     );
   }
-
   Widget _buildCursosList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -273,7 +254,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       ),
     );
   }
-
   Widget _buildCursoCard(Curso curso, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -314,11 +294,9 @@ class _CursosCrudViewState extends State<CursosCrudView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono, nombre y menú
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono de curso
                 Container(
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -332,7 +310,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                   ),
                 ),
                 SizedBox(width: 12),
-                // Código y título del curso
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,7 +345,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                     ],
                   ),
                 ),
-                // Menú de 3 puntos
                 PopupMenuButton<String>(
                   icon: Icon(
                     Icons.more_vert_rounded,
@@ -410,7 +386,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
               ],
             ),
             SizedBox(height: 12),
-            // Divider sutil con gradiente
             Container(
               height: 1,
               decoration: BoxDecoration(
@@ -424,24 +399,20 @@ class _CursosCrudViewState extends State<CursosCrudView> {
               ),
             ),
             SizedBox(height: 12),
-            // Información del curso (etapa, nivel y estado)
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                // Chip de etapa
                 _buildInfoChip(
                   icon: Icons.stairs_rounded,
                   label: curso.etapaDescripcion,
                   isDark: isDark,
                 ),
-                // Chip de nivel
                 _buildInfoChip(
                   icon: Icons.looks_one_rounded,
                   label: 'Nivel ${curso.nivel}',
                   isDark: isDark,
                 ),
-                // Chip de estado
                 _buildStatusChip(
                   label: curso.activo ? 'Activo' : 'Inactivo',
                   isActive: curso.activo,
@@ -454,7 +425,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       ),
     );
   }
-
   Widget _buildInfoChip({required IconData icon, required String label, required bool isDark}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -483,7 +453,6 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       ),
     );
   }
-
   Widget _buildStatusChip({required String label, required bool isActive, required bool isDark}) {
     final color = isActive ? Colors.green : Colors.red;
     return Container(

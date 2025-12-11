@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
@@ -7,36 +7,28 @@ import 'package:proyecto_santi/services/actividad_service.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Vista CRUD moderna para gestionar Actividades
 class ActividadesCrudView extends StatefulWidget {
   const ActividadesCrudView({Key? key}) : super(key: key);
-
   @override
   State<ActividadesCrudView> createState() => _ActividadesCrudViewState();
 }
-
 class _ActividadesCrudViewState extends State<ActividadesCrudView> {
   final ActividadService _actividadService = ActividadService(ApiService());
   List<Actividad> _actividades = [];
   List<Actividad> _filteredActividades = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
-
   bool get isDesktop => kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-
   @override
   void initState() {
     super.initState();
     _loadActividades();
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadActividades() async {
     setState(() => _isLoading = true);
     try {
@@ -57,7 +49,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       }
     }
   }
-
   void _filterActividades(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -72,7 +63,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       }
     });
   }
-
   void _editActividad(Actividad actividad) {
     Navigator.pushNamed(
       context,
@@ -80,7 +70,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       arguments: actividad.id,
     ).then((_) => _loadActividades());
   }
-
   Future<void> _showDeleteDialog(Actividad actividad) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -112,7 +101,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
         ],
       ),
     );
-
     if (confirm == true) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -124,25 +112,21 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-
     return Stack(
       children: [
         isDark 
             ? GradientBackgroundDark(child: Container()) 
             : GradientBackgroundLight(child: Container()),
-        
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
             child: Column(
               children: [
-                // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
                     padding: EdgeInsets.all(16),
@@ -164,8 +148,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                       ],
                     ),
                   ),
-
-                // Barra de búsqueda
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -192,10 +174,7 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
-
-                // Lista de actividades
                 Expanded(
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator())
@@ -227,7 +206,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       ],
     );
   }
-
   Widget _buildActividadesList(bool isDark, bool isMobile) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -261,7 +239,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
             offset: Offset(0, 4),
             spreadRadius: 0,
           ),
-          // Inner shadow effect
           BoxShadow(
             color: isDark
                 ? Colors.black.withOpacity(0.2)
@@ -324,11 +301,9 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header con título y menú
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Icono de actividad
                               Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -342,7 +317,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                                 ),
                               ),
                               SizedBox(width: 12),
-                          // Título
                           Expanded(
                             child: Text(
                               actividad.titulo,
@@ -356,7 +330,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          // Menú de 3 puntos
                           PopupMenuButton<String>(
                             icon: Icon(
                               Icons.more_vert_rounded,
@@ -398,7 +371,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                         ],
                       ),
                       SizedBox(height: 12),
-                      // Divider sutil
                       Container(
                         height: 1,
                         decoration: BoxDecoration(
@@ -412,7 +384,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
                         ),
                       ),
                       SizedBox(height: 12),
-                      // Chips de Tipo y Estado
                       Row(
                         children: [
                           Flexible(
@@ -436,11 +407,9 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       ),
     );
   }
-
   Widget _buildTipoChip(String tipo) {
     Color color;
     IconData icon;
-    
     switch (tipo.toLowerCase()) {
       case 'complementaria':
         color = AppColors.tipoComplementaria;
@@ -454,7 +423,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
         color = Colors.grey;
         icon = Icons.event_rounded;
     }
-
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -482,11 +450,9 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
       ),
     );
   }
-
   Widget _buildEstadoChip(String estado) {
     Color color;
     IconData icon;
-    
     switch (estado.toLowerCase()) {
       case 'aprobada':
       case 'aprobado':
@@ -506,7 +472,6 @@ class _ActividadesCrudViewState extends State<ActividadesCrudView> {
         color = Colors.grey;
         icon = Icons.help_rounded;
     }
-
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

@@ -1,30 +1,24 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/alojamiento.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
 class AlojamientoDetailDialog extends StatefulWidget {
   final Alojamiento? alojamiento;
   final VoidCallback onSaved;
-
   const AlojamientoDetailDialog({
     Key? key,
     this.alojamiento,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<AlojamientoDetailDialog> createState() => _AlojamientoDetailDialogState();
 }
-
 class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final ActividadService _actividadService;
-  
-  // Controllers
   late final TextEditingController _nombreController;
   late final TextEditingController _direccionController;
   late final TextEditingController _ciudadController;
@@ -38,11 +32,8 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
   late final TextEditingController _precioPorNocheController;
   late final TextEditingController _serviciosController;
   late final TextEditingController _observacionesController;
-  
   String? _tipoAlojamientoSeleccionado;
   bool _isLoading = false;
-
-  // Tipos de alojamiento según la base de datos
   final List<String> _tiposAlojamiento = [
     'Hotel',
     'Hostal',
@@ -53,13 +44,10 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     'Camping',
     'Otro',
   ];
-
   @override
   void initState() {
     super.initState();
     _actividadService = ActividadService(_apiService);
-    
-    // Inicializar controllers con valores existentes o vacíos
     _nombreController = TextEditingController(text: widget.alojamiento?.nombre ?? '');
     _direccionController = TextEditingController(text: widget.alojamiento?.direccion ?? '');
     _ciudadController = TextEditingController(text: widget.alojamiento?.ciudad ?? '');
@@ -79,10 +67,8 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     );
     _serviciosController = TextEditingController(text: widget.alojamiento?.servicios ?? '');
     _observacionesController = TextEditingController(text: widget.alojamiento?.observaciones ?? '');
-    
     _tipoAlojamientoSeleccionado = widget.alojamiento?.tipoAlojamiento;
   }
-
   @override
   void dispose() {
     _nombreController.dispose();
@@ -100,12 +86,9 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     _observacionesController.dispose();
     super.dispose();
   }
-
   Future<void> _saveAlojamiento() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final data = {
         'nombre': _nombreController.text.trim(),
@@ -130,9 +113,7 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
         'observaciones': _observacionesController.text.trim().isEmpty ? null : _observacionesController.text.trim(),
         'activo': true,
       };
-
       if (widget.alojamiento != null) {
-        // Actualizar
         await _actividadService.updateAlojamiento(widget.alojamiento!.id, data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -143,7 +124,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           );
         }
       } else {
-        // Crear
         await _actividadService.createAlojamiento(data);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -154,7 +134,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           );
         }
       }
-
       widget.onSaved();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -169,14 +148,12 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isDesktop = screenWidth > 900;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -216,9 +193,7 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header con gradiente
               _buildHeader(isDark, isMobile),
-              // Contenido con scroll
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -230,7 +205,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
                   ),
                 ),
               ),
-              // Footer con botones
               _buildFooter(isDark, isMobile),
             ],
           ),
@@ -238,7 +212,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -291,7 +264,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -350,12 +322,10 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: Nombre y Tipo
         Row(
           children: [
             Expanded(flex: 2, child: _buildNombreField(isDark)),
@@ -364,10 +334,8 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 2: Dirección
         _buildDireccionField(isDark),
         SizedBox(height: 16),
-        // Fila 3: Ciudad, CP, Provincia
         Row(
           children: [
             Expanded(child: _buildCiudadField(isDark)),
@@ -378,7 +346,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 4: Teléfono, Email, Web
         Row(
           children: [
             Expanded(child: _buildTelefonoField(isDark)),
@@ -389,7 +356,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 5: Número Habitaciones, Capacidad Total, Precio
         Row(
           children: [
             Expanded(child: _buildNumeroHabitacionesField(isDark)),
@@ -400,15 +366,12 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 6: Servicios
         _buildServiciosField(isDark),
         SizedBox(height: 16),
-        // Fila 7: Observaciones
         _buildObservacionesField(isDark),
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       children: [
@@ -442,7 +405,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ],
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -480,7 +442,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ],
     );
   }
-
   Widget _buildNombreField(bool isDark) {
     return _buildStyledField(
       label: 'Nombre *',
@@ -504,7 +465,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildTipoAlojamientoField(bool isDark) {
     return _buildStyledField(
       label: 'Tipo de Alojamiento (opcional)',
@@ -534,7 +494,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildDireccionField(bool isDark) {
     return _buildStyledField(
       label: 'Dirección (opcional)',
@@ -552,7 +511,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildCiudadField(bool isDark) {
     return _buildStyledField(
       label: 'Ciudad (opcional)',
@@ -570,7 +528,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildCPField(bool isDark) {
     return _buildStyledField(
       label: 'Código Postal (opcional)',
@@ -591,7 +548,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildProvinciaField(bool isDark) {
     return _buildStyledField(
       label: 'Provincia (opcional)',
@@ -609,7 +565,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildTelefonoField(bool isDark) {
     return _buildStyledField(
       label: 'Teléfono (opcional)',
@@ -628,7 +583,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildEmailField(bool isDark) {
     return _buildStyledField(
       label: 'Email (opcional)',
@@ -653,7 +607,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildWebField(bool isDark) {
     return _buildStyledField(
       label: 'Web (opcional)',
@@ -672,7 +625,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildNumeroHabitacionesField(bool isDark) {
     return _buildStyledField(
       label: 'Nº Habitaciones (opcional)',
@@ -692,7 +644,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildCapacidadTotalField(bool isDark) {
     return _buildStyledField(
       label: 'Capacidad Total (opcional)',
@@ -712,7 +663,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildPrecioPorNocheField(bool isDark) {
     return _buildStyledField(
       label: 'Precio por Noche (opcional)',
@@ -734,7 +684,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildServiciosField(bool isDark) {
     return _buildStyledField(
       label: 'Servicios (opcional)',
@@ -753,7 +702,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
       ),
     );
   }
-
   Widget _buildObservacionesField(bool isDark) {
     return _buildStyledField(
       label: 'Observaciones (opcional)',
@@ -773,6 +721,3 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     );
   }
 }
-
-
-

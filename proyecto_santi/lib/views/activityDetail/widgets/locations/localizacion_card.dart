@@ -1,27 +1,22 @@
-import 'dart:io';
+ï»¿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Widget para mostrar una tarjeta de localización
 class LocalizacionCard extends StatelessWidget {
   final Localizacion localizacion;
   final bool isAdminOrSolicitante;
   final VoidCallback? onDelete;
-
   const LocalizacionCard({
     Key? key,
     required this.localizacion,
     required this.isAdminOrSolicitante,
     this.onDelete,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     return Container(
       margin: EdgeInsets.only(bottom: 16),
       padding: EdgeInsets.all(16),
@@ -31,7 +26,7 @@ class LocalizacionCard extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: localizacion.esPrincipal 
             ? [
-                Color.fromRGBO(239, 83, 80, 0.25), // Red for principal
+                Color.fromRGBO(239, 83, 80, 0.25), 
                 Color.fromRGBO(255, 205, 210, 0.85),
               ]
             : [

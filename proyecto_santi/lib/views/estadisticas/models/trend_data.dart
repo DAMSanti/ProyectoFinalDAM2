@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 enum TrendDirection {
   up,
   down,
   stable,
 }
-
 class TrendData {
   final String title;
   final String currentValue;
@@ -15,7 +13,6 @@ class TrendData {
   final IconData icon;
   final Color color;
   final String? subtitle;
-
   TrendData({
     required this.title,
     required this.currentValue,
@@ -26,8 +23,6 @@ class TrendData {
     required this.color,
     this.subtitle,
   });
-
-  /// Crea un TrendData comparando dos valores numéricos
   factory TrendData.fromValues({
     required String title,
     required double currentValue,
@@ -43,7 +38,6 @@ class TrendData {
     final percentage = previousValue != 0 
         ? (change / previousValue) * 100 
         : (currentValue > 0 ? 100.0 : 0.0);
-    
     TrendDirection direction;
     if (percentage > 0.5) {
       direction = TrendDirection.up;
@@ -52,10 +46,8 @@ class TrendData {
     } else {
       direction = TrendDirection.stable;
     }
-
     final prefix = valuePrefix ?? '';
     final suffix = valueSuffix ?? '';
-
     return TrendData(
       title: title,
       currentValue: '$prefix${currentValue.toStringAsFixed(decimals)}$suffix',
@@ -67,7 +59,6 @@ class TrendData {
       subtitle: subtitle,
     );
   }
-
   IconData get trendIcon {
     switch (direction) {
       case TrendDirection.up:
@@ -78,7 +69,6 @@ class TrendData {
         return Icons.trending_flat_rounded;
     }
   }
-
   Color get trendColor {
     switch (direction) {
       case TrendDirection.up:
@@ -89,7 +79,6 @@ class TrendData {
         return Colors.orange;
     }
   }
-
   String get trendText {
     if (direction == TrendDirection.stable) {
       return 'Sin cambios';

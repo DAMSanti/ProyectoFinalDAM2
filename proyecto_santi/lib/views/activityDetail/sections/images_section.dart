@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -8,15 +8,6 @@ import 'package:proyecto_santi/tema/tema.dart';
 import '../widgets/images/network_image_with_delete.dart';
 import '../widgets/images/image_with_delete.dart';
 import '../dialogs/image_preview_dialog.dart';
-
-/// Widget que maneja toda la sección de imágenes de una actividad.
-/// 
-/// Responsabilidades:
-/// - Mostrar imágenes existentes de la API
-/// - Mostrar imágenes nuevas seleccionadas localmente
-/// - Permitir agregar nuevas imágenes
-/// - Permitir eliminar imágenes
-/// - Permitir editar descripciones de imágenes
 class ActivityImagesSection extends StatefulWidget {
   final List<Photo> imagesActividad;
   final List<XFile> selectedImages;
@@ -25,10 +16,9 @@ class ActivityImagesSection extends StatefulWidget {
   final VoidCallback showImagePicker;
   final Function(int) removeSelectedImage;
   final Function(int)? removeApiImage;
-  final Function(int)? removeApiImageConfirmed; // Nuevo: para eliminación ya confirmada
+  final Function(int)? removeApiImageConfirmed; 
   final Function(int)? editLocalImage;
   final Function(Map<String, dynamic>)? onDataChanged;
-
   const ActivityImagesSection({
     super.key,
     required this.imagesActividad,
@@ -42,15 +32,11 @@ class ActivityImagesSection extends StatefulWidget {
     this.editLocalImage,
     this.onDataChanged,
   });
-
   @override
   State<ActivityImagesSection> createState() => _ActivityImagesSectionState();
 }
-
 class _ActivityImagesSectionState extends State<ActivityImagesSection> {
-  // Mapa para guardar cambios temporales en descripciones antes de guardar
   final Map<int, String> _photoDescriptionChanges = {};
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -59,11 +45,9 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
       },
     );
   }
-
   Widget _buildImagesContainer(BuildContext context, BoxConstraints constraints) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -100,7 +84,6 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Patrón decorativo de fondo
           Positioned(
             right: -20,
             top: -20,
@@ -113,13 +96,11 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
               ),
             ),
           ),
-          // Contenido
           Padding(
             padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título con icono
                 Row(
                   children: [
                     Container(
@@ -173,44 +154,29 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
       ),
     );
   }
-
-  /// Maneja la eliminación de una foto existente (ya confirmada desde el diálogo)
   Future<void> _handleDeletePhoto(Photo photo) async {
     print('DEBUG: _handleDeletePhoto llamado para foto ID: ${photo.id}');
     print('DEBUG: removeApiImageConfirmed es null? ${widget.removeApiImageConfirmed == null}');
-    
     if (widget.removeApiImageConfirmed == null) {
       print('ERROR: removeApiImageConfirmed es null!');
       return;
     }
-    
-    // Buscar el índice de la foto en la lista
     final photoIndex = widget.imagesActividad.indexWhere((p) => p.id == photo.id);
     print('DEBUG: photoIndex encontrado: $photoIndex');
-    
     if (photoIndex == -1) {
       print('ERROR: No se encontró la foto en la lista!');
       return;
     }
-    
-    // Limpiar cambios pendientes para esta foto antes de eliminar
     _photoDescriptionChanges.remove(photo.id);
-    
-    // Llamar al método de eliminación confirmada (sin pedir confirmación de nuevo)
     print('DEBUG: Llamando a removeApiImageConfirmed con index: $photoIndex');
     widget.removeApiImageConfirmed!(photoIndex);
     print('DEBUG: removeApiImageConfirmed ejecutado');
   }
-
-  /// Muestra el diálogo para editar la descripción de una foto existente
   void _showImageEditDialog(BuildContext context, Photo photo) async {
-    // Obtener la descripción actual (puede haber cambios pendientes)
     final currentDescription = _photoDescriptionChanges.containsKey(photo.id)
         ? _photoDescriptionChanges[photo.id]
         : photo.descripcion;
-    
     print('DEBUG: Abriendo diálogo para foto ID: ${photo.id}');
-    
     final result = await showDialog<String>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -224,44 +190,30 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
         );
       },
     );
-    
     print('DEBUG: Diálogo cerrado con resultado: $result');
-    
-    // Manejar eliminación
     if (result == 'delete') {
       print('DEBUG: Resultado es delete, llamando a _handleDeletePhoto');
-      // Llamar al método de eliminación
       await _handleDeletePhoto(photo);
       return;
     }
-    
-    // Si se confirmó la descripción, guardar cambio localmente
     if (result != null && mounted) {
       setState(() {
         _photoDescriptionChanges[photo.id] = result;
         photo.descripcion = result;
       });
-      
-      // Notificar cambios pendientes
       if (widget.onDataChanged != null) {
         widget.onDataChanged!({
           'photoDescriptionChanges': Map<int, String>.from(_photoDescriptionChanges),
         });
       }
-      
-      // Mostrar feedback
       if (mounted) {
         SnackBarHelper.showInfo(context, 'Descripción actualizada (pendiente de guardar)');
       }
     }
   }
-
-  /// Retorna el mapa de cambios de descripciones para que el padre pueda guardarlos
   Map<int, String> getPhotoDescriptionChanges() {
     return Map<int, String>.from(_photoDescriptionChanges);
   }
-
-  /// Limpia los cambios pendientes (llamar después de guardar exitosamente)
   void clearPhotoDescriptionChanges() {
     if (mounted) {
       setState(() {
@@ -270,8 +222,6 @@ class _ActivityImagesSectionState extends State<ActivityImagesSection> {
     }
   }
 }
-
-/// Widget interno que maneja el scroll horizontal de imágenes
 class _HorizontalImageScroller extends StatefulWidget {
   final BoxConstraints constraints;
   final bool isAdminOrSolicitante;
@@ -283,7 +233,6 @@ class _HorizontalImageScroller extends StatefulWidget {
   final Function(int)? onDeleteApiImage;
   final Function(Photo)? onImageTap;
   final Function(int)? onLocalImageTap;
-
   const _HorizontalImageScroller({
     required this.constraints,
     required this.isAdminOrSolicitante,
@@ -296,31 +245,25 @@ class _HorizontalImageScroller extends StatefulWidget {
     this.onImageTap,
     this.onLocalImageTap,
   });
-
   @override
   _HorizontalImageScrollerState createState() => _HorizontalImageScrollerState();
 }
-
 class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
   final ScrollController _scrollController = ScrollController();
-
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = widget.constraints.maxWidth < 600;
-    
     return SizedBox(
       width: widget.constraints.maxWidth,
       height: 200.0,
       child: Row(
         children: [
-          // Botón de cámara fijo (no hace scroll)
           if (widget.isAdminOrSolicitante)
             Container(
               width: isMobile ? 100.0 : 160.0,
@@ -365,7 +308,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                 ),
               ),
             ),
-          // Área con scroll para las imágenes
           Expanded(
             child: Listener(
               onPointerSignal: (pointerSignal) {
@@ -386,7 +328,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Imágenes de la API
                       ...widget.imagesActividad.asMap().entries.map((entry) {
                         final index = entry.key;
                         final photo = entry.value;
@@ -402,7 +343,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
                               : null,
                         );
                       }),
-                      // Imágenes locales seleccionadas
                       ...widget.selectedImages.asMap().entries.map((entry) {
                         final index = entry.key;
                         final image = entry.value;
@@ -425,8 +365,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
       ),
     );
   }
-
-  /// Botón compacto para móviles
   Widget _buildMobileAddButton(bool isDark) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -481,8 +419,6 @@ class _HorizontalImageScrollerState extends State<_HorizontalImageScroller> {
       ],
     );
   }
-
-  /// Botón para desktop
   Widget _buildDesktopAddButton(bool isDark) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

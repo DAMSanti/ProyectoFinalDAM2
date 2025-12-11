@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,39 +10,29 @@ import '../widgets/locations/localizacion_widgets.dart';
 import 'layouts/add_localizacion_landscape_layout.dart';
 import 'layouts/add_localizacion_portrait_layout.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Diálogo para gestionar las localizaciones de una actividad
-/// Permite buscar, añadir, editar y eliminar localizaciones
 class AddLocalizacionDialog extends StatefulWidget {
   final int actividadId;
   final List<Localizacion> localizacionesExistentes;
   final VoidCallback onLocalizacionAdded;
-
   const AddLocalizacionDialog({
     Key? key,
     required this.actividadId,
     required this.localizacionesExistentes,
     required this.onLocalizacionAdded,
   }) : super(key: key);
-
   @override
   AddLocalizacionDialogState createState() => AddLocalizacionDialogState();
 }
-
 class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
   final _searchController = TextEditingController();
   final _geocodingService = GeocodingService();
-  
   List<GeocodingResult> _searchResults = [];
   List<Localizacion> _localizacionesActuales = [];
-  Map<int, IconData> _iconosLocalizaciones = {}; // Mapa de id -> icono
+  Map<int, IconData> _iconosLocalizaciones = {}; 
   bool _isSearching = false;
   bool _hasChanges = false;
-  int _nextTempId = -1; // IDs temporales para localizaciones nuevas (negativos)
-  
+  int _nextTempId = -1; 
   Timer? _debounce;
-
-  // Iconos disponibles para localizaciones
   final List<IconData> _iconosDisponibles = [
     Icons.school,
     Icons.museum,
@@ -57,32 +47,23 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
     Icons.church,
     Icons.landscape,
   ];
-
   @override
   void initState() {
     super.initState();
-    
-    // Copiar las localizaciones existentes e inicializar iconos por defecto
     _localizacionesActuales = List.from(widget.localizacionesExistentes);
     for (var loc in _localizacionesActuales) {
       _iconosLocalizaciones[loc.id] = loc.esPrincipal ? Icons.location_pin : Icons.location_on;
     }
-    
     _searchController.addListener(_onSearchChanged);
   }
-
   @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
-
   void _onSearchChanged() {
-    // Cancelar búsqueda anterior
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    
-    // Esperar 500ms después de que el usuario deje de escribir
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _searchController.text.trim();
       if (query.isNotEmpty) {
@@ -94,12 +75,10 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       }
     });
   }
-
   Future<void> _searchAddress(String query) async {
     setState(() {
       _isSearching = true;
     });
-
     try {
       final results = await _geocodingService.searchAddress(query);
       setState(() {
@@ -115,27 +94,21 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       }
     }
   }
-
   Future<void> _addLocalizacionFromSearch(GeocodingResult result) async {
-    // Verificar si ya existe una localización en las mismas coordenadas
     final yaExiste = _localizacionesActuales.any((loc) =>
       (loc.latitud != null && loc.longitud != null) &&
       (loc.latitud! - result.lat).abs() < 0.001 &&
       (loc.longitud! - result.lon).abs() < 0.001
     );
-
     if (yaExiste) {
       if (mounted) {
         SnackBarHelper.show(context, 'Esta localización ya está añadida');
       }
       return;
     }
-
-    // Crear la localización solo en memoria (con ID temporal negativo)
     final tempId = _nextTempId--;
     final orden = _localizacionesActuales.length + 1;
     final esPrincipal = _localizacionesActuales.isEmpty;
-    
     final nuevaLoc = Localizacion(
       id: tempId,
       nombre: result.city ?? result.road ?? result.displayName,
@@ -147,7 +120,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       longitud: result.lon,
       esPrincipal: esPrincipal,
     );
-    
     setState(() {
       _localizacionesActuales.add(nuevaLoc);
       _iconosLocalizaciones[tempId] = Icons.location_on;
@@ -155,14 +127,11 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
       _searchResults = [];
       _hasChanges = true;
     });
-    
     if (mounted) {
       SnackBarHelper.show(context, 'Localización añadida (pendiente de guardar)');
     }
   }
-
   Future<void> _editLocalizacion(Localizacion loc) async {
-    // Mostrar diálogo de edición
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => EditLocalizacionDialog(
@@ -172,28 +141,21 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
         puedeSerPrincipal: !loc.esPrincipal,
       ),
     );
-
     if (result != null) {
       final nuevoPrincipal = result['esPrincipal'] as bool;
       final nuevoIcono = result['icono'] as IconData?;
       final nuevaDescripcion = result['descripcion'] as String?;
       final nuevoTipo = result['tipoLocalizacion'] as String?;
       String? nuevoIconoNombre;
-      
-      // Actualizar icono si se seleccionó uno y convertirlo a nombre string
       if (nuevoIcono != null) {
         nuevoIconoNombre = IconHelper.getIconName(nuevoIcono);
         setState(() {
           _iconosLocalizaciones[loc.id] = nuevoIcono;
         });
       }
-      
-      // Actualizar lista de localizaciones con el nuevo estado
       bool cambioRealizado = false;
-      
       setState(() {
         _localizacionesActuales = _localizacionesActuales.map((l) {
-          // Si esta localización se marca como principal, desmarcar las demás
           if (nuevoPrincipal && !loc.esPrincipal && l.esPrincipal) {
             cambioRealizado = true;
             return Localizacion(
@@ -211,14 +173,11 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               tipoLocalizacion: l.tipoLocalizacion,
             );
           }
-          
-          // Actualizar la localización editada
           if (l.id == loc.id) {
             final iconoCambio = nuevoIconoNombre != null && nuevoIconoNombre != l.icono;
             final principalCambio = nuevoPrincipal != l.esPrincipal;
             final descripcionCambio = nuevaDescripcion != l.descripcion;
             final tipoCambio = nuevoTipo != l.tipoLocalizacion;
-            
             if (iconoCambio || principalCambio || descripcionCambio || tipoCambio) {
               cambioRealizado = true;
               return Localizacion(
@@ -237,21 +196,17 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               );
             }
           }
-          
           return l;
         }).toList();
-        
         if (cambioRealizado) {
           _hasChanges = true;
         }
       });
-      
       if (cambioRealizado && mounted) {
         SnackBarHelper.show(context, 'Cambio pendiente de guardar');
       }
     }
   }
-
   Future<void> _removeLocalizacion(Localizacion loc) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -271,34 +226,29 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
         ],
       ),
     );
-
     if (confirmar == true) {
       setState(() {
         _localizacionesActuales.removeWhere((l) => l.id == loc.id);
         _iconosLocalizaciones.remove(loc.id);
         _hasChanges = true;
       });
-      
       if (mounted) {
         SnackBarHelper.show(context, 'Eliminación pendiente de guardar');
       }
     }
   }
-
   void _guardarYCerrar() {
     if (_hasChanges) {
-      // Devolver los datos modificados al padre
       Navigator.of(context).pop({
         'localizaciones': _localizacionesActuales,
         'iconos': _iconosLocalizaciones,
         'hasChanges': true,
       });
-      widget.onLocalizacionAdded(); // Notificar que hay cambios
+      widget.onLocalizacionAdded(); 
     } else {
       Navigator.of(context).pop();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
@@ -309,7 +259,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
     final isPortrait = orientation == Orientation.portrait;
     final isMobile = screenWidth < 600;
     final isMobileLandscape = (isMobile && !isPortrait) || (!isPortrait && screenHeight < 500);
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: isMobileLandscape
@@ -355,7 +304,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: isMobileLandscape ? 12 : (isMobile ? 12 : 20),
@@ -482,8 +430,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                 ],
               ),
             ),
-            
-            // Content - Layout condicional
             Expanded(
               child: isMobileLandscape
                   ? AddLocalizacionLandscapeLayout(
@@ -523,8 +469,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
                       onRemove: _removeLocalizacion,
                     ),
             ),
-            
-            // Actions - Footer adaptivo
             Container(
               padding: EdgeInsets.all(isMobileLandscape ? 10 : (isMobile ? 12 : 20)),
               decoration: BoxDecoration(
@@ -546,7 +490,6 @@ class AddLocalizacionDialogState extends State<AddLocalizacionDialog> {
               child: Row(
                 mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.end,
                 children: [
-                  // Botón Guardar
                   Flexible(
                     child: Container(
                       constraints: isMobile ? BoxConstraints(minWidth: double.infinity) : BoxConstraints(),

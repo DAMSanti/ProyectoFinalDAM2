@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'vistas/login_portrait_layout.dart';
@@ -10,45 +10,30 @@ import 'package:proyecto_santi/components/app_bar.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
-
 class LoginView extends StatefulWidget {
   final VoidCallback onToggleTheme;
-
   const LoginView({super.key, required this.onToggleTheme});
-
   @override
   LoginViewState createState() => LoginViewState();
 }
-
-// Comprueba conexión y almacena datos de forma segura
 class LoginViewState extends State<LoginView> {
   bool isLoading = false;
   final ApiService _apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   void _login() async {
     setState(() {
       isLoading = true;
     });
-
     final username = _usernameController.text;
     final password = _passwordController.text;
-
     try {
-      // Usar directamente el Auth provider en lugar de authenticate()
       final success = await Provider.of<Auth>(context, listen: false).login(username, password);
-
       if (!mounted) return;
-
       setState(() {
         isLoading = false;
       });
-
       if (success) {
-        // Ya no necesitamos navegar manualmente, el Consumer en main.dart
-        // detectará el cambio de auth.isAuthenticated y mostrará el DesktopShell
-        // Navigator.pushReplacementNamed ya no es necesario
       } else {
         showLoginDialog();
       }
@@ -59,8 +44,6 @@ class LoginViewState extends State<LoginView> {
       showLoginDialog();
     }
   }
-
-  // Construye la vista
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -89,8 +72,6 @@ class LoginViewState extends State<LoginView> {
       ),
     );
   }
-
-  // Diferentes vistas para dispositivos y orientaciones
   Widget _buildLayout(BuildContext context) {
     if (kIsWeb) {
       return LayoutBuilder(
@@ -120,8 +101,6 @@ class LoginViewState extends State<LoginView> {
       );
     }
   }
-
-  // Mensaje de error en el login
   void showLoginDialog() {
     showDialog(
       context: context,

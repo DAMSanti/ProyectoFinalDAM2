@@ -1,15 +1,9 @@
-using ACEXAPI.Data;
+﻿using ACEXAPI.Data;
 using ACEXAPI.Models;
 using ACEXAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace ACEXAPI.Controllers;
-
-/// <summary>
-/// Controlador de utilidades para desarrollo
-/// SOLO PARA DESARROLLO - ELIMINAR EN PRODUCCIÓN
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class DevController : ControllerBase
@@ -17,7 +11,6 @@ public class DevController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly IPasswordService _passwordService;
     private readonly ILogger<DevController> _logger;
-
     public DevController(
         ApplicationDbContext context, 
         IPasswordService passwordService,
@@ -27,22 +20,14 @@ public class DevController : ControllerBase
         _passwordService = passwordService;
         _logger = logger;
     }
-
-    /// <summary>
-    /// Crea usuarios de prueba para desarrollo
-    /// </summary>
     [HttpPost("seed-users")]
     public async Task<ActionResult> SeedUsers()
     {
-        // Eliminar usuarios existentes de prueba
         var existingUsers = await _context.Usuarios
             .Where(u => u.NombreUsuario.Contains("demo") || u.NombreUsuario == "admin")
             .ToListAsync();
-        
         _context.Usuarios.RemoveRange(existingUsers);
         await _context.SaveChangesAsync();
-
-        // Crear usuarios de prueba
         var usuarios = new List<Usuario>
         {
             new Usuario
@@ -74,12 +59,9 @@ public class DevController : ControllerBase
                 Activo = true
             }
         };
-
         _context.Usuarios.AddRange(usuarios);
         await _context.SaveChangesAsync();
-
         _logger.LogInformation("Usuarios de prueba creados exitosamente");
-
         return Ok(new
         {
             message = "Usuarios de prueba creados exitosamente",
@@ -87,25 +69,16 @@ public class DevController : ControllerBase
             {
                 nombreUsuario = u.NombreUsuario,
                 rol = u.Rol,
-                // NO devolver contraseñas en producción
                 passwordHint = u.NombreUsuario + "123"
             })
         });
     }
-
-    /// <summary>
-    /// Genera un hash BCrypt para una contraseña dada
-    /// </summary>
     [HttpPost("hash-password")]
     public ActionResult<string> HashPassword([FromBody] HashPasswordRequest request)
     {
         var hash = _passwordService.HashPassword(request.Password);
         return Ok(new { hash, original = request.Password });
     }
-
-    /// <summary>
-    /// Lista todos los usuarios (solo para desarrollo)
-    /// </summary>
     [HttpGet("list-users")]
     public async Task<ActionResult> ListUsers()
     {
@@ -119,27 +92,17 @@ public class DevController : ControllerBase
                 u.FechaCreacion
             })
             .ToListAsync();
-
         return Ok(usuarios);
     }
-
-    /// <summary>
-    /// Crea actividades de prueba para desarrollo
-    /// </summary>
     [HttpPost("seed-activities")]
     public async Task<ActionResult> SeedActivities()
     {
-        // Eliminar actividades existentes de prueba (solo las que tienen "Demo" o "Prueba" en el nombre)
         var existingActivities = await _context.Actividades
             .Where(a => a.Nombre.Contains("Demo") || a.Nombre.Contains("Prueba") || a.Nombre.Contains("Excursión") || a.Nombre.Contains("Taller"))
             .ToListAsync();
-        
         _context.Actividades.RemoveRange(existingActivities);
         await _context.SaveChangesAsync();
-
         var now = DateTime.Now;
-
-        // Crear actividades de prueba
         var actividades = new List<Actividad>
         {
             new Actividad
@@ -203,12 +166,9 @@ public class DevController : ControllerBase
                 FechaCreacion = DateTime.UtcNow
             }
         };
-
         _context.Actividades.AddRange(actividades);
         await _context.SaveChangesAsync();
-
         _logger.LogInformation($"Se crearon {actividades.Count} actividades de prueba");
-
         return Ok(new
         {
             message = $"Se crearon {actividades.Count} actividades de prueba exitosamente",
@@ -223,7 +183,6 @@ public class DevController : ControllerBase
         });
     }
 }
-
 public class HashPasswordRequest
 {
     public string Password { get; set; } = string.Empty;

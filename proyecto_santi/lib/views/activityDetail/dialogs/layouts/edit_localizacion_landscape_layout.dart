@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
-
-/// Layout landscape para el diálogo de edición de localización
 class EditLocalizacionLandscapeLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -17,7 +15,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
   final List<IconData> iconosDisponibles;
   final IconData? iconoSeleccionado;
   final ValueChanged<IconData> onIconoSelected;
-
   const EditLocalizacionLandscapeLayout({
     Key? key,
     required this.isDark,
@@ -35,7 +32,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
     required this.iconoSeleccionado,
     required this.onIconoSelected,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -45,40 +41,27 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Columna izquierda: Info + Checkbox + Tipo
               Expanded(
                 flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Info compacta
                     _buildLocationInfo(),
                     SizedBox(height: 10),
-                    
-                    // Checkbox compacto
                     if (puedeSerPrincipal) _buildPrincipalCheckbox(),
-                    
                     if (puedeSerPrincipal) SizedBox(height: 10),
-                    
-                    // Tipo compacto
                     _buildTypeSelector(),
                   ],
                 ),
               ),
-              
               SizedBox(width: 12),
-              
-              // Columna derecha: Descripción + Iconos
               Expanded(
                 flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Descripción compacta
                     _buildDescription(),
                     SizedBox(height: 10),
-                    
-                    // Iconos compactos (altura fija)
                     SizedBox(
                       height: 200,
                       child: _buildIconSelector(),
@@ -92,7 +75,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildLocationInfo() {
     return Container(
       padding: EdgeInsets.all(10),
@@ -143,7 +125,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildPrincipalCheckbox() {
     return Container(
       decoration: BoxDecoration(
@@ -172,7 +153,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +200,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildDescription() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +239,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildIconSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +270,6 @@ class EditLocalizacionLandscapeLayout extends StatelessWidget {
             itemBuilder: (context, index) {
               final icono = iconosDisponibles[index];
               final isSelected = iconoSeleccionado == icono;
-              
               return InkWell(
                 onTap: () => onIconoSelected(icono),
                 borderRadius: BorderRadius.circular(6),

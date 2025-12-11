@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/profesor.dart';
-
-/// Sección de profesor responsable
 class ResponsableSection extends StatelessWidget {
   final String? selectedProfesorId;
   final List<Profesor> profesores;
@@ -18,7 +16,6 @@ class ResponsableSection extends StatelessWidget {
     required bool isMobile,
     required bool isMobileLandscape,
   }) buildDropdown;
-
   const ResponsableSection({
     Key? key,
     required this.selectedProfesorId,
@@ -29,7 +26,6 @@ class ResponsableSection extends StatelessWidget {
     required this.buildSectionTitle,
     required this.buildDropdown,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(

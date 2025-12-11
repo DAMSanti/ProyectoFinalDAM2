@@ -1,17 +1,14 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 class LoginForm extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController passwordController;
   final VoidCallback? onSubmit;
-
   const LoginForm({
     super.key,
     required this.usernameController,
     required this.passwordController,
     this.onSubmit,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(

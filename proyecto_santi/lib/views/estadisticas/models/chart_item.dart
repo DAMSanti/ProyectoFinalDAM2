@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+﻿import 'package:flutter/material.dart';
 enum ChartType {
   actividadesPorEstado,
   actividadesPorTipo,
@@ -8,7 +7,6 @@ enum ChartType {
   presupuestoVsCosto,
   tendencias,
 }
-
 class ChartItem {
   final ChartType type;
   final String title;
@@ -16,7 +14,6 @@ class ChartItem {
   final IconData icon;
   bool isSelected;
   int order;
-
   ChartItem({
     required this.type,
     required this.title,
@@ -25,7 +22,6 @@ class ChartItem {
     this.isSelected = false,
     this.order = 0,
   });
-
   ChartItem copyWith({
     ChartType? type,
     String? title,
@@ -43,7 +39,6 @@ class ChartItem {
       order: order ?? this.order,
     );
   }
-
   static List<ChartItem> getDefaultCharts() {
     return [
       ChartItem(

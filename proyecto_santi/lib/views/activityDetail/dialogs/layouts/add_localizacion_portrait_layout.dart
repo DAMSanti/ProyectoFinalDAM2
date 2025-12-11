@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import '../../../../models/localizacion.dart';
 import '../../../../services/geocoding_service.dart';
 import '../../widgets/locations/localizacion_widgets.dart';
-
-/// Layout portrait para el diálogo de añadir localizaciones
 class AddLocalizacionPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -17,7 +15,6 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
   final Function(GeocodingResult) onResultTap;
   final Function(Localizacion) onEdit;
   final Function(Localizacion) onRemove;
-
   const AddLocalizacionPortraitLayout({
     Key? key,
     required this.isDark,
@@ -32,7 +29,6 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
     required this.onEdit,
     required this.onRemove,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -40,34 +36,25 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Campo de búsqueda
           SearchAddressField(
             controller: searchController,
             isSearching: isSearching,
             onClear: onClearSearch,
           ),
           SizedBox(height: isMobile ? 12 : 16),
-          
-          // Resultados de búsqueda
           SearchResultsList(
             results: searchResults,
             onResultTap: onResultTap,
             isDark: isDark,
           ),
-          
-          // Divisor
           if (searchResults.isEmpty) DecorativeDivider(),
           SizedBox(height: isMobile ? 12 : 20),
-          
-          // Título de localizaciones
           SectionHeader(
             icon: Icons.list_alt_rounded,
             title: isMobile ? 'Localizaciones' : 'Localizaciones de esta actividad',
             count: localizacionesActuales.length,
           ),
           SizedBox(height: isMobile ? 12 : 16),
-          
-          // Lista de localizaciones actuales
           Container(
             constraints: BoxConstraints(
               minHeight: isMobile ? 180 : 200, 
@@ -93,7 +80,6 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
                       final loc = localizacionesActuales[index];
                       final icono = iconosLocalizaciones[loc.id] ?? 
                                    (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                      
                       return LocalizacionCard(
                         localizacion: loc,
                         icon: icono,
@@ -109,7 +95,6 @@ class AddLocalizacionPortraitLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildEmptyState() {
     return Center(
       child: Padding(

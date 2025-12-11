@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-
-/// Componente reutilizable para mostrar tablas de datos en las vistas CRUD
 class CrudDataTable<T> extends StatefulWidget {
   final List<T> items;
   final List<DataColumn> columns;
@@ -11,7 +9,6 @@ class CrudDataTable<T> extends StatefulWidget {
   final void Function(T item)? onDelete;
   final bool isLoading;
   final String emptyMessage;
-
   const CrudDataTable({
     Key? key,
     required this.items,
@@ -22,15 +19,12 @@ class CrudDataTable<T> extends StatefulWidget {
     this.isLoading = false,
     this.emptyMessage = 'No hay datos disponibles',
   }) : super(key: key);
-
   @override
   State<CrudDataTable<T>> createState() => _CrudDataTableState<T>();
 }
-
 class _CrudDataTableState<T> extends State<CrudDataTable<T>> {
   int _sortColumnIndex = 0;
   bool _sortAscending = true;
-
   @override
   Widget build(BuildContext context) {
     if (widget.isLoading) {
@@ -38,7 +32,6 @@ class _CrudDataTableState<T> extends State<CrudDataTable<T>> {
         child: CircularProgressIndicator(),
       );
     }
-
     if (widget.items.isEmpty) {
       return Center(
         child: Padding(
@@ -53,7 +46,6 @@ class _CrudDataTableState<T> extends State<CrudDataTable<T>> {
         ),
       );
     }
-
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(

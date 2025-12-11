@@ -1,5 +1,4 @@
-/// Modelo para representar períodos de filtrado
-enum FilterPeriodType {
+﻿enum FilterPeriodType {
   custom,
   last30Days,
   last90Days,
@@ -8,20 +7,17 @@ enum FilterPeriodType {
   academicYear,
   quarter,
 }
-
 class FilterPeriod {
   final FilterPeriodType type;
   final DateTime startDate;
   final DateTime endDate;
   final String label;
-
   FilterPeriod({
     required this.type,
     required this.startDate,
     required this.endDate,
     required this.label,
   });
-
   factory FilterPeriod.custom(DateTime start, DateTime end) {
     return FilterPeriod(
       type: FilterPeriodType.custom,
@@ -30,7 +26,6 @@ class FilterPeriod {
       label: 'Personalizado',
     );
   }
-
   factory FilterPeriod.last30Days() {
     final now = DateTime.now();
     return FilterPeriod(
@@ -40,7 +35,6 @@ class FilterPeriod {
       label: 'Últimos 30 días',
     );
   }
-
   factory FilterPeriod.last90Days() {
     final now = DateTime.now();
     return FilterPeriod(
@@ -50,7 +44,6 @@ class FilterPeriod {
       label: 'Últimos 90 días',
     );
   }
-
   factory FilterPeriod.currentMonth() {
     final now = DateTime.now();
     final startOfMonth = DateTime(now.year, now.month, 1);
@@ -62,7 +55,6 @@ class FilterPeriod {
       label: 'Mes actual',
     );
   }
-
   factory FilterPeriod.currentYear() {
     final now = DateTime.now();
     return FilterPeriod(
@@ -72,10 +64,8 @@ class FilterPeriod {
       label: 'Año actual',
     );
   }
-
   factory FilterPeriod.academicYear() {
     final now = DateTime.now();
-    // El año académico va de septiembre a junio del siguiente año
     final year = now.month >= 9 ? now.year : now.year - 1;
     return FilterPeriod(
       type: FilterPeriodType.academicYear,
@@ -84,7 +74,6 @@ class FilterPeriod {
       label: 'Año académico ${year}/${year + 1}',
     );
   }
-
   factory FilterPeriod.quarter([int? quarter, int? year]) {
     final now = DateTime.now();
     final currentYear = year ?? now.year;
@@ -98,8 +87,6 @@ class FilterPeriod {
       label: 'Q$currentQuarter $currentYear',
     );
   }
-
-  /// Obtiene el período anterior del mismo tipo para comparación de tendencias
   FilterPeriod getPreviousPeriod() {
     switch (type) {
       case FilterPeriodType.last30Days:
@@ -139,7 +126,6 @@ class FilterPeriod {
           label: 'Año académico anterior',
         );
       case FilterPeriodType.quarter:
-        // Trimestre anterior
         final prevQuarterStart = DateTime(startDate.year, startDate.month - 3, 1);
         return FilterPeriod(
           type: type,
@@ -148,7 +134,6 @@ class FilterPeriod {
           label: 'Trimestre anterior',
         );
       case FilterPeriodType.custom:
-        // Para personalizado, usar el mismo rango de días pero desplazado atrás
         final duration = endDate.difference(startDate);
         return FilterPeriod(
           type: type,

@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/views/estadisticas/models/filter_period.dart';
-
 class FilterBar extends StatelessWidget {
   final FilterPeriod currentPeriod;
   final ValueChanged<FilterPeriod> onPeriodChanged;
   final VoidCallback onCustomDateRange;
   final bool isDark;
   final bool isMobile;
-
   const FilterBar({
     Key? key,
     required this.currentPeriod,
@@ -17,7 +15,6 @@ class FilterBar extends StatelessWidget {
     required this.isDark,
     required this.isMobile,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     if (isMobile) {
@@ -25,7 +22,6 @@ class FilterBar extends StatelessWidget {
     }
     return _buildDesktopFilterBar(context);
   }
-
   Widget _buildDesktopFilterBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -92,7 +88,6 @@ class FilterBar extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildMobileFilterBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(12),
@@ -155,10 +150,8 @@ class FilterBar extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildFilterChip(BuildContext context, String label, FilterPeriod period, {bool compact = false}) {
     final isSelected = currentPeriod.type == period.type;
-    
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -210,10 +203,8 @@ class FilterBar extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCustomRangeChip(BuildContext context, {bool compact = false}) {
     final isSelected = currentPeriod.type == FilterPeriodType.custom;
-    
     return Material(
       color: Colors.transparent,
       child: InkWell(

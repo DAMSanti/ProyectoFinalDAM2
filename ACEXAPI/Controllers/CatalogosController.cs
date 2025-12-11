@@ -1,12 +1,10 @@
-using ACEXAPI.Data;
+﻿using ACEXAPI.Data;
 using ACEXAPI.DTOs;
 using ACEXAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 namespace ACEXAPI.Controllers;
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -14,13 +12,11 @@ public class DepartamentoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DepartamentoController> _logger;
-
     public DepartamentoController(ApplicationDbContext context, ILogger<DepartamentoController> logger)
     {
         _context = context;
         _logger = logger;
     }
-
     [HttpGet]
     public async Task<ActionResult<List<DepartamentoDto>>> GetAll()
     {
@@ -36,7 +32,6 @@ public class DepartamentoController : ControllerBase
                     Descripcion = d.Descripcion
                 })
                 .ToListAsync();
-
             _logger.LogInformation($"[DepartamentoController] GetAll completado. Total: {departamentos.Count}");
             return Ok(departamentos);
         }
@@ -46,14 +41,12 @@ public class DepartamentoController : ControllerBase
             return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
         }
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<DepartamentoDto>> GetById(int id)
     {
         var departamento = await _context.Departamentos.FindAsync(id);
         if (departamento == null)
             return NotFound();
-
         return Ok(new DepartamentoDto
         {
             Id = departamento.Id,
@@ -62,7 +55,6 @@ public class DepartamentoController : ControllerBase
             Descripcion = departamento.Descripcion
         });
     }
-
     [HttpPost]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<DepartamentoDto>> Create(DepartamentoDto dto)
@@ -73,14 +65,11 @@ public class DepartamentoController : ControllerBase
             Codigo = dto.Codigo,
             Descripcion = dto.Descripcion
         };
-
         _context.Departamentos.Add(departamento);
         await _context.SaveChangesAsync();
-
         dto.Id = departamento.Id;
         return CreatedAtAction(nameof(GetById), new { id = departamento.Id }, dto);
     }
-
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<DepartamentoDto>> Update(int id, DepartamentoDto dto)
@@ -88,16 +77,12 @@ public class DepartamentoController : ControllerBase
         var departamento = await _context.Departamentos.FindAsync(id);
         if (departamento == null)
             return NotFound();
-
         departamento.Nombre = dto.Nombre;
         departamento.Codigo = dto.Codigo;
         departamento.Descripcion = dto.Descripcion;
-
         await _context.SaveChangesAsync();
-
         return Ok(dto);
     }
-
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
@@ -105,26 +90,21 @@ public class DepartamentoController : ControllerBase
         var departamento = await _context.Departamentos.FindAsync(id);
         if (departamento == null)
             return NotFound();
-
         _context.Departamentos.Remove(departamento);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 }
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class CursoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-
     public CursoController(ApplicationDbContext context)
     {
         _context = context;
     }
-
     [HttpGet]
     public async Task<ActionResult<List<CursoDto>>> GetAll()
     {
@@ -137,17 +117,14 @@ public class CursoController : ControllerBase
                 Activo = c.Activo
             })
             .ToListAsync();
-
         return Ok(cursos);
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<CursoDto>> GetById(int id)
     {
         var curso = await _context.Cursos.FindAsync(id);
         if (curso == null)
             return NotFound();
-
         return Ok(new CursoDto
         {
             Id = curso.Id,
@@ -156,7 +133,6 @@ public class CursoController : ControllerBase
             Activo = curso.Activo
         });
     }
-
     [HttpPost]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<CursoDto>> Create(CursoDto dto)
@@ -167,14 +143,11 @@ public class CursoController : ControllerBase
             Nivel = dto.Nivel,
             Activo = dto.Activo
         };
-
         _context.Cursos.Add(curso);
         await _context.SaveChangesAsync();
-
         dto.Id = curso.Id;
         return CreatedAtAction(nameof(GetById), new { id = curso.Id }, dto);
     }
-
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<CursoDto>> Update(int id, CursoDto dto)
@@ -182,16 +155,12 @@ public class CursoController : ControllerBase
         var curso = await _context.Cursos.FindAsync(id);
         if (curso == null)
             return NotFound();
-
         curso.Nombre = dto.Nombre;
         curso.Nivel = dto.Nivel;
         curso.Activo = dto.Activo;
-
         await _context.SaveChangesAsync();
-
         return Ok(dto);
     }
-
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
@@ -199,14 +168,10 @@ public class CursoController : ControllerBase
         var curso = await _context.Cursos.FindAsync(id);
         if (curso == null)
             return NotFound();
-
         _context.Cursos.Remove(curso);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
-    
-    // Obtener grupos de un curso específico
     [HttpGet("{id}/grupos")]
     public async Task<ActionResult<List<GrupoDto>>> GetGruposByCurso(int id)
     {
@@ -222,23 +187,19 @@ public class CursoController : ControllerBase
                 CursoNombre = g.Curso.Nombre
             })
             .ToListAsync();
-
         return Ok(grupos);
     }
 }
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class GrupoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-
     public GrupoController(ApplicationDbContext context)
     {
         _context = context;
     }
-
     [HttpGet]
     public async Task<ActionResult<List<GrupoDto>>> GetAll()
     {
@@ -260,20 +221,16 @@ public class GrupoController : ControllerBase
                 } : null
             })
             .ToListAsync();
-
         return Ok(grupos);
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<GrupoDto>> GetById(int id)
     {
         var grupo = await _context.Grupos
             .Include(g => g.Curso)
             .FirstOrDefaultAsync(g => g.Id == id);
-            
         if (grupo == null)
             return NotFound();
-
         return Ok(new GrupoDto
         {
             Id = grupo.Id,
@@ -290,7 +247,6 @@ public class GrupoController : ControllerBase
             } : null
         });
     }
-
     [HttpPost]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<GrupoDto>> Create(GrupoDto dto)
@@ -301,14 +257,11 @@ public class GrupoController : ControllerBase
             NumeroAlumnos = dto.NumeroAlumnos,
             CursoId = dto.CursoId
         };
-
         _context.Grupos.Add(grupo);
         await _context.SaveChangesAsync();
-
         dto.Id = grupo.Id;
         return CreatedAtAction(nameof(GetById), new { id = grupo.Id }, dto);
     }
-
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<GrupoDto>> Update(int id, GrupoDto dto)
@@ -316,16 +269,12 @@ public class GrupoController : ControllerBase
         var grupo = await _context.Grupos.FindAsync(id);
         if (grupo == null)
             return NotFound();
-
         grupo.Nombre = dto.Nombre;
         grupo.NumeroAlumnos = dto.NumeroAlumnos;
         grupo.CursoId = dto.CursoId;
-
         await _context.SaveChangesAsync();
-
         return Ok(dto);
     }
-
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
@@ -333,26 +282,21 @@ public class GrupoController : ControllerBase
         var grupo = await _context.Grupos.FindAsync(id);
         if (grupo == null)
             return NotFound();
-
         _context.Grupos.Remove(grupo);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 }
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class LocalizacionController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-
     public LocalizacionController(ApplicationDbContext context)
     {
         _context = context;
     }
-
     [HttpGet]
     public async Task<ActionResult<List<LocalizacionDto>>> GetAll()
     {
@@ -371,17 +315,14 @@ public class LocalizacionController : ControllerBase
                 Icono = l.Icono
             })
             .ToListAsync();
-
         return Ok(localizaciones);
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<LocalizacionDto>> GetById(int id)
     {
         var localizacion = await _context.Localizaciones.FindAsync(id);
         if (localizacion == null)
             return NotFound();
-
         return Ok(new LocalizacionDto
         {
             Id = localizacion.Id,
@@ -396,7 +337,6 @@ public class LocalizacionController : ControllerBase
             Icono = localizacion.Icono
         });
     }
-
     [HttpPost]
     [Authorize(Roles = "Administrador,Coordinador")]
     public async Task<ActionResult<LocalizacionDto>> Create(LocalizacionDto dto)
@@ -413,14 +353,11 @@ public class LocalizacionController : ControllerBase
             EsPrincipal = dto.EsPrincipal,
             Icono = dto.Icono
         };
-
         _context.Localizaciones.Add(localizacion);
         await _context.SaveChangesAsync();
-
         dto.Id = localizacion.Id;
         return CreatedAtAction(nameof(GetById), new { id = localizacion.Id }, dto);
     }
-
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador,Coordinador")]
     public async Task<ActionResult<LocalizacionDto>> Update(int id, LocalizacionDto dto)
@@ -428,7 +365,6 @@ public class LocalizacionController : ControllerBase
         var localizacion = await _context.Localizaciones.FindAsync(id);
         if (localizacion == null)
             return NotFound();
-
         localizacion.Nombre = dto.Nombre;
         localizacion.Direccion = dto.Direccion;
         localizacion.Ciudad = dto.Ciudad;
@@ -438,12 +374,9 @@ public class LocalizacionController : ControllerBase
         localizacion.Longitud = dto.Longitud;
         localizacion.EsPrincipal = dto.EsPrincipal;
         localizacion.Icono = dto.Icono;
-
         await _context.SaveChangesAsync();
-
         return Ok(dto);
     }
-
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
@@ -451,26 +384,21 @@ public class LocalizacionController : ControllerBase
         var localizacion = await _context.Localizaciones.FindAsync(id);
         if (localizacion == null)
             return NotFound();
-
         _context.Localizaciones.Remove(localizacion);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 }
-
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class EmpTransporteController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-
     public EmpTransporteController(ApplicationDbContext context)
     {
         _context = context;
     }
-
     [HttpGet]
     public async Task<ActionResult<List<EmpTransporteDto>>> GetAll()
     {
@@ -485,17 +413,14 @@ public class EmpTransporteController : ControllerBase
                 Direccion = e.Direccion
             })
             .ToListAsync();
-
         return Ok(empresas);
     }
-
     [HttpGet("{id}")]
     public async Task<ActionResult<EmpTransporteDto>> GetById(int id)
     {
         var empresa = await _context.EmpTransportes.FindAsync(id);
         if (empresa == null)
             return NotFound();
-
         return Ok(new EmpTransporteDto
         {
             Id = empresa.Id,
@@ -506,7 +431,6 @@ public class EmpTransporteController : ControllerBase
             Direccion = empresa.Direccion
         });
     }
-
     [HttpPost]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<EmpTransporteDto>> Create(EmpTransporteDto dto)
@@ -519,14 +443,11 @@ public class EmpTransporteController : ControllerBase
             Email = dto.Email,
             Direccion = dto.Direccion
         };
-
         _context.EmpTransportes.Add(empresa);
         await _context.SaveChangesAsync();
-
         dto.Id = empresa.Id;
         return CreatedAtAction(nameof(GetById), new { id = empresa.Id }, dto);
     }
-
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<EmpTransporteDto>> Update(int id, EmpTransporteDto dto)
@@ -534,18 +455,14 @@ public class EmpTransporteController : ControllerBase
         var empresa = await _context.EmpTransportes.FindAsync(id);
         if (empresa == null)
             return NotFound();
-
         empresa.Nombre = dto.Nombre;
         empresa.Cif = dto.Cif;
         empresa.Telefono = dto.Telefono;
         empresa.Email = dto.Email;
         empresa.Direccion = dto.Direccion;
-
         await _context.SaveChangesAsync();
-
         return Ok(dto);
     }
-
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
@@ -553,10 +470,8 @@ public class EmpTransporteController : ControllerBase
         var empresa = await _context.EmpTransportes.FindAsync(id);
         if (empresa == null)
             return NotFound();
-
         _context.EmpTransportes.Remove(empresa);
         await _context.SaveChangesAsync();
-
         return NoContent();
     }
 }

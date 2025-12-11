@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/actividad.dart';
@@ -6,7 +6,6 @@ import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/shared/helpers/activity_formatters.dart';
-
 class AllActividades extends StatefulWidget {
   final String? selectedFilter;
   final String searchQuery;
@@ -15,7 +14,6 @@ class AllActividades extends StatefulWidget {
   final String? selectedState;
   final String? selectedProfesorId;
   final Function(int)? onCountChanged;
-
   AllActividades({
     required this.selectedFilter,
     required this.searchQuery,
@@ -25,11 +23,9 @@ class AllActividades extends StatefulWidget {
     this.selectedProfesorId,
     this.onCountChanged,
   });
-
   @override
   AllActividadesState createState() => AllActividadesState();
 }
-
 class AllActividadesState extends State<AllActividades> {
   late final ApiService _apiService;
   late final ActividadService _actividadService;
@@ -37,7 +33,6 @@ class AllActividadesState extends State<AllActividades> {
   late final ProfesorService _profesorService;
   List<Actividad> _allActividades = [];
   List<Actividad> _filteredActividades = [];
-
   @override
   void initState() {
     super.initState();
@@ -47,7 +42,6 @@ class AllActividadesState extends State<AllActividades> {
     _profesorService = ProfesorService(_apiService);
     _fetchActivities();
   }
-
   void _fetchActivities() async {
     List<Actividad> actividades = await _actividadService.fetchActivities(pageSize: 100);
     setState(() {
@@ -55,39 +49,29 @@ class AllActividadesState extends State<AllActividades> {
     });
     await _filterActivities();
   }
-
   Future<void> _filterActivities() async {
     List<Actividad> filtered = [];
-    
     for (var actividad in _allActividades) {
-      // ✅ SOLO Filtro por texto de búsqueda - NO aplicar filtros de fecha, estado, curso o profesor
       final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
       if (!matchesSearch) continue;
-      
       filtered.add(actividad);
     }
-    
-    // Ordenar por fecha (más próximas primero)
     filtered.sort((a, b) {
       try {
         final dateA = DateTime.parse(a.fini);
         final dateB = DateTime.parse(b.fini);
         return dateA.compareTo(dateB);
       } catch (e) {
-        return 0; // Si hay error en el parsing, mantener orden original
+        return 0; 
       }
     });
-    
     setState(() {
       _filteredActividades = filtered;
     });
-    
-    // Notificar el cambio de contador después del build
     SchedulerBinding.instance.addPostFrameCallback((_) {
       widget.onCountChanged?.call(_filteredActividades.length);
     });
   }
-
   @override
   void didUpdateWidget(AllActividades oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -99,7 +83,6 @@ class AllActividadesState extends State<AllActividades> {
       _filterActivities();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return _filteredActividades.isEmpty
@@ -113,7 +96,6 @@ class AllActividadesState extends State<AllActividades> {
     );
   }
 }
-
 class OtrasActividades extends StatefulWidget {
   final String? selectedFilter;
   final String searchQuery;
@@ -122,7 +104,6 @@ class OtrasActividades extends StatefulWidget {
   final String? selectedState;
   final String? selectedProfesorId;
   final Function(int)? onCountChanged;
-
   OtrasActividades({
     required this.selectedFilter,
     required this.searchQuery,
@@ -132,11 +113,9 @@ class OtrasActividades extends StatefulWidget {
     this.selectedProfesorId,
     this.onCountChanged,
   });
-
   @override
   OtrasActividadesState createState() => OtrasActividadesState();
 }
-
 class OtrasActividadesState extends State<OtrasActividades> {
   late final ApiService _apiService;
   late final ActividadService _actividadService;
@@ -144,7 +123,6 @@ class OtrasActividadesState extends State<OtrasActividades> {
   late final ProfesorService _profesorService;
   List<Actividad> _otrasActividades = [];
   List<Actividad> _filteredOtrasActividades = [];
-
   @override
   void initState() {
     super.initState();
@@ -154,7 +132,6 @@ class OtrasActividadesState extends State<OtrasActividades> {
     _profesorService = ProfesorService(_apiService);
     _fetchActivities();
   }
-
   void _fetchActivities() async {
     List<Actividad> actividades = await _actividadService.fetchActivities(pageSize: 100);
     setState(() {
@@ -162,14 +139,11 @@ class OtrasActividadesState extends State<OtrasActividades> {
     });
     await _filterActivities();
   }
-
   Future<void> _filterActivities() async {
-    // Obtener el UUID y rol del usuario actual desde Auth
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final currentUserUuid = currentUser?.uuid;
     final rol = currentUser?.rol;
-    
     if (currentUserUuid == null) {
       print('[OtrasActividades] ⚠️ No hay usuario autenticado');
       setState(() {
@@ -180,29 +154,17 @@ class OtrasActividadesState extends State<OtrasActividades> {
       });
       return;
     }
-    
     print('[OtrasActividades] 🔍 Filtrando actividades para usuario: $currentUserUuid (Rol: $rol)');
-    
-    // Administradores y Coordinadores ven TODAS las actividades
     final isAdminOrCoord = rol == 'Administrador' || rol == 'Admin' || rol == 'Coordinador' || rol == 'ED';
-    
     List<Actividad> filtered = [];
-    
     for (var actividad in _otrasActividades) {
-      // Filtro por texto de búsqueda
       final matchesSearch = actividad.titulo.toLowerCase().contains(widget.searchQuery.toLowerCase());
       if (!matchesSearch) continue;
-      
-      // ✅ SIN FILTRO POR FECHA - Mostrar TODAS las actividades del usuario (pasadas y futuras)
-      
-      // Filtro por estado (si está seleccionado)
       bool matchesState = true;
       if (widget.selectedState != null && widget.selectedState!.isNotEmpty) {
         matchesState = actividad.estado.toLowerCase() == widget.selectedState!.toLowerCase();
       }
       if (!matchesState) continue;
-      
-      // Filtro por curso (si está seleccionado)
       bool matchesCourse = true;
       if (widget.selectedCourse != null && widget.selectedCourse!.isNotEmpty) {
         try {
@@ -217,23 +179,14 @@ class OtrasActividadesState extends State<OtrasActividades> {
         }
       }
       if (!matchesCourse) continue;
-      
-      // ✅ FILTRO POR ROL: Admin/Coordinador ven todas, Profesores solo las suyas
-      bool isUserActivity = true; // Por defecto true para admin/coordinador
-      
+      bool isUserActivity = true; 
       if (!isAdminOrCoord) {
-        // Solo para profesores: verificar si es responsable o participante
         isUserActivity = false;
         try {
-          // Verificar si es el responsable
           bool isResponsable = actividad.responsable?.uuid.toLowerCase() == currentUserUuid.toLowerCase();
-          
-          // Verificar si es participante
           bool isParticipante = actividad.profesoresParticipantesIds
               .any((id) => id.toLowerCase() == currentUserUuid.toLowerCase());
-          
           isUserActivity = isResponsable || isParticipante;
-          
           print('[OtrasActividades] Actividad ${actividad.id} "${actividad.titulo}": '
               'Responsable=$isResponsable, Participante=$isParticipante → ${isUserActivity ? "✅ INCLUIR" : "❌ EXCLUIR"}');
         } catch (e) {
@@ -241,35 +194,26 @@ class OtrasActividadesState extends State<OtrasActividades> {
           isUserActivity = false;
         }
       }
-      
       if (!isUserActivity) continue;
-      
       filtered.add(actividad);
     }
-    
-    // Ordenar por fecha (más recientes primero, incluyendo pasadas)
     filtered.sort((a, b) {
       try {
         final dateA = DateTime.parse(a.fini);
         final dateB = DateTime.parse(b.fini);
-        return dateB.compareTo(dateA); // Orden descendente (más recientes primero)
+        return dateB.compareTo(dateA); 
       } catch (e) {
-        return 0; // Si hay error en el parsing, mantener orden original
+        return 0; 
       }
     });
-    
     print('[OtrasActividades] ✅ Total actividades filtradas: ${filtered.length} ${isAdminOrCoord ? "(Admin/Coord - Todas)" : "(Profesor - Solo las suyas)"}');
-    
     setState(() {
       _filteredOtrasActividades = filtered;
     });
-    
-    // Notificar el cambio de contador después del build
     SchedulerBinding.instance.addPostFrameCallback((_) {
       widget.onCountChanged?.call(_filteredOtrasActividades.length);
     });
   }
-
   @override
   void didUpdateWidget(OtrasActividades oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -281,7 +225,6 @@ class OtrasActividadesState extends State<OtrasActividades> {
       _filterActivities();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return _filteredOtrasActividades.isEmpty
@@ -295,28 +238,20 @@ class OtrasActividadesState extends State<OtrasActividades> {
     );
   }
 }
-
 class HoverableListItem extends StatefulWidget {
   final Actividad actividad;
-
   const HoverableListItem({super.key, required this.actividad});
-
   @override
   HoverableListItemState createState() => HoverableListItemState();
 }
-
 class HoverableListItemState extends State<HoverableListItem> {
   bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Usar helpers centralizados
     final fechaHora = ActivityFormatters.formatearFechaHora(widget.actividad);
     final estadoColor = ActivityFormatters.getEstadoColor(widget.actividad.estado);
     final estadoIcon = ActivityFormatters.getEstadoIcon(widget.actividad.estado);
-    
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -332,7 +267,7 @@ class HoverableListItemState extends State<HoverableListItem> {
                 ..multiply(Matrix4.diagonal3Values(1.005, 1.005, 1.0)))
               : Matrix4.identity(),
           child: Container(
-            height: 95, // Altura fija para el surco horizontal
+            height: 95, 
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.0),
               gradient: LinearGradient(
@@ -349,7 +284,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                       ],
               ),
               boxShadow: [
-                // Sombra principal
                 BoxShadow(
                   color: _isHovered 
                       ? const Color.fromRGBO(25, 118, 210, 0.30)
@@ -358,7 +292,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                   blurRadius: _isHovered ? 20.0 : 10.0,
                   spreadRadius: _isHovered ? 0 : -1,
                 ),
-                // Sombra secundaria en hover
                 if (_isHovered)
                   const BoxShadow(
                     color: Color.fromRGBO(25, 118, 210, 0.15),
@@ -379,7 +312,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                 borderRadius: BorderRadius.circular(16.0),
                 child: Stack(
                   children: [
-                    // Barra lateral izquierda decorativa
                     Positioned(
                       left: 0,
                       top: 0,
@@ -392,20 +324,19 @@ class HoverableListItemState extends State<HoverableListItem> {
                             end: Alignment.bottomCenter,
                             colors: widget.actividad.tipo == 'Complementaria'
                               ? [
-                                  Color(0xFF1976d2), // Azul oscuro
-                                  Color(0xFF42A5F5), // Azul medio
-                                  Color(0xFF64B5F6), // Azul claro
+                                  Color(0xFF1976d2), 
+                                  Color(0xFF42A5F5), 
+                                  Color(0xFF64B5F6), 
                                 ]
                               : [
-                                  Color(0xFFE65100), // Naranja oscuro
-                                  Color(0xFFFF6F00), // Naranja medio
-                                  Color(0xFFFF9800), // Naranja claro
+                                  Color(0xFFE65100), 
+                                  Color(0xFFFF6F00), 
+                                  Color(0xFFFF9800), 
                                 ],
                           ),
                         ),
                       ),
                     ),
-                    // Efecto de brillo en hover
                     if (_isHovered)
                       Positioned.fill(
                         child: Container(
@@ -421,7 +352,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                           ),
                         ),
                       ),
-                    // Icono decorativo de fondo
                     Positioned(
                       right: -15,
                       top: -15,
@@ -434,7 +364,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                         ),
                       ),
                     ),
-                    // Contenido principal
                     InkWell(
                       onTap: () {
                         navigateToActivityDetailInShell(
@@ -447,7 +376,6 @@ class HoverableListItemState extends State<HoverableListItem> {
                         padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
                         child: Row(
                           children: [
-                            // Icono del tipo de actividad
                             Container(
                               width: 48,
                               height: 48,
@@ -465,16 +393,12 @@ class HoverableListItemState extends State<HoverableListItem> {
                                 size: 24,
                               ),
                             ),
-                            
                             const SizedBox(width: 14),
-                            
-                            // Información de la actividad
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Título
                                   Text(
                                     widget.actividad.titulo,
                                     style: TextStyle(
@@ -487,10 +411,7 @@ class HoverableListItemState extends State<HoverableListItem> {
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
-                                  
                                   const SizedBox(height: 4),
-                                  
-                                  // Descripción
                                   Text(
                                     widget.actividad.descripcion?.isNotEmpty == true 
                                         ? widget.actividad.descripcion! 
@@ -506,15 +427,11 @@ class HoverableListItemState extends State<HoverableListItem> {
                                 ],
                               ),
                             ),
-                            
                             const SizedBox(width: 14),
-                            
-                            // Fecha y estado
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Fecha con icono
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -534,10 +451,7 @@ class HoverableListItemState extends State<HoverableListItem> {
                                     ),
                                   ],
                                 ),
-                                
                                 const SizedBox(height: 6),
-                                
-                                // Badge de estado
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(

@@ -1,14 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
-
 namespace ACEXAPI.Migrations
 {
-    /// <inheritdoc />
     public partial class AddFcmTokensTable : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -17,14 +12,12 @@ namespace ACEXAPI.Migrations
                 type: "nvarchar(500)",
                 maxLength: 500,
                 nullable: true);
-
             migrationBuilder.AddColumn<string>(
                 name: "TipoLocalizacion",
                 table: "ActividadLocalizaciones",
                 type: "nvarchar(50)",
                 maxLength: 50,
                 nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "FcmTokens",
                 columns: table => new
@@ -44,17 +37,13 @@ namespace ACEXAPI.Migrations
                     table.PrimaryKey("PK_FcmTokens", x => x.Id);
                 });
         }
-
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "FcmTokens");
-
             migrationBuilder.DropColumn(
                 name: "Descripcion",
                 table: "ActividadLocalizaciones");
-
             migrationBuilder.DropColumn(
                 name: "TipoLocalizacion",
                 table: "ActividadLocalizaciones");

@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import '../widgets/multi_select_cursos_list.dart';
-
-/// Layout landscape para el diálogo de multi-select de grupos
 class MultiSelectLandscapeLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -18,7 +16,6 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
   final Function(int) onToggleCurso;
   final Function(int) onExpandCurso;
   final Function(Grupo, bool) onSelectGrupo;
-
   const MultiSelectLandscapeLayout({
     Key? key,
     required this.isDark,
@@ -34,7 +31,6 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
     required this.onExpandCurso,
     required this.onSelectGrupo,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -42,7 +38,6 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Columna izquierda: Buscador y contador
           Expanded(
             flex: 2,
             child: Column(
@@ -56,10 +51,7 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
               ],
             ),
           ),
-          
           SizedBox(width: 12),
-          
-          // Columna derecha: Lista de cursos
           Expanded(
             flex: 5,
             child: MultiSelectCursosList(
@@ -80,7 +72,6 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSearchField() {
     return Container(
       decoration: BoxDecoration(
@@ -114,7 +105,6 @@ class MultiSelectLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSelectedCounter() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),

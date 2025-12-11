@@ -1,24 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/shared/constants/app_theme_constants.dart';
-
-/// Header reutilizable para la sección de actividades
-/// Aplica DRY (Don't Repeat Yourself)
 class ActivitiesHeader extends StatelessWidget {
   final int activityCount;
   final bool isCompact;
   final String title;
-
   const ActivitiesHeader({
     super.key,
     required this.activityCount,
     this.isCompact = false,
     this.title = 'Próximas Actividades',
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Padding(
       padding: EdgeInsets.fromLTRB(
         isCompact ? 12.0 : 20.0,
@@ -52,7 +46,6 @@ class ActivitiesHeader extends StatelessWidget {
             ),
           ),
           SizedBox(width: AppThemeConstants.spacingSmall),
-          // Burbuja con número
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: isCompact ? 8.0 : 10.0,

@@ -1,21 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
 import 'package:proyecto_santi/views/activities/components/activities_listas.dart';
 import 'package:proyecto_santi/views/activities/components/activities_search_bar.dart';
 import 'package:proyecto_santi/views/activities/components/activities_section_header.dart';
 import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
-
 class ActivitiesLargeLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
   final VoidCallback onToggleTheme;
-
   const ActivitiesLargeLandscapeLayout({super.key, required this.activities, required this.onToggleTheme});
-
   @override
   State<ActivitiesLargeLandscapeLayout> createState() => _ActivitiesLargeLandscapeLayoutState();
 }
-
 class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscapeLayout> {
   String searchQuery = '';
   Map<String, dynamic> filters = {
@@ -27,25 +23,17 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
   final ValueNotifier<List<Actividad>> _filteredActivitiesNotifier = ValueNotifier([]);
   int _allActivitiesCount = 0;
   int _userActivitiesCount = 0;
-
   @override
   void initState() {
     super.initState();
     _filterActivities();
   }
-
   void _filterActivities() {
     _filteredActivitiesNotifier.value = widget.activities.where((actividad) {
-      // Filtro por búsqueda de texto
       final matchesSearch = actividad.titulo.toLowerCase().contains(searchQuery.toLowerCase());
-      
-      // Aquí puedes agregar más lógica de filtrado basada en filters
-      // Por ahora solo filtramos por texto
-      
       return matchesSearch;
     }).toList();
   }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -60,12 +48,10 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
             Theme.of(context).brightness == Brightness.dark
                 ? GradientBackgroundDark(child: Container())
                 : GradientBackgroundLight(child: Container()),
-            // Ya no usar Scaffold ni MarcoDesktop, solo el contenido
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Barra de búsqueda moderna
                   ActivitiesSearchBar(
                     onSearchQueryChanged: (query) {
                       setState(() {
@@ -81,16 +67,12 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                       });
                     },
                   ),
-                  
                   SizedBox(height: 16),
-                  
-                  // Sección: Todas las actividades
                   ActivitiesSectionHeader(
                     title: 'Todas las Actividades',
                     icon: Icons.grid_view_rounded,
                     count: _allActivitiesCount,
                   ),
-                  
                   Flexible(
                     flex: 2,
                     child: ActivitiesListContainer(
@@ -111,16 +93,12 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                       ),
                     ),
                   ),
-                  
                   SizedBox(height: 16),
-                  
-                  // Sección: Tus actividades
                   ActivitiesSectionHeader(
                     title: 'Tus Actividades',
                     icon: Icons.person_rounded,
                     count: _userActivitiesCount,
                   ),
-                  
                   Flexible(
                     flex: 1,
                     child: ActivitiesListContainer(
@@ -141,7 +119,6 @@ class _ActivitiesLargeLandscapeLayoutState extends State<ActivitiesLargeLandscap
                       ),
                     ),
                   ),
-                  
                   SizedBox(height: 16),
                 ],
               ),

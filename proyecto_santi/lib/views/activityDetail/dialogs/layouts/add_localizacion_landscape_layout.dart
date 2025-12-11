@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../models/localizacion.dart';
 import '../../../../services/geocoding_service.dart';
 import '../../widgets/locations/localizacion_widgets.dart';
-
-/// Layout landscape para el diálogo de añadir localizaciones
 class AddLocalizacionLandscapeLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -16,7 +14,6 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
   final Function(GeocodingResult) onResultTap;
   final Function(Localizacion) onEdit;
   final Function(Localizacion) onRemove;
-
   const AddLocalizacionLandscapeLayout({
     Key? key,
     required this.isDark,
@@ -31,7 +28,6 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
     required this.onEdit,
     required this.onRemove,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -39,21 +35,17 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Columna izquierda: Buscador y resultados
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Campo de búsqueda compacto
                 SearchAddressField(
                   controller: searchController,
                   isSearching: isSearching,
                   onClear: onClearSearch,
                 ),
                 SizedBox(height: 10),
-                
-                // Resultados de búsqueda (lista compacta)
                 if (searchResults.isNotEmpty)
                   Expanded(
                     child: SearchResultsList(
@@ -65,20 +57,14 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
               ],
             ),
           ),
-          
           SizedBox(width: 12),
-          
-          // Columna derecha: Lista de localizaciones
           Expanded(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Título compacto
                 _buildCompactHeader(),
                 SizedBox(height: 10),
-                
-                // Lista de localizaciones compacta
                 Expanded(
                   child: _buildLocationsList(),
                 ),
@@ -89,7 +75,6 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildCompactHeader() {
     return Row(
       children: [
@@ -135,7 +120,6 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildLocationsList() {
     return Container(
       decoration: BoxDecoration(
@@ -157,12 +141,11 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
                 final loc = localizacionesActuales[index];
                 final icono = iconosLocalizaciones[loc.id] ?? 
                              (loc.esPrincipal ? Icons.location_pin : Icons.location_on);
-                
                 return LocalizacionCard(
                   localizacion: loc,
                   icon: icono,
                   isDark: isDark,
-                  isMobile: true, // Usar versión compacta
+                  isMobile: true, 
                   onEdit: () => onEdit(loc),
                   onRemove: () => onRemove(loc),
                 );
@@ -170,7 +153,6 @@ class AddLocalizacionLandscapeLayout extends StatelessWidget {
             ),
     );
   }
-
   Widget _buildEmptyState() {
     return Center(
       child: Column(

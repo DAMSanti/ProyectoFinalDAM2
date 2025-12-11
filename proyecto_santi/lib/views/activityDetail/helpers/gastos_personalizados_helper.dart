@@ -2,17 +2,13 @@
 import '../../../models/gasto_personalizado.dart';
 import '../services/budget_state_service.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Helper para gestionar gastos personalizados
 class GastosPersonalizadosHelper {
-  /// Muestra diálogo para agregar un gasto personalizado
   static Future<void> mostrarDialogoAgregarGasto(
     BuildContext context,
     Function(String, double) onAgregar,
   ) async {
     final conceptoController = TextEditingController();
     final cantidadController = TextEditingController();
-    
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -49,18 +45,15 @@ class GastosPersonalizadosHelper {
               onPressed: () {
                 final concepto = conceptoController.text.trim();
                 final cantidadStr = cantidadController.text.trim();
-                
                 if (concepto.isEmpty || cantidadStr.isEmpty) {
                   SnackBarHelper.show(context, 'Por favor completa todos los campos');
                   return;
                 }
-                
                 final cantidad = double.tryParse(cantidadStr);
                 if (cantidad == null || cantidad <= 0) {
                   SnackBarHelper.show(context, 'La cantidad debe ser un número válido mayor a 0');
                   return;
                 }
-                
                 Navigator.of(context).pop();
                 onAgregar(concepto, cantidad);
               },
@@ -70,8 +63,6 @@ class GastosPersonalizadosHelper {
       },
     );
   }
-
-  /// Agrega un gasto personalizado
   static Future<void> agregarGasto(
     BuildContext context,
     BudgetStateService budgetState,
@@ -87,12 +78,10 @@ class GastosPersonalizadosHelper {
         concepto: concepto,
         cantidad: cantidad,
       );
-
       final gastoCreado = await budgetState.gastoService.createGasto(nuevoGasto);
       if (gastoCreado != null) {
         budgetState.gastosPersonalizados.add(gastoCreado);
         onUpdate();
-
         if (context.mounted) {
           SnackBarHelper.showSuccess(context, 'Gasto agregado correctamente');
         }
@@ -103,8 +92,6 @@ class GastosPersonalizadosHelper {
       }
     }
   }
-
-  /// Elimina un gasto personalizado
   static Future<void> eliminarGasto(
     BuildContext context,
     BudgetStateService budgetState,
@@ -131,16 +118,13 @@ class GastosPersonalizadosHelper {
         );
       },
     );
-
     if (confirmar != true) return;
-
     try {
       if (gasto.id != null) {
         await budgetState.gastoService.deleteGasto(gasto.id!);
       }
       budgetState.gastosPersonalizados.remove(gasto);
       onUpdate();
-
       if (context.mounted) {
         SnackBarHelper.showSuccess(context, 'Gasto eliminado correctamente');
       }
@@ -150,16 +134,10 @@ class GastosPersonalizadosHelper {
       }
     }
   }
-
-  /// Muestra diálogo para solicitar presupuestos de transporte
   static void mostrarDialogoSolicitarPresupuestosTransporte(BuildContext context) {
-    // TODO: Implementar lógica de solicitud de presupuestos
     SnackBarHelper.show(context, 'Funcionalidad en desarrollo');
   }
-
-  /// Muestra diálogo para solicitar presupuestos de alojamiento
   static void mostrarDialogoSolicitarPresupuestosAlojamiento(BuildContext context) {
-    // TODO: Implementar lógica de solicitud de presupuestos
     SnackBarHelper.show(context, 'Funcionalidad en desarrollo');
   }
 }

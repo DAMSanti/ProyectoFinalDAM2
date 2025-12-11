@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../../models/gasto_personalizado.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Widget reutilizable para mostrar la tarjeta de gastos personalizados
 class GastosVariosCardWidget extends StatelessWidget {
   final List<GastoPersonalizado> gastos;
   final bool isAdminOrSolicitante;
@@ -10,7 +8,6 @@ class GastosVariosCardWidget extends StatelessWidget {
   final bool isWeb;
   final VoidCallback onAddGasto;
   final Function(GastoPersonalizado) onDeleteGasto;
-
   const GastosVariosCardWidget({
     Key? key,
     required this.gastos,
@@ -20,19 +17,14 @@ class GastosVariosCardWidget extends StatelessWidget {
     required this.onAddGasto,
     required this.onDeleteGasto,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
-    // Calcular total de gastos personalizados
     final totalGastos = gastos.fold<double>(
       0.0, 
       (sum, gasto) => sum + gasto.cantidad
     );
-    
     return Container(
       padding: EdgeInsets.all(isMobile ? 10 : 18),
       decoration: BoxDecoration(
@@ -60,13 +52,11 @@ class GastosVariosCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado con título y botón agregar
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  // Ocultar icono en móvil
                   if (!isMobile)
                     Container(
                       padding: EdgeInsets.all(10),
@@ -155,7 +145,6 @@ class GastosVariosCardWidget extends StatelessWidget {
                 ),
             ],
           ),
-          
           if (isLoading)
             Center(
               child: Padding(
@@ -230,7 +219,6 @@ class GastosVariosCardWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        // Ocultar icono en móvil
                         if (!isMobile)
                           Container(
                             padding: EdgeInsets.all(8),

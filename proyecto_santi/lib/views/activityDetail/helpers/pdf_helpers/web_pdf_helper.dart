@@ -1,9 +1,6 @@
-// Archivo específico para web
-import 'dart:ui_web' as ui_web;
+﻿import 'dart:ui_web' as ui_web;
 import 'package:universal_html/html.dart' as html;
-
 void registerWebPdfView(String blobUrl) {
-  // ignore: undefined_prefixed_name
   ui_web.platformViewRegistry.registerViewFactory(
     'pdf-viewer-${blobUrl.hashCode}',
     (int viewId) {
@@ -12,7 +9,6 @@ void registerWebPdfView(String blobUrl) {
         ..style.border = 'none'
         ..style.width = '100%'
         ..style.height = '100%';
-      
       return iframe;
     },
   );

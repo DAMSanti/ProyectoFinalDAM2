@@ -1,5 +1,4 @@
-/// Modelo de Usuario para la gestión de usuarios del sistema
-class Usuario {
+﻿class Usuario {
   final String id;
   final String nombreUsuario;
   final String email;
@@ -9,7 +8,6 @@ class Usuario {
   final DateTime? ultimoAcceso;
   final String? profesorNombreCompleto;
   final String? profesorUuid;
-
   Usuario({
     required this.id,
     required this.nombreUsuario,
@@ -21,7 +19,6 @@ class Usuario {
     this.profesorNombreCompleto,
     this.profesorUuid,
   });
-
   factory Usuario.fromJson(Map<String, dynamic> json) {
     return Usuario(
       id: json['id']?.toString() ?? '',
@@ -39,7 +36,6 @@ class Usuario {
       profesorUuid: json['profesorUuid']?.toString(),
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -53,7 +49,6 @@ class Usuario {
       'profesorUuid': profesorUuid,
     };
   }
-
   Usuario copyWith({
     String? id,
     String? nombreUsuario,
@@ -77,7 +72,6 @@ class Usuario {
       profesorUuid: profesorUuid ?? this.profesorUuid,
     );
   }
-
   @override
   String toString() {
     return 'Usuario(id: $id, nombreUsuario: $nombreUsuario, email: $email, rol: $rol, activo: $activo)';

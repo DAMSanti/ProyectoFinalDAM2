@@ -1,25 +1,20 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/func.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_santi/models/auth.dart';
 import 'package:proyecto_santi/components/user_avatar.dart';
-
 class MarcoDesktop extends StatelessWidget {
   final Widget content;
   final VoidCallback onToggleTheme;
-
   const MarcoDesktop({super.key, required this.content, required this.onToggleTheme});
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ancho mínimo del menú para evitar descuadres
         final minMenuWidth = 200.0;
         final menuWidth = constraints.maxWidth * 0.15;
         final effectiveMenuWidth = menuWidth < minMenuWidth ? minMenuWidth : menuWidth;
-        
         return Row(
           children: [
             SizedBox(
@@ -30,7 +25,7 @@ class MarcoDesktop extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(
-                    height: 92, // Fixed height for AppBar
+                    height: 92, 
                     child: DesktopBar(onToggleTheme: onToggleTheme),
                   ),
                   Expanded(
@@ -51,27 +46,21 @@ class MarcoDesktop extends StatelessWidget {
     );
   }
 }
-
 class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
   final String? title;
-  final int? activitiesCount; // Contador de actividades (opcional)
-
+  final int? activitiesCount; 
   const DesktopBar({
     super.key, 
     required this.onToggleTheme,
     this.title,
-    this.activitiesCount, // Nuevo parámetro opcional
+    this.activitiesCount, 
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Obtener información del usuario
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
-    
     return OrientationBuilder(
       builder: (context, orientation) {
         return Container(
@@ -93,7 +82,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
               title: activitiesCount != null
                   ? LayoutBuilder(
                       builder: (context, constraints) {
-                        // Si el ancho es muy pequeño, mostrar versión compacta
                         if (constraints.maxWidth < 400) {
                           return Row(
                             mainAxisSize: MainAxisSize.min,
@@ -135,8 +123,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                             ],
                           );
                         }
-                        
-                        // Versión completa
                         return Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -306,12 +292,10 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
-
   @override
   Size get preferredSize {
     return Size.fromHeight(92);
   }
-
   void _showAccountSettingsDialog(BuildContext context, dynamic currentUser, bool isDark) {
     showDialog(
       context: context,
@@ -335,7 +319,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar y nombre del usuario
                   Center(
                     child: Column(
                       children: [
@@ -373,11 +356,8 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   SizedBox(height: 24),
-                  
                   Divider(),
                   SizedBox(height: 16),
-                  
-                  // Información del usuario
                   Text(
                     'Información Personal',
                     style: TextStyle(
@@ -387,7 +367,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
                   _buildInfoTile(
                     icon: Icons.email,
                     label: 'Correo',
@@ -395,19 +374,15 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     isDark: isDark,
                   ),
                   SizedBox(height: 8),
-                  
                   _buildInfoTile(
                     icon: Icons.badge,
                     label: 'DNI',
                     value: currentUser?.dni?.isNotEmpty == true ? currentUser!.dni : 'No disponible',
                     isDark: isDark,
                   ),
-                  
                   SizedBox(height: 24),
                   Divider(),
                   SizedBox(height: 16),
-                  
-                  // Opciones de configuración (placeholder)
                   Text(
                     'Opciones',
                     style: TextStyle(
@@ -417,7 +392,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   SizedBox(height: 12),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.lock,
@@ -428,7 +402,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     contentPadding: EdgeInsets.zero,
                     enabled: false,
                   ),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.notifications,
@@ -439,7 +412,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
                     contentPadding: EdgeInsets.zero,
                     enabled: false,
                   ),
-                  
                   ListTile(
                     leading: Icon(
                       Icons.language,
@@ -464,7 +436,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
-
   Widget _buildInfoTile({
     required IconData icon,
     required String label,
@@ -514,7 +485,6 @@ class DesktopBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-
 class MenuDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -531,16 +501,12 @@ class MenuDesktop extends StatelessWidget {
       },
     );
   }
-
   Widget _buildMenuContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Obtener el usuario actual para verificar si es admin
     final auth = Provider.of<Auth>(context, listen: false);
     final currentUser = auth.currentUser;
     final isAdmin = currentUser?.rol.toLowerCase() == 'admin' || 
                     currentUser?.rol.toLowerCase() == 'administrador';
-    
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -553,7 +519,6 @@ class MenuDesktop extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          // Header modernizado
           Container(
             height: 140.0,
             decoration: BoxDecoration(
@@ -607,10 +572,7 @@ class MenuDesktop extends StatelessWidget {
               ],
             ),
           ),
-          
           SizedBox(height: 16),
-          
-          // Items del menú
           Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(horizontal: 8),
@@ -642,7 +604,6 @@ class MenuDesktop extends StatelessWidget {
                   text: 'Mapa',
                   routeName: '/mapa',
                 ),
-                // Menú de Gestión solo para administradores
                 if (isAdmin) ...[
                   SizedBox(height: 8),
                   _buildGestionMenu(context, isDark),
@@ -650,8 +611,6 @@ class MenuDesktop extends StatelessWidget {
               ],
             ),
           ),
-          
-          // Separador con gradiente
           Container(
             height: 1,
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -665,8 +624,6 @@ class MenuDesktop extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Items del footer
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Column(
@@ -693,7 +650,6 @@ class MenuDesktop extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildGestionMenu(BuildContext context, bool isDark) {
     return Theme(
       data: Theme.of(context).copyWith(
@@ -729,7 +685,6 @@ class MenuDesktop extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSubMenuItem(BuildContext context, bool isDark, IconData icon, String text, String routeName) {
     return Container(
       margin: EdgeInsets.only(bottom: 4),
@@ -767,7 +722,6 @@ class MenuDesktop extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildDrawerItem(
     BuildContext context, {
     required IconData icon,
@@ -777,7 +731,6 @@ class MenuDesktop extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isCurrentRoute = ModalRoute.of(context)?.settings.name == routeName;
-    
     return Container(
       decoration: BoxDecoration(
         gradient: isCurrentRoute

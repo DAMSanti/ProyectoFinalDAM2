@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'package:proyecto_santi/models/curso.dart';
 import 'package:proyecto_santi/models/grupo.dart';
 import '../widgets/multi_select_cursos_list.dart';
-
-/// Layout portrait para el diálogo de multi-select de grupos
 class MultiSelectPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -18,7 +16,6 @@ class MultiSelectPortraitLayout extends StatelessWidget {
   final Function(int) onToggleCurso;
   final Function(int) onExpandCurso;
   final Function(Grupo, bool) onSelectGrupo;
-
   const MultiSelectPortraitLayout({
     Key? key,
     required this.isDark,
@@ -34,7 +31,6 @@ class MultiSelectPortraitLayout extends StatelessWidget {
     required this.onExpandCurso,
     required this.onSelectGrupo,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,10 +39,8 @@ class MultiSelectPortraitLayout extends StatelessWidget {
         children: [
           _buildSearchField(),
           SizedBox(height: isMobile ? 12 : 16),
-          
           if (selectedGrupos.isNotEmpty) _buildSelectedCounter(),
           SizedBox(height: isMobile ? 8 : 12),
-          
           Expanded(
             child: MultiSelectCursosList(
               filteredCursos: filteredCursos,
@@ -65,7 +59,6 @@ class MultiSelectPortraitLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSearchField() {
     return Container(
       decoration: BoxDecoration(
@@ -108,7 +101,6 @@ class MultiSelectPortraitLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSelectedCounter() {
     return Container(
       padding: EdgeInsets.symmetric(

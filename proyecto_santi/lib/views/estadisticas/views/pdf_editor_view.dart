@@ -1,34 +1,27 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/views/estadisticas/models/chart_item.dart';
-
 class PdfEditorView extends StatefulWidget {
   final Function(List<ChartItem>) onGeneratePdf;
-
   const PdfEditorView({
     Key? key,
     required this.onGeneratePdf,
   }) : super(key: key);
-
   @override
   State<PdfEditorView> createState() => _PdfEditorViewState();
 }
-
 class _PdfEditorViewState extends State<PdfEditorView> {
   List<ChartItem> _charts = [];
-  
   @override
   void initState() {
     super.initState();
     _charts = ChartItem.getDefaultCharts();
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedCharts = _charts.where((c) => c.isSelected).toList()
       ..sort((a, b) => a.order.compareTo(b.order));
-
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
@@ -64,7 +57,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
         ),
         child: Column(
           children: [
-            // Header
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -119,12 +111,9 @@ class _PdfEditorViewState extends State<PdfEditorView> {
                 ],
               ),
             ),
-
-            // Content
             Expanded(
               child: Row(
                 children: [
-                  // Lista de gráficas disponibles
                   Expanded(
                     flex: 3,
                     child: Container(
@@ -172,16 +161,12 @@ class _PdfEditorViewState extends State<PdfEditorView> {
                       ),
                     ),
                   ),
-
-                  // Divider
                   Container(
                     width: 1,
                     color: isDark 
                         ? Colors.white.withValues(alpha: 0.1)
                         : Colors.black.withValues(alpha: 0.1),
                   ),
-
-                  // Preview de gráficas seleccionadas
                   Expanded(
                     flex: 2,
                     child: Container(
@@ -266,8 +251,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
                 ],
               ),
             ),
-
-            // Footer con botones
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -315,7 +298,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       ),
     );
   }
-
   Widget _buildChartTile(ChartItem chart, bool isDark) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -391,7 +373,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       ),
     );
   }
-
   Widget _buildSelectedChartCard(ChartItem chart, int position, bool isDark) {
     return Container(
       key: ValueKey(chart.type),
@@ -451,25 +432,21 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       ),
     );
   }
-
   void _toggleChart(ChartItem chart) {
     setState(() {
       final index = _charts.indexWhere((c) => c.type == chart.type);
       if (index != -1) {
         _charts[index].isSelected = !_charts[index].isSelected;
         if (_charts[index].isSelected) {
-          // Asignar orden basado en cuántos ya están seleccionados
           final selectedCount = _charts.where((c) => c.isSelected).length;
           _charts[index].order = selectedCount - 1;
         } else {
           _charts[index].order = 0;
-          // Reordenar los demás
           _reorderAfterRemoval();
         }
       }
     });
   }
-
   void _onReorder(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) {
@@ -477,17 +454,13 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       }
       final selectedCharts = _charts.where((c) => c.isSelected).toList()
         ..sort((a, b) => a.order.compareTo(b.order));
-      
       final item = selectedCharts.removeAt(oldIndex);
       selectedCharts.insert(newIndex, item);
-      
-      // Actualizar orden
       for (int i = 0; i < selectedCharts.length; i++) {
         selectedCharts[i].order = i;
       }
     });
   }
-
   void _reorderAfterRemoval() {
     final selectedCharts = _charts.where((c) => c.isSelected).toList()
       ..sort((a, b) => a.order.compareTo(b.order));
@@ -495,7 +468,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       selectedCharts[i].order = i;
     }
   }
-
   void _selectAll() {
     setState(() {
       for (int i = 0; i < _charts.length; i++) {
@@ -504,7 +476,6 @@ class _PdfEditorViewState extends State<PdfEditorView> {
       }
     });
   }
-
   void _clearSelection() {
     setState(() {
       for (var chart in _charts) {

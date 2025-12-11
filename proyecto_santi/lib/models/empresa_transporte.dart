@@ -1,11 +1,10 @@
-class EmpresaTransporte {
+﻿class EmpresaTransporte {
   final int id;
   final String nombre;
   final String? cif;
   final String? telefono;
   final String? email;
   final String? direccion;
-
   EmpresaTransporte({
     required this.id,
     required this.nombre,
@@ -14,7 +13,6 @@ class EmpresaTransporte {
     this.email,
     this.direccion,
   });
-
   factory EmpresaTransporte.fromJson(Map<String, dynamic> json) {
     return EmpresaTransporte(
       id: json['id'] ?? 0,
@@ -25,7 +23,6 @@ class EmpresaTransporte {
       direccion: json['direccion']?.toString(),
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -36,19 +33,16 @@ class EmpresaTransporte {
       'direccion': direccion,
     };
   }
-
   @override
   String toString() {
     return nombre;
   }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is EmpresaTransporte &&
           runtimeType == other.runtimeType &&
           id == other.id;
-
   @override
   int get hashCode => id.hashCode;
 }

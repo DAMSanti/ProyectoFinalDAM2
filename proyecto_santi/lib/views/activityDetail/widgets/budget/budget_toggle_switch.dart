@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
-/// Widget reutilizable para switches de activación de transporte/alojamiento
-/// con diseño con gradiente y responsive
+﻿import 'package:flutter/material.dart';
 class BudgetToggleSwitchWidget extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -9,7 +6,6 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
   final bool value;
   final bool isWeb;
   final Function(bool) onChanged;
-
   const BudgetToggleSwitchWidget({
     Key? key,
     required this.label,
@@ -19,13 +15,10 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
     required this.isWeb,
     required this.onChanged,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    // Detectar si es móvil
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 10 : 16, 
@@ -65,7 +58,6 @@ class BudgetToggleSwitchWidget extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Ocultar icono en móvil
                 if (!isMobile)
                   Container(
                     padding: EdgeInsets.all(8),

@@ -1,5 +1,4 @@
-import 'package:proyecto_santi/models/departamento.dart';
-
+﻿import 'package:proyecto_santi/models/departamento.dart';
 class Profesor {
   final String uuid;
   final String dni;
@@ -12,7 +11,6 @@ class Profesor {
   final String? urlFoto;
   final int esJefeDep;
   final Departamento? depart;
-
   Profesor({
     required this.uuid,
     required this.dni,
@@ -26,11 +24,7 @@ class Profesor {
     required this.esJefeDep,
     this.depart,
   });
-
   factory Profesor.fromJson(Map<String, dynamic> json) {
-    // Soportar tanto el formato antiguo como el nuevo (ProfesorSimpleDto de la API)
-    
-    // Si viene el formato simple de la API (ProfesorSimpleDto)
     if (json.containsKey('email') && !json.containsKey('correo')) {
       return Profesor(
         uuid: json['uuid']?.toString() ?? json['id']?.toString() ?? '',
@@ -52,8 +46,6 @@ class Profesor {
           : null,
       );
     }
-    
-    // Si viene el formato de la API con telefono y departamentoId (formato actual)
     if (json.containsKey('telefono') || json.containsKey('departamentoId')) {
       return Profesor(
         uuid: json['uuid']?.toString() ?? '',
@@ -75,8 +67,6 @@ class Profesor {
           : null,
       );
     }
-    
-    // Formato completo original
     return Profesor(
       uuid: json['uuid']?.toString() ?? '',
       dni: json['dni']?.toString() ?? '',
@@ -91,7 +81,6 @@ class Profesor {
       depart: json['depart'] != null ? Departamento.fromJson(json['depart']) : null,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'uuid': uuid,

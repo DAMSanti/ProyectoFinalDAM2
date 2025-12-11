@@ -1,23 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/services/geocoding_service.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Widgets reutilizables para el diálogo de localizaciones
-
-/// Campo de búsqueda de direcciones
 class SearchAddressField extends StatelessWidget {
   final TextEditingController controller;
   final bool isSearching;
   final VoidCallback onClear;
-
   const SearchAddressField({
     Key? key,
     required this.controller,
     required this.isSearching,
     required this.onClear,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -75,24 +69,19 @@ class SearchAddressField extends StatelessWidget {
     );
   }
 }
-
-/// Lista de resultados de búsqueda
 class SearchResultsList extends StatelessWidget {
   final List<GeocodingResult> results;
   final Function(GeocodingResult) onResultTap;
   final bool isDark;
-
   const SearchResultsList({
     Key? key,
     required this.results,
     required this.onResultTap,
     required this.isDark,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     if (results.isEmpty) return SizedBox.shrink();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,7 +139,6 @@ class SearchResultsList extends StatelessWidget {
             itemCount: results.length,
             itemBuilder: (context, index) {
               final result = results[index];
-              
               return Container(
                 margin: EdgeInsets.only(bottom: 6),
                 decoration: BoxDecoration(
@@ -206,20 +194,16 @@ class SearchResultsList extends StatelessWidget {
     );
   }
 }
-
-/// Título de sección con icono y contador
 class SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
   final int? count;
-
   const SectionHeader({
     Key? key,
     required this.icon,
     required this.title,
     this.count,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -278,16 +262,12 @@ class SectionHeader extends StatelessWidget {
     );
   }
 }
-
-/// Mensaje de lista vacía
 class EmptyLocalizacionesMessage extends StatelessWidget {
   final bool isDark;
-
   const EmptyLocalizacionesMessage({
     Key? key,
     required this.isDark,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -332,8 +312,6 @@ class EmptyLocalizacionesMessage extends StatelessWidget {
     );
   }
 }
-
-/// Card de localización individual
 class LocalizacionCard extends StatelessWidget {
   final Localizacion localizacion;
   final IconData icon;
@@ -341,7 +319,6 @@ class LocalizacionCard extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onRemove;
   final bool isMobile;
-
   const LocalizacionCard({
     Key? key,
     required this.localizacion,
@@ -351,7 +328,6 @@ class LocalizacionCard extends StatelessWidget {
     required this.onRemove,
     this.isMobile = false,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -389,7 +365,6 @@ class LocalizacionCard extends StatelessWidget {
           padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: Row(
             children: [
-              // Icono de la localizaci�n
               Container(
                 padding: EdgeInsets.all(isMobile ? 6 : 10),
                 decoration: BoxDecoration(
@@ -415,8 +390,6 @@ class LocalizacionCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: isMobile ? 8 : 12),
-              
-              // Información de la localización
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,8 +455,6 @@ class LocalizacionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              // Botones de acción
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -513,11 +484,8 @@ class LocalizacionCard extends StatelessWidget {
     );
   }
 }
-
-/// Divisor decorativo
 class DecorativeDivider extends StatelessWidget {
   const DecorativeDivider({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(

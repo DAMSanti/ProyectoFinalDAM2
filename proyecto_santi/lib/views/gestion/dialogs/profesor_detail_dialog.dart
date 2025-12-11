@@ -1,80 +1,62 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/models/departamento.dart';
 import 'package:proyecto_santi/services/services.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
 class ProfesorDetailDialog extends StatefulWidget {
   final Profesor? profesor;
   final VoidCallback onSaved;
-
   const ProfesorDetailDialog({
     Key? key,
     this.profesor,
     required this.onSaved,
   }) : super(key: key);
-
   @override
   State<ProfesorDetailDialog> createState() => _ProfesorDetailDialogState();
 }
-
 class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
   late final ProfesorService _profesorService;
   late final CatalogoService _catalogoService;
-  
-  // Controllers
   late final TextEditingController _dniController;
   late final TextEditingController _nombreController;
   late final TextEditingController _apellidosController;
   late final TextEditingController _correoController;
   late final TextEditingController _passwordController;
-  
   String? _rolSeleccionado;
   int? _departamentoSeleccionado;
   bool _activo = true;
   bool _esJefeDep = false;
   bool _isLoading = false;
-  
   List<Departamento> _departamentos = [];
-
-  // Roles según la base de datos
   final List<Map<String, String>> _roles = [
     {'value': 'PROF', 'label': 'Profesor'},
     {'value': 'ED', 'label': 'Equipo Directivo'},
     {'value': 'ADM', 'label': 'Administrador'},
   ];
-
   @override
   void initState() {
     super.initState();
     _profesorService = ProfesorService(_apiService);
     _catalogoService = CatalogoService(_apiService);
-    
-    // Inicializar controllers con valores existentes o vacíos
     _dniController = TextEditingController(text: widget.profesor?.dni ?? '');
     _nombreController = TextEditingController(text: widget.profesor?.nombre ?? '');
     _apellidosController = TextEditingController(text: widget.profesor?.apellidos ?? '');
     _correoController = TextEditingController(text: widget.profesor?.correo ?? '');
     _passwordController = TextEditingController();
-    
-    // Validar que el rol exista en la lista de valores permitidos
     if (widget.profesor != null && widget.profesor!.rol.isNotEmpty) {
       final rolValido = _roles.any((r) => r['value'] == widget.profesor!.rol);
       _rolSeleccionado = rolValido ? widget.profesor!.rol : 'PROF';
     } else {
       _rolSeleccionado = 'PROF';
     }
-    
     _departamentoSeleccionado = widget.profesor?.depart?.id;
     _activo = widget.profesor?.activo == 1;
     _esJefeDep = widget.profesor?.esJefeDep == 1;
-    
     _loadDepartamentos();
   }
-
   @override
   void dispose() {
     _dniController.dispose();
@@ -84,7 +66,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
     _passwordController.dispose();
     super.dispose();
   }
-
   Future<void> _loadDepartamentos() async {
     try {
       final departamentos = await _catalogoService.fetchDepartamentos();
@@ -97,10 +78,8 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       print('Error loading departamentos: $e');
     }
   }
-
   Future<void> _saveProfesor() async {
     if (!_formKey.currentState!.validate()) return;
-
     if (_departamentoSeleccionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -110,8 +89,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       );
       return;
     }
-
-    // Si es nuevo profesor, la contraseña es obligatoria
     if (widget.profesor == null) {
       if (_passwordController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,11 +100,8 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         return;
       }
     }
-
     setState(() => _isLoading = true);
-
     try {
-      // Crear objeto Profesor con los datos del formulario
       final profesor = Profesor(
         uuid: widget.profesor?.uuid ?? '',
         dni: _dniController.text.trim(),
@@ -140,9 +114,7 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         esJefeDep: _esJefeDep ? 1 : 0,
         depart: null,
       );
-
       if (widget.profesor != null) {
-        // Actualizar
         await _profesorService.updateProfesor(
           widget.profesor!.uuid, 
           profesor,
@@ -157,7 +129,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
           );
         }
       } else {
-        // Crear
         await _profesorService.createProfesor(
           profesor,
           departamentoId: _departamentoSeleccionado,
@@ -171,7 +142,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
           );
         }
       }
-
       widget.onSaved();
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -186,14 +156,12 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isDesktop = screenWidth > 900;
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -233,9 +201,7 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header con gradiente
               _buildHeader(isDark, isMobile),
-              // Contenido con scroll
               Flexible(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -247,7 +213,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
                   ),
                 ),
               ),
-              // Footer con botones
               _buildFooter(isDark, isMobile),
             ],
           ),
@@ -255,7 +220,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildHeader(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -308,7 +272,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildFooter(bool isDark, bool isMobile) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -367,12 +330,10 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildDesktopLayout(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Fila 1: DNI, Nombre, Apellidos
         Row(
           children: [
             Expanded(child: _buildDniField(isDark)),
@@ -383,7 +344,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 2: Correo y Contraseña (solo al crear)
         if (widget.profesor == null)
           Row(
             children: [
@@ -395,7 +355,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         else
           _buildCorreoField(isDark),
         SizedBox(height: 16),
-        // Fila 3: Rol y Departamento
         Row(
           children: [
             Expanded(child: _buildRolField(isDark)),
@@ -404,7 +363,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // Fila 4: Estados (Activo y Jefe Dep)
         Row(
           children: [
             Expanded(child: _buildActivoField(isDark)),
@@ -415,7 +373,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ],
     );
   }
-
   Widget _buildMobileLayout(bool isDark) {
     return Column(
       children: [
@@ -427,7 +384,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         SizedBox(height: 16),
         _buildCorreoField(isDark),
         SizedBox(height: 16),
-        // Contraseña solo al crear
         if (widget.profesor == null) ...[
           _buildPasswordField(isDark),
           SizedBox(height: 16),
@@ -442,7 +398,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ],
     );
   }
-
   Widget _buildStyledField({
     required String label,
     required IconData icon,
@@ -480,7 +435,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ],
     );
   }
-
   Widget _buildDniField(bool isDark) {
     return _buildStyledField(
       label: 'DNI *',
@@ -510,7 +464,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildNombreField(bool isDark) {
     return _buildStyledField(
       label: 'Nombre *',
@@ -536,7 +489,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildApellidosField(bool isDark) {
     return _buildStyledField(
       label: 'Apellidos *',
@@ -562,7 +514,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildCorreoField(bool isDark) {
     return _buildStyledField(
       label: 'Correo Electrónico *',
@@ -590,7 +541,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildPasswordField(bool isDark) {
     return _buildStyledField(
       label: widget.profesor != null ? 'Contraseña (dejar vacío para no cambiar)' : 'Contraseña *',
@@ -609,7 +559,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildRolField(bool isDark) {
     return _buildStyledField(
       label: 'Rol *',
@@ -643,7 +592,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildDepartamentoField(bool isDark) {
     return _buildStyledField(
       label: 'Departamento *',
@@ -678,7 +626,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildActivoField(bool isDark) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -720,7 +667,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
       ),
     );
   }
-
   Widget _buildJefeDepField(bool isDark) {
     return Container(
       padding: EdgeInsets.all(16),
@@ -763,6 +709,3 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
     );
   }
 }
-
-
-

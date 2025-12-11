@@ -1,32 +1,24 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
 import 'dart:io';
 import 'package:proyecto_santi/models/profesor.dart';
-
 class DepartamentoCardWidget extends StatelessWidget {
   final Profesor? responsable;
   final bool isMobile;
-
   const DepartamentoCardWidget({
     super.key,
     required this.responsable,
     this.isMobile = false,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-    
-    // Debug: Imprimir información del responsable
     print('[DEBUG DepartamentoCard] Responsable: ${responsable?.nombre ?? 'null'}');
     print('[DEBUG DepartamentoCard] Departamento objeto: ${responsable?.depart}');
     print('[DEBUG DepartamentoCard] Departamento nombre: ${responsable?.depart?.nombre ?? 'null'}');
-    
-    // Obtener el nombre del departamento del responsable
     final departamentoNombre = responsable?.depart?.nombre ?? 'Sin asignar';
-
     return Container(
       padding: EdgeInsets.all(isMobile ? 10 : 12),
       decoration: BoxDecoration(

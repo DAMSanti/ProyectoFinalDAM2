@@ -1,29 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'package:proyecto_santi/shared/helpers/activity_formatters.dart';
-
 class ActivityCardItem extends StatefulWidget {
   final Actividad actividad;
   final bool isDarkTheme;
-
   const ActivityCardItem({
     super.key,
     required this.actividad,
     required this.isDarkTheme,
   });
-
   @override
   State<ActivityCardItem> createState() => _ActivityCardItemState();
 }
-
 class _ActivityCardItemState extends State<ActivityCardItem> {
   bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return LayoutBuilder(
       builder: (context, constraints) {
         return MouseRegion(
@@ -56,7 +50,6 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                         ],
                 ),
                 boxShadow: [
-                  // Sombra principal
                   BoxShadow(
                     color: _isHovered 
                         ? const Color.fromRGBO(25, 118, 210, 0.35)
@@ -65,7 +58,6 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                     blurRadius: _isHovered ? 24.0 : 12.0,
                     spreadRadius: _isHovered ? 0 : -1,
                   ),
-                  // Sombra secundaria para más profundidad
                   if (_isHovered)
                     const BoxShadow(
                       color: Color.fromRGBO(25, 118, 210, 0.2),
@@ -94,7 +86,6 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                     borderRadius: BorderRadius.circular(20.0),
                     child: Stack(
                       children: [
-                      // Gradiente superior decorativo
                       Positioned(
                         top: 0,
                         left: 0,
@@ -106,21 +97,20 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                               gradient: LinearGradient(
                                 colors: widget.actividad.tipo == 'Complementaria'
                                   ? [
-                                      Color(0xFF1976d2), // Azul oscuro
-                                      Color(0xFF42A5F5), // Azul medio
-                                      Color(0xFF64B5F6), // Azul claro
+                                      Color(0xFF1976d2), 
+                                      Color(0xFF42A5F5), 
+                                      Color(0xFF64B5F6), 
                                     ]
                                   : [
-                                      Color(0xFFE65100), // Naranja oscuro
-                                      Color(0xFFFF6F00), // Naranja medio
-                                      Color(0xFFFF9800), // Naranja claro
+                                      Color(0xFFE65100), 
+                                      Color(0xFFFF6F00), 
+                                      Color(0xFFFF9800), 
                                     ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                      // Efecto de brillo en hover
                       if (_isHovered)
                         Positioned.fill(
                           child: IgnorePointer(
@@ -138,7 +128,6 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
                             ),
                           ),
                         ),
-                      // Patrón de puntos decorativos
                       Positioned(
                         right: -20,
                         bottom: -20,
@@ -169,29 +158,22 @@ class _ActivityCardItemState extends State<ActivityCardItem> {
     );
   }
 }
-
 class ActivityInfo extends StatelessWidget {
   final Actividad actividad;
   final bool isHovered;
-
   const ActivityInfo({
     super.key,
     required this.actividad,
     required this.isHovered,
   });
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    // Usar helpers centralizados
     final fechaHora = ActivityFormatters.formatearFechaHora(actividad);
     final estadoColor = ActivityFormatters.getEstadoColor(actividad.estado);
     final estadoIcon = ActivityFormatters.getEstadoIcon(actividad.estado);
-
     return Container(
       decoration: BoxDecoration(
-        // Efecto glassmorphism sutil en hover
         gradient: isHovered
             ? LinearGradient(
                 begin: Alignment.topLeft,
@@ -208,12 +190,11 @@ class ActivityInfo extends StatelessWidget {
               )
             : null,
       ),
-      padding: const EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 8.0), // Padding optimizado para móvil
+      padding: const EdgeInsets.fromLTRB(10.0, 8.0, 10.0, 8.0), 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Título con icono más compacto
           Row(
             children: [
               Container(
@@ -233,7 +214,7 @@ class ActivityInfo extends StatelessWidget {
                 child: Text(
                   actividad.titulo,
                   style: TextStyle(
-                    fontSize: 14, // Reducido de 16
+                    fontSize: 14, 
                     fontWeight: FontWeight.bold,
                     color: isDark ? Colors.white : const Color(0xFF1A237E),
                     letterSpacing: -0.3,
@@ -245,26 +226,20 @@ class ActivityInfo extends StatelessWidget {
               ),
             ],
           ),
-          
-          const SizedBox(height: 6), // Reducido de 10
-          
-          // Descripción más compacta
+          const SizedBox(height: 6), 
           Text(
             actividad.descripcion?.isNotEmpty == true 
                 ? actividad.descripcion! 
                 : 'Sin descripción',
             style: TextStyle(
-              fontSize: 11, // Reducido de 13
+              fontSize: 11, 
               color: isDark ? Colors.white70 : Colors.black87,
               height: 1.3,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
-          
-          const SizedBox(height: 6), // Reducido de 10
-          
-          // Divider más fino
+          const SizedBox(height: 6), 
           Container(
             height: 1,
             margin: const EdgeInsets.symmetric(vertical: 4),
@@ -278,18 +253,15 @@ class ActivityInfo extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Fecha y estado más compactos
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Fecha con icono más pequeño
               Flexible(
                 child: Row(
                   children: [
                     Icon(
                       Icons.access_time_rounded,
-                      size: 12, // Reducido de 15
+                      size: 12, 
                       color: isDark ? Colors.white60 : Colors.black45,
                     ),
                     const SizedBox(width: 4),
@@ -297,7 +269,7 @@ class ActivityInfo extends StatelessWidget {
                       child: Text(
                         fechaHora,
                         style: TextStyle(
-                          fontSize: 10, // Reducido de 12
+                          fontSize: 10, 
                           color: isDark ? Colors.white70 : Colors.black54,
                           fontWeight: FontWeight.w500,
                         ),
@@ -308,9 +280,8 @@ class ActivityInfo extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              // Badge de estado más pequeño
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // Reducido
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), 
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(
                     (estadoColor.r * 255.0).round(),
@@ -334,14 +305,14 @@ class ActivityInfo extends StatelessWidget {
                   children: [
                     Icon(
                       estadoIcon,
-                      size: 10, // Reducido de 14
+                      size: 10, 
                       color: estadoColor,
                     ),
                     const SizedBox(width: 3),
                     Text(
                       actividad.estado,
                       style: TextStyle(
-                        fontSize: 9, // Reducido de 12
+                        fontSize: 9, 
                         fontWeight: FontWeight.bold,
                         color: estadoColor,
                       ),

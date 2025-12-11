@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/tema.dart';
-
-/// Footer genérico para diálogos con botones de acción personalizables
 class DialogFooter extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
@@ -12,7 +10,6 @@ class DialogFooter extends StatelessWidget {
   final String saveText;
   final IconData cancelIcon;
   final IconData saveIcon;
-
   const DialogFooter({
     Key? key,
     required this.isMobile,
@@ -25,7 +22,6 @@ class DialogFooter extends StatelessWidget {
     this.cancelIcon = Icons.close_rounded,
     this.saveIcon = Icons.save_rounded,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,7 +45,6 @@ class DialogFooter extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // Botón Cancelar
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Container(
@@ -102,7 +97,6 @@ class DialogFooter extends StatelessWidget {
             ),
           ),
           SizedBox(width: isMobileLandscape ? 6 : (isMobile ? 8 : 12)),
-          // Botón Guardar
           Expanded(
             flex: isMobile ? 1 : 0,
             child: Container(
@@ -159,15 +153,12 @@ class DialogFooter extends StatelessWidget {
     );
   }
 }
-
-/// Footer del diálogo de edición (mantenido para compatibilidad)
 class EditDialogFooter extends StatelessWidget {
   final bool isMobile;
   final bool isMobileLandscape;
   final bool isDark;
   final VoidCallback onCancel;
   final VoidCallback onSave;
-
   const EditDialogFooter({
     Key? key,
     required this.isMobile,
@@ -176,7 +167,6 @@ class EditDialogFooter extends StatelessWidget {
     required this.onCancel,
     required this.onSave,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return DialogFooter(

@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/tema/theme.dart';
 import 'package:proyecto_santi/views/login/components/login_form.dart';
 import 'package:proyecto_santi/views/login/components/login_buttons.dart';
-
 Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraints, TextEditingController usernameController, TextEditingController passwordController, bool isLoading, VoidCallback login, VoidCallback showLoginDialog) {
   return Stack(
     children: [
@@ -25,7 +24,6 @@ Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo con tamaño fijo
                 Container(
                   constraints: const BoxConstraints(
                     maxWidth: 180,
@@ -37,14 +35,12 @@ Widget loginLargeLandscapeLayout(BuildContext context, BoxConstraints constraint
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Form
                 LoginForm(
                   usernameController: usernameController,
                   passwordController: passwordController,
                   onSubmit: login,
                 ),
                 const SizedBox(height: 24),
-                // Botones
                 LoginButtons(
                   onLoginPressed: login,
                   onMicrosoftLoginPressed: showLoginDialog,

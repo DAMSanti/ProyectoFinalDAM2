@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/tema/app_colors.dart';
-
-/// Layout portrait para el diálogo de edición de localización
 class EditLocalizacionPortraitLayout extends StatelessWidget {
   final bool isDark;
   final bool isMobile;
@@ -18,7 +16,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
   final List<IconData> iconosDisponibles;
   final IconData? iconoSeleccionado;
   final ValueChanged<IconData> onIconoSelected;
-
   const EditLocalizacionPortraitLayout({
     Key? key,
     required this.isDark,
@@ -36,7 +33,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
     required this.iconoSeleccionado,
     required this.onIconoSelected,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -44,30 +40,19 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Info de la localización
           _buildLocationInfo(),
           SizedBox(height: isMobile ? 10 : 20),
-          
-          // Checkbox para marcar como principal
           if (puedeSerPrincipal) _buildPrincipalCheckbox(),
-          
           SizedBox(height: puedeSerPrincipal ? (isMobile ? 10 : 20) : 0),
-          
-          // Tipo de localización
           _buildTypeSelector(),
           SizedBox(height: isMobile ? 10 : 20),
-          
-          // Campo de descripción
           _buildDescription(),
           SizedBox(height: isMobile ? 10 : 20),
-          
-          // Selector de icono
           _buildIconSelector(),
         ],
       ),
     );
   }
-
   Widget _buildLocationInfo() {
     return Container(
       padding: EdgeInsets.all(isMobile ? 8 : 16),
@@ -127,7 +112,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildPrincipalCheckbox() {
     return Container(
       decoration: BoxDecoration(
@@ -184,7 +168,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +254,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
                 default:
                   iconoTipo = Icons.place_rounded;
               }
-              
               return DropdownMenuItem<String>(
                 value: tipo,
                 child: Row(
@@ -289,7 +271,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildDescription() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,7 +334,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
       ],
     );
   }
-
   Widget _buildIconSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +387,6 @@ class EditLocalizacionPortraitLayout extends StatelessWidget {
             itemBuilder: (context, index) {
               final icono = iconosDisponibles[index];
               final isSelected = iconoSeleccionado == icono;
-              
               return Material(
                 color: Colors.transparent,
                 child: InkWell(

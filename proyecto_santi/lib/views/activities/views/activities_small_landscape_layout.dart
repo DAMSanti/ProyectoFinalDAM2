@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:proyecto_santi/components/menu.dart';
 import 'package:proyecto_santi/models/actividad.dart';
 import 'package:proyecto_santi/tema/gradient_background.dart';
@@ -8,21 +8,17 @@ import 'package:proyecto_santi/views/activities/components/activities_section_he
 import 'package:proyecto_santi/views/activities/components/activities_list_container.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
-
 class ActivitiesSmallLandscapeLayout extends StatefulWidget {
   final List<Actividad> activities;
   final VoidCallback onToggleTheme;
-
   const ActivitiesSmallLandscapeLayout({
     super.key,
     required this.activities,
     required this.onToggleTheme,
   });
-
   @override
   _ActivitiesSmallLandscapeLayoutState createState() => _ActivitiesSmallLandscapeLayoutState();
 }
-
 class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscapeLayout> {
   String searchQuery = '';
   Map<String, dynamic> filters = {
@@ -33,7 +29,6 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
   };
   int _allActivitiesCount = 0;
   int _userActivitiesCount = 0;
-
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
@@ -61,8 +56,6 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
               child: Column(
                 children: [
                   SizedBox(height: 8),
-                  
-                  // Barra de búsqueda moderna
                   ActivitiesSearchBar(
                     onSearchQueryChanged: (query) {
                       setState(() {
@@ -76,14 +69,10 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
                       });
                     },
                   ),
-                  
                   SizedBox(height: 8),
-                  
-                  // Layout horizontal para landscape
                   Expanded(
                     child: Row(
                       children: [
-                        // Columna izquierda: Todas las actividades
                         Expanded(
                           child: Column(
                             children: [
@@ -114,10 +103,7 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
                             ],
                           ),
                         ),
-                        
                         SizedBox(width: 8),
-                        
-                        // Columna derecha: Tus actividades
                         Expanded(
                           child: Column(
                             children: [
@@ -151,7 +137,6 @@ class _ActivitiesSmallLandscapeLayoutState extends State<ActivitiesSmallLandscap
                       ],
                     ),
                   ),
-                  
                   SizedBox(height: 8),
                 ],
               ),

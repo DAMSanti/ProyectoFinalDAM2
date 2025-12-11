@@ -1,4 +1,4 @@
-class Localizacion {
+﻿class Localizacion {
   final int id;
   final String nombre;
   final String? direccion;
@@ -8,10 +8,9 @@ class Localizacion {
   final double? latitud;
   final double? longitud;
   final bool esPrincipal;
-  final String? icono; // Nombre del icono de Material Icons
-  final String? descripcion; // Descripción o comentario sobre esta localización
-  final String? tipoLocalizacion; // Tipo: "Punto de salida", "Punto de llegada", "Alojamiento", "Actividad"
-
+  final String? icono; 
+  final String? descripcion; 
+  final String? tipoLocalizacion; 
   Localizacion({
     required this.id,
     required this.nombre,
@@ -26,7 +25,6 @@ class Localizacion {
     this.descripcion,
     this.tipoLocalizacion,
   });
-
   factory Localizacion.fromJson(Map<String, dynamic> json) {
     return Localizacion(
       id: json['id'] as int,
@@ -43,7 +41,6 @@ class Localizacion {
       tipoLocalizacion: json['tipoLocalizacion']?.toString(),
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -60,7 +57,6 @@ class Localizacion {
       'tipoLocalizacion': tipoLocalizacion,
     };
   }
-
   String get direccionCompleta {
     final partes = <String>[];
     if (direccion != null && direccion!.isNotEmpty) partes.add(direccion!);
