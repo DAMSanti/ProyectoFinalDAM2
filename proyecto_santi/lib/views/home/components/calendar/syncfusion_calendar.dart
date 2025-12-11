@@ -264,10 +264,17 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
   }
 
   Widget _buildCalendarContainer(BuildContext context, bool isDark, bool isNarrowScreen) {
+    final screenSize = MediaQuery.of(context).size;
+    
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Usar MediaQuery si constraints es infinito
+        final effectiveWidth = constraints.maxWidth.isFinite 
+            ? constraints.maxWidth 
+            : screenSize.width;
+        
         // Usar isNarrowScreen para determinar si ocultar iconos
-        final isSmallScreen = isNarrowScreen || constraints.maxWidth < 600;
+        final isSmallScreen = isNarrowScreen || effectiveWidth < 600;
         
         return Container(
           decoration: BoxDecoration(
@@ -312,25 +319,26 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
             borderRadius: BorderRadius.circular(24),
             child: Stack(
               children: [
-                SfCalendar(
-                  controller: _calendarController,
-                  view: _currentView,
-                  dataSource: _dataSource,
-                  firstDayOfWeek: 1, // Lunes como primer día
-                  showNavigationArrow: false, // Desactivamos las flechas predeterminadas
-                  showDatePickerButton: true,
-                  allowViewNavigation: true,
-                  onViewChanged: (ViewChangedDetails details) {
-                    // Actualizar cuando el usuario navega en el calendario o cambia de vista
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) {
-                        bool needsUpdate = false;
-                        
-                        // Actualizar el estado de la vista actual si cambió
-                        if (_calendarController.view != null && _calendarController.view != _currentView) {
-                          setState(() {
-                            _currentView = _calendarController.view!;
-                          });
+                SizedBox.expand(
+                  child: SfCalendar(
+                    controller: _calendarController,
+                    view: _currentView,
+                    dataSource: _dataSource,
+                    firstDayOfWeek: 1, // Lunes como primer día
+                    showNavigationArrow: false, // Desactivamos las flechas predeterminadas
+                    showDatePickerButton: true,
+                    allowViewNavigation: true,
+                    onViewChanged: (ViewChangedDetails details) {
+                      // Actualizar cuando el usuario navega en el calendario o cambia de vista
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          bool needsUpdate = false;
+                          
+                          // Actualizar el estado de la vista actual si cambió
+                          if (_calendarController.view != null && _calendarController.view != _currentView) {
+                            setState(() {
+                              _currentView = _calendarController.view!;
+                            });
                           needsUpdate = true;
                         }
                         
@@ -460,7 +468,8 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
                     isSmallScreen,
                   );
                 },
-                ),
+                  ),
+                ), // Cierra SizedBox.expand
                 // Flechas de navegación personalizadas
                 Positioned(
                   top: 12,
