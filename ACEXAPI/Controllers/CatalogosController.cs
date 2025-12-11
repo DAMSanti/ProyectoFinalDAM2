@@ -13,26 +13,38 @@ namespace ACEXAPI.Controllers;
 public class DepartamentoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<DepartamentoController> _logger;
 
-    public DepartamentoController(ApplicationDbContext context)
+    public DepartamentoController(ApplicationDbContext context, ILogger<DepartamentoController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<DepartamentoDto>>> GetAll()
     {
-        var departamentos = await _context.Departamentos
-            .Select(d => new DepartamentoDto
-            {
-                Id = d.Id,
-                Nombre = d.Nombre,
-                Codigo = d.Codigo,
-                Descripcion = d.Descripcion
-            })
-            .ToListAsync();
+        try
+        {
+            _logger.LogInformation("[DepartamentoController] Iniciando GetAll");
+            var departamentos = await _context.Departamentos
+                .Select(d => new DepartamentoDto
+                {
+                    Id = d.Id,
+                    Nombre = d.Nombre,
+                    Codigo = d.Codigo,
+                    Descripcion = d.Descripcion
+                })
+                .ToListAsync();
 
-        return Ok(departamentos);
+            _logger.LogInformation($"[DepartamentoController] GetAll completado. Total: {departamentos.Count}");
+            return Ok(departamentos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[DepartamentoController] Error en GetAll: {Message}", ex.Message);
+            return StatusCode(500, new { error = ex.Message, stackTrace = ex.StackTrace });
+        }
     }
 
     [HttpGet("{id}")]
