@@ -197,13 +197,13 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
               size: 28,
             ),
           ),
-          SizedBox(width: 16.w),
+          SizedBox(width: 16),
           Expanded(
             child: Text(
               widget.departamento != null ? 'Editar Departamento' : 'Nuevo Departamento',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isMobile ? 20.sp : 24.sp,
+                fontSize: isMobile ? 20.sp : 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -239,11 +239,11 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
               'Cancelar',
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.grey[700],
-                fontSize: isMobile ? 14.sp : 16.sp,
+                fontSize: isMobile ? 14.sp : 16,
               ),
             ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12),
           ElevatedButton.icon(
             onPressed: _isLoading ? null : _saveDepartamento,
             icon: _isLoading
@@ -258,7 +258,7 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
                 : Icon(Icons.save_rounded, size: isMobile ? 18 : 20),
             label: Text(
               _isLoading ? 'Guardando...' : 'Guardar',
-              style: TextStyle(fontSize: isMobile ? 14.sp : 16.sp),
+              style: TextStyle(fontSize: isMobile ? 14.sp : 16),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -282,7 +282,7 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(child: _buildCodigoField(isDark)),
-        SizedBox(width: 16.w),
+        SizedBox(width: 16),
         Expanded(flex: 2, child: _buildNombreField(isDark)),
       ],
     );
@@ -292,7 +292,7 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
     return Column(
       children: [
         _buildCodigoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildNombreField(isDark),
       ],
     );
@@ -310,18 +310,18 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
         Row(
           children: [
             Icon(icon, size: 18, color: AppColors.primary),
-            SizedBox(width: 8.w),
+            SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ],
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
@@ -390,3 +390,6 @@ class _DepartamentoDetailDialogState extends State<DepartamentoDetailDialog> {
     );
   }
 }
+
+
+

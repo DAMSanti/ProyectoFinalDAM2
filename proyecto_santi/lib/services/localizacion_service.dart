@@ -65,10 +65,13 @@ class LocalizacionService {
         final List<dynamic> data = response.data as List;
         return data.map((e) => e as Map<String, dynamic>).toList();
       }
-      throw ApiException('Error al obtener localizaciones', statusCode: response.statusCode);
+      // Si no es 200, retornar lista vacía en lugar de lanzar excepción
+      print('[LocalizacionService] fetchLocalizaciones retornó status ${response.statusCode}');
+      return [];
     } catch (e) {
       print('[LocalizacionService ERROR] fetchLocalizaciones: $e');
-      rethrow;
+      // Retornar lista vacía en lugar de relanzar para no bloquear el guardado
+      return [];
     }
   }
 
@@ -83,16 +86,21 @@ class LocalizacionService {
   }) async {
     try {
       print('[LocalizacionService] Adding localización $localizacionId to actividad $actividadId');
+      final bodyData = {
+        'esPrincipal': esPrincipal,
+        'orden': 0,
+        if (icono != null) 'icono': icono,
+        if (descripcion != null && descripcion.isNotEmpty) 'descripcion': descripcion,
+        if (tipoLocalizacion != null && tipoLocalizacion.isNotEmpty) 'tipoLocalizacion': tipoLocalizacion,
+      };
+      print('[LocalizacionService] Body data: $bodyData');
+      
       final response = await _apiService.postData(
         '/Actividad/$actividadId/localizaciones/$localizacionId',
-        {
-          'esPrincipal': esPrincipal,
-          if (icono != null) 'icono': icono,
-          if (descripcion != null && descripcion.isNotEmpty) 'descripcion': descripcion,
-          if (tipoLocalizacion != null && tipoLocalizacion.isNotEmpty) 'tipoLocalizacion': tipoLocalizacion,
-        },
+        bodyData,
       );
       
+      print('[LocalizacionService] Response status: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
       print('[LocalizacionService ERROR] addLocalizacion: $e');

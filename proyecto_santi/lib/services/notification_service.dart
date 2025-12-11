@@ -110,6 +110,11 @@ class NotificationService {
 
   /// Obtiene el token FCM del dispositivo
   Future<void> _getFCMToken() async {
+    if (kIsWeb) {
+      print('[Notifications] Firebase Messaging not supported on web');
+      return;
+    }
+
     try {
       _fcmToken = await _firebaseMessaging.getToken();
       print('[Notifications] FCM Token: $_fcmToken');
@@ -122,31 +127,45 @@ class NotificationService {
       });
     } catch (e) {
       print('[Notifications] Error getting FCM token: $e');
+      print('[Notifications] Note: Firebase Messaging may not be properly configured');
     }
   }
 
   /// Configura los listeners de Firebase
   void _configureFirebaseListeners() {
-    // Cuando la app está en FOREGROUND (abierta)
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('[Notifications] Foreground message received: ${message.notification?.title}');
-      _handleMessage(message);
-      _showLocalNotification(message);
-    });
+    // Solo configurar listeners en plataformas soportadas
+    if (kIsWeb) {
+      print('[Notifications] Firebase Messaging not supported on web');
+      return;
+    }
 
-    // Cuando el usuario toca una notificación con la app en BACKGROUND
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('[Notifications] Background notification tapped: ${message.notification?.title}');
-      _handleNotificationTap(message);
-    });
+    try {
+      // Cuando la app está en FOREGROUND (abierta)
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('[Notifications] Foreground message received: ${message.notification?.title}');
+        _handleMessage(message);
+        _showLocalNotification(message);
+      });
 
-    // Verificar si la app se abrió desde una notificación (cuando estaba cerrada)
-    _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        print('[Notifications] App opened from terminated state via notification');
+      // Cuando el usuario toca una notificación con la app en BACKGROUND
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print('[Notifications] Background notification tapped: ${message.notification?.title}');
         _handleNotificationTap(message);
-      }
-    });
+      });
+
+      // Verificar si la app se abrió desde una notificación (cuando estaba cerrada)
+      _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
+        if (message != null) {
+          print('[Notifications] App opened from terminated state via notification');
+          _handleNotificationTap(message);
+        }
+      }).catchError((e) {
+        print('[Notifications] Error getting initial message: $e');
+      });
+    } catch (e) {
+      print('[Notifications] Error configuring Firebase listeners: $e');
+      print('[Notifications] Note: Firebase Messaging may not be available on this platform');
+    }
   }
 
   /// Muestra una notificación local cuando la app está abierta
@@ -265,6 +284,10 @@ class NotificationService {
   /// Suscribirse a un tópico (útil para notificaciones grupales)
   Future<void> subscribeToTopic(String topic) async {
     try {
+      if (kIsWeb) {
+        print('[Notifications] Cannot subscribe to topics on web');
+        return;
+      }
       await _firebaseMessaging.subscribeToTopic(topic);
       print('[Notifications] Subscribed to topic: $topic');
     } catch (e) {
@@ -275,6 +298,10 @@ class NotificationService {
   /// Desuscribirse de un tópico
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
+      if (kIsWeb) {
+        print('[Notifications] Cannot unsubscribe from topics on web');
+        return;
+      }
       await _firebaseMessaging.unsubscribeFromTopic(topic);
       print('[Notifications] Unsubscribed from topic: $topic');
     } catch (e) {

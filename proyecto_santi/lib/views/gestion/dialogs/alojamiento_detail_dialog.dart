@@ -271,13 +271,13 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
               size: 28,
             ),
           ),
-          SizedBox(width: 16.w),
+          SizedBox(width: 16),
           Expanded(
             child: Text(
               widget.alojamiento != null ? 'Editar Alojamiento' : 'Nuevo Alojamiento',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isMobile ? 20.sp : 24.sp,
+                fontSize: isMobile ? 20.sp : 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -313,11 +313,11 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
               'Cancelar',
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.grey[700],
-                fontSize: isMobile ? 14.sp : 16.sp,
+                fontSize: isMobile ? 14.sp : 16,
               ),
             ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12),
           ElevatedButton.icon(
             onPressed: _isLoading ? null : _saveAlojamiento,
             icon: _isLoading
@@ -332,7 +332,7 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
                 : Icon(Icons.save_rounded, size: isMobile ? 18 : 20),
             label: Text(
               _isLoading ? 'Guardando...' : 'Guardar',
-              style: TextStyle(fontSize: isMobile ? 14.sp : 16.sp),
+              style: TextStyle(fontSize: isMobile ? 14.sp : 16),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -359,50 +359,50 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
         Row(
           children: [
             Expanded(flex: 2, child: _buildNombreField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildTipoAlojamientoField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 2: Dirección
         _buildDireccionField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 3: Ciudad, CP, Provincia
         Row(
           children: [
             Expanded(child: _buildCiudadField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildCPField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildProvinciaField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 4: Teléfono, Email, Web
         Row(
           children: [
             Expanded(child: _buildTelefonoField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildEmailField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildWebField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 5: Número Habitaciones, Capacidad Total, Precio
         Row(
           children: [
             Expanded(child: _buildNumeroHabitacionesField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildCapacidadTotalField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildPrecioPorNocheField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 6: Servicios
         _buildServiciosField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 7: Observaciones
         _buildObservacionesField(isDark),
       ],
@@ -413,31 +413,31 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     return Column(
       children: [
         _buildNombreField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildTipoAlojamientoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildDireccionField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildCiudadField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildCPField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildProvinciaField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildTelefonoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildEmailField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildWebField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildNumeroHabitacionesField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildCapacidadTotalField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildPrecioPorNocheField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildServiciosField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildObservacionesField(isDark),
       ],
     );
@@ -455,18 +455,18 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
         Row(
           children: [
             Icon(icon, size: 18, color: AppColors.primary),
-            SizedBox(width: 8.w),
+            SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ],
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
@@ -773,3 +773,6 @@ class _AlojamientoDetailDialogState extends State<AlojamientoDetailDialog> {
     );
   }
 }
+
+
+

@@ -499,24 +499,51 @@ class SaveHandler {
     required List<dynamic> localizaciones,
   }) async {
     try {
+      print('DEBUG: ========================================');
+      print('DEBUG: INICIANDO _saveLocalizaciones');
       print('DEBUG: Guardando localizaciones - Total: ${localizaciones.length}');
+      print('DEBUG: Tipo de lista recibida: ${localizaciones.runtimeType}');
+      if (localizaciones.isNotEmpty) {
+        print('DEBUG: Tipo del primer elemento: ${localizaciones.first.runtimeType}');
+      }
       
       // Obtener las localizaciones actuales de la BD
-      final localizacionesOriginales = await localizacionService.fetchLocalizaciones(actividadId);
-      print('DEBUG: Localizaciones originales en BD: ${localizacionesOriginales.length}');
+      List<Map<String, dynamic>> localizacionesOriginales;
+      try {
+        localizacionesOriginales = await localizacionService.fetchLocalizaciones(actividadId);
+        print('DEBUG: Localizaciones originales en BD: ${localizacionesOriginales.length}');
+      } catch (e) {
+        print('DEBUG: ERROR al obtener localizaciones originales: $e');
+        localizacionesOriginales = [];
+      }
       
       // Procesar cada localización
       for (var loc in localizaciones) {
         // Convertir a Map si es un objeto Localizacion
         Map<String, dynamic> locData;
-        if (loc is Map<String, dynamic>) {
-          locData = loc;
-        } else {
-          // Es un objeto Localizacion, usar toJson()
-          locData = (loc as dynamic).toJson() as Map<String, dynamic>;
+        try {
+          if (loc is Map<String, dynamic>) {
+            locData = loc;
+          } else if (loc is Map) {
+            // Es un Map pero no Map<String, dynamic>
+            locData = Map<String, dynamic>.from(loc);
+          } else {
+            // Es un objeto Localizacion, usar toJson()
+            locData = (loc as dynamic).toJson() as Map<String, dynamic>;
+          }
+        } catch (e) {
+          print('DEBUG: Error convirtiendo localización a Map: $e');
+          print('DEBUG: Tipo de loc: ${loc.runtimeType}');
+          continue;
         }
         
-        int? locId = locData['id'] as int?;
+        int? locId;
+        try {
+          locId = locData['id'] as int?;
+        } catch (e) {
+          print('DEBUG: Error obteniendo ID de localización: $e, valor: ${locData['id']}');
+          continue;
+        }
         bool esPrincipal = locData['esPrincipal'] as bool? ?? false;
         String? icono = locData['icono'] as String?;
         String? descripcion = locData['descripcion'] as String?;
@@ -565,9 +592,10 @@ class SaveHandler {
         // Ahora agregar o actualizar la relación con la actividad
         final yaExiste = localizacionesOriginales.any((l) => l['id'] == locId);
         
+        bool operacionExitosa = false;
         if (yaExiste) {
           print('DEBUG: Actualizando localización $locId en actividad $actividadId');
-          await localizacionService.updateLocalizacion(
+          operacionExitosa = await localizacionService.updateLocalizacion(
             actividadId,
             locId!,
             esPrincipal: esPrincipal,
@@ -575,9 +603,10 @@ class SaveHandler {
             descripcion: descripcion,
             tipoLocalizacion: tipoLocalizacion,
           );
+          print('DEBUG: Resultado de actualizar localización: $operacionExitosa');
         } else {
           print('DEBUG: Agregando localización $locId a actividad $actividadId');
-          final resultado = await localizacionService.addLocalizacion(
+          operacionExitosa = await localizacionService.addLocalizacion(
             actividadId,
             locId!,
             esPrincipal: esPrincipal,
@@ -585,15 +614,34 @@ class SaveHandler {
             descripcion: descripcion,
             tipoLocalizacion: tipoLocalizacion,
           );
-          print('DEBUG: Resultado de agregar localización: $resultado');
+          print('DEBUG: Resultado de agregar localización: $operacionExitosa');
+        }
+        
+        if (!operacionExitosa) {
+          print('ERROR: No se pudo guardar la localización $locId en la actividad $actividadId');
+          // Continuamos con las demás localizaciones pero marcamos que hubo error
         }
       }
       
       // Eliminar localizaciones que ya no están en la lista
-      final localizacionesActualesIds = localizaciones
-          .map((l) => l is Map ? l['id'] as int? : (l as dynamic).id as int?)
-          .where((id) => id != null && id > 0)
-          .toSet();
+      final localizacionesActualesIds = <int>{};
+      for (var l in localizaciones) {
+        try {
+          int? id;
+          if (l is Map<String, dynamic>) {
+            id = l['id'] as int?;
+          } else if (l is Map) {
+            id = l['id'] as int?;
+          } else {
+            id = (l as dynamic).id as int?;
+          }
+          if (id != null && id > 0) {
+            localizacionesActualesIds.add(id);
+          }
+        } catch (e) {
+          print('DEBUG: Error obteniendo ID para eliminación: $e');
+        }
+      }
       
       for (var locOriginal in localizacionesOriginales) {
         final locOriginalId = locOriginal['id'] as int?;
@@ -604,10 +652,14 @@ class SaveHandler {
       }
       
       print('DEBUG: Localizaciones guardadas exitosamente');
+      print('DEBUG: ========================================');
       return true;
     } catch (e, stackTrace) {
+      print('ERROR ========================================');
       print('ERROR al guardar localizaciones: $e');
+      print('ERROR tipo: ${e.runtimeType}');
       print('StackTrace: $stackTrace');
+      print('ERROR ========================================');
       return false;
     }
   }

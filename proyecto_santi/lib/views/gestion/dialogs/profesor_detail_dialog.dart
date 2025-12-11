@@ -286,13 +286,13 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
               size: 28,
             ),
           ),
-          SizedBox(width: 16.w),
+          SizedBox(width: 16),
           Expanded(
             child: Text(
               widget.profesor != null ? 'Editar Profesor' : 'Nuevo Profesor',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isMobile ? 20.sp : 24.sp,
+                fontSize: isMobile ? 20.sp : 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -328,11 +328,11 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
               'Cancelar',
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.grey[700],
-                fontSize: isMobile ? 14.sp : 16.sp,
+                fontSize: isMobile ? 14.sp : 16,
               ),
             ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12),
           ElevatedButton.icon(
             onPressed: _isLoading ? null : _saveProfesor,
             icon: _isLoading
@@ -347,7 +347,7 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
                 : Icon(Icons.save_rounded, size: isMobile ? 18 : 20),
             label: Text(
               _isLoading ? 'Guardando...' : 'Guardar',
-              style: TextStyle(fontSize: isMobile ? 14.sp : 16.sp),
+              style: TextStyle(fontSize: isMobile ? 14.sp : 16),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -374,39 +374,39 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         Row(
           children: [
             Expanded(child: _buildDniField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildNombreField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildApellidosField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 2: Correo y Contraseña (solo al crear)
         if (widget.profesor == null)
           Row(
             children: [
               Expanded(flex: 2, child: _buildCorreoField(isDark)),
-              SizedBox(width: 16.w),
+              SizedBox(width: 16),
               Expanded(child: _buildPasswordField(isDark)),
             ],
           )
         else
           _buildCorreoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 3: Rol y Departamento
         Row(
           children: [
             Expanded(child: _buildRolField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildDepartamentoField(isDark)),
           ],
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Fila 4: Estados (Activo y Jefe Dep)
         Row(
           children: [
             Expanded(child: _buildActivoField(isDark)),
-            SizedBox(width: 16.w),
+            SizedBox(width: 16),
             Expanded(child: _buildJefeDepField(isDark)),
           ],
         ),
@@ -418,24 +418,24 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
     return Column(
       children: [
         _buildDniField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildNombreField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildApellidosField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildCorreoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         // Contraseña solo al crear
         if (widget.profesor == null) ...[
           _buildPasswordField(isDark),
-          SizedBox(height: 16.h),
+          SizedBox(height: 16),
         ],
         _buildRolField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildDepartamentoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildActivoField(isDark),
-        SizedBox(height: 16.h),
+        SizedBox(height: 16),
         _buildJefeDepField(isDark),
       ],
     );
@@ -453,18 +453,18 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         Row(
           children: [
             Icon(icon, size: 18, color: AppColors.primary),
-            SizedBox(width: 8.w),
+            SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ],
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
@@ -629,7 +629,7 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
             value: rol['value']!,
             child: Text(
               rol['label']!,
-              style: TextStyle(fontSize: 14.sp),
+              style: TextStyle(fontSize: 14),
             ),
           );
         }).toList(),
@@ -663,7 +663,7 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
             value: depto.id,
             child: Text(
               depto.nombre,
-              style: TextStyle(fontSize: 14.sp),
+              style: TextStyle(fontSize: 14),
               overflow: TextOverflow.ellipsis,
             ),
           );
@@ -694,12 +694,12 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
             color: _activo ? Colors.green : Colors.red,
             size: 24,
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12),
           Expanded(
             child: Text(
               'Profesor Activo',
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
@@ -736,12 +736,12 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
             color: _esJefeDep ? Colors.amber : Colors.grey,
             size: 24,
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12),
           Expanded(
             child: Text(
               'Jefe Departamento',
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : Colors.black87,
               ),
@@ -761,3 +761,6 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
     );
   }
 }
+
+
+

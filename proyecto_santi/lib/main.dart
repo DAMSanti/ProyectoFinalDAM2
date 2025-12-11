@@ -21,8 +21,12 @@ import 'dart:io' show Platform;
 /// Debe estar fuera de cualquier clase y ser top-level
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print('[Background] Notification received: ${message.notification?.title}');
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    print('[Background] Notification received: ${message.notification?.title}');
+  } catch (e) {
+    print('[Background] Error handling notification: $e');
+  }
 }
 
 void main() async {
@@ -35,8 +39,14 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     
-    // Configurar el handler de notificaciones en background
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Configurar el handler de notificaciones en background (solo en plataformas soportadas)
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      } catch (e) {
+        print('[Firebase] Error setting background message handler: $e');
+      }
+    }
     
     // Inicializar el servicio de notificaciones
     await NotificationService().initialize();

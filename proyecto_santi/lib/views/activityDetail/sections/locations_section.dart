@@ -349,14 +349,43 @@ class _ActivityLocationsSectionState extends State<ActivityLocationsSection> {
 
     // El diálogo devuelve las localizaciones modificadas, iconos y un flag de cambios
     if (result != null && result['hasChanges'] == true) {
-      final localizacionesModificadas = result['localizaciones'] as List<Localizacion>?;
-      final iconosModificados = result['iconos'] as Map<int, IconData>?;
+      List<Localizacion>? localizacionesModificadas;
+      Map<int, IconData>? iconosModificados;
+      
+      // Cast seguro de localizaciones
+      final locsResult = result['localizaciones'];
+      if (locsResult is List<Localizacion>) {
+        localizacionesModificadas = locsResult;
+      } else if (locsResult is List) {
+        // Intentar convertir cada elemento
+        try {
+          localizacionesModificadas = locsResult.map((e) {
+            if (e is Localizacion) return e;
+            if (e is Map<String, dynamic>) return Localizacion.fromJson(e);
+            return Localizacion.fromJson(Map<String, dynamic>.from(e as Map));
+          }).toList();
+        } catch (e) {
+          print('ERROR al convertir localizaciones: $e');
+        }
+      }
+      
+      // Cast seguro de iconos
+      final iconosResult = result['iconos'];
+      if (iconosResult is Map<int, IconData>) {
+        iconosModificados = iconosResult;
+      } else if (iconosResult is Map) {
+        try {
+          iconosModificados = Map<int, IconData>.from(iconosResult);
+        } catch (e) {
+          print('ERROR al convertir iconos: $e');
+        }
+      }
       
       if (localizacionesModificadas != null) {
         setState(() {
-          _localizaciones = localizacionesModificadas;
+          _localizaciones = localizacionesModificadas!;
           if (iconosModificados != null) {
-            _iconosLocalizaciones = iconosModificados;
+            _iconosLocalizaciones = iconosModificados!;
           }
         });
         

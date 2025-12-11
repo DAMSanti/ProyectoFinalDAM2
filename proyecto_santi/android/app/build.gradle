@@ -18,6 +18,7 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        encoding = 'UTF-8'
     }
 
     kotlinOptions {
