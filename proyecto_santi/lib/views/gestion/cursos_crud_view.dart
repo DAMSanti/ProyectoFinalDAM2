@@ -91,7 +91,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Curso'),
-        content: Text('¿Estás seguro de que deseas eliminar el curso "${curso.nombre}"?'),
+        content: Text('¿Estás seguro de que deseas eliminar el curso "${curso.nombre}"?\n\nEsta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -107,9 +107,27 @@ class _CursosCrudViewState extends State<CursosCrudView> {
     );
 
     if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Funcionalidad de eliminar curso en desarrollo')),
-      );
+      try {
+        final success = await _catalogoService.deleteCurso(curso.id);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Curso eliminado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadCursos();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar curso: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

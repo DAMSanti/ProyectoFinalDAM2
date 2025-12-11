@@ -89,7 +89,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Alojamiento'),
-        content: Text('¿Estás seguro de que deseas eliminar el alojamiento "${alojamiento.nombre}"?'),
+        content: Text('¿Estás seguro de que deseas eliminar el alojamiento "${alojamiento.nombre}"?\n\nEsta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -105,9 +105,27 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
     );
 
     if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Funcionalidad de eliminar alojamiento en desarrollo')),
-      );
+      try {
+        final success = await _actividadService.deleteAlojamiento(alojamiento.id);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Alojamiento eliminado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadAlojamientos();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar alojamiento: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

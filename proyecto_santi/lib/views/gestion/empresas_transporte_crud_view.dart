@@ -90,7 +90,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Empresa de Transporte'),
-        content: Text('¿Estás seguro de que deseas eliminar la empresa "${empresa.nombre}"?'),
+        content: Text('¿Estás seguro de que deseas eliminar la empresa "${empresa.nombre}"?\n\nEsta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -106,9 +106,27 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
     );
 
     if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Funcionalidad de eliminar empresa en desarrollo')),
-      );
+      try {
+        final success = await _actividadService.deleteEmpresaTransporte(empresa.id);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Empresa eliminada correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadEmpresas();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar empresa: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

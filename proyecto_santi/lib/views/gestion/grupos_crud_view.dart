@@ -105,7 +105,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar Grupo'),
-        content: Text('¿Estás seguro de que deseas eliminar el grupo "${grupo.nombre}"?'),
+        content: Text('¿Estás seguro de que deseas eliminar el grupo "${grupo.nombre}"?\n\nEsta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -121,9 +121,27 @@ class _GruposCrudViewState extends State<GruposCrudView> {
     );
 
     if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Funcionalidad de eliminar grupo en desarrollo')),
-      );
+      try {
+        final success = await _catalogoService.deleteGrupo(grupo.id);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Grupo eliminado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadGrupos();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar grupo: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

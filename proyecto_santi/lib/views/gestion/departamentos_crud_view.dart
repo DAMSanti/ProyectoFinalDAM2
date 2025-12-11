@@ -115,7 +115,7 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
           ],
         ),
         content: Text(
-          '¿Está seguro de que desea eliminar el departamento "${departamento.nombre}"?\n\nEsta funcionalidad estará disponible próximamente.',
+          '¿Está seguro de que desea eliminar el departamento "${departamento.nombre}"?\n\nEsta acción no se puede deshacer.',
         ),
         actions: [
           TextButton(
@@ -135,13 +135,26 @@ class _DepartamentosCrudViewState extends State<DepartamentosCrudView> {
     );
 
     if (confirm == true) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Funcionalidad de eliminación próximamente disponible'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+      try {
+        final success = await _catalogoService.deleteDepartamento(departamento.id);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Departamento eliminado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadDepartamentos();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar departamento: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

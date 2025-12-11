@@ -58,9 +58,8 @@ class ProfesorService {
       });
 
       final response = await _apiService.dio.post(
-        '${AppConfig.apiBaseUrl}${AppConfig.profesorEndpoint}',
+        AppConfig.profesorEndpoint,
         data: formData,
-        options: Options(contentType: 'multipart/form-data'),
       );
       
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -85,9 +84,8 @@ class ProfesorService {
       });
 
       final response = await _apiService.dio.put(
-        '${AppConfig.apiBaseUrl}${AppConfig.profesorEndpoint}/$uuid',
+        '${AppConfig.profesorEndpoint}/$uuid',
         data: formData,
-        options: Options(contentType: 'multipart/form-data'),
       );
       
       if (response.statusCode == 200) {

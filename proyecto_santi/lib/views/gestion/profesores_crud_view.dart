@@ -107,7 +107,7 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
           ],
         ),
         content: Text(
-          '¿Está seguro de que desea eliminar al profesor "${profesor.nombre} ${profesor.apellidos}"?\n\nEsta funcionalidad estará disponible próximamente.',
+          '¿Está seguro de que desea eliminar al profesor "${profesor.nombre} ${profesor.apellidos}"?\n\nEsta acción no se puede deshacer.',
         ),
         actions: [
           TextButton(
@@ -127,13 +127,26 @@ class _ProfesoresCrudViewState extends State<ProfesoresCrudView> {
     );
 
     if (confirm == true) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Funcionalidad de eliminación próximamente disponible'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+      try {
+        final success = await _profesorService.deleteProfesor(profesor.uuid);
+        if (success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Profesor eliminado correctamente'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadProfesores();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar profesor: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

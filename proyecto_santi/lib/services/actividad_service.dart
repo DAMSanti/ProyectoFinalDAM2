@@ -397,6 +397,22 @@ class ActividadService {
     }
   }
 
+  /// Elimina una empresa de transporte
+  Future<bool> deleteEmpresaTransporte(int id) async {
+    try {
+      print('[ActividadService] Deleting empresa de transporte $id');
+      
+      final response = await _apiService.deleteData('/EmpTransporte/$id');
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print('[ActividadService ERROR] deleteEmpresaTransporte: $e');
+      rethrow;
+    }
+  }
+
   /// Obtiene todos los alojamientos activos
   Future<List<Alojamiento>> fetchAlojamientos() async {
     try {
@@ -468,6 +484,22 @@ class ActividadService {
       throw ApiException('Error al actualizar alojamiento', statusCode: response.statusCode);
     } catch (e) {
       print('[ActividadService ERROR] updateAlojamiento: $e');
+      rethrow;
+    }
+  }
+
+  /// Elimina un alojamiento
+  Future<bool> deleteAlojamiento(int id) async {
+    try {
+      print('[ActividadService] Deleting alojamiento $id');
+      
+      final response = await _apiService.deleteData('/Alojamiento/$id');
+      
+      print('[ActividadService] Response status: ${response.statusCode}');
+      
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print('[ActividadService ERROR] deleteAlojamiento: $e');
       rethrow;
     }
   }
