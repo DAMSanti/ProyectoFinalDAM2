@@ -1,32 +1,39 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proyecto_santi/models/localizacion.dart';
 import 'package:proyecto_santi/utils/icon_helper.dart';
+
 class LocalizacionesMapWidget extends StatefulWidget {
   final List<Localizacion> localizaciones;
   final Map<int, IconData> iconosLocalizaciones;
   final Function(Localizacion)? onLocalizacionTapped;
+
   const LocalizacionesMapWidget({
     Key? key,
     required this.localizaciones,
     this.iconosLocalizaciones = const {},
     this.onLocalizacionTapped,
   }) : super(key: key);
+
   @override
   State<LocalizacionesMapWidget> createState() => _LocalizacionesMapWidgetState();
 }
+
 class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
   final MapController _mapController = MapController();
   Localizacion? _selectedLocalizacion;
+
   @override
   void initState() {
     super.initState();
+    // Centrar el mapa en la primera localización o en la principal
     if (widget.localizaciones.isNotEmpty) {
       final localizacionInicial = widget.localizaciones.firstWhere(
         (loc) => loc.esPrincipal,
         orElse: () => widget.localizaciones.first,
       );
+      
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (localizacionInicial.latitud != null && localizacionInicial.longitud != null) {
           _mapController.move(
@@ -37,48 +44,62 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
       });
     }
   }
+
   void _onMarkerTapped(Localizacion localizacion) {
     setState(() {
       _selectedLocalizacion = localizacion;
     });
+    
     if (localizacion.latitud != null && localizacion.longitud != null) {
       _mapController.move(
         LatLng(localizacion.latitud!, localizacion.longitud!),
         14.0,
       );
     }
+    
     if (widget.onLocalizacionTapped != null) {
       widget.onLocalizacionTapped!(localizacion);
     }
   }
+
   LatLng _calcularCentro() {
+    // Coordenadas del IES Miguel Herrero Pereda, Torrelavega
     const defaultLocation = LatLng(43.3506, -4.0462);
+    
     if (widget.localizaciones.isEmpty) {
       return defaultLocation;
     }
+    
     final localizacionesConCoords = widget.localizaciones
         .where((loc) => loc.latitud != null && loc.longitud != null)
         .toList();
+    
     if (localizacionesConCoords.isEmpty) {
       return defaultLocation;
     }
+    
     double sumLat = 0;
     double sumLng = 0;
+    
     for (var loc in localizacionesConCoords) {
       sumLat += loc.latitud!;
       sumLng += loc.longitud!;
     }
+    
     return LatLng(
       sumLat / localizacionesConCoords.length,
       sumLng / localizacionesConCoords.length,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final localizacionesConCoords = widget.localizaciones
         .where((loc) => loc.latitud != null && loc.longitud != null)
         .toList();
+
+    // Si no hay localizaciones, mostrar mensaje sobre el mapa
     if (localizacionesConCoords.isEmpty) {
       return Stack(
         children: [
@@ -93,13 +114,14 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https:
+                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: ['a', 'b', 'c'],
                 userAgentPackageName: 'com.proyecto_santi.app',
               ),
-              MarkerLayer(markers: []), 
+              MarkerLayer(markers: []), // Sin marcadores
             ],
           ),
+          // Mensaje de no hay localizaciones
           Center(
             child: Container(
               margin: EdgeInsets.all(20),
@@ -174,6 +196,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
         ],
       );
     }
+
+    // Si hay localizaciones, mostrar el mapa con marcadores
     return Stack(
       children: [
         FlutterMap(
@@ -187,24 +211,31 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https:
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
               subdomains: ['a', 'b', 'c'],
               userAgentPackageName: 'com.proyecto_santi.app',
             ),
+            // Mostrar marcadores de localizaciones
             MarkerLayer(
               markers: localizacionesConCoords.map((localizacion) {
                 final isSelected = _selectedLocalizacion?.id == localizacion.id;
                 final isPrincipal = localizacion.esPrincipal;
+                
+                // Obtener el icono desde la base de datos o usar el por defecto
                 final IconData icono;
                 if (localizacion.icono != null && localizacion.icono!.isNotEmpty) {
+                  // Usar el icono guardado en la base de datos
                   icono = IconHelper.getIcon(
                     localizacion.icono,
                     defaultIcon: isPrincipal ? Icons.location_pin : Icons.location_on,
                   );
                 } else {
+                  // Usar icono personalizado del mapa temporal o el por defecto
                   icono = widget.iconosLocalizaciones[localizacion.id] ?? 
                       (isPrincipal ? Icons.location_pin : Icons.location_on);
                 }
+                
+                // Determinar el color según el estado
                 final Color iconColor;
                 if (isPrincipal) {
                   iconColor = Colors.red;
@@ -213,6 +244,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                 } else {
                   iconColor = Colors.orange;
                 }
+                
                 return Marker(
                   point: LatLng(localizacion.latitud!, localizacion.longitud!),
                   width: isSelected ? 50 : 40,
@@ -221,6 +253,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                     onTap: () => _onMarkerTapped(localizacion),
                     child: Column(
                       children: [
+                        // Icono personalizado de marker
                         AnimatedContainer(
                           duration: Duration(milliseconds: 200),
                           child: Icon(
@@ -244,6 +277,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             ),
           ],
         ),
+        // Leyenda
         Positioned(
           top: 8,
           right: 8,
@@ -263,6 +297,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             ),
           ),
         ),
+        // Info card cuando hay selección - Diseño moderno con scroll
         if (_selectedLocalizacion != null)
           Positioned(
             bottom: 16,
@@ -270,7 +305,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
             right: 16,
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.4, 
+                maxHeight: MediaQuery.of(context).size.height * 0.4, // Máximo 40% de la altura de pantalla
               ),
               child: SingleChildScrollView(
                 child: _buildLocalizacionInfoCard(_selectedLocalizacion!),
@@ -280,6 +315,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
       ],
     );
   }
+
   Widget _buildLeyendaItem(IconData icon, Color color, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -290,11 +326,15 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
       ],
     );
   }
+
   Widget _buildLocalizacionInfoCard(Localizacion localizacion) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Determinar icono y color según el tipo
     IconData tipoIcono;
     Color tipoColor;
     String tipoTexto = localizacion.tipoLocalizacion ?? 'Sin especificar';
+    
     switch (localizacion.tipoLocalizacion) {
       case 'Punto de salida':
         tipoIcono = Icons.location_on_rounded;
@@ -316,6 +356,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
         tipoIcono = Icons.place_rounded;
         tipoColor = Color(0xFF757575);
     }
+    
     return Container(
       constraints: BoxConstraints(maxWidth: 500),
       decoration: BoxDecoration(
@@ -357,6 +398,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // Patrón decorativo de fondo
           Positioned(
             right: -15,
             top: -15,
@@ -369,15 +411,18 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
               ),
             ),
           ),
+          // Contenido
           Padding(
             padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Header compacto: Icono + Nombre + Botón cerrar (1 línea)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // Icono del tipo de localización
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -403,6 +448,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                       ),
                     ),
                     SizedBox(width: 12),
+                    // Nombre
                     Expanded(
                       child: Text(
                         localizacion.nombre,
@@ -417,6 +463,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                       ),
                     ),
                     SizedBox(width: 8),
+                    // Botón cerrar
                     Container(
                       decoration: BoxDecoration(
                         color: isDark 
@@ -443,12 +490,15 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                   ],
                 ),
                 SizedBox(height: 8),
+                
+                // Badges de tipo y principal (2da línea, sin repetir icono ni X)
                 Padding(
-                  padding: EdgeInsets.only(left: 56), 
+                  padding: EdgeInsets.only(left: 56), // Alineado con el texto del nombre
                   child: Wrap(
                     spacing: 6,
                     runSpacing: 4,
                     children: [
+                      // Badge del tipo
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
@@ -484,6 +534,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                           ],
                         ),
                       ),
+                      // Badge de principal si aplica
                       if (localizacion.esPrincipal)
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -525,6 +576,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                   ),
                 ),
                 SizedBox(height: 12),
+                
+                // Divider decorativo
                 Container(
                   height: 1.5,
                   decoration: BoxDecoration(
@@ -538,6 +591,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                   ),
                 ),
                 SizedBox(height: 12),
+                
+                // Dirección
                 if (localizacion.direccionCompleta.isNotEmpty)
                   Container(
                     padding: EdgeInsets.all(10),
@@ -589,6 +644,8 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
                       ],
                     ),
                   ),
+                
+                // Descripción/Comentario
                 if (localizacion.descripcion != null && localizacion.descripcion!.isNotEmpty) ...[
                   SizedBox(height: 10),
                   Container(
@@ -664,6 +721,7 @@ class _LocalizacionesMapWidgetState extends State<LocalizacionesMapWidget> {
       ),
     );
   }
+
   @override
   void dispose() {
     _mapController.dispose();

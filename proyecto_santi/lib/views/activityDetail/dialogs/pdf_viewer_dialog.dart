@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -7,49 +7,66 @@ import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart' as html;
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/config.dart';
+
+// Import condicional para el helper de web
 import '../helpers/pdf_helpers/web_pdf_helper_stub.dart' if (dart.library.html) '../helpers/pdf_helpers/web_pdf_helper.dart';
+
 class PdfViewerDialog extends StatefulWidget {
   final String pdfUrl;
   final String fileName;
+
   const PdfViewerDialog({
     super.key,
     required this.pdfUrl,
     required this.fileName,
   });
+
   @override
   State<PdfViewerDialog> createState() => _PdfViewerDialogState();
 }
+
 class _PdfViewerDialogState extends State<PdfViewerDialog> {
   bool _isDownloading = false;
   bool _isLoading = true;
   Uint8List? _pdfBytes;
   String? _loadError;
-  String? _blobUrl; 
+  String? _blobUrl; // Para web: URL del blob del PDF
+
   @override
   void initState() {
     super.initState();
     _loadPdfBytes();
   }
+
   @override
   void dispose() {
+    // Limpiar el blob URL en web para liberar memoria
     if (kIsWeb && _blobUrl != null) {
       html.Url.revokeObjectUrl(_blobUrl!);
     }
     super.dispose();
   }
+
+  /// Carga los bytes del PDF desde la URL
   Future<void> _loadPdfBytes() async {
     try {
       setState(() {
         _isLoading = true;
         _loadError = null;
       });
+
       final fullUrl = _getFullPdfUrl();
+      
       final response = await http.get(Uri.parse(fullUrl));
+      
       if (response.statusCode == 200) {
         if (mounted) {
+          
+          // En web, crear un blob URL para el iframe
           if (kIsWeb) {
             final blob = html.Blob([response.bodyBytes], 'application/pdf');
             final url = html.Url.createObjectUrlFromBlob(blob);
+            
             setState(() {
               _pdfBytes = response.bodyBytes;
               _blobUrl = url;
@@ -74,30 +91,51 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
       }
     }
   }
+
+  /// Construye la URL completa del PDF si es una ruta relativa
   String _getFullPdfUrl() {
     final url = widget.pdfUrl;
-    if (url.startsWith('http:
+    
+    // Si ya es una URL completa (empieza con http:// o https://), retornarla tal cual
+    if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
+    
+    // Si es una ruta relativa, construir la URL completa usando AppConfig
+    // El backend devuelve URLs como '/uploads/folletos/filename.pdf'
+    // Obtener la base URL sin el /api
     final baseUrl = AppConfig.apiBaseUrl.replaceAll('/api', '');
+    
+    // Asegurar que la URL no tenga doble barra
     final cleanUrl = url.startsWith('/') ? url : '/$url';
+    
+    // Construir la URL completa y codificar caracteres especiales (espacios, etc.)
     final fullUrl = Uri.parse('$baseUrl$cleanUrl').toString();
+    
     print('[PdfViewerDialog] URL completa del PDF: $fullUrl');
+    
     return fullUrl;
   }
+
   Future<void> _downloadPdf() async {
     setState(() {
       _isDownloading = true;
     });
+
     try {
       final fullUrl = _getFullPdfUrl();
+      
       if (kIsWeb) {
+        // Para web, usar AnchorElement para descargar
         html.AnchorElement anchorElement = html.AnchorElement(href: fullUrl);
         anchorElement.download = widget.fileName;
         anchorElement.click();
+        
         if (mounted) {
+          // Usar un SnackBar dentro del di�logo no es posible, mostrar un mensaje simple
         }
       } else {
+        // Para m�vil/escritorio
         await _downloadPdfNative(fullUrl);
       }
     } catch (e) {
@@ -111,12 +149,17 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
       }
     }
   }
+
   Future<void> _downloadPdfNative(String url) async {
+    // Funcionalidad solo disponible en plataformas nativas
+    // En web, la descarga se maneja de forma diferente
   }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(
@@ -139,6 +182,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
         ),
         child: Column(
           children: [
+            // Header del di�logo
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -186,6 +230,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                       ],
                     ),
                   ),
+                  // Bot�n de descargar
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
@@ -211,6 +256,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                     ),
                   ),
                   SizedBox(width: 8),
+                  // Bot�n de cerrar
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
@@ -229,6 +275,8 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                 ],
               ),
             ),
+            
+            // Visor de PDF
             Expanded(
               child: Container(
                 padding: EdgeInsets.all(8),
@@ -287,7 +335,9 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                             )
                           : _pdfBytes != null
                               ? (kIsWeb && _blobUrl != null)
+                                  // Para web: usar HtmlElementView con iframe
                                   ? _WebPdfViewer(blobUrl: _blobUrl!)
+                                  // Para m�vil/desktop: usar SfPdfViewer.memory
                                   : SfPdfViewer.memory(
                                       _pdfBytes!,
                                       canShowScrollHead: true,
@@ -316,14 +366,20 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
     );
   }
 }
+
+/// Widget espec�fico para mostrar PDFs en Flutter Web usando iframe
 class _WebPdfViewer extends StatefulWidget {
   final String blobUrl;
+
   const _WebPdfViewer({required this.blobUrl});
+
   @override
   State<_WebPdfViewer> createState() => _WebPdfViewerState();
 }
+
 class _WebPdfViewerState extends State<_WebPdfViewer> {
   bool _registered = false;
+
   @override
   void initState() {
     super.initState();
@@ -332,11 +388,13 @@ class _WebPdfViewerState extends State<_WebPdfViewer> {
       _registered = true;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     if (!kIsWeb) {
       return Center(child: Text('Este widget solo funciona en web'));
     }
+
     return HtmlElementView(
       viewType: 'pdf-viewer-${widget.blobUrl.hashCode}',
     );

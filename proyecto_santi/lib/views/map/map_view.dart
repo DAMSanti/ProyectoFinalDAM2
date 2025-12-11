@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -10,22 +10,27 @@ import 'package:proyecto_santi/utils/icon_helper.dart';
 import 'package:proyecto_santi/components/desktop_shell.dart';
 import 'dart:io';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class MapView extends StatefulWidget {
   final VoidCallback onToggleTheme;
   final bool isDarkTheme;
+
   const MapView({super.key, required this.onToggleTheme, required this.isDarkTheme});
+
   @override
   MapViewState createState() => MapViewState();
 }
+
 class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
   late final ApiService _apiService;
   late final ActividadService _actividadService;
   late final LocalizacionService _localizacionService;
   List<Actividad> activities = [];
   List<Actividad> filteredActivities = [];
-  Map<int, List<Localizacion>> actividadLocalizaciones = {}; 
+  Map<int, List<Localizacion>> actividadLocalizaciones = {}; // Map actividadId -> lista de localizaciones
   final LatLng _center = LatLng(43.353, -4.064);
   bool isLoading = true;
+  
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -33,14 +38,18 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
   bool _showSearchResults = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  // Modo detalle de actividad
   bool _activityDetailMode = false;
   Actividad? _activityInDetailMode;
+
   @override
   void initState() {
     super.initState();
     _apiService = ApiService();
     _actividadService = ActividadService(_apiService);
     _localizacionService = LocalizacionService(_apiService);
+    
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -49,9 +58,11 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+    
     _searchController.addListener(_onSearchChanged);
     _fetchActivities();
   }
+
   @override
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
@@ -60,6 +71,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     _animationController.dispose();
     super.dispose();
   }
+
   void _onSearchChanged() {
     setState(() {
       _showSearchResults = _searchController.text.isNotEmpty;
@@ -74,9 +86,12 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       }
     });
   }
+
   Future<void> _fetchActivities() async {
     try {
       final fetchedActivities = await _actividadService.fetchFutureActivities();
+      
+      // Cargar localizaciones para cada actividad
       for (var actividad in fetchedActivities) {
         try {
           final localizacionesData = await _localizacionService.fetchLocalizaciones(actividad.id);
@@ -89,7 +104,9 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           actividadLocalizaciones[actividad.id] = [];
         }
       }
+      
       setState(() {
+        // Solo incluir actividades que tienen al menos una localización principal con coordenadas
         activities = fetchedActivities.where((actividad) {
           final localizaciones = actividadLocalizaciones[actividad.id] ?? [];
           return localizaciones.any((loc) => 
@@ -108,16 +125,20 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       });
     }
   }
+
   void _onMarkerTapped(Actividad actividad) {
     setState(() {
       _selectedActividad = actividad;
       _animationController.forward();
     });
+    
+    // Centrar el mapa en la localización principal de la actividad seleccionada
     final localizaciones = actividadLocalizaciones[actividad.id] ?? [];
     final locPrincipal = localizaciones.firstWhere(
       (loc) => loc.esPrincipal,
       orElse: () => localizaciones.first,
     );
+    
     if (locPrincipal.latitud != null && locPrincipal.longitud != null) {
       _mapController.move(
         LatLng(locPrincipal.latitud!, locPrincipal.longitud!),
@@ -125,6 +146,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       );
     }
   }
+
   void _onActivitySearchSelected(Actividad actividad) {
     _onMarkerTapped(actividad);
     _searchController.clear();
@@ -133,19 +155,23 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     });
     _searchFocusNode.unfocus();
   }
+
   void _showActivityDetails(Actividad actividad) {
     setState(() {
       _activityDetailMode = true;
       _activityInDetailMode = actividad;
-      _selectedActividad = null; 
-      _animationController.reverse(); 
+      _selectedActividad = null; // Cerrar el info card
+      _animationController.reverse(); // Animar salida del card
     });
+    
+    // Centrar el mapa en la localización principal
     final localizaciones = actividadLocalizaciones[actividad.id] ?? [];
     if (localizaciones.isNotEmpty) {
       final locPrincipal = localizaciones.firstWhere(
         (loc) => loc.esPrincipal,
         orElse: () => localizaciones.first,
       );
+      
       if (locPrincipal.latitud != null && locPrincipal.longitud != null) {
         _mapController.move(
           LatLng(locPrincipal.latitud!, locPrincipal.longitud!),
@@ -154,21 +180,29 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       }
     }
   }
+  
   void _exitDetailMode() {
     setState(() {
       _activityDetailMode = false;
       _activityInDetailMode = null;
       _selectedActividad = null;
     });
+    
+    // Volver a la vista general del mapa
     _mapController.move(_center, 11.0);
   }
+  
+  // Construir markers en modo normal (solo localizaciones principales)
   List<Marker> _buildNormalModeMarkers() {
     return activities.expand((actividad) {
       final localizaciones = actividadLocalizaciones[actividad.id] ?? [];
       final locPrincipales = localizaciones.where((loc) => loc.esPrincipal).toList();
+      
       return locPrincipales.map((loc) {
         if (loc.latitud == null || loc.longitud == null) return null;
+        
         final isSelected = _selectedActividad?.id == actividad.id;
+        
         IconData markerIcon = Icons.location_on;
         if (loc.icono != null && loc.icono!.isNotEmpty) {
           markerIcon = IconHelper.getIcon(
@@ -176,6 +210,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             defaultIcon: Icons.location_on,
           );
         }
+        
         return Marker(
           point: LatLng(loc.latitud!, loc.longitud!),
           width: isSelected ? 60 : 50,
@@ -239,11 +274,16 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       }).whereType<Marker>().toList();
     }).toList();
   }
+  
+  // Construir markers en modo detalle (todas las localizaciones de una actividad)
   List<Marker> _buildDetailModeMarkers(Actividad actividad) {
     final localizaciones = actividadLocalizaciones[actividad.id] ?? [];
+    
     return localizaciones.map((loc) {
       if (loc.latitud == null || loc.longitud == null) return null;
+      
       final isPrincipal = loc.esPrincipal;
+      
       IconData markerIcon = Icons.location_on;
       if (loc.icono != null && loc.icono!.isNotEmpty) {
         markerIcon = IconHelper.getIcon(
@@ -251,12 +291,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           defaultIcon: Icons.location_on,
         );
       }
+      
       return Marker(
         point: LatLng(loc.latitud!, loc.longitud!),
         width: isPrincipal ? 60 : 50,
         height: isPrincipal ? 60 : 50,
         builder: (ctx) => GestureDetector(
           onTap: () {
+            // Mostrar información de la localización
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Column(
@@ -305,6 +347,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             child: Stack(
               alignment: Alignment.center,
               children: [
+                // Efecto especial para localización principal
                 if (isPrincipal)
                   Container(
                     width: 70,
@@ -355,9 +398,11 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       );
     }).whereType<Marker>().toList();
   }
+
   Widget _buildSearchBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    
     return Positioned(
       top: 16,
       left: 16,
@@ -456,6 +501,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               ),
             ),
           ),
+          // Resultados de búsqueda
           if (_showSearchResults && filteredActivities.isNotEmpty)
             Container(
               margin: EdgeInsets.only(top: 8),
@@ -619,8 +665,11 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
   Widget _buildActivityInfoCard() {
+    // No mostrar el info card en modo detalle
     if (_activityDetailMode || _selectedActividad == null) return SizedBox.shrink();
+    
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isMobile = MediaQuery.of(context).size.width < 600;
@@ -634,6 +683,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         esPrincipal: false,
       ),
     );
+    
     String direccionCompleta = '';
     bool hasDireccion = false;
     if (locPrincipal.direccion != null && locPrincipal.direccion!.isNotEmpty) {
@@ -643,6 +693,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       }
       hasDireccion = true;
     }
+    
     return Positioned(
       bottom: isMobile ? 12 : 16,
       left: isMobile ? 12 : 16,
@@ -682,6 +733,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           ),
           child: Stack(
             children: [
+              // Patrón decorativo de fondo
               if (!isMobile)
                 Positioned(
                   right: -30,
@@ -695,12 +747,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
+              // Contenido
               Padding(
                 padding: EdgeInsets.all(isMobile ? 14 : 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Header con título y botón cerrar
                     Row(
                       children: [
                         Container(
@@ -792,6 +846,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     SizedBox(height: isMobile ? 12 : 16),
+                    // Divider con gradiente
                     Container(
                       height: isMobile ? 1.5 : 2,
                       decoration: BoxDecoration(
@@ -806,6 +861,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(height: isMobile ? 12 : 16),
+                    // Dirección (solo si existe)
                     if (hasDireccion)
                       Container(
                         padding: EdgeInsets.all(isMobile ? 10 : 12),
@@ -844,6 +900,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           ],
                         ),
                       ),
+                    // Descripción de la actividad
                     if (_selectedActividad!.descripcion != null &&
                         _selectedActividad!.descripcion!.isNotEmpty) ...[
                       SizedBox(height: isMobile ? 10 : 12),
@@ -887,6 +944,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       ),
                     ],
                     SizedBox(height: isMobile ? 12 : 16),
+                    // Botón ver detalles
                     SizedBox(
                       width: double.infinity,
                       child: Container(
@@ -940,12 +998,14 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
   Widget _buildDetailModeBanner() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
     final isMobile = MediaQuery.of(context).size.width < 600;
+    
     return Positioned(
-      top: isMobile ? 80 : 90, 
+      top: isMobile ? 80 : 90, // Debajo de la barra de búsqueda
       left: isMobile ? 12 : 16,
       right: isMobile ? 12 : 16,
       child: Container(
@@ -980,6 +1040,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         ),
         child: Row(
           children: [
+            // Icono de información
             Container(
               padding: EdgeInsets.all(isMobile ? 6 : 8),
               decoration: BoxDecoration(
@@ -993,6 +1054,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               ),
             ),
             SizedBox(width: isMobile ? 10 : 12),
+            // Texto informativo
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1079,6 +1141,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               ),
             ),
             SizedBox(width: isMobile ? 8 : 12),
+            // Botón para ir a detalles completos de la actividad
             Container(
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
@@ -1089,8 +1152,11 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                 child: InkWell(
                   onTap: () {
                     if (_activityInDetailMode != null) {
+                      // Guardar referencia a la actividad antes de salir del modo detalle
                       final activityToNavigate = _activityInDetailMode;
+                      // Salir del modo detalle ANTES de navegar
                       _exitDetailMode();
+                      // Navegar a los detalles de la actividad usando la función helper
                       navigateToActivityDetailInShell(context, {
                         'activity': activityToNavigate,
                       });
@@ -1123,6 +1189,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
               ),
             ),
             SizedBox(width: isMobile ? 6 : 8),
+            // Botón de cerrar/volver
             Container(
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
@@ -1163,9 +1230,11 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacementNamed(context, '/home');
@@ -1221,6 +1290,7 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   )
                 : Stack(
                     children: [
+                      // Mapa
                       FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
@@ -1233,24 +1303,28 @@ class MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         children: [
                           TileLayer(
                             urlTemplate: isDark
-                                ? 'https:
-                                : 'https:
+                                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                             subdomains: ['a', 'b', 'c'],
                             userAgentPackageName: 'com.proyecto_santi.app',
                           ),
                           MarkerLayer(
                             markers: _activityDetailMode && _activityInDetailMode != null
-                                ? 
+                                ? // MODO DETALLE: Mostrar TODAS las localizaciones de la actividad seleccionada
                                   _buildDetailModeMarkers(_activityInDetailMode!)
-                                : 
+                                : // MODO NORMAL: Mostrar solo localizaciones principales de todas las actividades
                                   _buildNormalModeMarkers(),
                           ),
                         ],
                       ),
+                      // Barra de búsqueda
                       _buildSearchBar(),
+                      // Banner de modo detalle (cuando estamos viendo una actividad específica)
                       if (_activityDetailMode && _activityInDetailMode != null)
                         _buildDetailModeBanner(),
+                      // Info card de actividad seleccionada
                       _buildActivityInfoCard(),
+                      // Botón centrar mapa
                       Builder(
                         builder: (context) {
                           final isMobile = MediaQuery.of(context).size.width < 600;
