@@ -78,16 +78,16 @@ class Profesor {
     
     // Formato completo original
     return Profesor(
-      uuid: json['uuid'],
-      dni: json['dni'],
-      nombre: json['nombre'],
-      apellidos: json['apellidos'],
-      correo: json['correo'],
-      password: json['password'],
-      rol: json['rol'],
-      activo: json['activo'],
-      urlFoto: json['urlFoto'],
-      esJefeDep: json['esJefeDep'],
+      uuid: json['uuid']?.toString() ?? '',
+      dni: json['dni']?.toString() ?? '',
+      nombre: json['nombre']?.toString() ?? '',
+      apellidos: json['apellidos']?.toString() ?? '',
+      correo: json['correo']?.toString() ?? '',
+      password: json['password']?.toString() ?? '',
+      rol: json['rol']?.toString() ?? 'Profesor',
+      activo: json['activo'] is int ? json['activo'] : (json['activo'] == true ? 1 : 0),
+      urlFoto: json['urlFoto']?.toString(),
+      esJefeDep: json['esJefeDep'] is int ? json['esJefeDep'] : 0,
       depart: json['depart'] != null ? Departamento.fromJson(json['depart']) : null,
     );
   }

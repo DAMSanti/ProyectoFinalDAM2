@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:proyecto_santi/models/profesor.dart';
 import 'package:proyecto_santi/services/api_service.dart';
 import 'package:proyecto_santi/config.dart';
@@ -44,12 +45,22 @@ class ProfesorService {
     }
   }
 
-  /// Crea un nuevo profesor
-  Future<Profesor?> createProfesor(Profesor profesor) async {
+  /// Crea un nuevo profesor usando FormData (requerido por la API)
+  Future<Profesor?> createProfesor(Profesor profesor, {int? departamentoId}) async {
     try {
-      final response = await _apiService.postData(
-        AppConfig.profesorEndpoint,
-        profesor.toJson(),
+      final formData = FormData.fromMap({
+        'Dni': profesor.dni,
+        'Nombre': profesor.nombre,
+        'Apellidos': profesor.apellidos,
+        'Correo': profesor.correo,
+        'Telefono': '', // Campo opcional
+        'DepartamentoId': departamentoId ?? profesor.depart?.id,
+      });
+
+      final response = await _apiService.dio.post(
+        '${AppConfig.apiBaseUrl}${AppConfig.profesorEndpoint}',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
       );
       
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -62,12 +73,21 @@ class ProfesorService {
     }
   }
 
-  /// Actualiza un profesor
-  Future<Profesor?> updateProfesor(String uuid, Profesor profesor) async {
+  /// Actualiza un profesor usando FormData (requerido por la API)
+  Future<Profesor?> updateProfesor(String uuid, Profesor profesor, {int? departamentoId}) async {
     try {
-      final response = await _apiService.putData(
-        '${AppConfig.profesorEndpoint}/$uuid',
-        profesor.toJson(),
+      final formData = FormData.fromMap({
+        'Nombre': profesor.nombre,
+        'Apellidos': profesor.apellidos,
+        'Telefono': '', // Campo opcional
+        'Activo': profesor.activo == 1,
+        'DepartamentoId': departamentoId ?? profesor.depart?.id,
+      });
+
+      final response = await _apiService.dio.put(
+        '${AppConfig.apiBaseUrl}${AppConfig.profesorEndpoint}/$uuid',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
       );
       
       if (response.statusCode == 200) {

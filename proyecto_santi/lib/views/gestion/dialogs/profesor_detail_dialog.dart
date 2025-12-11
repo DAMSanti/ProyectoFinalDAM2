@@ -127,27 +127,27 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
     setState(() => _isLoading = true);
 
     try {
-      final data = {
-        'dni': _dniController.text.trim(),
-        'nombre': _nombreController.text.trim(),
-        'apellidos': _apellidosController.text.trim(),
-        'correo': _correoController.text.trim(),
-        'rol': _rolSeleccionado,
-        'activo': _activo ? 1 : 0,
-        'esJefeDep': _esJefeDep ? 1 : 0,
-        'departId': _departamentoSeleccionado,
-      };
-
-      // Solo incluir password al crear (no al editar)
-      if (widget.profesor == null && _passwordController.text.trim().isNotEmpty) {
-        data['password'] = _passwordController.text.trim();
-      }
+      // Crear objeto Profesor con los datos del formulario
+      final profesor = Profesor(
+        uuid: widget.profesor?.uuid ?? '',
+        dni: _dniController.text.trim(),
+        nombre: _nombreController.text.trim(),
+        apellidos: _apellidosController.text.trim(),
+        correo: _correoController.text.trim(),
+        password: _passwordController.text.trim(),
+        rol: _rolSeleccionado ?? 'Profesor',
+        activo: _activo ? 1 : 0,
+        esJefeDep: _esJefeDep ? 1 : 0,
+        depart: null,
+      );
 
       if (widget.profesor != null) {
         // Actualizar
-        data['uuid'] = widget.profesor!.uuid;
-        final profesor = Profesor.fromJson(data);
-        await _profesorService.updateProfesor(widget.profesor!.uuid, profesor);
+        await _profesorService.updateProfesor(
+          widget.profesor!.uuid, 
+          profesor,
+          departamentoId: _departamentoSeleccionado,
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -158,8 +158,10 @@ class _ProfesorDetailDialogState extends State<ProfesorDetailDialog> {
         }
       } else {
         // Crear
-        final profesor = Profesor.fromJson(data);
-        await _profesorService.createProfesor(profesor);
+        await _profesorService.createProfesor(
+          profesor,
+          departamentoId: _departamentoSeleccionado,
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

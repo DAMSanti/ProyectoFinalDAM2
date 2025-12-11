@@ -111,7 +111,7 @@ public class AlojamientoController : ControllerBase
 
     // POST: api/alojamiento
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<AlojamientoDto>> CreateAlojamiento(CreateAlojamientoDto dto)
     {
         try
@@ -163,7 +163,7 @@ public class AlojamientoController : ControllerBase
 
     // PUT: api/alojamiento/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> UpdateAlojamiento(int id, UpdateAlojamientoDto dto)
     {
         try
@@ -200,7 +200,7 @@ public class AlojamientoController : ControllerBase
 
     // DELETE: api/alojamiento/5
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> DeleteAlojamiento(int id)
     {
         try
