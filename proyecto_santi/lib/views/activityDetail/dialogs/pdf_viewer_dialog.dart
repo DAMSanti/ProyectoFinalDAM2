@@ -8,10 +8,6 @@ import 'package:universal_html/html.dart' as html;
 import 'package:proyecto_santi/tema/app_colors.dart';
 import 'package:proyecto_santi/config.dart';
 
-// Imports condicionales para plataforma
-import 'dart:io' if (dart.library.html) 'dart:html';
-import 'package:path_provider/path_provider.dart' if (dart.library.html) 'package:path_provider/path_provider.dart';
-
 // Import condicional para el helper de web
 import '../helpers/pdf_helpers/web_pdf_helper_stub.dart' if (dart.library.html) '../helpers/pdf_helpers/web_pdf_helper.dart';
 
@@ -155,26 +151,14 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   }
 
   Future<void> _downloadPdfNative(String url) async {
-    if (!kIsWeb) {
-      final response = await http.get(Uri.parse(url));
-      
-      if (response.statusCode == 200) {
-        final dir = await getApplicationDocumentsDirectory();
-        final file = File('${dir.path}/${widget.fileName}');
-        await file.writeAsBytes(response.bodyBytes);
-        
-        if (mounted) {
-        }
-      } else {
-        throw Exception('Error al descargar el PDF');
-      }
-    }
+    // Funcionalidad solo disponible en plataformas nativas
+    // En web, la descarga se maneja de forma diferente
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isWeb = kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+    final isWeb = kIsWeb;
 
     return Dialog(
       backgroundColor: Colors.transparent,

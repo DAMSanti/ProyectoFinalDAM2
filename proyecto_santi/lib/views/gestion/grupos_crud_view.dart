@@ -146,7 +146,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                 // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
-                    padding: EdgeInsets.all(16.dg),
+                    padding: EdgeInsets.all(16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -164,7 +164,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                   ),
                 // Barra de búsqueda
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     onChanged: _filterGrupos,
                     decoration: InputDecoration(
@@ -179,7 +179,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 // Lista de grupos
                 Expanded(
                   child: _isLoading
@@ -191,7 +191,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                                     ? 'No hay grupos disponibles'
                                     : 'No se encontraron grupos',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
@@ -215,7 +215,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
 
   Widget _buildGruposList(bool isDark, bool isMobile) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
@@ -259,7 +259,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: ListView.builder(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           itemCount: _filteredGrupos.length,
           itemBuilder: (context, index) {
             final grupo = _filteredGrupos[index];
@@ -272,7 +272,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
 
   Widget _buildGrupoCard(Grupo grupo, bool isDark) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -306,7 +306,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.dg),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -327,13 +327,13 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                     size: 24,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12),
                 // Nombre del grupo
                 Expanded(
                   child: Text(
                     grupo.nombre,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : AppColors.primary,
                       height: 1.3,
@@ -383,7 +383,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Divider sutil con gradiente
             Container(
               height: 1,
@@ -397,7 +397,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                 ),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Información del grupo (curso y alumnos)
             Row(
               children: [
@@ -409,7 +409,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
                     isDark: isDark,
                   ),
                 ),
-                SizedBox(width: 8.w),
+                SizedBox(width: 8),
                 // Chip de alumnos
                 Flexible(
                   child: _buildInfoChip(
@@ -444,7 +444,7 @@ class _GruposCrudViewState extends State<GruposCrudView> {
               label,
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 13.sp,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,

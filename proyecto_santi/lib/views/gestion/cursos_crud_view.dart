@@ -132,7 +132,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                 // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
-                    padding: EdgeInsets.all(16.dg),
+                    padding: EdgeInsets.all(16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -150,7 +150,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                   ),
                 // Barra de búsqueda
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     onChanged: _filterCursos,
                     decoration: InputDecoration(
@@ -165,7 +165,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 // Lista de cursos
                 Expanded(
                   child: _isLoading
@@ -177,7 +177,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                                     ? 'No hay cursos disponibles'
                                     : 'No se encontraron cursos',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
@@ -201,7 +201,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
 
   Widget _buildCursosList(bool isDark, bool isMobile) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
@@ -245,7 +245,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: ListView.builder(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           itemCount: _filteredCursos.length,
           itemBuilder: (context, index) {
             final curso = _filteredCursos[index];
@@ -258,7 +258,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
 
   Widget _buildCursoCard(Curso curso, bool isDark) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -292,7 +292,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.dg),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -313,7 +313,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                     size: 24,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12),
                 // Código y título del curso
                 Expanded(
                   child: Column(
@@ -328,18 +328,18 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                         child: Text(
                           curso.codCurso,
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12,
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
                         ),
                       ),
-                      SizedBox(height: 6.h),
+                      SizedBox(height: 6),
                       Text(
                         curso.titulo,
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : AppColors.primary,
                           height: 1.3,
@@ -391,7 +391,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Divider sutil con gradiente
             Container(
               height: 1,
@@ -405,11 +405,11 @@ class _CursosCrudViewState extends State<CursosCrudView> {
                 ),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Información del curso (etapa, nivel y estado)
             Wrap(
-              spacing: 8.w,
-              runSpacing: 8.h,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 // Chip de etapa
                 _buildInfoChip(
@@ -455,7 +455,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
               label,
               style: TextStyle(
                 color: AppColors.primary,
-                fontSize: 13.sp,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -488,7 +488,7 @@ class _CursosCrudViewState extends State<CursosCrudView> {
             label,
             style: TextStyle(
               color: color,
-              fontSize: 13.sp,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -21,7 +21,8 @@ namespace ACEXAPI.Controllers
         /// Sube un archivo multimedia para el chat (imagen, video, audio)
         /// </summary>
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromForm] string actividadId, [FromForm] string userId)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string actividadId, [FromForm] string userId)
         {
             try
             {

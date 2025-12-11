@@ -130,7 +130,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                 // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
-                    padding: EdgeInsets.all(16.dg),
+                    padding: EdgeInsets.all(16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -148,7 +148,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                   ),
                 // Barra de búsqueda
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     onChanged: _filterAlojamientos,
                     decoration: InputDecoration(
@@ -163,7 +163,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 // Lista de alojamientos
                 Expanded(
                   child: _isLoading
@@ -175,7 +175,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                                     ? 'No hay alojamientos disponibles'
                                     : 'No se encontraron alojamientos',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
@@ -199,7 +199,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
 
   Widget _buildAlojamientosList(bool isDark, bool isMobile) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
@@ -243,7 +243,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: ListView.builder(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           itemCount: _filteredAlojamientos.length,
           itemBuilder: (context, index) {
             final alojamiento = _filteredAlojamientos[index];
@@ -256,7 +256,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
 
   Widget _buildAlojamientoCard(Alojamiento alojamiento, bool isDark) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -290,7 +290,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.dg),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -311,7 +311,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                     size: 24,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12),
                 // Nombre del alojamiento
                 Expanded(
                   child: Column(
@@ -320,7 +320,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                       Text(
                         alojamiento.nombre,
                         style: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : AppColors.primary,
                           height: 1.3,
@@ -329,7 +329,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (alojamiento.tipoAlojamiento != null) ...[
-                        SizedBox(height: 4.h),
+                        SizedBox(height: 4),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
@@ -339,7 +339,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                           child: Text(
                             alojamiento.tipoAlojamiento!,
                             style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 12,
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                             ),
@@ -390,7 +390,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Divider sutil con gradiente
             Container(
               height: 1,
@@ -404,7 +404,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
                 ),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Información del alojamiento
             _buildInfoRow(
               icon: Icons.location_city_rounded,
@@ -412,7 +412,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               isDark: isDark,
             ),
             if (alojamiento.direccion != null && alojamiento.direccion!.isNotEmpty) ...[
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
               _buildInfoRow(
                 icon: Icons.place_rounded,
                 label: alojamiento.direccion!,
@@ -420,7 +420,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               ),
             ],
             if (alojamiento.telefono != null && alojamiento.telefono!.isNotEmpty) ...[
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
               _buildInfoRow(
                 icon: Icons.phone_rounded,
                 label: alojamiento.telefono!,
@@ -428,7 +428,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               ),
             ],
             if (alojamiento.email != null && alojamiento.email!.isNotEmpty) ...[
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
               _buildInfoRow(
                 icon: Icons.email_rounded,
                 label: alojamiento.email!,
@@ -436,7 +436,7 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
               ),
             ],
             if (alojamiento.precioPorNoche != null) ...[
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
               _buildInfoRow(
                 icon: Icons.euro_rounded,
                 label: '${alojamiento.precioPorNoche!.toStringAsFixed(2)}€ / noche',
@@ -457,12 +457,12 @@ class _AlojamientosCrudViewState extends State<AlojamientosCrudView> {
           size: 16,
           color: isDark ? Colors.white70 : Colors.grey[600],
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 8),
         Expanded(
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14,
               color: isDark ? Colors.white70 : Colors.grey[700],
             ),
             maxLines: 2,

@@ -256,7 +256,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                               child: Text(
                                 'No se encontraron usuarios',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
@@ -280,7 +280,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
 
   Widget _buildUsuariosList(bool isDark, bool isMobile) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
@@ -324,7 +324,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: ListView.builder(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           itemCount: _filteredUsuarios.length,
           itemBuilder: (context, index) {
             final usuario = _filteredUsuarios[index];
@@ -337,7 +337,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
 
   Widget _buildUsuarioCard(Usuario usuario, bool isDark) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -373,7 +373,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -390,11 +390,11 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                       style: TextStyle(
                         color: _getRolColor(usuario.rol),
                         fontWeight: FontWeight.bold,
-                        fontSize: 20.sp,
+                        fontSize: 20,
                       ),
                     ),
                   ),
-                  SizedBox(width: 12.w),
+                  SizedBox(width: 12),
                   // Nombre del usuario y profesor
                   Expanded(
                     child: Column(
@@ -403,7 +403,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                         Text(
                           usuario.nombreUsuario,
                           style: TextStyle(
-                            fontSize: 18.sp,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : AppColors.primary,
                             height: 1.3,
@@ -413,11 +413,11 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                         ),
                         if (usuario.profesorNombreCompleto != null && 
                             usuario.profesorNombreCompleto!.isNotEmpty) ...[
-                          SizedBox(height: 2.h),
+                          SizedBox(height: 2),
                           Text(
                             usuario.profesorNombreCompleto!,
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 13,
                               color: isDark ? Colors.white70 : Colors.grey[600],
                               height: 1.2,
                             ),
@@ -485,7 +485,7 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
               // Divider sutil con gradiente
               Container(
                 height: 1,
@@ -499,19 +499,19 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
                   ),
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
               // Email
               _buildInfoRow(
                 icon: Icons.email_rounded,
                 label: usuario.email,
                 isDark: isDark,
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
               // Chips de rol y estado
               Row(
                 children: [
                   Flexible(child: _buildRolChip(usuario.rol)),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 8),
                   Flexible(child: _buildStatusChip(usuario.activo)),
                 ],
               ),
@@ -530,12 +530,12 @@ class _UsuariosCrudViewState extends State<UsuariosCrudView> {
           size: 16,
           color: isDark ? Colors.white70 : Colors.grey[600],
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 8),
         Expanded(
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14,
               color: isDark ? Colors.white70 : Colors.grey[700],
             ),
             maxLines: 1,

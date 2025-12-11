@@ -131,7 +131,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 // Botón crear solo en desktop
                 if (!isMobile)
                   Padding(
-                    padding: EdgeInsets.all(16.dg),
+                    padding: EdgeInsets.all(16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -149,7 +149,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                   ),
                 // Barra de búsqueda
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
                     onChanged: _filterEmpresas,
                     decoration: InputDecoration(
@@ -164,7 +164,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 // Lista de empresas
                 Expanded(
                   child: _isLoading
@@ -176,7 +176,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                                     ? 'No hay empresas de transporte disponibles'
                                     : 'No se encontraron empresas',
                                 style: TextStyle(
-                                  fontSize: 16.sp,
+                                  fontSize: 16,
                                   color: isDark ? Colors.white70 : AppColors.textLight,
                                 ),
                               ),
@@ -200,7 +200,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
 
   Widget _buildEmpresasList(bool isDark, bool isMobile) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
@@ -244,7 +244,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: ListView.builder(
-          padding: EdgeInsets.all(16.dg),
+          padding: EdgeInsets.all(16),
           itemCount: _filteredEmpresas.length,
           itemBuilder: (context, index) {
             final empresa = _filteredEmpresas[index];
@@ -257,7 +257,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
 
   Widget _buildEmpresaCard(EmpresaTransporte empresa, bool isDark) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -291,7 +291,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(16.dg),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -312,13 +312,13 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                     size: 24,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 12),
                 // Nombre de la empresa
                 Expanded(
                   child: Text(
                     empresa.nombre,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : AppColors.primary,
                       height: 1.3,
@@ -368,7 +368,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Divider sutil con gradiente
             Container(
               height: 1,
@@ -382,7 +382,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 ),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 12),
             // Información de la empresa
             if (empresa.cif != null && empresa.cif!.isNotEmpty) ...[
               _buildInfoRow(
@@ -390,7 +390,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 label: 'CIF: ${empresa.cif}',
                 isDark: isDark,
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
             ],
             if (empresa.telefono != null && empresa.telefono!.isNotEmpty) ...[
               _buildInfoRow(
@@ -398,7 +398,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 label: empresa.telefono!,
                 isDark: isDark,
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
             ],
             if (empresa.email != null && empresa.email!.isNotEmpty) ...[
               _buildInfoRow(
@@ -406,7 +406,7 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
                 label: empresa.email!,
                 isDark: isDark,
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 8),
             ],
             if (empresa.direccion != null && empresa.direccion!.isNotEmpty) ...[
               _buildInfoRow(
@@ -429,12 +429,12 @@ class _EmpresasTransporteCrudViewState extends State<EmpresasTransporteCrudView>
           size: 16,
           color: isDark ? Colors.white70 : Colors.grey[600],
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 8),
         Expanded(
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14,
               color: isDark ? Colors.white70 : Colors.grey[700],
             ),
             maxLines: 2,
