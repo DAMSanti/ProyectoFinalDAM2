@@ -47,7 +47,7 @@ namespace ACEXAPI.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
-                var fileUrl = $"{Request.Scheme}:
+                var fileUrl = $"{Request.Scheme}://{Request.Host}/chat_media/{actividadId}/{uniqueFileName}";
                 _logger.LogInformation($"Archivo subido correctamente: {fileUrl}");
                 return Ok(new
                 {

@@ -1,5 +1,12 @@
-﻿FlutterWindow::FlutterWindow(const flutter::DartProject& project)
-    : project_(project) {}
+﻿// Include necessary headers
+#include <windows.h>
+#include <memory>
+#include <optional>
+#include "flutter_window.h"
+#include "flutter/generated_plugin_registrant.h"
+
+FlutterWindow::FlutterWindow(const flutter::DartProject& project)
+  : project_(project) {}
 FlutterWindow::~FlutterWindow() {}
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {

@@ -12,6 +12,7 @@ class PdfEditorView extends StatefulWidget {
 }
 class _PdfEditorViewState extends State<PdfEditorView> {
   List<ChartItem> _charts = [];
+  int _step = 0; // 0 = select, 1 = preview
   @override
   void initState() {
     super.initState();
@@ -112,143 +113,165 @@ class _PdfEditorViewState extends State<PdfEditorView> {
               ),
             ),
             Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isNarrow = constraints.maxWidth < 600;
+                  // Left pane (available charts)
+                  Widget leftPane = Container(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LayoutBuilder(builder: (context, headerConstraints) {
+                          final narrow = headerConstraints.maxWidth < 380;
+                          if (narrow) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(children: [
+                                  Icon(Icons.dashboard_customize_rounded, color: AppColors.primary, size: 20),
+                                  SizedBox(width: 8),
+                                  Flexible(child: Text('Gráficas Disponibles', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppColors.primary), overflow: TextOverflow.ellipsis)),
+                                ]),
+                                SizedBox(height: 8),
+                                Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: _selectAll, icon: Icon(Icons.select_all, size: 18), label: Text('Seleccionar todo'), style: TextButton.styleFrom(foregroundColor: AppColors.primary))),
+                              ],
+                            );
+                          }
+
+                          return Row(
                             children: [
-                              Icon(
-                                Icons.dashboard_customize_rounded,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
+                              Icon(Icons.dashboard_customize_rounded, color: AppColors.primary, size: 20),
                               SizedBox(width: 8),
-                              Text(
-                                'Gráficas Disponibles',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : AppColors.primary,
-                                ),
-                              ),
-                              Spacer(),
-                              TextButton.icon(
-                                onPressed: _selectAll,
-                                icon: Icon(Icons.select_all, size: 18),
-                                label: Text('Seleccionar todo'),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.primary,
-                                ),
-                              ),
+                              Expanded(child: Text('Gráficas Disponibles', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppColors.primary))),
+                              TextButton.icon(onPressed: _selectAll, icon: Icon(Icons.select_all, size: 18), label: Text('Seleccionar todo'), style: TextButton.styleFrom(foregroundColor: AppColors.primary)),
                             ],
+                          );
+                        }),
+                        SizedBox(height: 16),
+                        // Constrain height on narrow screens
+                        Flexible(
+                          child: ListView.builder(
+                            itemCount: _charts.length,
+                            itemBuilder: (context, index) {
+                              return _buildChartTile(_charts[index], isDark);
+                            },
                           ),
-                          SizedBox(height: 16),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: _charts.length,
-                              itemBuilder: (context, index) {
-                                return _buildChartTile(_charts[index], isDark);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Container(
-                    width: 1,
-                    color: isDark 
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.black.withValues(alpha: 0.1),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                  );
+
+                  // Right pane (preview)
+                  Widget rightPane = Container(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LayoutBuilder(builder: (context, headerConstraints) {
+                          final narrow = headerConstraints.maxWidth < 380;
+                          if (narrow) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(children: [
+                                  Icon(Icons.preview_rounded, color: AppColors.estadoAprobado, size: 20),
+                                  SizedBox(width: 8),
+                                  Flexible(child: Text('Vista Previa (${selectedCharts.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppColors.primary), overflow: TextOverflow.ellipsis)),
+                                ]),
+                                SizedBox(height: 8),
+                                if (selectedCharts.isNotEmpty) Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: _clearSelection, icon: Icon(Icons.clear_all, size: 18), label: Text('Limpiar'), style: TextButton.styleFrom(foregroundColor: AppColors.estadoRechazado))),
+                              ],
+                            );
+                          }
+
+                          return Row(
                             children: [
-                              Icon(
-                                Icons.preview_rounded,
-                                color: AppColors.estadoAprobado,
-                                size: 20,
-                              ),
+                              Icon(Icons.preview_rounded, color: AppColors.estadoAprobado, size: 20),
                               SizedBox(width: 8),
-                              Text(
-                                'Vista Previa (${selectedCharts.length})',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : AppColors.primary,
-                                ),
-                              ),
-                              Spacer(),
-                              if (selectedCharts.isNotEmpty)
-                                TextButton.icon(
-                                  onPressed: _clearSelection,
-                                  icon: Icon(Icons.clear_all, size: 18),
-                                  label: Text('Limpiar'),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: AppColors.estadoRechazado,
-                                  ),
-                                ),
+                              Expanded(child: Text('Vista Previa (${selectedCharts.length})', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppColors.primary))),
+                              if (selectedCharts.isNotEmpty) TextButton.icon(onPressed: _clearSelection, icon: Icon(Icons.clear_all, size: 18), label: Text('Limpiar'), style: TextButton.styleFrom(foregroundColor: AppColors.estadoRechazado)),
                             ],
-                          ),
-                          SizedBox(height: 16),
-                          if (selectedCharts.isEmpty)
-                            Expanded(
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.inbox_rounded,
-                                      size: 64,
-                                      color: isDark 
-                                          ? Colors.white.withValues(alpha: 0.3)
-                                          : Colors.black.withValues(alpha: 0.2),
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'Ninguna gráfica seleccionada',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isDark 
-                                            ? Colors.white.withValues(alpha: 0.5)
-                                            : Colors.black.withValues(alpha: 0.4),
+                          );
+                        }),
+                        SizedBox(height: 16),
+                        Expanded(
+                          child: selectedCharts.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.inbox_rounded,
+                                        size: 64,
+                                        color: isDark
+                                            ? Colors.white.withValues(alpha: 0.3)
+                                            : Colors.black.withValues(alpha: 0.2),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Ninguna gráfica seleccionada',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.5)
+                                              : Colors.black.withValues(alpha: 0.4),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ReorderableListView.builder(
+                                  itemCount: selectedCharts.length,
+                                  onReorder: _onReorder,
+                                  itemBuilder: (context, index) {
+                                    return _buildSelectedChartCard(
+                                      selectedCharts[index],
+                                      index + 1,
+                                      isDark,
+                                    );
+                                  },
                                 ),
-                              ),
-                            )
-                          else
-                            Expanded(
-                              child: ReorderableListView.builder(
-                                itemCount: selectedCharts.length,
-                                onReorder: _onReorder,
-                                itemBuilder: (context, index) {
-                                  return _buildSelectedChartCard(
-                                    selectedCharts[index],
-                                    index + 1,
-                                    isDark,
-                                  );
-                                },
-                              ),
-                            ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  );
+
+                  // On narrow screens use a two-step flow; on wide screens keep side-by-side
+                  if (isNarrow) {
+                    Widget stepContent = _step == 0 ? leftPane : rightPane;
+                    return Column(
+                      children: [
+                        // progress indicator shown only on narrow (mobile)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Text('Paso ${_step + 1} de 2', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: LinearProgressIndicator(value: (_step + 1) / 2, backgroundColor: isDark ? Colors.white12 : Colors.black12, valueColor: AlwaysStoppedAnimation(AppColors.primary)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(child: stepContent),
+                      ],
+                    );
+                  }
+
+                  // Desktop / wide layout: keep side-by-side
+                  return Row(
+                    children: [
+                      Expanded(flex: 3, child: leftPane),
+                      Container(
+                        width: 1,
+                        color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1),
+                      ),
+                      Expanded(flex: 2, child: rightPane),
+                    ],
+                  );
+                },
               ),
             ),
             Container(
@@ -256,42 +279,45 @@ class _PdfEditorViewState extends State<PdfEditorView> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: isDark 
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.black.withValues(alpha: 0.1),
+                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1),
                   ),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancelar'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: isDark ? Colors.white70 : Colors.black54,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: selectedCharts.isEmpty
-                        ? null
-                        : () {
-                            widget.onGeneratePdf(selectedCharts);
-                            Navigator.pop(context);
-                          },
-                    icon: Icon(Icons.download_rounded),
-                    label: Text('Generar PDF'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.estadoAprobado,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      disabledBackgroundColor: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
+              child: LayoutBuilder(builder: (context, footerConstraints) {
+                final narrow = footerConstraints.maxWidth < 420;
+                if (narrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(children: [
+                        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancelar'), style: TextButton.styleFrom(foregroundColor: isDark ? Colors.white70 : Colors.black54)),
+                        Spacer(),
+                        if (_step == 1)
+                          TextButton(onPressed: () => setState(() => _step = 0), child: Text('Atrás'), style: TextButton.styleFrom(foregroundColor: isDark ? Colors.white70 : Colors.black54)),
+                      ]),
+                      SizedBox(height: 8),
+                      ElevatedButton.icon(
+                        onPressed: _step == 0 ? (selectedCharts.isEmpty ? null : () => setState(() => _step = 1)) : (selectedCharts.isEmpty ? null : () { widget.onGeneratePdf(selectedCharts); Navigator.pop(context); }),
+                        icon: Icon(_step == 0 ? Icons.arrow_forward : Icons.download_rounded),
+                        label: Text(_step == 0 ? 'Siguiente' : 'Generar PDF'),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoAprobado, foregroundColor: Colors.white, padding: EdgeInsets.symmetric(vertical: 14), disabledBackgroundColor: Colors.grey),
+                      ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancelar'), style: TextButton.styleFrom(foregroundColor: isDark ? Colors.white70 : Colors.black54, padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12))),
+                    SizedBox(width: 12),
+                    if (_step == 1)
+                      TextButton(onPressed: () => setState(() => _step = 0), child: Text('Atrás'), style: TextButton.styleFrom(foregroundColor: isDark ? Colors.white70 : Colors.black54, padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12))),
+                    SizedBox(width: 8),
+                    ElevatedButton.icon(onPressed: _step == 0 ? (selectedCharts.isEmpty ? null : () => setState(() => _step = 1)) : (selectedCharts.isEmpty ? null : () { widget.onGeneratePdf(selectedCharts); Navigator.pop(context); }), icon: Icon(_step == 0 ? Icons.arrow_forward : Icons.download_rounded), label: Text(_step == 0 ? 'Siguiente' : 'Generar PDF'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.estadoAprobado, foregroundColor: Colors.white, padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), disabledBackgroundColor: Colors.grey)),
+                  ],
+                );
+              }),
             ),
           ],
         ),

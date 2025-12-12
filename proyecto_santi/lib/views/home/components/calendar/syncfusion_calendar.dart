@@ -143,7 +143,10 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
         final isMobileScreen = effectiveWidth < 600;
         final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
         final isMobileLandscape = isMobileScreen && isLandscape;
-        final isNarrowScreen = effectiveWidth < 1200 && !isMobileScreen;
+        // isNarrowScreen: pantallas entre 600 y 1200 px (tablets, ventanas medianas)
+        final isNarrowScreen = effectiveWidth >= 600 && effectiveWidth < 1200;
+        // isLargeScreen: pantallas >= 1200 px (desktop, monitores grandes)
+        final isLargeScreen = effectiveWidth >= 1200;
         if (isMobileLandscape) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,23 +195,25 @@ class _ModernSyncfusionCalendarState extends State<ModernSyncfusionCalendar> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildCalendarContainer(context, isDark, isNarrowScreen),
+                child: _buildCalendarContainer(context, isDark, false),
               ),
             ],
           );
         } 
         else {
-          return Column(
+          // Pantallas grandes (>= 1200px): Layout horizontal con botones verticales a la izquierda
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CalendarViewButtons(
                 currentView: _currentView,
                 onViewChanged: _changeView,
                 isDark: isDark,
-                isVertical: false,
+                isVertical: true,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(width: 16),
               Expanded(
-                child: _buildCalendarContainer(context, isDark, isNarrowScreen),
+                child: _buildCalendarContainer(context, isDark, false),
               ),
             ],
           );

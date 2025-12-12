@@ -14,9 +14,10 @@ class AppConfig {
   // URL base de la API (ACEXAPI C# .NET)
   // IMPORTANTE: Para Android físico en local, usar la IP local de tu PC en la misma red WiFi
   static String get apiBaseUrl {
-    // En modo release web, usa ruta relativa (mismo dominio con proxy nginx)
+    // En modo release web, usa URL completa del servidor de producción
+    // Nota: Cambiar a '/api' cuando se despliegue con nginx como proxy
     if (kIsWeb && kReleaseMode) {
-      return '/api';
+      return '$productionUrl/api';
     }
     
     // Si está en modo producción, usa el servidor remoto
@@ -46,9 +47,9 @@ class AppConfig {
   
   // URL de imágenes
   static String get imagenesBaseUrl {
-    // En modo release web, usa ruta relativa (mismo dominio)
+    // En modo release web, usa URL completa del servidor de producción
     if (kIsWeb && kReleaseMode) {
-      return '/uploads';
+      return '$productionUrl/uploads';
     }
     
     // Si está en modo producción, usa el servidor remoto

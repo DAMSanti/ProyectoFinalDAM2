@@ -1,4 +1,10 @@
-﻿class Win32Window {
+﻿#pragma once
+
+#include <windows.h>
+#include <string>
+#include <memory>
+
+class Win32Window {
  public:
   struct Point {
     unsigned int x;

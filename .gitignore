@@ -192,3 +192,13 @@ node_modules/
 ## JetBrains Rider
 .idea/
 *.sln.iml
+# ============================================
+# Dist - Archivos grandes de distribución
+# ============================================
+dist/ACEXAPI/
+dist/proyecto_santi/*.apk
+dist/proyecto_santi/*.zip
+dist/proyecto_santi/windows/
+dist/proyecto_santi/installers/
+*.apk
+*.msi

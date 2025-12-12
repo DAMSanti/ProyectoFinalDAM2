@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACEX - Presentación Técnica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        /* BASE */
+        body { font-family: 'Inter', sans-serif; background-color: #111827; color: #1e293b; margin: 0; overflow: hidden; }
+
+        /* VIEWPORT */
+        #slide-viewport {
+            width: 1280px; height: 720px; background-color: white; border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+            transform-origin: center center; flex-shrink: 0;
+        }
+
+        /* UTILS */
+        .slide-bg-full { background-size: cover; background-position: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .slide-overlay-dark { background: rgba(30, 58, 138, 0.9); position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; }
+        .slide-content-padded { padding: 60px; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 10; }
+        
+        .s-title { color: #1e3a8a; font-size: 48px; font-weight: 800; margin-bottom: 20px; border-bottom: 4px solid #3b82f6; padding-bottom: 15px; display: inline-block; width: 100%; }
+        .s-h3 { color: #2563eb; font-size: 28px; font-weight: 600; margin-bottom: 10px; margin-top: 20px; }
+        .s-text { font-size: 22px; line-height: 1.5; color: #475569; }
+        .s-list li { margin-bottom: 12px; display: flex; align-items: center; gap: 12px; font-size: 20px; }
+        
+        .s-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; height: 100%; align-items: center; }
+        .s-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .s-card { background: #eff6ff; border: 1px solid #dbeafe; border-radius: 12px; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .s-img-box { width: 100%; height: 100%; max-height: 500px; border-radius: 12px; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .s-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .timeline-container { display: flex; justify-content: space-between; position: relative; margin-top: 40px; }
+        .timeline-bar { position: absolute; top: 24px; left: 0; width: 100%; height: 4px; background: #cbd5e1; z-index: 0; }
+        .timeline-node { position: relative; z-index: 10; width: 22%; text-align: center; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .timeline-badge { width: 48px; height: 48px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; margin: -40px auto 10px auto; border: 4px solid white; }
+
+        #notes-panel { transition: width 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="h-screen flex flex-col bg-gray-900">
+
+    <!-- ERROR TRAP (Muestra errores en pantalla si JS falla) -->
+    <div id="error-trap" style="display:none; position:fixed; top:0; left:0; width:100%; padding:20px; background:red; color:white; z-index:9999;"></div>
+    <script>window.onerror = function(m,u,l){document.getElementById('error-trap').style.display='block';document.getElementById('error-trap').innerText='Error: '+m+' (Line '+l+')';}</script>
+
+    <!-- AREA PRINCIPAL -->
+    <div class="flex-1 flex overflow-hidden relative">
+        <main id="main-area" class="flex-1 flex items-center justify-center p-8 relative z-10 overflow-hidden">
+            <div id="slide-viewport"></div>
+        </main>
+
+        <aside id="notes-panel" class="bg-gray-800 border-l border-gray-700 flex flex-col shrink-0 relative z-20 shadow-2xl" style="width: 0px;">
+            <div class="p-4 border-b border-gray-700 bg-gray-900 flex justify-between items-center sticky top-0">
+                <h3 class="font-bold text-yellow-400 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <i data-lucide="mic-2" class="w-4 h-4"></i> Guión
+                </h3>
+                <div class="text-xs text-gray-400 font-mono bg-gray-800 px-2 py-1 rounded border border-gray-700" id="timer-display">00:00</div>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 bg-gray-800">
+                <p id="notes-content" class="text-gray-300 leading-relaxed whitespace-pre-line text-base font-sans"></p>
+                <div class="mt-8 text-xs font-mono text-gray-500 pt-4 border-t border-gray-700">
+                    <i class="fa-regular fa-clock mr-1"></i> Tiempo: <span id="suggested-time" class="text-white font-bold"></span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-950 border-t border-gray-800 p-4 flex justify-between items-center select-none z-30">
+        <div class="flex gap-4 items-center">
+            <span class="text-gray-500 text-sm font-mono w-16 text-center" id="slide-counter">-- / --</span>
+            <button onclick="toggleNotes()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition-all hover:text-white cursor-pointer">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span id="notes-btn-text">Ver Guión</span>
+            </button>
+            <button onclick="toggleTimer()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 border border-gray-700 transition-all hover:text-red-400 cursor-pointer" id="timer-btn">
+                <i data-lucide="play" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="prevSlide()" id="btn-prev" class="w-12 h-12 rounded-full bg-gray-800 hover:bg-blue-600 hover:text-white border border-gray-700 text-gray-400 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <button onclick="nextSlide()" id="btn-next" class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/50 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                <i data-lucide="chevron-right" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- LÓGICA -->
+    <script>
+        // --- 1. DEFINICIÓN DE DIAPOSITIVAS ---
+        const slides = [
+            {
+                note: `Buenos días a todos. Hoy vamos a profundizar en el detalle técnico de ACEX.\n\nNo es solo una app, es una solución completa para la gestión de campo.`,
+                time: "2 min",
+                render: () => `
+                    <div class="absolute inset-0 bg-slate-900 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-slate-900 to-slate-950 z-0"></div>
+                        <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-pulse"></div>
+                        <div class="absolute -bottom-24 -left-24 w-[500px] h-[500px] bg-indigo-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse"></div>
+                    </div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full w-full">
+                        <div class="backdrop-blur-xl bg-white/5 border border-white/10 p-16 rounded-3xl shadow-2xl flex flex-col items-center max-w-5xl w-full mx-8">
+                            <div class="mb-8 px-4 py-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-300 text-xs font-mono uppercase tracking-[0.3em]">Technical Overview</div>
+                            <h1 class="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-blue-300 tracking-tighter mb-6 drop-shadow-2xl font-inter">ACEX</h1>
+                            <h2 class="text-2xl font-light text-blue-100 tracking-[0.2em] mb-12 text-center border-b border-white/10 pb-6 w-3/4">ANÁLISIS TÉCNICO & ARQUITECTURA</h2>
+                            <div class="grid grid-cols-3 gap-12 w-full max-w-2xl px-8">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 p-3"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" alt="Flutter" class="w-full h-full"></div>
+                                    <span class="text-xs text-gray-400 font-mono tracking-widest uppercase">Flutter</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 p-3"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" alt=".NET" class="w-full h-full"></div>
+                                    <span class="text-xs text-gray-400 font-mono tracking-widest uppercase">.NET 7</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10 p-3"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-plain.svg" alt="SQL Server" class="w-full h-full"></div>
+                                    <span class="text-xs text-gray-400 font-mono tracking-widest uppercase">SQL Server</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `ACEX se diseñó con tres pilares fundamentales: Rapidez (Flutter), Robustez (.NET) y Utilidad (PDF).`,
+                time: "3 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <div class="s-grid-2">
+                            <div>
+                                <h2 class="s-title">Resumen Ejecutivo</h2>
+                                <p class="s-text mb-6"><strong>ACEX</strong> centraliza la gestión de actividades de campo.</p>
+                                <ul class="s-list">
+                                    <li class="flex items-center gap-4"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" class="w-8 h-8" alt="Flutter"><span>Cliente Móvil (Flutter)</span></li>
+                                    <li class="flex items-center gap-4"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" class="w-8 h-8" alt=".NET"><span>API REST (.NET 7)</span></li>
+                                    <li class="flex items-center gap-4"><i class="fa-solid fa-file-pdf text-red-500 text-2xl w-8 text-center"></i><span>Motor de PDF</span></li>
+                                </ul>
+                            </div>
+                            <div class="s-img-box">
+                                <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1000&q=80" alt="Mobile Dashboard" style="object-fit:cover; width: 100%; height: 100%;">
+                            </div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Stack completo: Flutter, .NET 7, SQL Server y Firebase.`,
+                time: "2 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Stack Tecnológico</h2>
+                        <div class="s-grid-4 mt-12">
+                            <div class="s-card"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" class="w-16 h-16 mb-4" alt="Flutter"><h3 class="text-xl font-bold text-blue-900">Frontend</h3><p class="text-gray-500">Flutter (Dart)</p></div>
+                            <div class="s-card"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" class="w-16 h-16 mb-4" alt=".NET"><h3 class="text-xl font-bold text-blue-900">Backend</h3><p class="text-gray-500">.NET 7 API</p></div>
+                            <div class="s-card"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-plain.svg" class="w-16 h-16 mb-4" alt="SQL"><h3 class="text-xl font-bold text-blue-900">Datos</h3><p class="text-gray-500">SQL Server</p></div>
+                            <div class="s-card"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg" class="w-16 h-16 mb-4" alt="Firebase"><h3 class="text-xl font-bold text-blue-900">Push</h3><p class="text-gray-500">Firebase FCM</p></div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Diseño en capas: Controllers, Services y DbContext para máxima mantenibilidad.`,
+                time: "3 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Arquitectura del Sistema</h2>
+                        <div class="s-grid-2">
+                            <div class="s-img-box"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80" alt="Architecture" style="object-fit: cover;"></div>
+                            <div>
+                                <h3 class="s-h3">Diseño en Capas</h3>
+                                <p class="s-text mb-4">Estructura limpia para mantenibilidad:</p>
+                                <ul class="s-list text-gray-600">
+                                    <li><strong class="text-blue-700">Controllers:</strong> Entry point (HTTP).</li>
+                                    <li><strong class="text-blue-700">Services:</strong> Lógica de negocio.</li>
+                                    <li><strong class="text-blue-700">DbContext:</strong> ORM Entity Framework.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Seguridad crítica con JWT y Hashing BCrypt.`,
+                time: "3 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Seguridad y Autenticación</h2>
+                        <div class="s-grid-2">
+                            <div class="flex flex-col gap-6">
+                                <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500 shadow-sm"><h3 class="text-xl font-bold text-blue-900 mb-2"><i class="fa-solid fa-key mr-2"></i> JWT</h3><p class="text-gray-600">Tokens HMAC SHA256. Expiración 24h.</p></div>
+                                <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500 shadow-sm"><h3 class="text-xl font-bold text-blue-900 mb-2"><i class="fa-solid fa-shield-halved mr-2"></i> BCrypt</h3><p class="text-gray-600">Hashing de contraseñas con salt automático.</p></div>
+                            </div>
+                            <div class="s-img-box"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=1000&q=80" alt="Security" style="object-fit: cover;"></div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Flujo Crítico: Login -> Gestión -> Asociación -> PDF.`,
+                time: "3 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Flujo Crítico</h2>
+                        <div class="timeline-container">
+                            <div class="timeline-bar"></div>
+                            <div class="timeline-node"><div class="timeline-badge">1</div><h3 class="font-bold text-blue-900">Login</h3><p class="text-sm text-gray-500">POST /Auth</p></div>
+                            <div class="timeline-node"><div class="timeline-badge">2</div><h3 class="font-bold text-blue-900">Gestión</h3><p class="text-sm text-gray-500">CRUD Actividad</p></div>
+                            <div class="timeline-node border-blue-500 bg-blue-50"><div class="timeline-badge bg-indigo-600">3</div><h3 class="font-bold text-indigo-900">Asociar</h3><p class="text-sm font-bold text-indigo-700">Loc -> Actividad</p></div>
+                            <div class="timeline-node"><div class="timeline-badge">4</div><h3 class="font-bold text-blue-900">PDF</h3><p class="text-sm text-gray-500">Generar Reporte</p></div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `UI Adaptativa con LayoutBuilder.`,
+                time: "2 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <div class="s-grid-2">
+                             <div class="s-img-box"><img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1000&q=80" alt="Responsive" style="object-fit: cover;"></div>
+                            <div>
+                                <h2 class="s-title">UI Adaptativa</h2>
+                                <h3 class="s-h3">Problema: Overflow</h3>
+                                <p class="s-text mb-6">Tablas complejas rompían la vista móvil.</p>
+                                <h3 class="s-h3">Solución: LayoutBuilder</h3>
+                                <ul class="s-list"><li><i class="fa-solid fa-mobile-button text-blue-500"></i> Móvil: Flujo "Wizard"</li><li><i class="fa-solid fa-desktop text-blue-500"></i> PC: Split View</li></ul>
+                            </div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Retos resueltos: Gradle BOM, Errores 500 y Tokens FCM.`,
+                time: "3 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Retos Resueltos</h2>
+                        <div class="s-grid-2">
+                            <div class="flex flex-col gap-4">
+                                <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded"><strong class="block text-red-900">Gradle BOM Error</strong><span class="text-gray-600">Fix: Codificación UTF-8 limpia.</span></div>
+                                <div class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded"><strong class="block text-yellow-900">Error 500 (Gastos)</strong><span class="text-gray-600">Fix: Aplicar Migraciones DB.</span></div>
+                                <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded"><strong class="block text-blue-900">FCM Token Error</strong><span class="text-gray-600">Fix: Debugging de Payload.</span></div>
+                            </div>
+                            <div class="s-img-box"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80" alt="Code" style="object-fit: cover;"></div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Checklist: DB, Config, Tests y Push.`,
+                time: "2 min",
+                render: () => `
+                    <div class="slide-content-padded">
+                        <h2 class="s-title">Checklist Despliegue</h2>
+                        <div class="s-grid-4 mt-8">
+                            <div class="s-card bg-green-50 border-green-200"><i class="fa-solid fa-database text-4xl text-green-600 mb-2"></i><h3 class="font-bold text-green-900">1. DB</h3><p class="text-sm">Migraciones OK</p></div>
+                            <div class="s-card bg-green-50 border-green-200"><i class="fa-solid fa-sliders text-4xl text-green-600 mb-2"></i><h3 class="font-bold text-green-900">2. Config</h3><p class="text-sm">Env Vars</p></div>
+                            <div class="s-card bg-green-50 border-green-200"><i class="fa-solid fa-vial-circle-check text-4xl text-green-600 mb-2"></i><h3 class="font-bold text-green-900">3. E2E</h3><p class="text-sm">Login -> PDF</p></div>
+                            <div class="s-card bg-green-50 border-green-200"><i class="fa-solid fa-paper-plane text-4xl text-green-600 mb-2"></i><h3 class="font-bold text-green-900">4. Push</h3><p class="text-sm">Test FCM</p></div>
+                        </div>
+                    </div>`
+            },
+            {
+                note: `Pasemos a la acción.`,
+                time: "5 min",
+                render: () => `
+                    <div class="slide-bg-full" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=2000&q=80');"></div>
+                    <div class="slide-overlay-dark">
+                        <h1 class="text-6xl font-extrabold mb-8">DEMO EN VIVO</h1>
+                        <p class="text-2xl text-blue-200 bg-black/30 px-6 py-3 rounded-full border border-blue-500/50">Flujo: Admin &rarr; Localización &rarr; Informe PDF</p>
+                    </div>`
+            },
+            {
+                note: `Preguntas?`,
+                time: "Final",
+                render: () => `
+                    <div class="slide-content-padded text-center items-center">
+                        <h2 class="text-8xl font-bold text-blue-900 mb-8">¿Preguntas?</h2>
+                        <p class="text-2xl text-gray-500">Equipo Técnico ACEX</p>
+                    </div>`
+            }
+        ];
+
+        // --- 2. ESTADO Y FUNCIONES ---
+        let currentSlideIndex = 0;
+        let isTimerRunning = false;
+        let timerSeconds = 0;
+        let timerInterval;
+        let notesVisible = false;
+
+        function renderSlide() {
+            const viewport = document.getElementById('slide-viewport');
+            const noteContent = document.getElementById('notes-content');
+            const suggestedTime = document.getElementById('suggested-time');
+            const counter = document.getElementById('slide-counter');
+            const prevBtn = document.getElementById('btn-prev');
+            const nextBtn = document.getElementById('btn-next');
+
+            viewport.innerHTML = slides[currentSlideIndex].render();
+            
+            noteContent.textContent = slides[currentSlideIndex].note;
+            suggestedTime.textContent = slides[currentSlideIndex].time;
+            counter.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+
+            prevBtn.disabled = currentSlideIndex === 0;
+            prevBtn.style.opacity = currentSlideIndex === 0 ? "0.5" : "1";
+            prevBtn.style.cursor = currentSlideIndex === 0 ? "not-allowed" : "pointer";
+
+            if (currentSlideIndex === slides.length - 1) {
+                nextBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-500');
+            } else {
+                nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-500');
+                nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+            }
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                renderSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                renderSlide();
+            }
+        }
+
+        function fitSlide() {
+            const mainArea = document.getElementById('main-area');
+            const viewport = document.getElementById('slide-viewport');
+            if (!mainArea || !viewport) return;
+            const padding = 60;
+            const availableW = Math.max(100, mainArea.clientWidth - padding);
+            const availableH = Math.max(100, mainArea.clientHeight - padding);
+            const scale = Math.min(availableW / 1280, availableH / 720);
+            viewport.style.transform = `scale(${scale > 0 ? scale : 1})`;
+        }
+
+        function toggleNotes() {
+            const panel = document.getElementById('notes-panel');
+            const btnText = document.getElementById('notes-btn-text');
+            if (notesVisible) {
+                panel.style.width = '0px';
+                btnText.textContent = "Ver Guión";
+            } else {
+                panel.style.width = '350px';
+                btnText.textContent = "Ocultar Guión";
+            }
+            notesVisible = !notesVisible;
+            setTimeout(fitSlide, 350);
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            const display = document.getElementById('timer-display');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                btn.classList.remove('text-red-400');
+            } else {
+                isTimerRunning = true;
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                btn.classList.add('text-red-400');
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                    const secs = (timerSeconds % 60).toString().padStart(2, '0');
+                    display.textContent = `${mins}:${secs}`;
+                }, 1000);
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // --- 3. INICIALIZACIÓN DIRECTA ---
+        try {
+            renderSlide();
+            fitSlide();
+            window.addEventListener('resize', fitSlide);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+        } catch(e) {
+            alert("Error inicial: " + e.message);
+        }
+    </script>
+</body>
+</html>

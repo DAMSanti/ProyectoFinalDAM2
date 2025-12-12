@@ -1,4 +1,14 @@
-﻿class FlutterWindow : public Win32Window {
+﻿// Standard includes required by Flutter window implementation
+#pragma once
+
+#include <windows.h>
+#include <memory>
+#include <optional>
+#include "win32_window.h"
+#include <flutter/dart_project.h>
+#include <flutter/flutter_view_controller.h>
+
+class FlutterWindow : public Win32Window {
  public:
   explicit FlutterWindow(const flutter::DartProject& project);
   virtual ~FlutterWindow();

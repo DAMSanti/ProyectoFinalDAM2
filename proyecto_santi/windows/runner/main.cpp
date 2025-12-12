@@ -1,4 +1,12 @@
-﻿int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
+﻿// Includes required for Win32 and Flutter embedding
+#include <windows.h>
+#include <shellapi.h>
+#include <flutter/dart_project.h>
+#include "flutter_window.h"
+#include "win32_window.h"
+#include "utils.h"
+
+int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
     CreateAndAttachConsole();

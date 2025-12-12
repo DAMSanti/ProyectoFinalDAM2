@@ -1,4 +1,12 @@
-﻿namespace {
+﻿#include <windows.h>
+#include <vector>
+#include <string>
+#include <flutter_windows.h>
+#include "win32_window.h"
+#include "resource.h"
+#include <dwmapi.h>
+
+namespace {
 constexpr const wchar_t kWindowClassName[] = L"FLUTTER_RUNNER_WIN32_WINDOW";
 constexpr const wchar_t kGetPreferredBrightnessRegKey[] =
   L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";

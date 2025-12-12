@@ -1,4 +1,16 @@
-﻿void CreateAndAttachConsole() {
+﻿#include <windows.h>
+#include <cstdio>
+#include <io.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cstring>
+#include <flutter_windows.h>
+
+// Forward declaration
+std::string Utf8FromUtf16(const wchar_t* utf16_string);
+
+void CreateAndAttachConsole() {
   if (::AllocConsole()) {
     FILE *unused;
     if (freopen_s(&unused, "CONOUT$", "w", stdout)) {

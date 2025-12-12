@@ -16,6 +16,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
+import 'package:syncfusion_flutter_core/core.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
@@ -27,6 +28,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Registrar licencia de Syncfusion (Community License - gratuita para proyectos no comerciales)
+  // Obtén tu clave gratuita en: https://www.syncfusion.com/products/communitylicense
+  SyncfusionLicense.registerLicense('');
+  
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
